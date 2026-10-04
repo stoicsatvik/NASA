@@ -1,0 +1,1 @@
+observation_id,site_id,timestamp_utc,latitude_deg,longitude_deg,gps_accuracy_m,access_type,observer_id,terrain_class,substrate_class,surface_state,slope_estimate_deg,aspect_estimate_deg,surface_temp_c,air_temp_c,relative_humidity_pct,photo_ids,scale_reference_present,sensor_or_method,source_dataset_links,notes,uncertainty_notes,qa_status
