@@ -10,6 +10,7 @@ import hashlib
 import json
 import re
 import struct
+from datetime import date, datetime
 from pathlib import Path
 
 ARCHIVE = "https://pds-geosciences.wustl.edu/mgs/urn-nasa-pds-mgs_mola_topography_derived/meg004/"
@@ -28,6 +29,16 @@ def metadata(label: Path, product: str) -> dict:
         raise ValueError("wrong product label")
     if field("PRODUCT_VERSION_ID") != "2.0":
         raise ValueError("not final MEGDR version")
+    # Final MOLA MEGDRs require both version 2.0 and creation on/after 2003-03-21.
+    created = field("PRODUCT_CREATION_TIME")
+    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}:\d{2}(?:\.\d+)?)?", created):
+        raise ValueError("invalid MEGDR creation time")
+    try:
+        creation_date = datetime.fromisoformat(created).date()
+    except ValueError as exc:
+        raise ValueError("invalid MEGDR creation time") from exc
+    if creation_date < date(2003, 3, 21):
+        raise ValueError("pre-final MEGDR creation time")
     if field("SAMPLE_TYPE") != "MSB_INTEGER" or int(field("SAMPLE_BITS")) != 16:
         raise ValueError("unsupported binary representation")
     if field("MAP_PROJECTION_TYPE") != "SIMPLE CYLINDRICAL":
