@@ -60,6 +60,11 @@ def analyze(
 ) -> dict:
     if min_count < 1:
         raise ValueError("min_count must be >= 1")
+    # Product IDs in the labels alone cannot detect accidentally reversed raster paths.
+    if topography.name.upper() != "MEGT90N000CB.IMG":
+        raise ValueError("topography binary filename does not match labeled product")
+    if counts.name.upper() != "MEGC90N000CB.IMG":
+        raise ValueError("counts binary filename does not match labeled product")
     top_meta = metadata(topography_label, "MEGT90N000CB.IMG")
     count_meta = metadata(counts_label, "MEGC90N000CB.IMG")
     if top_meta != count_meta:
