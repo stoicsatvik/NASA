@@ -22,6 +22,7 @@ def label_text(product: str, **overrides: str) -> str:
     fields = {
         "PRODUCT_ID": f'"{product}"',
         "PRODUCT_VERSION_ID": '"2.0"',
+        "PRODUCT_CREATION_TIME": "2003-04-03T01:00:00",
         "SAMPLE_TYPE": "MSB_INTEGER",
         "SAMPLE_BITS": "16",
         "MAP_PROJECTION_TYPE": '"SIMPLE CYLINDRICAL"',
@@ -71,6 +72,28 @@ class MolaMegdrContractTests(unittest.TestCase):
         self.top_lbl.write_text(label_text("MEGT90N000CB.IMG",
                                            PRODUCT_VERSION_ID='"1.0"'), encoding="ascii")
         with self.assertRaisesRegex(ValueError, "not final MEGDR version"):
+            metadata(self.top_lbl, "MEGT90N000CB.IMG")
+
+    def test_final_product_creation_date_boundary(self) -> None:
+        self.top_lbl.write_text(label_text("MEGT90N000CB.IMG",
+                                           PRODUCT_CREATION_TIME="2003-03-21T00:00:00"), encoding="ascii")
+        self.assertEqual(metadata(self.top_lbl, "MEGT90N000CB.IMG"),
+                         {"lines": ROWS, "samples": COLS})
+        self.top_lbl.write_text(label_text("MEGT90N000CB.IMG",
+                                           PRODUCT_CREATION_TIME="2003-03-20T23:59:59"), encoding="ascii")
+        with self.assertRaisesRegex(ValueError, "pre-final MEGDR"):
+            metadata(self.top_lbl, "MEGT90N000CB.IMG")
+
+    def test_invalid_or_missing_creation_date_rejected(self) -> None:
+        for value in ("not-a-date", "2003-02-30", "2003-04-03T00:00:00junk", "2003-04-03T25:00:00", "2003-04-03T01:61:00", "2003-04-03T01:00:61"):
+            with self.subTest(value=value):
+                self.top_lbl.write_text(label_text("MEGT90N000CB.IMG",
+                                                   PRODUCT_CREATION_TIME=value), encoding="ascii")
+                with self.assertRaisesRegex(ValueError, "invalid MEGDR creation time"):
+                    metadata(self.top_lbl, "MEGT90N000CB.IMG")
+        self.top_lbl.write_text(label_text("MEGT90N000CB.IMG").replace(
+            "  PRODUCT_CREATION_TIME   =   2003-04-03T01:00:00\n", ""), encoding="ascii")
+        with self.assertRaisesRegex(ValueError, "missing PRODUCT_CREATION_TIME"):
             metadata(self.top_lbl, "MEGT90N000CB.IMG")
 
     def test_wrong_row_bytes_are_rejected(self) -> None:
