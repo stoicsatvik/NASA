@@ -1,0 +1,19 @@
+{
+  "schema": "nasa/gistemp-independent-manual-audit/v1",
+  "checked_on": "2026-10-10",
+  "source_url": "https://data.giss.nasa.gov/gistemp/tabledata_v4/ZonAnn.Ts%2BdSST.txt",
+  "source_units": "0.01 degrees Celsius anomaly relative to 1951-1980",
+  "source_period": "2001-2025",
+  "rows_compared": 25,
+  "integer_fields_per_row": 16,
+  "integer_fields_compared": 400,
+  "mismatched_fields": 0,
+  "independent_transcription_sha256": "dc7a82491f9e003fe93c59e6dca0c2f285e0c297ffd23bace2c6508c764d1ef2",
+  "comparison": "Compared an independently re-transcribed 25-year NASA web text table against the previous frozen manual transcription, including both year markers and 14 data columns.",
+  "caveats": [
+    "Both copies were manually transcribed from the same mutable public source; this is not a byte-for-byte independent source download.",
+    "Agreement validates transcription consistency, not statistical assumptions or challenge superiority.",
+    "This is Earth temperature evidence only; no lunar or Martian terrain data were ingested.",
+    "Cross-body similarity NOT YET PROVEN; E001 known-site recovery NOT YET MEASURED."
+  ]
+}
