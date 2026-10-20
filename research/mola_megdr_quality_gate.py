@@ -49,6 +49,22 @@ def metadata(label: Path, product: str) -> dict:
         raise ValueError("unsupported longitude convention")
     if float(field("MAP_RESOLUTION").split()[0]) != 4.0:
         raise ValueError("unexpected pixels per degree")
+    # The paired MEG004 products must have the same official geographic footprint.
+    # Matching raster dimensions alone cannot establish cell-by-cell alignment.
+    projection = {
+        "CENTER_LATITUDE": 0.0,
+        "CENTER_LONGITUDE": 180.0,
+        "WESTERNMOST_LONGITUDE": 0.0,
+        "EASTERNMOST_LONGITUDE": 360.0,
+        "MAXIMUM_LATITUDE": 90.0,
+        "MINIMUM_LATITUDE": -90.0,
+        "LINE_PROJECTION_OFFSET": 360.5,
+        "SAMPLE_PROJECTION_OFFSET": 720.5,
+        "MAP_PROJECTION_ROTATION": 0.0,
+    }
+    for key, expected in projection.items():
+        if float(field(key).split()[0]) != expected:
+            raise ValueError(f"unexpected MEG004 projection: {key}")
     lines, samples = int(field("LINES")), int(field("LINE_SAMPLES"))
     if (lines, samples) != (720, 1440):
         raise ValueError("unexpected MEG004 dimensions")

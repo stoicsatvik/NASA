@@ -29,6 +29,15 @@ def label_text(product: str, **overrides: str) -> str:
         "COORDINATE_SYSTEM_NAME": "PLANETOCENTRIC",
         "POSITIVE_LONGITUDE_DIRECTION": "EAST",
         "MAP_RESOLUTION": "4 <PIX/DEG>",
+        "CENTER_LATITUDE": "0.0 <DEGREE>",
+        "CENTER_LONGITUDE": "180.0 <DEGREE>",
+        "WESTERNMOST_LONGITUDE": "0.0 <DEGREE>",
+        "EASTERNMOST_LONGITUDE": "360.0 <DEGREE>",
+        "MAXIMUM_LATITUDE": "90.0 <DEGREE>",
+        "MINIMUM_LATITUDE": "-90.0 <DEGREE>",
+        "LINE_PROJECTION_OFFSET": "360.5",
+        "SAMPLE_PROJECTION_OFFSET": "720.5",
+        "MAP_PROJECTION_ROTATION": "0.0",
         "LINES": str(ROWS),
         "LINE_SAMPLES": str(COLS),
         "RECORD_BYTES": str(COLS * 2),
@@ -100,6 +109,20 @@ class MolaMegdrContractTests(unittest.TestCase):
         self.top_lbl.write_text(label_text("MEGT90N000CB.IMG",
                                            RECORD_BYTES="1234"), encoding="ascii")
         with self.assertRaisesRegex(ValueError, "row-byte mismatch"):
+            metadata(self.top_lbl, "MEGT90N000CB.IMG")
+
+    def test_mismatched_geospatial_origin_rejected(self) -> None:
+        self.count_lbl.write_text(label_text("MEGC90N000CB.IMG",
+                                             CENTER_LONGITUDE="90.0 <DEGREE>"), encoding="ascii")
+        self.grids(top_cells={0: 1200}, count_cells={0: 1})
+        with self.assertRaisesRegex(ValueError, "unexpected MEG004 projection: CENTER_LONGITUDE"):
+            analyze(self.top, self.counts, self.top_lbl, self.count_lbl)
+
+    def test_missing_projection_offset_rejected(self) -> None:
+        text = label_text("MEGT90N000CB.IMG")
+        text = text.replace("  LINE_PROJECTION_OFFSET   =   360.5\n", "")
+        self.top_lbl.write_text(text, encoding="ascii")
+        with self.assertRaisesRegex(ValueError, "missing LINE_PROJECTION_OFFSET"):
             metadata(self.top_lbl, "MEGT90N000CB.IMG")
 
     def test_truncated_grid_is_rejected(self) -> None:
