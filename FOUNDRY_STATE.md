@@ -110,3 +110,9 @@ The next substantive run should reduce one of these uncertainties, not add anoth
 Official maintained MEGDR labels establish that the 720×1440 MEGT median-topography raster **interpolates cells without MOLA observations** and that only ~55% of equatorial bins contain shots; the paired MEGC counts raster is needed to distinguish measured from interpolated cells. See `research/MOLA_MEGDR_COUNTS_INTERPOLATION_GATE_20261023.md`.
 
 **No raw MEGT/MEGC bytes were ingested**. Dataset access remains unverified and E001 remains NOT YET MEASURED. Next preparation gate is checksum + counts-mask QC on official data, not geospatial UI. Full 2026 challenge statements are expected 28 Oct; actual competition solution development is reserved for 14–15 Nov under official guidance. Planetary challenge ranking remains NOT YET PROVEN.
+
+## 2026-10-24: E193 challenge-ranking falsification
+
+All 14 official 2026 challenge summaries were included in a seeded sensitivity audit using the repository's declared scoring weights and explicitly subjective analyst ratings. Under those assumptions, planetary analogues ranked 5/14 (base score 4.59) and topped 6.725% of hypothetical score/weight perturbation scenarios. These scenario frequencies **are not competition success probabilities** and must not be presented as empirical evidence. MODIS/VIIRS and Earth Trend ranked higher under the stated assumptions. Reproducible script and limitations: `research/e193_challenge_sensitivity.py` and `research/E193_CHALLENGE_RANKING_FALSIFICATION_20261024.md`.
+
+**Decision:** challenge-selection superiority NOT YET PROVEN; do not lock the planetary track. Reassess all fourteen when full statements/resources arrive 2026-10-28. Continue real paired MOLA/LOLA data-access preparation, but do not begin developing the competition solution before 14 November. No new raster ingestion or E001 recovery was performed.
