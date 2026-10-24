@@ -1,0 +1,1889 @@
+{
+  "claim_state": "DESCRIPTOR SENSITIVITY ONLY; E001 NOT YET MEASURED; CROSS-BODY SIMILARITY NOT YET PROVEN",
+  "experiment": "E221 real Earth SRTM-derived geolocation jitter sensitivity",
+  "limitations": [
+    "Research lead coordinates are not independently validated analogue labels.",
+    "Mapzen HGT is SRTM-derived/mosaicked, not direct NASADEM or per-pixel instrument evidence.",
+    "Nearby shifted windows overlap and are NOT independent replicates or uncertainty confidence intervals.",
+    "Offset magnitude is an analyst sensitivity choice, NOT measured geolocation error.",
+    "No lunar/Martian site recovery, analogue detection, or novel discovery was performed."
+  ],
+  "observations": 150,
+  "preregistered_offsets_km": [
+    -0.5,
+    -0.25,
+    0,
+    0.25,
+    0.5
+  ],
+  "preregistered_window_km": [
+    2,
+    4
+  ],
+  "rank_audit": {
+    "2.0km/plane_detrended_relief_std_m": {
+      "center_order_descending": [
+        "western_ghats_lead",
+        "ladakh_lead",
+        "lonar_lead"
+      ],
+      "distinct_orders": 3,
+      "fraction_offsets_different_from_center": 0.24,
+      "orders": {
+        "ladakh_lead > western_ghats_lead > lonar_lead": 5,
+        "western_ghats_lead > ladakh_lead > lonar_lead": 19,
+        "western_ghats_lead > lonar_lead > ladakh_lead": 1
+      }
+    },
+    "2.0km/slope_p90_dimensionless": {
+      "center_order_descending": [
+        "western_ghats_lead",
+        "lonar_lead",
+        "ladakh_lead"
+      ],
+      "distinct_orders": 3,
+      "fraction_offsets_different_from_center": 0.76,
+      "orders": {
+        "ladakh_lead > western_ghats_lead > lonar_lead": 4,
+        "western_ghats_lead > ladakh_lead > lonar_lead": 15,
+        "western_ghats_lead > lonar_lead > ladakh_lead": 6
+      }
+    },
+    "4.0km/plane_detrended_relief_std_m": {
+      "center_order_descending": [
+        "ladakh_lead",
+        "western_ghats_lead",
+        "lonar_lead"
+      ],
+      "distinct_orders": 2,
+      "fraction_offsets_different_from_center": 0.36,
+      "orders": {
+        "ladakh_lead > western_ghats_lead > lonar_lead": 16,
+        "western_ghats_lead > ladakh_lead > lonar_lead": 9
+      }
+    },
+    "4.0km/slope_p90_dimensionless": {
+      "center_order_descending": [
+        "ladakh_lead",
+        "western_ghats_lead",
+        "lonar_lead"
+      ],
+      "distinct_orders": 1,
+      "fraction_offsets_different_from_center": 0,
+      "orders": {
+        "ladakh_lead > western_ghats_lead > lonar_lead": 25
+      }
+    }
+  },
+  "sources": {
+    "ladakh_lead": {
+      "sha256": "9179642ad2f9ccd90266229b9e9d7c49044bda661ec731d0068879dd607f2c7c",
+      "site_lat_lon": [
+        34.2,
+        77.6
+      ],
+      "source": "Mapzen Skadi SRTM-derived HGT; no per-pixel provenance",
+      "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N34/N34E077.hgt.gz"
+    },
+    "lonar_lead": {
+      "sha256": "99633e38befb5f7e78bac0eb53e79319085e767fa5181b0968347f89095547ea",
+      "site_lat_lon": [
+        19.975,
+        76.51
+      ],
+      "source": "Mapzen Skadi SRTM-derived HGT; no per-pixel provenance",
+      "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N19/N19E076.hgt.gz"
+    },
+    "western_ghats_lead": {
+      "sha256": "73523b876c229607f421c529b8c91a5ed7dd9b504ba413064b5ab0fcb193361b",
+      "site_lat_lon": [
+        18.6,
+        73.5
+      ],
+      "source": "Mapzen Skadi SRTM-derived HGT; no per-pixel provenance",
+      "url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N18/N18E073.hgt.gz"
+    }
+  },
+  "summaries": {
+    "ladakh_lead": {
+      "2.0": {
+        "plane_detrended_relief_std_m": {
+          "center": 48.24920695444129,
+          "coefficient_of_variation": 0.17739643721365914,
+          "max": 67.27014760101349,
+          "max_abs_relative_change_from_center": 0.3942228659744083,
+          "median": 45.37903895530235,
+          "min": 34.5429978387787,
+          "std": 8.350284753101118
+        },
+        "slope_p90_dimensionless": {
+          "center": 0.46646799036808007,
+          "coefficient_of_variation": 0.12204615651535547,
+          "max": 0.6246626674811239,
+          "max_abs_relative_change_from_center": 0.33913297456534097,
+          "median": 0.5106779428960788,
+          "min": 0.4145160362566307,
+          "std": 0.06257780149086399
+        }
+      },
+      "4.0": {
+        "plane_detrended_relief_std_m": {
+          "center": 98.16181534658526,
+          "coefficient_of_variation": 0.07945163064541051,
+          "max": 113.86084056074253,
+          "max_abs_relative_change_from_center": 0.15993006199740573,
+          "median": 95.90887176454893,
+          "min": 84.52612982778703,
+          "std": 7.67930338926593
+        },
+        "slope_p90_dimensionless": {
+          "center": 0.665680155118198,
+          "coefficient_of_variation": 0.024219874959716555,
+          "max": 0.6976849850081288,
+          "max_abs_relative_change_from_center": 0.04807838966485044,
+          "median": 0.6618725867182216,
+          "min": 0.6421654585693928,
+          "std": 0.016141656583505262
+        }
+      }
+    },
+    "lonar_lead": {
+      "2.0": {
+        "plane_detrended_relief_std_m": {
+          "center": 43.425896850396775,
+          "coefficient_of_variation": 0.12192156663833242,
+          "max": 46.69682275595142,
+          "max_abs_relative_change_from_center": 0.2932530043696853,
+          "median": 35.3065411224051,
+          "min": 30.691122131569866,
+          "std": 4.4585569037942445
+        },
+        "slope_p90_dimensionless": {
+          "center": 0.48274074504486597,
+          "coefficient_of_variation": 0.13331506824783185,
+          "max": 0.5030017561792193,
+          "max_abs_relative_change_from_center": 0.4366797603427975,
+          "median": 0.43740895278967884,
+          "min": 0.2719376321909704,
+          "std": 0.0567352055572018
+        }
+      },
+      "4.0": {
+        "plane_detrended_relief_std_m": {
+          "center": 30.717701809565906,
+          "coefficient_of_variation": 0.0036642049739444775,
+          "max": 30.813872539278798,
+          "max_abs_relative_change_from_center": 0.013051606467783628,
+          "median": 30.67756341012997,
+          "min": 30.316786453952727,
+          "std": 0.11229876389128299
+        },
+        "slope_p90_dimensionless": {
+          "center": 0.14182196184926554,
+          "coefficient_of_variation": 0.01168415983730446,
+          "max": 0.14610254320920157,
+          "max_abs_relative_change_from_center": 0.030182782018525568,
+          "median": 0.14182411028974032,
+          "min": 0.1415399865269205,
+          "std": 0.0016675700388809134
+        }
+      }
+    },
+    "western_ghats_lead": {
+      "2.0": {
+        "plane_detrended_relief_std_m": {
+          "center": 75.81884911991553,
+          "coefficient_of_variation": 0.23250435141223363,
+          "max": 104.70192563258392,
+          "max_abs_relative_change_from_center": 0.44005518996643095,
+          "median": 74.20287551270864,
+          "min": 42.45437106741493,
+          "std": 16.572613617657996
+        },
+        "slope_p90_dimensionless": {
+          "center": 0.7508075644063756,
+          "coefficient_of_variation": 0.11104682580200229,
+          "max": 0.8054120969494962,
+          "max_abs_relative_change_from_center": 0.3199262045313982,
+          "median": 0.7176427845174778,
+          "min": 0.5106045499923806,
+          "std": 0.07707113722280994
+        }
+      },
+      "4.0": {
+        "plane_detrended_relief_std_m": {
+          "center": 94.61938741148357,
+          "coefficient_of_variation": 0.06822241398985991,
+          "max": 100.64177446840344,
+          "max_abs_relative_change_from_center": 0.17420222319299944,
+          "median": 92.86938363708153,
+          "min": 78.13647976724343,
+          "std": 6.264983578863552
+        },
+        "slope_p90_dimensionless": {
+          "center": 0.5654258105779653,
+          "coefficient_of_variation": 0.11062555443748047,
+          "max": 0.6396113955787753,
+          "max_abs_relative_change_from_center": 0.27272584387671805,
+          "median": 0.5503853861785816,
+          "min": 0.41121957923841235,
+          "std": 0.06037271485757199
+        }
+      }
+    }
+  },
+  "window_measurements": [
+    {
+      "east_offset_km": -0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 35.66561797643149,
+        "slope_p90_dimensionless": 0.4145160362566307
+      },
+      "north_offset_km": -0.5,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": -0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 34.5429978387787,
+        "slope_p90_dimensionless": 0.41687664042895217
+      },
+      "north_offset_km": -0.5,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0,
+      "features": {
+        "plane_detrended_relief_std_m": 37.624579195160806,
+        "slope_p90_dimensionless": 0.4354700092044376
+      },
+      "north_offset_km": -0.5,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 40.351855883035256,
+        "slope_p90_dimensionless": 0.5023267127872275
+      },
+      "north_offset_km": -0.5,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 46.499685322453054,
+        "slope_p90_dimensionless": 0.588266507082921
+      },
+      "north_offset_km": -0.5,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": -0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 37.745154745985225,
+        "slope_p90_dimensionless": 0.4413950649604331
+      },
+      "north_offset_km": -0.25,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": -0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 38.78911340205435,
+        "slope_p90_dimensionless": 0.43832809338245765
+      },
+      "north_offset_km": -0.25,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0,
+      "features": {
+        "plane_detrended_relief_std_m": 42.81067546677858,
+        "slope_p90_dimensionless": 0.45286187781908677
+      },
+      "north_offset_km": -0.25,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 46.57839384439088,
+        "slope_p90_dimensionless": 0.5155186997756707
+      },
+      "north_offset_km": -0.25,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 50.85430884795212,
+        "slope_p90_dimensionless": 0.5945167058642122
+      },
+      "north_offset_km": -0.25,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": -0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 40.25881405364128,
+        "slope_p90_dimensionless": 0.47026173386104286
+      },
+      "north_offset_km": 0,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": -0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 42.228522282616844,
+        "slope_p90_dimensionless": 0.46016349792504635
+      },
+      "north_offset_km": 0,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0,
+      "features": {
+        "plane_detrended_relief_std_m": 48.24920695444129,
+        "slope_p90_dimensionless": 0.46646799036808007
+      },
+      "north_offset_km": 0,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 52.601052194960786,
+        "slope_p90_dimensionless": 0.5106779428960788
+      },
+      "north_offset_km": 0,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 56.56162974042305,
+        "slope_p90_dimensionless": 0.5965870569252653
+      },
+      "north_offset_km": 0,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": -0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 44.46414242628389,
+        "slope_p90_dimensionless": 0.5155383721595828
+      },
+      "north_offset_km": 0.25,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": -0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 45.37903895530235,
+        "slope_p90_dimensionless": 0.4972003891509771
+      },
+      "north_offset_km": 0.25,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0,
+      "features": {
+        "plane_detrended_relief_std_m": 50.48017882722483,
+        "slope_p90_dimensionless": 0.5091475475707893
+      },
+      "north_offset_km": 0.25,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 55.95021329818701,
+        "slope_p90_dimensionless": 0.5527000603918863
+      },
+      "north_offset_km": 0.25,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 64.89606564834338,
+        "slope_p90_dimensionless": 0.619465018055169
+      },
+      "north_offset_km": 0.25,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": -0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 44.68055742160933,
+        "slope_p90_dimensionless": 0.5387422477198353
+      },
+      "north_offset_km": 0.5,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": -0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 45.318930410201766,
+        "slope_p90_dimensionless": 0.5291866602244
+      },
+      "north_offset_km": 0.5,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0,
+      "features": {
+        "plane_detrended_relief_std_m": 50.0128401617206,
+        "slope_p90_dimensionless": 0.545218758070426
+      },
+      "north_offset_km": 0.5,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 56.96931839205912,
+        "slope_p90_dimensionless": 0.5823740485609535
+      },
+      "north_offset_km": 0.5,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 67.27014760101349,
+        "slope_p90_dimensionless": 0.6246626674811239
+      },
+      "north_offset_km": 0.5,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": -0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 88.6410207553246,
+        "slope_p90_dimensionless": 0.6421654585693928
+      },
+      "north_offset_km": -0.5,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": -0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 91.97047864817213,
+        "slope_p90_dimensionless": 0.648692665376779
+      },
+      "north_offset_km": -0.5,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0,
+      "features": {
+        "plane_detrended_relief_std_m": 95.60017625605754,
+        "slope_p90_dimensionless": 0.6596774102109537
+      },
+      "north_offset_km": -0.5,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 97.34127336091537,
+        "slope_p90_dimensionless": 0.6615805922307328
+      },
+      "north_offset_km": -0.5,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 93.04245942753282,
+        "slope_p90_dimensionless": 0.6648516531993683
+      },
+      "north_offset_km": -0.5,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": -0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 84.99019181766084,
+        "slope_p90_dimensionless": 0.6430150704361381
+      },
+      "north_offset_km": -0.25,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": -0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 90.29114074104297,
+        "slope_p90_dimensionless": 0.6491022735362335
+      },
+      "north_offset_km": -0.25,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0,
+      "features": {
+        "plane_detrended_relief_std_m": 96.39563224994046,
+        "slope_p90_dimensionless": 0.6571456267952313
+      },
+      "north_offset_km": -0.25,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 100.01450014965974,
+        "slope_p90_dimensionless": 0.6535595705226632
+      },
+      "north_offset_km": -0.25,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 95.15968927017116,
+        "slope_p90_dimensionless": 0.6596922887434046
+      },
+      "north_offset_km": -0.25,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": -0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 84.52612982778703,
+        "slope_p90_dimensionless": 0.6477049505803557
+      },
+      "north_offset_km": 0,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": -0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 90.87664693763328,
+        "slope_p90_dimensionless": 0.6571497263707261
+      },
+      "north_offset_km": 0,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0,
+      "features": {
+        "plane_detrended_relief_std_m": 98.16181534658526,
+        "slope_p90_dimensionless": 0.665680155118198
+      },
+      "north_offset_km": 0,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 102.86694509930769,
+        "slope_p90_dimensionless": 0.6618725867182216
+      },
+      "north_offset_km": 0,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 97.60640593038283,
+        "slope_p90_dimensionless": 0.6654539832254711
+      },
+      "north_offset_km": 0,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": -0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 86.59323353321186,
+        "slope_p90_dimensionless": 0.660994603089513
+      },
+      "north_offset_km": 0.25,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": -0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 93.63117970490305,
+        "slope_p90_dimensionless": 0.6708197233581441
+      },
+      "north_offset_km": 0.25,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0,
+      "features": {
+        "plane_detrended_relief_std_m": 102.09213545771938,
+        "slope_p90_dimensionless": 0.6814774460422595
+      },
+      "north_offset_km": 0.25,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 108.31382046367973,
+        "slope_p90_dimensionless": 0.6799143622755288
+      },
+      "north_offset_km": 0.25,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 103.35152365702965,
+        "slope_p90_dimensionless": 0.6812328313302918
+      },
+      "north_offset_km": 0.25,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": -0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 88.72571759941326,
+        "slope_p90_dimensionless": 0.6718612277010602
+      },
+      "north_offset_km": 0.5,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": -0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 95.90887176454893,
+        "slope_p90_dimensionless": 0.6867818402465479
+      },
+      "north_offset_km": 0.5,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0,
+      "features": {
+        "plane_detrended_relief_std_m": 105.48183691591764,
+        "slope_p90_dimensionless": 0.6972445382755922
+      },
+      "north_offset_km": 0.5,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 113.86084056074253,
+        "slope_p90_dimensionless": 0.696225684402985
+      },
+      "north_offset_km": 0.5,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 110.90176597916272,
+        "slope_p90_dimensionless": 0.6976849850081288
+      },
+      "north_offset_km": 0.5,
+      "site": "ladakh_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": -0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 31.051010543802924,
+        "slope_p90_dimensionless": 0.3426925907175789
+      },
+      "north_offset_km": -0.5,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": -0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 32.43594541749218,
+        "slope_p90_dimensionless": 0.4356386954586643
+      },
+      "north_offset_km": -0.5,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0,
+      "features": {
+        "plane_detrended_relief_std_m": 33.42398238275584,
+        "slope_p90_dimensionless": 0.4176800802948241
+      },
+      "north_offset_km": -0.5,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 32.63034112140507,
+        "slope_p90_dimensionless": 0.35530352220501654
+      },
+      "north_offset_km": -0.5,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 32.29007184359927,
+        "slope_p90_dimensionless": 0.2719376321909704
+      },
+      "north_offset_km": -0.5,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": -0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 32.915244291982596,
+        "slope_p90_dimensionless": 0.38993653198533257
+      },
+      "north_offset_km": -0.25,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": -0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 36.447361154014814,
+        "slope_p90_dimensionless": 0.4683073573086163
+      },
+      "north_offset_km": -0.25,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0,
+      "features": {
+        "plane_detrended_relief_std_m": 37.296452421365785,
+        "slope_p90_dimensionless": 0.45827486725707794
+      },
+      "north_offset_km": -0.25,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 34.26895327158198,
+        "slope_p90_dimensionless": 0.391170938474032
+      },
+      "north_offset_km": -0.25,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 33.13123199593496,
+        "slope_p90_dimensionless": 0.34220501904257494
+      },
+      "north_offset_km": -0.25,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": -0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 36.02974265992896,
+        "slope_p90_dimensionless": 0.44393992811233834
+      },
+      "north_offset_km": 0,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": -0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 42.430402473817196,
+        "slope_p90_dimensionless": 0.48685322422048843
+      },
+      "north_offset_km": 0,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0,
+      "features": {
+        "plane_detrended_relief_std_m": 43.425896850396775,
+        "slope_p90_dimensionless": 0.48274074504486597
+      },
+      "north_offset_km": 0,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 37.8589505943369,
+        "slope_p90_dimensionless": 0.448521301034018
+      },
+      "north_offset_km": 0,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 33.61041875326664,
+        "slope_p90_dimensionless": 0.3919275363556592
+      },
+      "north_offset_km": 0,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": -0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 38.03617993037077,
+        "slope_p90_dimensionless": 0.47228050261975274
+      },
+      "north_offset_km": 0.25,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": -0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 45.27873441833915,
+        "slope_p90_dimensionless": 0.5030017561792193
+      },
+      "north_offset_km": 0.25,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0,
+      "features": {
+        "plane_detrended_relief_std_m": 46.69682275595142,
+        "slope_p90_dimensionless": 0.5003762008221794
+      },
+      "north_offset_km": 0.25,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 40.40684199415718,
+        "slope_p90_dimensionless": 0.47228050261975274
+      },
+      "north_offset_km": 0.25,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 34.240633543833795,
+        "slope_p90_dimensionless": 0.43740895278967884
+      },
+      "north_offset_km": 0.25,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": -0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 33.12571483906081,
+        "slope_p90_dimensionless": 0.4105733239038726
+      },
+      "north_offset_km": 0.5,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": -0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 39.75463386277961,
+        "slope_p90_dimensionless": 0.4722805832713169
+      },
+      "north_offset_km": 0.5,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0,
+      "features": {
+        "plane_detrended_relief_std_m": 41.44323232791024,
+        "slope_p90_dimensionless": 0.46386790289752045
+      },
+      "north_offset_km": 0.5,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 35.3065411224051,
+        "slope_p90_dimensionless": 0.4133860562978222
+      },
+      "north_offset_km": 0.5,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 30.691122131569866,
+        "slope_p90_dimensionless": 0.36672274996802867
+      },
+      "north_offset_km": 0.5,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": -0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 30.316786453952727,
+        "slope_p90_dimensionless": 0.1415399865269205
+      },
+      "north_offset_km": -0.5,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": -0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 30.466669447882136,
+        "slope_p90_dimensionless": 0.1415399865269205
+      },
+      "north_offset_km": -0.5,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0,
+      "features": {
+        "plane_detrended_relief_std_m": 30.543352565524252,
+        "slope_p90_dimensionless": 0.1415399865269205
+      },
+      "north_offset_km": -0.5,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 30.641695341055236,
+        "slope_p90_dimensionless": 0.14232467988522984
+      },
+      "north_offset_km": -0.5,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 30.711757929496827,
+        "slope_p90_dimensionless": 0.14568989892337517
+      },
+      "north_offset_km": -0.5,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": -0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 30.519710755632513,
+        "slope_p90_dimensionless": 0.1418208878597013
+      },
+      "north_offset_km": -0.25,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": -0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 30.64273443634407,
+        "slope_p90_dimensionless": 0.1418208878597013
+      },
+      "north_offset_km": -0.25,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0,
+      "features": {
+        "plane_detrended_relief_std_m": 30.69796188323461,
+        "slope_p90_dimensionless": 0.14162559589372078
+      },
+      "north_offset_km": -0.25,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 30.765078578682278,
+        "slope_p90_dimensionless": 0.14232542296013076
+      },
+      "north_offset_km": -0.25,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 30.813872539278798,
+        "slope_p90_dimensionless": 0.14609698216183897
+      },
+      "north_offset_km": -0.25,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": -0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 30.572308234147506,
+        "slope_p90_dimensionless": 0.14182196184926554
+      },
+      "north_offset_km": 0,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": -0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 30.67756341012997,
+        "slope_p90_dimensionless": 0.14182196184926554
+      },
+      "north_offset_km": 0,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0,
+      "features": {
+        "plane_detrended_relief_std_m": 30.717701809565906,
+        "slope_p90_dimensionless": 0.14182196184926554
+      },
+      "north_offset_km": 0,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 30.75941731251214,
+        "slope_p90_dimensionless": 0.14232616614318191
+      },
+      "north_offset_km": 0,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 30.794570203537937,
+        "slope_p90_dimensionless": 0.14609883558838563
+      },
+      "north_offset_km": 0,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": -0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 30.588728809977038,
+        "slope_p90_dimensionless": 0.1418230359926078
+      },
+      "north_offset_km": 0.25,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": -0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 30.6776158150971,
+        "slope_p90_dimensionless": 0.1418230359926078
+      },
+      "north_offset_km": 0.25,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0,
+      "features": {
+        "plane_detrended_relief_std_m": 30.70481501931694,
+        "slope_p90_dimensionless": 0.1418230359926078
+      },
+      "north_offset_km": 0.25,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 30.733482364608324,
+        "slope_p90_dimensionless": 0.14232690943439252
+      },
+      "north_offset_km": 0.25,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 30.76886006596978,
+        "slope_p90_dimensionless": 0.14610068927083397
+      },
+      "north_offset_km": 0.25,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": -0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 30.517523343956135,
+        "slope_p90_dimensionless": 0.14182411028974032
+      },
+      "north_offset_km": 0.5,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": -0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 30.59572912180898,
+        "slope_p90_dimensionless": 0.14182411028974032
+      },
+      "north_offset_km": 0.5,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0,
+      "features": {
+        "plane_detrended_relief_std_m": 30.618857701872592,
+        "slope_p90_dimensionless": 0.14182411028974032
+      },
+      "north_offset_km": 0.5,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 30.64892744296551,
+        "slope_p90_dimensionless": 0.14232765283377194
+      },
+      "north_offset_km": 0.5,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 30.692065644160532,
+        "slope_p90_dimensionless": 0.14610254320920157
+      },
+      "north_offset_km": 0.5,
+      "site": "lonar_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": -0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 104.70192563258392,
+        "slope_p90_dimensionless": 0.8054120969494962
+      },
+      "north_offset_km": -0.5,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": -0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 94.98320755630583,
+        "slope_p90_dimensionless": 0.7760444119161002
+      },
+      "north_offset_km": -0.5,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0,
+      "features": {
+        "plane_detrended_relief_std_m": 75.9393570148406,
+        "slope_p90_dimensionless": 0.7488741207186639
+      },
+      "north_offset_km": -0.5,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 54.824671966994664,
+        "slope_p90_dimensionless": 0.698614161068537
+      },
+      "north_offset_km": -0.5,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 42.45437106741493,
+        "slope_p90_dimensionless": 0.5106045499923806
+      },
+      "north_offset_km": -0.5,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": -0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 99.98445853608125,
+        "slope_p90_dimensionless": 0.7919198849256557
+      },
+      "north_offset_km": -0.25,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": -0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 92.36488490040193,
+        "slope_p90_dimensionless": 0.764235940306088
+      },
+      "north_offset_km": -0.25,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0,
+      "features": {
+        "plane_detrended_relief_std_m": 76.16070368168214,
+        "slope_p90_dimensionless": 0.742091251047401
+      },
+      "north_offset_km": -0.25,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 57.45668179199516,
+        "slope_p90_dimensionless": 0.6982545173948839
+      },
+      "north_offset_km": -0.25,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 44.61381480976375,
+        "slope_p90_dimensionless": 0.5567921995610309
+      },
+      "north_offset_km": -0.25,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": -0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 86.01532573183555,
+        "slope_p90_dimensionless": 0.7863410494936061
+      },
+      "north_offset_km": 0,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": -0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 84.84697038190231,
+        "slope_p90_dimensionless": 0.7684389065419713
+      },
+      "north_offset_km": 0,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0,
+      "features": {
+        "plane_detrended_relief_std_m": 75.81884911991553,
+        "slope_p90_dimensionless": 0.7508075644063756
+      },
+      "north_offset_km": 0,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 63.11333911065,
+        "slope_p90_dimensionless": 0.7178560610590976
+      },
+      "north_offset_km": 0,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 49.85215682134767,
+        "slope_p90_dimensionless": 0.5980261779094596
+      },
+      "north_offset_km": 0,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": -0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 74.47210092891433,
+        "slope_p90_dimensionless": 0.7176427845174778
+      },
+      "north_offset_km": 0.25,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": -0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 79.27263172895103,
+        "slope_p90_dimensionless": 0.7176427845174778
+      },
+      "north_offset_km": 0.25,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0,
+      "features": {
+        "plane_detrended_relief_std_m": 75.44307318311446,
+        "slope_p90_dimensionless": 0.7176427845174778
+      },
+      "north_offset_km": 0.25,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 65.39877206492405,
+        "slope_p90_dimensionless": 0.696888133209793
+      },
+      "north_offset_km": 0.25,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 51.6330943487157,
+        "slope_p90_dimensionless": 0.5987196843372041
+      },
+      "north_offset_km": 0.25,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": -0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 65.25888506666075,
+        "slope_p90_dimensionless": 0.6504627996610919
+      },
+      "north_offset_km": 0.5,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": -0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 73.62643739867598,
+        "slope_p90_dimensionless": 0.6504627996610919
+      },
+      "north_offset_km": 0.5,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0,
+      "features": {
+        "plane_detrended_relief_std_m": 74.20287551270864,
+        "slope_p90_dimensionless": 0.6504627996610919
+      },
+      "north_offset_km": 0.5,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 66.63390481782903,
+        "slope_p90_dimensionless": 0.6504627996610919
+      },
+      "north_offset_km": 0.5,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": 0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 52.8956202176247,
+        "slope_p90_dimensionless": 0.5863443675046095
+      },
+      "north_offset_km": 0.5,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 2
+    },
+    {
+      "east_offset_km": -0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 100.64177446840344,
+        "slope_p90_dimensionless": 0.6396113955787753
+      },
+      "north_offset_km": -0.5,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": -0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 97.81592648722896,
+        "slope_p90_dimensionless": 0.6206458716785059
+      },
+      "north_offset_km": -0.5,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0,
+      "features": {
+        "plane_detrended_relief_std_m": 92.54011375721043,
+        "slope_p90_dimensionless": 0.5894178395796578
+      },
+      "north_offset_km": -0.5,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 86.10846957500944,
+        "slope_p90_dimensionless": 0.5662947653026391
+      },
+      "north_offset_km": -0.5,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 78.13647976724343,
+        "slope_p90_dimensionless": 0.5250004811678828
+      },
+      "north_offset_km": -0.5,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": -0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 100.3610049621966,
+        "slope_p90_dimensionless": 0.6352556790964976
+      },
+      "north_offset_km": -0.25,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": -0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 98.35608671286198,
+        "slope_p90_dimensionless": 0.611135858637947
+      },
+      "north_offset_km": -0.25,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0,
+      "features": {
+        "plane_detrended_relief_std_m": 93.84926726146124,
+        "slope_p90_dimensionless": 0.5841719183145593
+      },
+      "north_offset_km": -0.25,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 87.93176921638894,
+        "slope_p90_dimensionless": 0.5612071708205443
+      },
+      "north_offset_km": -0.25,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 80.23720207245293,
+        "slope_p90_dimensionless": 0.5177358026825136
+      },
+      "north_offset_km": -0.25,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": -0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 98.9310744575948,
+        "slope_p90_dimensionless": 0.6230985161453303
+      },
+      "north_offset_km": 0,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": -0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 98.04349019720185,
+        "slope_p90_dimensionless": 0.5924791185176662
+      },
+      "north_offset_km": 0,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0,
+      "features": {
+        "plane_detrended_relief_std_m": 94.61938741148357,
+        "slope_p90_dimensionless": 0.5654258105779653
+      },
+      "north_offset_km": 0,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 89.57128064981137,
+        "slope_p90_dimensionless": 0.540186986672653
+      },
+      "north_offset_km": 0,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 82.36296820229008,
+        "slope_p90_dimensionless": 0.4994213648232085
+      },
+      "north_offset_km": 0,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": -0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 96.57490139473154,
+        "slope_p90_dimensionless": 0.5783291586020108
+      },
+      "north_offset_km": 0.25,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": -0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 96.84995041464404,
+        "slope_p90_dimensionless": 0.5503853861785816
+      },
+      "north_offset_km": 0.25,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0,
+      "features": {
+        "plane_detrended_relief_std_m": 94.73381884922074,
+        "slope_p90_dimensionless": 0.520536651299462
+      },
+      "north_offset_km": 0.25,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 90.66818363733327,
+        "slope_p90_dimensionless": 0.49121381487535876
+      },
+      "north_offset_km": 0.25,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 84.2305080635074,
+        "slope_p90_dimensionless": 0.4583116061076109
+      },
+      "north_offset_km": 0.25,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": -0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 92.86938363708153,
+        "slope_p90_dimensionless": 0.5420669924742907
+      },
+      "north_offset_km": 0.5,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": -0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 93.89314347649598,
+        "slope_p90_dimensionless": 0.5083128922954544
+      },
+      "north_offset_km": 0.5,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0,
+      "features": {
+        "plane_detrended_relief_std_m": 92.7603907668775,
+        "slope_p90_dimensionless": 0.4712857515447404
+      },
+      "north_offset_km": 0.5,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0.25,
+      "features": {
+        "plane_detrended_relief_std_m": 89.6342544215424,
+        "slope_p90_dimensionless": 0.4407325887455616
+      },
+      "north_offset_km": 0.5,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    },
+    {
+      "east_offset_km": 0.5,
+      "features": {
+        "plane_detrended_relief_std_m": 84.07288824047126,
+        "slope_p90_dimensionless": 0.41121957923841235
+      },
+      "north_offset_km": 0.5,
+      "site": "western_ghats_lead",
+      "valid_fraction": 1,
+      "window_km": 4
+    }
+  ],
+  "evidence_run": "https://github.com/stoicsatvik/NASA/actions/runs/40099007353",
+  "evidence_head_sha": "dc24e08a357f587b92f80babbddccaa17876f01b"
+}
