@@ -9,6 +9,8 @@ import argparse
 import json
 from collections import Counter
 from pathlib import Path
+import re
+import xml.etree.ElementTree as ET
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
@@ -68,10 +70,41 @@ def parse_usgs_metadata(item: dict) -> dict:
         "title": item["title"],
         "file_count": len(files),
         "files": files,
+        "web_links": [{"title": w.get("title"), "uri": w.get("uri")} for w in item.get("webLinks", [])],
+        "identifiers": [{"type": i.get("type"), "key": i.get("key")} for i in item.get("identifiers", [])],
         "coordinates_ingested": 0,
         "claim": "Metadata access only; no point-layer records parsed.",
     }
 
+
+
+
+def probe_metadata_xml(files: list[dict]) -> dict:
+    """Read the public USGS FGDC metadata and extract declared distribution URLs."""
+    xml_files = [f for f in files if f.get("name", "").lower().endswith(".xml")]
+    if not xml_files:
+        return {"status": "NO_XML", "links": []}
+    uri = xml_files[0].get("download_uri") or ""
+    if not uri.startswith("https://www.sciencebase.gov/catalog/file/get/"):
+        return {"status": "UNTRUSTED_URI", "links": []}
+    try:
+        with urlopen(Request(uri, headers={"User-Agent": "NASA-E227-Research/1.0"}), timeout=25) as response:
+            raw = response.read(100_001)
+        if len(raw) > 100_000:
+            raise ValueError("FGDC metadata exceeds bounded limit")
+        root = ET.fromstring(raw)
+        links = []
+        for element in root.iter():
+            tag = element.tag.rsplit("}", 1)[-1].lower()
+            value = (element.text or "").strip()
+            if tag in {"onlink", "networkr", "linkage"} and value:
+                links.append(value[:500])
+        return {"status": "XML_VERIFIED", "bytes": len(raw),
+                "links": sorted(set(links))[:40],
+                "mentions_arcgis": bool(re.search(rb"arcgis|featureserver|shapefile", raw, re.I))}
+    except (HTTPError, URLError, TimeoutError, ValueError, ET.ParseError) as exc:
+        return {"status": "XML_ACCESS_FAILED", "error_type": type(exc).__name__,
+                "error": str(exc)[:240], "links": []}
 
 
 def probe_usgs_children() -> dict:
@@ -128,6 +161,7 @@ def probe_usgs() -> dict:
             raise ValueError("Metadata exceeds bounded response limit")
         result = parse_usgs_metadata(json.loads(raw))
         result["child_index"] = probe_usgs_children()
+        result["metadata_xml"] = probe_metadata_xml(result["files"])
         return result
     except (HTTPError, URLError, TimeoutError, ValueError, json.JSONDecodeError) as exc:
         return {
