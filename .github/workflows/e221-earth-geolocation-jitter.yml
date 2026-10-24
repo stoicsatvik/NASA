@@ -1,0 +1,46 @@
+name: E221 real Earth geolocation jitter audit
+on:
+  push:
+    branches:
+      - foundry/e221-earth-geolocation-jitter-20261024
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  earth-jitter:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install bounded numerical dependencies
+        run: python -m pip install 'numpy>=2.0,<3' 'rasterio>=1.4,<2' 'Pillow>=11,<13'
+      - name: Execute deterministic geometry and regression tests
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Download three public Mapzen Skadi HGT tiles read-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .data/e221
+          base='https://s3.amazonaws.com/elevation-tiles-prod/skadi'
+          for tile in N19E076 N18E073 N34E077; do
+            band="${tile:0:3}"
+            curl --fail --location --retry 2 --connect-timeout 20 --max-time 240 --silent --show-error \
+              "$base/$band/$tile.hgt.gz" --output ".data/e221/$tile.hgt.gz"
+            gzip -dc ".data/e221/$tile.hgt.gz" > ".data/e221/$tile.hgt"
+          done
+      - name: Execute preregistered 150-window real-data sensitivity audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m research.e221_geolocation_jitter \
+            --lonar .data/e221/N19E076.hgt \
+            --ghats .data/e221/N18E073.hgt \
+            --ladakh .data/e221/N34E077.hgt | tee e221_results.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e221-earth-jitter-numerical-receipt
+          path: e221_results.json
+          retention-days: 30
