@@ -1,0 +1,46 @@
+name: E223 independent coordinate-jitter rank audit
+on:
+  push:
+    branches:
+      - foundry/e223-independent-coordinate-jitter-20261024
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  independent-jitter:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test deterministic combinatorial invariants
+        run: python -m unittest discover -s tests -p 'test_e223_independent_jitter_rank.py' -v
+      - name: Execute exact audit on committed E221 real-data measurements
+        run: python research/e223_independent_jitter_rank.py --output e223_exact_rank_results.json
+      - name: Check preregistered exact scenario counts
+        run: |
+          python - <<'PY'
+          import json
+          d = json.load(open("e223_exact_rank_results.json", encoding="utf-8"))
+          expected = {
+              "2km/plane_detrended_relief_std_m": (12117, 19),
+              "2km/slope_p90_dimensionless": (2625, 6),
+              "4km/plane_detrended_relief_std_m": (10250, 16),
+              "4km/slope_p90_dimensionless": (15625, 25),
+          }
+          for key, (independent, synchronized) in expected.items():
+              row = d["comparisons"][key]
+              center = row["center_order"]
+              assert row["independent_combinations"] == 15625
+              assert sum(row["independent_order_counts"].values()) == 15625
+              assert row["independent_order_counts"][center] == independent, key
+              assert row["synchronized_order_counts"][center] == synchronized, key
+          print("Four real-data exact-combination invariants verified")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e223-exact-independent-jitter
+          path: e223_exact_rank_results.json
+          if-no-files-found: error
