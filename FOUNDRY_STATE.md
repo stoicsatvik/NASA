@@ -189,3 +189,16 @@ Read-only reuse of E221's **150 real SRTM-derived overlapping Earth windows** fr
 **Measured two-feature site-identity correct counts:** 2km→2km **50/72**; 4km→2km **47/72**; 2km→4km **30/72**; 4km→4km **68/72**. Slope-only 4km→2km **4/72** versus uniform random expected **24/72**. The six 2km→4km two-feature reference-label permutations yield [30, 3, 17, 16, 26, 52], so do not claim statistical significance. This is an exploratory source-site recognition test, **not** independent analogue-label recovery or independent sample inference. Overlapping windows and site selection create substantial leakage risk. See `research/E226_CROSS_FOOTPRINT_SITE_IDENTITY_20261024.md` and branch-scoped deterministic workflow.
 
 **Claim:** footprint-transfer failure in this tiny Earth site-identity sanity check SUPPORTED CONDITIONAL ON RECORDED MEASUREMENTS. **E001 known-analogue recovery NOT YET MEASURED**; cross-body similarity, novel discovery, local validation advantage and challenge superiority **NOT YET PROVEN**. Next: independently sourced known positive/negative analogue labels and blinded recovery against transparent baselines. No new rasters, field data, competition solution or submission.
+
+
+## 2026-10-24: E227 independent NASA/USGS analogue-label evidence gate
+
+**Real public-source ingestion, not E001.** Official NASA Planetary Analog Explorer has 11 descriptive analogue pairs (9 Moon/Mars); their primary evidence spans terrain, lithology, geochemistry, subsurface ice, astrobiology, operations and temporal landforms. Five of eleven were analyst-tagged as having a plausible static surface-morphology component; these are not NASA-authored machine-learning labels.
+
+USGS Astrogeology DOI `10.5066/P9J72921` was accessed read-only via ScienceBase metadata and an unauthenticated public ArcGIS FeatureServer. The currently returned single point layer contained **4 volcanic points**, all **4/4 missing a populated `AnalogBody`**, with one geometry/Lat-Lon attribute discrepancy >100 m: **Baugur 3,534.10 m** (maximum). Raw GeoJSON SHA-256 `0d0b61a5663f3cb2c00de5a02dfb6bf4599195a4dd28d81514af4d52351f0f1e`. Embedded source URL token parameters were redacted; no token used. Exact-head Actions E227 passed and uploaded raw receipt and source-QC outputs. See `research/E227_USGS_ANALOGUE_LABEL_ACCESS_20261024.md` and draft PR #16.
+
+**Falsification:** This accessible USGS point service **cannot by itself supply Moon/Mars known-site labels or independent negative controls**. The coordinate disagreement is an unresolved source ambiguity, not proof which coordinate is correct. Do not treat the NASA gallery as a binary similarity benchmark.
+
+**Claims:** official-source metadata and four real points SUPPORTED; source missingness/disagreement SUPPORTED; cross-body similarity NOT YET PROVEN; E001 NOT YET MEASURED; novel discovery, local advantage, challenge superiority NOT YET PROVEN.
+
+**Next:** Seek explicit site-to-target geological analogue pairs with validated coordinates/process and independent negative controls. Attempt E001 only with compatible measured descriptors. Re-rank all official challenge statements after 28 Oct; no competition solution build before event.
