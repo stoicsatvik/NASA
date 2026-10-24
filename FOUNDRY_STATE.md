@@ -116,3 +116,18 @@ Official maintained MEGDR labels establish that the 720×1440 MEGT median-topogr
 All 14 official 2026 challenge summaries were included in a seeded sensitivity audit using the repository's declared scoring weights and explicitly subjective analyst ratings. Under those assumptions, planetary analogues ranked 5/14 (base score 4.59) and topped 6.725% of hypothetical score/weight perturbation scenarios. These scenario frequencies **are not competition success probabilities** and must not be presented as empirical evidence. MODIS/VIIRS and Earth Trend ranked higher under the stated assumptions. Reproducible script and limitations: `research/e193_challenge_sensitivity.py` and `research/E193_CHALLENGE_RANKING_FALSIFICATION_20261024.md`.
 
 **Decision:** challenge-selection superiority NOT YET PROVEN; do not lock the planetary track. Reassess all fourteen when full statements/resources arrive 2026-10-28. Continue real paired MOLA/LOLA data-access preparation, but do not begin developing the competition solution before 14 November. No new raster ingestion or E001 recovery was performed.
+
+## 2026-10-24: E209 real MOLA MEG004 counts-mask ablation
+
+**First real Mars raster ingestion achieved on an isolated research branch.** Official PDS3 MEGT and MEGC 4-pixel/degree (720 × 1440, signed 16-bit big-endian) binaries and labels were downloaded in read-only GitHub Actions run 40074383215, passed the existing metadata/geometry reader and five new synthetic ablation controls, and were SHA-256 fingerprinted. Raw rasters were not committed. Full exact-head JSON is `research/results/e209_mola_real_data_20261024.json`; numerical evidence is from the real PDS bytes, not synthetic measurements.
+
+- MEGC > 0 in **1,027,663 / 1,036,800** cells (99.1187%); 9,137 cells (0.8813%) have zero observations and MEGT supplies interpolated values.
+- At global 16 × 16-pixel tiles, the top-decile ranking by uncorrected elevation standard deviation had **100% overlap** with a measured-only ranking (ordinal rank correlation 0.999808). At 4 × 4-pixel tiles overlap was **99.892%**.
+- Within ±16° latitude, measured coverage was 99.9995%, and top-decile overlap was 100% at 16 × 16 tiles. Missingness was concentrated in polar bands (85–90°N: 86.00% observed; 85–90°S: 82.27% observed).
+- This **fails to support a large global top-decile mask effect at coarse MEG004 resolution**, under these particular descriptors. It does **not** establish that interpolated data are harmless in small areas, polar regions, higher-resolution products or physically normalized morphology.
+- The PDS label's approximate 55% equatorial-shot coverage statement is not a measured coverage estimate for the coarse 4ppd product used here; do not generalize it without resolution context.
+- Dataset bytes: MEGT SHA-256 `25f16fb7aaf857898dcf98bc4f841341a24f8b9f7e98453ca083bc45d897ca2c`; MEGC SHA-256 `7e920ec43497b4beddf974650471600c7afd4916e2a8dd3500d6b14714365661`.
+
+**Claim states:** real Mars MEG004 ingestion SUPPORTED; this coarse mask-sensitivity result SUPPORTED for the tested metric; cross-body similarity NOT YET PROVEN; E001 known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local field-validation advantage NOT YET PROVEN; challenge superiority NOT YET PROVEN.
+
+**Next highest-value experiment:** test the same counts-mask sensitivity on higher-resolution MOLA MEG016/MEG032 products, then ingest real LOLA and Earth terrain at matched physical scales. Do not optimize UI or infer planetary analogues from one Mars dataset. Re-rank all 14 challenges after full statements on 28 October.
