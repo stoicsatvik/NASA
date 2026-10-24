@@ -1,0 +1,51 @@
+name: E210 real MOLA MEG016 higher-resolution ablation
+on:
+  push:
+    branches:
+      - foundry/e210-mola-16ppd-mask-ablation-20261024
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  mola-e210:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test endian, metadata and mask-sensitivity controls
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Fetch real official MEG016 topography and observation counts
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .data/e210
+          base="https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg016"
+          for file in megt90n000eb.img megc90n000eb.img megt90n000eb.lbl megc90n000eb.lbl; do
+            curl --fail --location --retry 2 --connect-timeout 20 --max-time 300 --silent --show-error \
+              "$base/$file" --output ".data/e210/$file"
+          done
+          test "$(wc -c < .data/e210/megt90n000eb.img)" -eq 33177600
+          test "$(wc -c < .data/e210/megc90n000eb.img)" -eq 33177600
+      - name: Run higher-resolution real-data falsification
+        shell: bash
+        run: |
+          set -euo pipefail
+          python research/e210_mola_16ppd.py \
+            --topography .data/e210/megt90n000eb.img \
+            --counts .data/e210/megc90n000eb.img \
+            --topography-label .data/e210/megt90n000eb.lbl \
+            --counts-label .data/e210/megc90n000eb.lbl \
+            > .data/e210/e210_results.json
+          python -m json.tool .data/e210/e210_results.json > /dev/null
+          cat .data/e210/e210_results.json
+      - name: Preserve numerical results only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e210-mola-16ppd-json
+          path: .data/e210/e210_results.json
+          if-no-files-found: ignore
+          retention-days: 14

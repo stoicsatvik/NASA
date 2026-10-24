@@ -131,3 +131,15 @@ All 14 official 2026 challenge summaries were included in a seeded sensitivity a
 **Claim states:** real Mars MEG004 ingestion SUPPORTED; this coarse mask-sensitivity result SUPPORTED for the tested metric; cross-body similarity NOT YET PROVEN; E001 known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local field-validation advantage NOT YET PROVEN; challenge superiority NOT YET PROVEN.
 
 **Next highest-value experiment:** test the same counts-mask sensitivity on higher-resolution MOLA MEG016/MEG032 products, then ingest real LOLA and Earth terrain at matched physical scales. Do not optimize UI or infer planetary analogues from one Mars dataset. Re-rank all 14 challenges after full statements on 28 October.
+
+## 2026-10-24: E210 higher-resolution real MOLA falsification
+
+Read-only exact-head GitHub Actions run 40074587339 successfully downloaded official **16 pixels/degree** MEGT/MEGC 2880×5760 signed-big-endian PDS3 rasters (33,177,600 bytes each), checked labels/units/projection and source SHA-256, and executed the same masked-vs-all-cell tile-rank experiment at 16/32/64-pixel scales. Full immutable numerical receipt: `research/results/e210_mola_16ppd_real_data_20261024.json`; no raw rasters committed.
+
+**Measured evidence:** 15,685,242/16,588,800 cells (94.5532%) have counts>0; 903,558 cells (5.4468%) are interpolated. At global 16×16 tiles, 1,304 of 64,800 tiles failed the >=25% measured coverage gate; among 63,496 eligible tiles the top-decile overlap was **99.213%**, ordinal rank correlation 0.999453. In ±16° latitude, observed coverage was 96.0475% and 16×16 top-decile overlap **99.306%**. Polar 5° bands have only ~53.96% observed at 85–90°N and ~51.19% at 85–90°S.
+
+**Falsification:** The E209 coarse-resolution finding of strong *global top-decile rank stability* largely survived the independent 16ppd test, but finer resolution revealed more missing bins, coverage-gated exclusions and larger individual rank displacements. This is **not** a demonstration that interpolation is harmless in polar or local patches, nor that elevation standard deviation is a physically comparable cross-body descriptor. The source label's generic equatorial 55% note must not be mistaken for a measured coverage fraction of these particular products.
+
+**Claim states:** real Mars MEG004+MEG016 ingestion SUPPORTED; 4ppd/16ppd masked-rank sensitivity SUPPORTED under tested synthetic metric; E001 known-site recovery NOT YET MEASURED; cross-body similarity NOT YET PROVEN; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN; planetary challenge superiority NOT YET PROVEN.
+
+**Next:** target polar/high-missingness sensitivity and independent 32ppd count/raster geometry only if it can change the representation decision; prioritize obtaining actual lunar LOLA and Earth terrain and matching physical footprint before E001. Full official 2026 challenge statements on 28 October may change project selection. No UI/demo polish.
