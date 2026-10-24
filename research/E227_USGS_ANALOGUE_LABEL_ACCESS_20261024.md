@@ -15,7 +15,7 @@ Can an independent official source provide usable known-site labels for E001, an
 - Read-only ScienceBase JSON and FGDC XML accessed; official public ArcGIS FeatureServer discovered from item metadata. Its URL was sanitized to remove embedded query parameters before access or persistence.
 - **No access token was used.** The public FeatureServer exposes one point layer, `TerrestrialAnalogs`, returning **4** features in the bounded GeoJSON query.
 - Raw public GeoJSON SHA-256: `0d0b61a5663f3cb2c00de5a02dfb6bf4599195a4dd28d81514af4d52351f0f1e`.
-- Exact-head Actions run [40117178252](https://github.com/stoicsatvik/NASA/actions/runs/40117178252): success. The workflow runs ten deterministic source/QC tests and uploads `e227_analogue_source_audit.json` and `e227_usgs_coordinate_qc.json` as an immutable numerical artifact.
+- Exact-head Actions run [40117178252](https://github.com/stoicsatvik/NASA/actions/runs/40117178252): success. The workflow runs twelve deterministic source/QC tests and uploads `e227_analogue_source_audit.json` and `e227_usgs_coordinate_qc.json` as an immutable numerical artifact.
 
 ## Real public-source measurements
 
