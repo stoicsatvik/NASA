@@ -1,0 +1,48 @@
+name: E226 cross-footprint Earth identity falsification
+on:
+  push:
+    branches:
+      - foundry/e226-cross-footprint-site-identity-20261024
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  cross-footprint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Deterministic synthetic tests
+        run: python -m unittest discover -s tests -p 'test_e226_cross_footprint_identity.py' -v
+      - name: Evaluate previously recorded real Earth windows
+        run: python research/e226_cross_footprint_identity.py --output e226_real_site_identity.json
+      - name: Verify exact real-data and null-count invariants
+        run: |
+          python - <<'PY'
+          import json
+          d = json.load(open("e226_real_site_identity.json", encoding="utf-8"))
+          expected = {
+              "query_2km__reference_2km__both": 50,
+              "query_4km__reference_2km__both": 47,
+              "query_2km__reference_4km__both": 30,
+              "query_4km__reference_4km__both": 68,
+              "query_4km__reference_2km__slope_only": 4,
+              "query_2km__reference_4km__slope_only": 10,
+          }
+          assert len(d["comparisons"]) == 12
+          for key, correct in expected.items():
+              assert d["comparisons"][key]["correct"] == correct, key
+          for row in d["comparisons"].values():
+              assert row["total"] == 72
+              assert sum(row["confusion"].values()) == 72
+              assert sum(row["exact_reference_label_permutation_correct"]) == 144
+          print("12 real-data ablations and six exact-count invariants verified")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e226-real-earth-cross-footprint-results
+          path: e226_real_site_identity.json
+          if-no-files-found: error
