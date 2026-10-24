@@ -1,0 +1,39 @@
+name: E227 independent analogue label evidence gate
+on:
+  push:
+    branches:
+      - foundry/e227-independent-analogue-label-gate-20261024
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Offline NASA/USGS evidence-contract tests
+        run: python -m unittest discover -s tests -p 'test_e227_independent_analogue_labels.py' -v
+      - name: Audit NASA gallery and attempt read-only USGS metadata access
+        run: python research/e227_independent_analogue_labels.py --probe-usgs --output e227_analogue_source_audit.json
+      - name: Preserve exact source-access outcome and prohibit fabricated recovery
+        run: |
+          python - <<'PY'
+          import json
+          d=json.load(open('e227_analogue_source_audit.json', encoding='utf-8'))
+          assert d['nasa_gallery']['examples'] == 11
+          assert d['nasa_gallery']['moon_mars_examples'] == 9
+          assert d['nasa_gallery']['e001_known_site_recovery'] == 'NOT YET MEASURED'
+          assert d['usgs']['status'] in {'ACCESS_FAILED','METADATA_VERIFIED'}
+          assert d['usgs']['coordinates_ingested'] == 0
+          print('USGS status:', d['usgs']['status'])
+          print('No site-recovery result or coordinates fabricated')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e227-nasa-usgs-source-access-receipt
+          path: e227_analogue_source_audit.json
+          if-no-files-found: error
