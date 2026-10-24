@@ -1,0 +1,131 @@
+{
+  "schema": "nasa/e227/analogue-pair-source-audit/v1",
+  "retrieved_date": "2026-10-24",
+  "source": "https://science.nasa.gov/solar-system/analog-explorer/",
+  "source_page_last_updated": "2026-03-04",
+  "usgs_candidate_catalog": {
+    "title": "Known Terrestrial Analog Sites for Planetary Science",
+    "doi": "10.5066/P9J72921",
+    "item_id": "5f88940b82cebb8c13d912ee",
+    "source": "https://data.usgs.gov/datacatalog/data/USGS%3A5f88940b82cebb8c13d912ee",
+    "claim": "independently curated terrestrial analog site point layer; contents not yet downloaded or verified"
+  },
+  "limitations": [
+    "NASA examples are descriptive research/mission analogs, not a blind benchmark or a binary planetary-similarity truth set.",
+    "The primary_basis and static_surface_morphology_component fields are analyst classifications of NASA descriptions, not NASA-issued feature labels.",
+    "No coordinates, negative controls, geologic ground-truth masks, physical descriptors or novel sites are inferred.",
+    "Not E001; no Earth-Moon-Mars recovery is measured."
+  ],
+  "pairs": [
+    {
+      "id": "lava_caves_california_moon",
+      "earth_site": "Medicine Lake Volcano lava caves",
+      "target_body": "Moon",
+      "primary_basis": "subsurface_structure",
+      "static_surface_morphology_component": false,
+      "source_heading": "Lava Caves: California and the Moon",
+      "latitude": null,
+      "longitude": null
+    },
+    {
+      "id": "rocky_reconnaissance_death_valley_mars",
+      "earth_site": "Death Valley",
+      "target_body": "Mars",
+      "primary_basis": "operational_hazard",
+      "static_surface_morphology_component": true,
+      "source_heading": "Rocky Reconnaissance: California and Mars",
+      "latitude": null,
+      "longitude": null
+    },
+    {
+      "id": "basalt_kilauea_moon",
+      "earth_site": "Kilauea Volcano",
+      "target_body": "Moon",
+      "primary_basis": "volcanic_lithology_and_operations",
+      "static_surface_morphology_component": true,
+      "source_heading": "Basalt Landscapes: Kilauea and the Moon",
+      "latitude": null,
+      "longitude": null
+    },
+    {
+      "id": "lake_salda_jezero",
+      "earth_site": "Lake Salda",
+      "target_body": "Mars",
+      "primary_basis": "mineralogy_sedimentology",
+      "static_surface_morphology_component": true,
+      "source_heading": "Looking for Life: Turkey and Mars",
+      "latitude": null,
+      "longitude": null
+    },
+    {
+      "id": "pilot_valley_mars",
+      "earth_site": "Pilot Valley",
+      "target_body": "Mars",
+      "primary_basis": "salt_geochemistry",
+      "static_surface_morphology_component": false,
+      "source_heading": "Looking for Life: Utah and Mars",
+      "latitude": null,
+      "longitude": null
+    },
+    {
+      "id": "aden_crater_venus",
+      "earth_site": "Aden Crater",
+      "target_body": "Venus",
+      "primary_basis": "volcanic_morphology",
+      "static_surface_morphology_component": true,
+      "source_heading": "Shield Volcanoes: New Mexico and Venus",
+      "latitude": null,
+      "longitude": null
+    },
+    {
+      "id": "gulkana_enceladus",
+      "earth_site": "Gulkana Glacier",
+      "target_body": "Enceladus",
+      "primary_basis": "subsurface_water_seismology",
+      "static_surface_morphology_component": false,
+      "source_heading": "Icequakes: Alaska and Enceladus",
+      "latitude": null,
+      "longitude": null
+    },
+    {
+      "id": "verde_valley_mars",
+      "earth_site": "Verde Valley",
+      "target_body": "Mars",
+      "primary_basis": "biosignature_preservation",
+      "static_surface_morphology_component": false,
+      "source_heading": "Looking for Life: Arizona and Mars",
+      "latitude": null,
+      "longitude": null
+    },
+    {
+      "id": "atacama_mars",
+      "earth_site": "Atacama Desert",
+      "target_body": "Mars",
+      "primary_basis": "aridity_and_biosignatures",
+      "static_surface_morphology_component": false,
+      "source_heading": "Looking for Life: the Atacama Desert and Mars",
+      "latitude": null,
+      "longitude": null
+    },
+    {
+      "id": "askja_ice_moon",
+      "earth_site": "Askja volcano region",
+      "target_body": "Moon",
+      "primary_basis": "subsurface_ice_radar",
+      "static_surface_morphology_component": false,
+      "source_heading": "Subsurface Ice: Iceland and the Lunar South Pole",
+      "latitude": null,
+      "longitude": null
+    },
+    {
+      "id": "vikursundar_ripples_mars",
+      "earth_site": "Vikursundar region",
+      "target_body": "Mars",
+      "primary_basis": "aeolian_morphodynamics",
+      "static_surface_morphology_component": true,
+      "source_heading": "Land Ripples: Iceland and Mars",
+      "latitude": null,
+      "longitude": null
+    }
+  ]
+}
