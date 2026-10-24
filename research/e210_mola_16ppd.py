@@ -7,7 +7,8 @@ import json
 from pathlib import Path
 import re
 import sys
-from e209_mola_mask_ablation import latitude_coverage, region_ablation
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from research.e209_mola_mask_ablation import latitude_coverage, region_ablation
 
 BASE = "https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg016/"
 ROWS, COLS = 2880, 5760
