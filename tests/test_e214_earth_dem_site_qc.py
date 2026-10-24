@@ -8,8 +8,8 @@ class E214Tests(unittest.TestCase):
         self.assertEqual(tile_name(*SITES["lonar_lead"]),"N19E076")
         self.assertEqual(tile_name(*SITES["western_ghats_lead"]),"N18E073")
         self.assertEqual(tile_name(*SITES["ladakh_lead"]),"N34E077")
-        self.assertIn("NASADEM_HGT_n19e076.tif",source_url("lonar_lead"))
-        self.assertIn("N19E076.tif",source_url("lonar_lead","SRTM_GL1"))
+        self.assertIn("/N19/N19E076.hgt.gz",source_url("lonar_lead"))
+        with self.assertRaises(ValueError):source_url("lonar_lead","NASADEM")
     def test_square_footprint_and_tile_boundary(self):
         w,s,e,n=square_bounds(19.975,76.51,4)
         self.assertAlmostEqual((n-s)*np.pi/180*6371008.8,4000,places=6)
