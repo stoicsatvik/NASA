@@ -111,6 +111,72 @@ def probe_public_arcgis(service_url: str | None) -> dict:
                 "point_features_ingested": 0, "authenticated": False}
 
 
+
+def probe_public_arcgis_layers(service_url: str | None) -> dict:
+    """Enumerate bounded public layer samples without an ArcGIS access token."""
+    if not service_url:
+        return {"status": "NO_PUBLIC_SERVICE", "layers": []}
+    try:
+        with urlopen(Request(service_url + "?f=json", headers={
+            "User-Agent": "NASA-E227-Research/1.0", "Accept": "application/json",
+        }), timeout=25) as response:
+            raw = response.read(500_001)
+        if len(raw) > 500_000:
+            raise ValueError("Service metadata exceeds bound")
+        info = json.loads(raw)
+        if info.get("error"):
+            return {"status": "SERVICE_ERROR", "error_code": info["error"].get("code"), "layers": []}
+        layers = info.get("layers", [])
+        if not isinstance(layers, list) or len(layers) > 30:
+            raise ValueError("Unexpected layer count")
+        summaries = []
+        for layer in layers:
+            lid = layer.get("id")
+            if not isinstance(lid, int) or lid < 0:
+                continue
+            query = urlencode({
+                "where": "1=1", "outFields": "*", "returnGeometry": "true",
+                "f": "geojson", "resultRecordCount": "100",
+            })
+            with urlopen(Request(f"{service_url}/{lid}/query?{query}", headers={
+                "User-Agent": "NASA-E227-Research/1.0",
+            }), timeout=30) as response:
+                layer_raw = response.read(2_000_001)
+            if len(layer_raw) > 2_000_000:
+                raise ValueError("Layer sample exceeds bound")
+            data = json.loads(layer_raw)
+            if data.get("error"):
+                summaries.append({"id": lid, "name": layer.get("name"),
+                                  "status": "SERVICE_ERROR",
+                                  "error_code": data["error"].get("code")})
+                continue
+            features = data.get("features", [])
+            valid = []
+            for feature in features:
+                geometry = feature.get("geometry") or {}
+                xy = geometry.get("coordinates")
+                if geometry.get("type") != "Point" or not isinstance(xy, list) or len(xy) < 2:
+                    continue
+                lon, lat = xy[:2]
+                if (isinstance(lon, (int, float)) and isinstance(lat, (int, float))
+                        and -180 <= lon <= 180 and -90 <= lat <= 90):
+                    valid.append({"longitude": lon, "latitude": lat,
+                                  "attributes": feature.get("properties") or {}})
+            summaries.append({
+                "id": lid, "name": layer.get("name"), "status": "SAMPLED",
+                "features_returned": len(features), "valid_points": len(valid),
+                "sample_limit": 100, "possibly_truncated": len(features) == 100,
+                "raw_sha256": hashlib.sha256(layer_raw).hexdigest(),
+                "first_two_points": valid[:2],
+            })
+        return {"status": "LAYERS_ENUMERATED", "layers": summaries,
+                "total_valid_sample_points": sum(x.get("valid_points", 0) for x in summaries),
+                "no_access_token_used": True}
+    except (HTTPError, URLError, TimeoutError, ValueError, json.JSONDecodeError) as exc:
+        return {"status": "LAYER_ENUMERATION_FAILED", "error_type": type(exc).__name__,
+                "error": str(exc)[:180], "layers": [], "no_access_token_used": True}
+
+
 def parse_usgs_metadata(item: dict) -> dict:
     if "Known Terrestrial Analog Sites for Planetary Science" not in item.get("title", ""):
         raise ValueError("USGS item title mismatch")
@@ -222,6 +288,7 @@ def probe_usgs() -> dict:
         result["metadata_xml"] = probe_metadata_xml(result["files"])
         services = [w["uri"] for w in result["web_links"] if w.get("uri")]
         result["arcgis_public_sample"] = probe_public_arcgis(services[0] if services else None)
+        result["arcgis_layers"] = probe_public_arcgis_layers(services[0] if services else None)
         return result
     except (HTTPError, URLError, TimeoutError, ValueError, json.JSONDecodeError) as exc:
         return {
