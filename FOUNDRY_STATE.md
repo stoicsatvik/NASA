@@ -180,3 +180,12 @@ Read-only Actions [40099007353](https://github.com/stoicsatvik/NASA/actions/runs
 **Claims:** Real terrain descriptor sensitivity SUPPORTED for finite tested windows. E001 known-site recovery **NOT YET MEASURED**; cross-body similarity **NOT YET PROVEN**; novel discovery **NOT YET PROVEN**; local field advantage **NOT YET PROVEN**; challenge superiority **NOT YET PROVEN**.
 
 **Next:** Stop extending coordinate-only sensitivity without new external labels. Obtain independently established planetary analogue positives and negative controls, then execute E001 with blind holdouts and random/Euclidean/physically weighted baselines. Reassess official challenges on 28 Oct; no competition solution build before the permitted event window.
+
+
+## 2026-10-24: E226 exploratory cross-footprint site-identity sanity gate
+
+Read-only reuse of E221's **150 real SRTM-derived overlapping Earth windows** from three *unvalidated* site leads. The experiment held out the exact central coordinate from 72 query windows per case, used one central reference per site, and compared 2-km and 4-km footprints using reference-only normalized relief/slope nearest-neighbor scores, ablations and exact 3! label permutations.
+
+**Measured two-feature site-identity correct counts:** 2km→2km **50/72**; 4km→2km **47/72**; 2km→4km **30/72**; 4km→4km **68/72**. Slope-only 4km→2km **4/72** versus uniform random expected **24/72**. The six 2km→4km two-feature reference-label permutations yield [30, 3, 17, 16, 26, 52], so do not claim statistical significance. This is an exploratory source-site recognition test, **not** independent analogue-label recovery or independent sample inference. Overlapping windows and site selection create substantial leakage risk. See `research/E226_CROSS_FOOTPRINT_SITE_IDENTITY_20261024.md` and branch-scoped deterministic workflow.
+
+**Claim:** footprint-transfer failure in this tiny Earth site-identity sanity check SUPPORTED CONDITIONAL ON RECORDED MEASUREMENTS. **E001 known-analogue recovery NOT YET MEASURED**; cross-body similarity, novel discovery, local validation advantage and challenge superiority **NOT YET PROVEN**. Next: independently sourced known positive/negative analogue labels and blinded recovery against transparent baselines. No new rasters, field data, competition solution or submission.
