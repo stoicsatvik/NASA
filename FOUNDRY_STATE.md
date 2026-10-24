@@ -167,3 +167,16 @@ The first NASADEM OpenTopography mirror URL failed HTTP 404 in read-only CI; **d
 Read-only Actions [40099007353](https://github.com/stoicsatvik/NASA/actions/runs/40099007353) at code head `dc24e08a357f587b92f80babbddccaa17876f01b` passed and evaluated **150 real Mapzen Skadi SRTM-derived Earth raster windows** (3 research leads × 2/4-km windows × 25 preregistered ±500m coordinate shifts). Complete source-hashed per-window numerical receipt: `research/results/e221_earth_geolocation_jitter_20261024.json`; analysis: `research/E221_GEOLOCATION_JITTER_ABLATION_20261024.md`.
 
 **Falsification:** 2-km detrended relief site ordering changed on 24% of offsets, 4-km relief on 36%; 2-km slope p90 on 76%, while 4-km slope p90 ordering remained unchanged. Largest 2-km relief change from the unshifted coordinate: 29.3% Lonar, 44.0% Western Ghats, 39.4% Ladakh. These overlapping offsets are descriptive sensitivity checks, not independent observations, confidence intervals or measured geolocation uncertainty. No independent analogue labels or cross-body recovery. **E001 NOT YET MEASURED; cross-body similarity, novel discovery, local validation and challenge superiority NOT YET PROVEN.** Next: independent known-site labels and physical/coordinate uncertainty in held-out recovery; no UI or competition submission.
+
+
+## 2026-10-24: E223 exact independent-site coordinate-jitter stress test
+
+**Question:** E221 shifted all three unvalidated Earth research leads synchronously. Does the same full-rank stability hold if each site is allowed an independently selected offset from the 25 previously measured real SRTM-derived windows?
+
+**Result:** Exhaustively enumerated 25³ = **15,625 exact combinations per descriptor/footprint**, without treating overlapping windows as independent observations. Central full ordering preserved: 2-km relief **77.5488%**, 2-km slope-p90 **16.8%**, 4-km relief **65.6%**, 4-km slope-p90 **100%**. Crucially, at 2-km slope-p90, Western Ghats still ranks top in **95.52%** despite full-order instability. Common-offset E221 audit hides some site-specific possible rank reversals; top-site stability and complete-order stability are different claims.
+
+**Evidence:** `research/e223_independent_jitter_rank.py`, five deterministic tests, `research/E223_INDEPENDENT_SITE_JITTER_20261024.md`; exact-head CI [40103028365](https://github.com/stoicsatvik/NASA/actions/runs/40103028365) SUCCESS at `ee7bed88de398741647f3612b2bde397870cf237`. The source remains E221's 150 real Earth windows; no new planetary rasters or analogue labels. Uniform independent-offset scenario fractions are **NOT empirical probabilities or confidence intervals**. The sites remain unvalidated leads.
+
+**Claims:** Real terrain descriptor sensitivity SUPPORTED for finite tested windows. E001 known-site recovery **NOT YET MEASURED**; cross-body similarity **NOT YET PROVEN**; novel discovery **NOT YET PROVEN**; local field advantage **NOT YET PROVEN**; challenge superiority **NOT YET PROVEN**.
+
+**Next:** Stop extending coordinate-only sensitivity without new external labels. Obtain independently established planetary analogue positives and negative controls, then execute E001 with blind holdouts and random/Euclidean/physically weighted baselines. Reassess official challenges on 28 Oct; no competition solution build before the permitted event window.
