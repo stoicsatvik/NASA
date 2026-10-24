@@ -73,6 +73,50 @@ def parse_usgs_metadata(item: dict) -> dict:
     }
 
 
+
+def probe_usgs_children() -> dict:
+    """Discover actual data child items; the parent may hold only FGDC metadata."""
+    url = (
+        "https://www.sciencebase.gov/catalog/items?"
+        f"filter=parentId={USGS_ITEM}&format=json&max=100"
+    )
+    try:
+        with urlopen(Request(url, headers={"User-Agent": "NASA-E227-Research/1.0", "Accept": "application/json"}), timeout=25) as response:
+            raw = response.read(3_000_001)
+        if len(raw) > 3_000_000:
+            raise ValueError("USGS child index exceeds bounded limit")
+        index = json.loads(raw)
+        children = []
+        for item in index.get("items", [])[:20]:
+            child_id = item.get("id")
+            if not child_id:
+                continue
+            with urlopen(Request(
+                f"https://www.sciencebase.gov/catalog/item/{child_id}?format=json",
+                headers={"User-Agent": "NASA-E227-Research/1.0", "Accept": "application/json"},
+            ), timeout=25) as response:
+                child = json.loads(response.read(2_000_001))
+            children.append({
+                "id": child_id,
+                "title": child.get("title"),
+                "files": [
+                    {"name": f.get("name"), "size_bytes": f.get("size"),
+                     "download_uri": f.get("downloadUri"), "content_type": f.get("contentType")}
+                    for f in child.get("files", [])
+                ],
+            })
+        return {
+            "status": "CHILD_INDEX_VERIFIED",
+            "total_children_reported": index.get("total"),
+            "children_examined": len(children),
+            "children": children,
+            "point_features_ingested": 0,
+        }
+    except (HTTPError, URLError, TimeoutError, ValueError, json.JSONDecodeError) as exc:
+        return {"status": "CHILD_INDEX_ACCESS_FAILED", "error_type": type(exc).__name__,
+                "error": str(exc)[:240], "point_features_ingested": 0}
+
+
 def probe_usgs() -> dict:
     req = Request(USGS_URL, headers={"User-Agent": "NASA-E227-Research/1.0", "Accept": "application/json"})
     try:
@@ -82,7 +126,9 @@ def probe_usgs() -> dict:
             raw = response.read(2_000_001)
         if len(raw) > 2_000_000:
             raise ValueError("Metadata exceeds bounded response limit")
-        return parse_usgs_metadata(json.loads(raw))
+        result = parse_usgs_metadata(json.loads(raw))
+        result["child_index"] = probe_usgs_children()
+        return result
     except (HTTPError, URLError, TimeoutError, ValueError, json.JSONDecodeError) as exc:
         return {
             "status": "ACCESS_FAILED",
