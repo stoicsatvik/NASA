@@ -1,0 +1,117 @@
+"""E227: independent NASA analogue-pair evidence audit and USGS access spike.
+
+Pre-event, read-only research. NASA examples are NOT E001 ground-truth
+recoveries; do not treat analyst modality tags as NASA-authored labels.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+from collections import Counter
+from pathlib import Path
+from urllib.error import HTTPError, URLError
+from urllib.request import Request, urlopen
+
+DATA = Path(__file__).parent / "data/e227_nasa_analogue_pairs.json"
+USGS_ITEM = "5f88940b82cebb8c13d912ee"
+USGS_URL = f"https://www.sciencebase.gov/catalog/item/{USGS_ITEM}?format=json"
+EXPECTED_BODIES = {"Moon": 3, "Mars": 6, "Venus": 1, "Enceladus": 1}
+
+
+def audit(source: dict) -> dict:
+    if source.get("schema") != "nasa/e227/analogue-pair-source-audit/v1":
+        raise ValueError("Unexpected source schema")
+    if source.get("source") != "https://science.nasa.gov/solar-system/analog-explorer/":
+        raise ValueError("Missing authoritative NASA source")
+    pairs = source.get("pairs", [])
+    if len(pairs) != 11 or len({p["id"] for p in pairs}) != 11:
+        raise ValueError("Expected 11 unique NASA gallery examples")
+    for p in pairs:
+        if not p.get("source_heading") or not p.get("primary_basis"):
+            raise ValueError("Missing traceable source heading or analyst basis")
+        if p.get("latitude") is not None or p.get("longitude") is not None:
+            raise ValueError("No invented geocoding permitted")
+        if not isinstance(p.get("static_surface_morphology_component"), bool):
+            raise ValueError("Unclassified morphology component")
+    bodies = Counter(p["target_body"] for p in pairs)
+    if dict(bodies) != EXPECTED_BODIES:
+        raise ValueError("NASA gallery body coverage changed")
+    morphology = sum(p["static_surface_morphology_component"] for p in pairs)
+    return {
+        "source": source["source"],
+        "examples": len(pairs),
+        "target_bodies": dict(sorted(bodies.items())),
+        "moon_mars_examples": bodies["Moon"] + bodies["Mars"],
+        "analyst_marked_surface_morphology_component": morphology,
+        "analyst_marked_without_surface_morphology_component": len(pairs) - morphology,
+        "primary_basis_counts": dict(sorted(Counter(p["primary_basis"] for p in pairs).items())),
+        "interpretation": "Analyst source-taxonomy audit only; not an ML accuracy result.",
+        "claim": "NASA documents process-specific analog pairs; static DEM-only recovery NOT YET PROVEN",
+        "e001_known_site_recovery": "NOT YET MEASURED",
+    }
+
+
+def parse_usgs_metadata(item: dict) -> dict:
+    if "Known Terrestrial Analog Sites for Planetary Science" not in item.get("title", ""):
+        raise ValueError("USGS item title mismatch")
+    files = []
+    for f in item.get("files", []):
+        files.append({
+            "name": f.get("name"),
+            "size_bytes": f.get("size"),
+            "download_uri": f.get("downloadUri"),
+            "content_type": f.get("contentType"),
+        })
+    return {
+        "status": "METADATA_VERIFIED",
+        "item_id": item.get("id"),
+        "title": item["title"],
+        "file_count": len(files),
+        "files": files,
+        "coordinates_ingested": 0,
+        "claim": "Metadata access only; no point-layer records parsed.",
+    }
+
+
+def probe_usgs() -> dict:
+    req = Request(USGS_URL, headers={"User-Agent": "NASA-E227-Research/1.0", "Accept": "application/json"})
+    try:
+        with urlopen(req, timeout=25) as response:
+            if response.status != 200:
+                raise ValueError(f"Unexpected HTTP status {response.status}")
+            raw = response.read(2_000_001)
+        if len(raw) > 2_000_000:
+            raise ValueError("Metadata exceeds bounded response limit")
+        return parse_usgs_metadata(json.loads(raw))
+    except (HTTPError, URLError, TimeoutError, ValueError, json.JSONDecodeError) as exc:
+        return {
+            "status": "ACCESS_FAILED",
+            "item_id": USGS_ITEM,
+            "source_url": USGS_URL,
+            "error_type": type(exc).__name__,
+            "error": str(exc)[:240],
+            "coordinates_ingested": 0,
+            "claim": "USGS point layer NOT INGESTED",
+        }
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--input", type=Path, default=DATA)
+    parser.add_argument("--output", type=Path)
+    parser.add_argument("--probe-usgs", action="store_true")
+    args = parser.parse_args()
+    source = json.loads(args.input.read_text(encoding="utf-8"))
+    result = {"experiment": "E227 independent analogue label access gate", "nasa_gallery": audit(source)}
+    if args.probe_usgs:
+        result["usgs"] = probe_usgs()
+    payload = json.dumps(result, indent=2, sort_keys=True) + "\n"
+    if args.output:
+        args.output.parent.mkdir(parents=True, exist_ok=True)
+        args.output.write_text(payload, encoding="utf-8")
+    else:
+        print(payload, end="")
+
+
+if __name__ == "__main__":
+    main()
