@@ -1,0 +1,47 @@
+name: E214 real Earth NASADEM/SRTM processing sensitivity
+on:
+  push:
+    branches:
+      - foundry/e214-earth-dem-source-ablation-20261024
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  earth-dem-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install bounded numerical dependencies
+        run: python -m pip install 'numpy>=2.0,<3' 'rasterio>=1.4,<2'
+      - name: Run deterministic numerical and provenance controls
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Download public NASA-derived Earth DEM tiles read-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .data/e214
+          base='https://opentopography.s3.sdsc.edu/raster'
+          for tile in n19e076 n18e073 n34e077; do
+            curl --fail --location --retry 2 --connect-timeout 20 --max-time 240 --silent --show-error \
+              "$base/NASADEM/NASADEM_be/NASADEM_HGT_\${tile}.tif" --output ".data/e214/nasadem_\${tile}.tif"
+          done
+          curl --fail --location --retry 2 --connect-timeout 20 --max-time 240 --silent --show-error \
+            "$base/SRTM_GL1/SRTM_GL1_srtm/N19E076.tif" --output .data/e214/srtm_N19E076.tif
+      - name: Execute real-data E214 and preserve numerical receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m research.e214_earth_dem_site_qc \
+            --nasadem-lonar .data/e214/nasadem_n19e076.tif \
+            --nasadem-ghats .data/e214/nasadem_n18e073.tif \
+            --nasadem-ladakh .data/e214/nasadem_n34e077.tif \
+            --srtm-lonar .data/e214/srtm_N19E076.tif | tee e214_results.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e214-real-earth-dem-numerical-receipt
+          path: e214_results.json
+          retention-days: 30
