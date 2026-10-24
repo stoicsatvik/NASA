@@ -10,9 +10,11 @@ import json
 from collections import Counter
 from pathlib import Path
 import re
+import hashlib
 import xml.etree.ElementTree as ET
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
+from urllib.parse import urlencode, urlsplit, urlunsplit
 
 DATA = Path(__file__).parent / "data/e227_nasa_analogue_pairs.json"
 USGS_ITEM = "5f88940b82cebb8c13d912ee"
@@ -53,6 +55,62 @@ def audit(source: dict) -> dict:
     }
 
 
+
+def safe_public_service_url(uri: str) -> str | None:
+    """Strip embedded URL credentials; never copy ScienceBase token parameters."""
+    parts = urlsplit(uri)
+    if (parts.scheme == "https" and parts.hostname == "services.arcgis.com"
+            and parts.path.endswith("/FeatureServer")):
+        return urlunsplit((parts.scheme, parts.netloc, parts.path, "", ""))
+    return None
+
+
+def probe_public_arcgis(service_url: str | None) -> dict:
+    """Unauthenticated, bounded public feature sample only. Never reuse metadata tokens."""
+    if not service_url:
+        return {"status": "NO_PUBLIC_SERVICE", "point_features_ingested": 0}
+    query = urlencode({
+        "where": "1=1", "outFields": "*", "returnGeometry": "true",
+        "f": "geojson", "resultRecordCount": "100",
+    })
+    url = f"{service_url}/0/query?{query}"
+    try:
+        with urlopen(Request(url, headers={"User-Agent": "NASA-E227-Research/1.0", "Accept": "application/geo+json"}), timeout=30) as response:
+            raw = response.read(2_000_001)
+        if len(raw) > 2_000_000:
+            raise ValueError("ArcGIS sample exceeds bounded limit")
+        data = json.loads(raw)
+        if data.get("error"):
+            return {"status": "SERVICE_ERROR", "error_code": data["error"].get("code"),
+                    "point_features_ingested": 0}
+        if data.get("type") != "FeatureCollection":
+            raise ValueError("Unexpected ArcGIS response format")
+        features = data.get("features", [])
+        valid = []
+        for feature in features:
+            geom = feature.get("geometry") or {}
+            xy = geom.get("coordinates")
+            if geom.get("type") != "Point" or not isinstance(xy, list) or len(xy) < 2:
+                continue
+            lon, lat = xy[:2]
+            if not isinstance(lon, (int, float)) or not isinstance(lat, (int, float)):
+                continue
+            if not (-180 <= lon <= 180 and -90 <= lat <= 90):
+                continue
+            valid.append({"longitude": lon, "latitude": lat,
+                          "attributes": feature.get("properties") or {}})
+        return {"status": "PUBLIC_SAMPLE_INGESTED" if valid else "NO_VALID_POINTS",
+                "feature_count_returned": len(features), "point_features_ingested": len(valid),
+                "raw_sha256": hashlib.sha256(raw).hexdigest(),
+                "first_five_points": valid[:5],
+                "sample_not_complete_catalog": True,
+                "authenticated": False}
+    except (HTTPError, URLError, TimeoutError, ValueError, json.JSONDecodeError) as exc:
+        return {"status": "UNAUTHENTICATED_ACCESS_FAILED",
+                "error_type": type(exc).__name__, "error": str(exc)[:180],
+                "point_features_ingested": 0, "authenticated": False}
+
+
 def parse_usgs_metadata(item: dict) -> dict:
     if "Known Terrestrial Analog Sites for Planetary Science" not in item.get("title", ""):
         raise ValueError("USGS item title mismatch")
@@ -70,7 +128,7 @@ def parse_usgs_metadata(item: dict) -> dict:
         "title": item["title"],
         "file_count": len(files),
         "files": files,
-        "web_links": [{"title": w.get("title"), "uri": w.get("uri")} for w in item.get("webLinks", [])],
+        "web_links": [{"title": w.get("title"), "uri": safe_public_service_url(w.get("uri") or "")} for w in item.get("webLinks", [])],
         "identifiers": [{"type": i.get("type"), "key": i.get("key")} for i in item.get("identifiers", [])],
         "coordinates_ingested": 0,
         "claim": "Metadata access only; no point-layer records parsed.",
@@ -162,6 +220,8 @@ def probe_usgs() -> dict:
         result = parse_usgs_metadata(json.loads(raw))
         result["child_index"] = probe_usgs_children()
         result["metadata_xml"] = probe_metadata_xml(result["files"])
+        services = [w["uri"] for w in result["web_links"] if w.get("uri")]
+        result["arcgis_public_sample"] = probe_public_arcgis(services[0] if services else None)
         return result
     except (HTTPError, URLError, TimeoutError, ValueError, json.JSONDecodeError) as exc:
         return {
