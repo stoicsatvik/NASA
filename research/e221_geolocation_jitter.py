@@ -96,7 +96,7 @@ def analyze(paths: dict[str, Path]) -> dict:
     return {"experiment": "E221 real Earth SRTM-derived geolocation jitter sensitivity",
             "claim_state": "DESCRIPTOR SENSITIVITY ONLY; E001 NOT YET MEASURED; CROSS-BODY SIMILARITY NOT YET PROVEN",
             "preregistered_offsets_km": list(OFFSETS_KM), "preregistered_window_km": list(WIDTHS_KM),
-            "sources": sources, "observations": len(rows), "summaries": summaries, "rank_audit": rank_audit,
+            "sources": sources, "observations": len(rows), "window_measurements": rows, "summaries": summaries, "rank_audit": rank_audit,
             "limitations": ["Research lead coordinates are not independently validated analogue labels.",
                 "Mapzen HGT is SRTM-derived/mosaicked, not direct NASADEM or per-pixel instrument evidence.",
                 "Nearby shifted windows overlap and are NOT independent replicates or uncertainty confidence intervals.",
