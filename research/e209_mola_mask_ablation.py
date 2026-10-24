@@ -72,6 +72,33 @@ def rank_sensitivity(heights, counts, rows, cols, tile_size=16, min_observed_fra
     return result
 
 
+
+def latitude_coverage(counts, rows, cols, band_rows=20):
+    if len(counts) != rows * cols or rows % band_rows:
+        raise ValueError("invalid latitude band geometry")
+    bands = []
+    for start in range(0, rows, band_rows):
+        band = counts[start * cols:(start + band_rows) * cols]
+        observed = sum(x > 0 for x in band)
+        bands.append({
+            "latitude_north_deg": 90 - start * 180 / rows,
+            "latitude_south_deg": 90 - (start + band_rows) * 180 / rows,
+            "observed_fraction": observed / len(band),
+            "observed_cells": observed,
+            "total_cells": len(band),
+        })
+    return bands
+
+
+def region_ablation(heights, counts, rows, cols, start_row, stop_row, sizes):
+    if not (0 <= start_row < stop_row <= rows):
+        raise ValueError("invalid region bounds")
+    region_h = heights[start_row * cols:stop_row * cols]
+    region_c = counts[start_row * cols:stop_row * cols]
+    return {str(size): rank_sensitivity(region_h, region_c, stop_row - start_row, cols, tile_size=size)
+            for size in sizes}
+
+
 def main():
     from mola_megdr_quality_gate import analyze, read_grid
     parser = argparse.ArgumentParser()
@@ -90,6 +117,9 @@ def main():
         },
         "qc": qc,
         "tile_ablation": rank_sensitivity(heights, counts, 720, 1440),
+        "multiscale_global": region_ablation(heights, counts, 720, 1440, 0, 720, (4, 8, 16, 24)),
+        "equatorial_plus_minus_16_deg": region_ablation(heights, counts, 720, 1440, 296, 424, (4, 8, 16)),
+        "latitude_5deg_coverage": latitude_coverage(counts, 720, 1440),
         "limitations": [
             "Measured-cell selection changes sample size and may introduce selection bias.",
             "Tile standard deviation is not slope or resolution-matched planetary roughness.",
