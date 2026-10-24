@@ -16,9 +16,22 @@ jobs:
         with:
           python-version: '3.12'
       - name: Offline NASA/USGS evidence-contract tests
-        run: python -m unittest discover -s tests -p 'test_e227_independent_analogue_labels.py' -v
+        run: python -m unittest discover -s tests -p 'test_e227*.py' -v
       - name: Audit NASA gallery and attempt read-only USGS metadata access
         run: python research/e227_independent_analogue_labels.py --probe-usgs --output e227_analogue_source_audit.json
+      - name: Measure real USGS coordinate and label quality
+        run: |
+          python research/e227_usgs_coordinate_qc.py e227_analogue_source_audit.json --output e227_usgs_coordinate_qc.json
+          python - <<'PY'
+          import json
+          d=json.load(open('e227_usgs_coordinate_qc.json', encoding='utf-8'))
+          assert d['sample_count'] > 0
+          assert d['coordinate_discrepancies_over_100m'] >= 0
+          assert 'NOT YET MEASURED' in d['claim']
+          print('Verified USGS points:', d['sample_count'])
+          print('Missing target-body labels:', d['body_missing_count'])
+          print('Geometry-attribute discrepancies >100m:', d['coordinate_discrepancies_over_100m'])
+          PY
       - name: Preserve exact source-access outcome and prohibit fabricated recovery
         run: |
           python - <<'PY'
@@ -35,5 +48,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: e227-nasa-usgs-source-access-receipt
-          path: e227_analogue_source_audit.json
+          path: |
+            e227_analogue_source_audit.json
+            e227_usgs_coordinate_qc.json
           if-no-files-found: error
