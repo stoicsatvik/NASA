@@ -1,0 +1,51 @@
+name: E209 real MOLA MEG004 counts-mask experiment
+on:
+  push:
+    branches:
+      - foundry/e209-real-mola-count-mask-20261024
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  mola-e209:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate existing and E209 synthetic controls
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Fetch official MOLA MEGT and MEGC labels and rasters
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .data/e209
+          base="https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg004"
+          for file in megt90n000cb.img megc90n000cb.img megt90n000cb.lbl megc90n000cb.lbl; do
+            curl --fail --location --retry 2 --connect-timeout 20 --max-time 180 --silent --show-error \
+              "$base/$file" --output ".data/e209/$file"
+          done
+          test "$(wc -c < .data/e209/megt90n000cb.img)" -eq 2073600
+          test "$(wc -c < .data/e209/megc90n000cb.img)" -eq 2073600
+      - name: Run E209 against real Mars rasters
+        shell: bash
+        run: |
+          set -euo pipefail
+          python research/e209_mola_mask_ablation.py \
+            --topography .data/e209/megt90n000cb.img \
+            --counts .data/e209/megc90n000cb.img \
+            --topography-label .data/e209/megt90n000cb.lbl \
+            --counts-label .data/e209/megc90n000cb.lbl \
+            > .data/e209/e209_results.json
+          python -m json.tool .data/e209/e209_results.json > /dev/null
+          cat .data/e209/e209_results.json
+      - name: Preserve small numerical evidence only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e209-mola-qc-json
+          path: .data/e209/e209_results.json
+          if-no-files-found: ignore
+          retention-days: 14

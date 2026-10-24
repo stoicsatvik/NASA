@@ -13,7 +13,7 @@ import struct
 from datetime import date, datetime
 from pathlib import Path
 
-ARCHIVE = "https://pds-geosciences.wustl.edu/mgs/urn-nasa-pds-mgs_mola_topography_derived/meg004/"
+ARCHIVE = "https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg004/"
 
 
 def metadata(label: Path, product: str) -> dict:

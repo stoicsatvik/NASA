@@ -1,0 +1,426 @@
+{
+  "experiment_id": "E209",
+  "execution_date_utc": "2026-10-24",
+  "evidence_run": "https://github.com/stoicsatvik/NASA/actions/runs/40074383215",
+  "exact_experiment_head_sha": "a67bb868a592ae45aecc05b1d43fbf127beca845",
+  "data_provenance": "Official NASA PDS Geosciences Node MGS MOLA MEG004 archive; real paired MEGT/MEGC PDS3 binaries, fetched by read-only GitHub Actions runner",
+  "equatorial_plus_minus_16_deg": {
+    "4": {
+      "eligible_tiles": 11520,
+      "excluded_tiles": 0,
+      "max_rank_displacement": 90,
+      "mean_all_cells_std_m": 243.00776651137792,
+      "mean_measured_only_std_m": 243.00869070630563,
+      "mean_tile_observed_fraction": 0.9999945746527777,
+      "metric": "within-tile elevation standard deviation in metres; not scale-corrected roughness",
+      "min_observed_fraction": 0.25,
+      "ordinal_rank_correlation": 0.9999999678576431,
+      "tile_size_pixels": 4,
+      "tiles_below_50_percent_measured": 0,
+      "top_decile_k": 1152,
+      "top_decile_overlap_fraction": 1,
+      "total_tiles": 11520
+    },
+    "8": {
+      "eligible_tiles": 2880,
+      "excluded_tiles": 0,
+      "max_rank_displacement": 1,
+      "mean_all_cells_std_m": 378.5635435115421,
+      "mean_measured_only_std_m": 378.56371277065216,
+      "mean_tile_observed_fraction": 0.9999945746527777,
+      "metric": "within-tile elevation standard deviation in metres; not scale-corrected roughness",
+      "min_observed_fraction": 0.25,
+      "ordinal_rank_correlation": 0.999999999497653,
+      "tile_size_pixels": 8,
+      "tiles_below_50_percent_measured": 0,
+      "top_decile_k": 288,
+      "top_decile_overlap_fraction": 1,
+      "total_tiles": 2880
+    },
+    "16": {
+      "eligible_tiles": 720,
+      "excluded_tiles": 0,
+      "max_rank_displacement": 1,
+      "mean_all_cells_std_m": 564.6430159130234,
+      "mean_measured_only_std_m": 564.6437315536419,
+      "mean_tile_observed_fraction": 0.9999945746527777,
+      "metric": "within-tile elevation standard deviation in metres; not scale-corrected roughness",
+      "min_observed_fraction": 0.25,
+      "ordinal_rank_correlation": 0.9999999678497322,
+      "tile_size_pixels": 16,
+      "tiles_below_50_percent_measured": 0,
+      "top_decile_k": 72,
+      "top_decile_overlap_fraction": 1,
+      "total_tiles": 720
+    }
+  },
+  "experiment": "E209 MOLA interpolation-mask rank sensitivity",
+  "labels_sha256": {
+    "counts": "487004de9598296dc910b814ee8a256e7755abed7ade9f1180743208eccb8476",
+    "topography": "5a3fe60256afa1c35fea5d551fe0ab0a9198fb2bcd2c2e161d078aa69627ebac"
+  },
+  "latitude_5deg_coverage": [
+    {
+      "latitude_north_deg": 90,
+      "latitude_south_deg": 85,
+      "observed_cells": 24769,
+      "observed_fraction": 0.8600347222222222,
+      "total_cells": 28800
+    },
+    {
+      "latitude_north_deg": 85,
+      "latitude_south_deg": 80,
+      "observed_cells": 28800,
+      "observed_fraction": 1,
+      "total_cells": 28800
+    },
+    {
+      "latitude_north_deg": 80,
+      "latitude_south_deg": 75,
+      "observed_cells": 28800,
+      "observed_fraction": 1,
+      "total_cells": 28800
+    },
+    {
+      "latitude_north_deg": 75,
+      "latitude_south_deg": 70,
+      "observed_cells": 28800,
+      "observed_fraction": 1,
+      "total_cells": 28800
+    },
+    {
+      "latitude_north_deg": 70,
+      "latitude_south_deg": 65,
+      "observed_cells": 28800,
+      "observed_fraction": 1,
+      "total_cells": 28800
+    },
+    {
+      "latitude_north_deg": 65,
+      "latitude_south_deg": 60,
+      "observed_cells": 28800,
+      "observed_fraction": 1,
+      "total_cells": 28800
+    },
+    {
+      "latitude_north_deg": 60,
+      "latitude_south_deg": 55,
+      "observed_cells": 28800,
+      "observed_fraction": 1,
+      "total_cells": 28800
+    },
+    {
+      "latitude_north_deg": 55,
+      "latitude_south_deg": 50,
+      "observed_cells": 28800,
+      "observed_fraction": 1,
+      "total_cells": 28800
+    },
+    {
+      "latitude_north_deg": 50,
+      "latitude_south_deg": 45,
+      "observed_cells": 28800,
+      "observed_fraction": 1,
+      "total_cells": 28800
+    },
+    {
+      "latitude_north_deg": 45,
+      "latitude_south_deg": 40,
+      "observed_cells": 28800,
+      "observed_fraction": 1,
+      "total_cells": 28800
+    },
+    {
+      "latitude_north_deg": 40,
+      "latitude_south_deg": 35,
+      "observed_cells": 28800,
+      "observed_fraction": 1,
+      "total_cells": 28800
+    },
+    {
+      "latitude_north_deg": 35,
+      "latitude_south_deg": 30,
+      "observed_cells": 28800,
+      "observed_fraction": 1,
+      "total_cells": 28800
+    },
+    {
+      "latitude_north_deg": 30,
+      "latitude_south_deg": 25,
+      "observed_cells": 28800,
+      "observed_fraction": 1,
+      "total_cells": 28800
+    },
+    {
+      "latitude_north_deg": 25,
+      "latitude_south_deg": 20,
+      "observed_cells": 28800,
+      "observed_fraction": 1,
+      "total_cells": 28800
+    },
+    {
+      "latitude_north_deg": 20,
+      "latitude_south_deg": 15,
+      "observed_cells": 28800,
+      "observed_fraction": 1,
+      "total_cells": 28800
+    },
+    {
+      "latitude_north_deg": 15,
+      "latitude_south_deg": 10,
+      "observed_cells": 28800,
+      "observed_fraction": 1,
+      "total_cells": 28800
+    },
+    {
+      "latitude_north_deg": 10,
+      "latitude_south_deg": 5,
+      "observed_cells": 28800,
+      "observed_fraction": 1,
+      "total_cells": 28800
+    },
+    {
+      "latitude_north_deg": 5,
+      "latitude_south_deg": 0,
+      "observed_cells": 28800,
+      "observed_fraction": 1,
+      "total_cells": 28800
+    },
+    {
+      "latitude_north_deg": 0,
+      "latitude_south_deg": -5,
+      "observed_cells": 28800,
+      "observed_fraction": 1,
+      "total_cells": 28800
+    },
+    {
+      "latitude_north_deg": -5,
+      "latitude_south_deg": -10,
+      "observed_cells": 28799,
+      "observed_fraction": 0.9999652777777778,
+      "total_cells": 28800
+    },
+    {
+      "latitude_north_deg": -10,
+      "latitude_south_deg": -15,
+      "observed_cells": 28800,
+      "observed_fraction": 1,
+      "total_cells": 28800
+    },
+    {
+      "latitude_north_deg": -15,
+      "latitude_south_deg": -20,
+      "observed_cells": 28800,
+      "observed_fraction": 1,
+      "total_cells": 28800
+    },
+    {
+      "latitude_north_deg": -20,
+      "latitude_south_deg": -25,
+      "observed_cells": 28800,
+      "observed_fraction": 1,
+      "total_cells": 28800
+    },
+    {
+      "latitude_north_deg": -25,
+      "latitude_south_deg": -30,
+      "observed_cells": 28800,
+      "observed_fraction": 1,
+      "total_cells": 28800
+    },
+    {
+      "latitude_north_deg": -30,
+      "latitude_south_deg": -35,
+      "observed_cells": 28800,
+      "observed_fraction": 1,
+      "total_cells": 28800
+    },
+    {
+      "latitude_north_deg": -35,
+      "latitude_south_deg": -40,
+      "observed_cells": 28800,
+      "observed_fraction": 1,
+      "total_cells": 28800
+    },
+    {
+      "latitude_north_deg": -40,
+      "latitude_south_deg": -45,
+      "observed_cells": 28800,
+      "observed_fraction": 1,
+      "total_cells": 28800
+    },
+    {
+      "latitude_north_deg": -45,
+      "latitude_south_deg": -50,
+      "observed_cells": 28800,
+      "observed_fraction": 1,
+      "total_cells": 28800
+    },
+    {
+      "latitude_north_deg": -50,
+      "latitude_south_deg": -55,
+      "observed_cells": 28800,
+      "observed_fraction": 1,
+      "total_cells": 28800
+    },
+    {
+      "latitude_north_deg": -55,
+      "latitude_south_deg": -60,
+      "observed_cells": 28800,
+      "observed_fraction": 1,
+      "total_cells": 28800
+    },
+    {
+      "latitude_north_deg": -60,
+      "latitude_south_deg": -65,
+      "observed_cells": 28800,
+      "observed_fraction": 1,
+      "total_cells": 28800
+    },
+    {
+      "latitude_north_deg": -65,
+      "latitude_south_deg": -70,
+      "observed_cells": 28800,
+      "observed_fraction": 1,
+      "total_cells": 28800
+    },
+    {
+      "latitude_north_deg": -70,
+      "latitude_south_deg": -75,
+      "observed_cells": 28800,
+      "observed_fraction": 1,
+      "total_cells": 28800
+    },
+    {
+      "latitude_north_deg": -75,
+      "latitude_south_deg": -80,
+      "observed_cells": 28800,
+      "observed_fraction": 1,
+      "total_cells": 28800
+    },
+    {
+      "latitude_north_deg": -80,
+      "latitude_south_deg": -85,
+      "observed_cells": 28800,
+      "observed_fraction": 1,
+      "total_cells": 28800
+    },
+    {
+      "latitude_north_deg": -85,
+      "latitude_south_deg": -90,
+      "observed_cells": 23695,
+      "observed_fraction": 0.8227430555555556,
+      "total_cells": 28800
+    }
+  ],
+  "limitations": [
+    "Measured-cell selection changes sample size and may introduce selection bias.",
+    "Tile standard deviation is not slope or resolution-matched planetary roughness.",
+    "Equal-angle tiles have latitude-dependent physical areas.",
+    "No Earth or Moon raster is ingested; E001 known-site recovery NOT YET MEASURED.",
+    "Cross-body similarity and novel analogue discovery NOT YET PROVEN."
+  ],
+  "multiscale_global": {
+    "4": {
+      "eligible_tiles": 64800,
+      "excluded_tiles": 0,
+      "max_rank_displacement": 42812,
+      "mean_all_cells_std_m": 160.07173838424737,
+      "mean_measured_only_std_m": 160.00645931883258,
+      "mean_tile_observed_fraction": 0.9911873070987655,
+      "metric": "within-tile elevation standard deviation in metres; not scale-corrected roughness",
+      "min_observed_fraction": 0.25,
+      "ordinal_rank_correlation": 0.9982439699007267,
+      "tile_size_pixels": 4,
+      "tiles_below_50_percent_measured": 142,
+      "top_decile_k": 6480,
+      "top_decile_overlap_fraction": 0.9989197530864198,
+      "total_tiles": 64800
+    },
+    "8": {
+      "eligible_tiles": 16200,
+      "excluded_tiles": 0,
+      "max_rank_displacement": 7689,
+      "mean_all_cells_std_m": 248.6880368057378,
+      "mean_measured_only_std_m": 248.3506862062413,
+      "mean_tile_observed_fraction": 0.9911873070987655,
+      "metric": "within-tile elevation standard deviation in metres; not scale-corrected roughness",
+      "min_observed_fraction": 0.25,
+      "ordinal_rank_correlation": 0.9994412260925831,
+      "tile_size_pixels": 8,
+      "tiles_below_50_percent_measured": 1,
+      "top_decile_k": 1620,
+      "top_decile_overlap_fraction": 0.9993827160493827,
+      "total_tiles": 16200
+    },
+    "16": {
+      "eligible_tiles": 4050,
+      "excluded_tiles": 0,
+      "max_rank_displacement": 380,
+      "mean_all_cells_std_m": 365.365246087207,
+      "mean_measured_only_std_m": 365.6444604994193,
+      "mean_tile_observed_fraction": 0.9911873070987655,
+      "metric": "within-tile elevation standard deviation in metres; not scale-corrected roughness",
+      "min_observed_fraction": 0.25,
+      "ordinal_rank_correlation": 0.9998078755266816,
+      "tile_size_pixels": 16,
+      "tiles_below_50_percent_measured": 0,
+      "top_decile_k": 405,
+      "top_decile_overlap_fraction": 1,
+      "total_tiles": 4050
+    },
+    "24": {
+      "eligible_tiles": 1800,
+      "excluded_tiles": 0,
+      "max_rank_displacement": 180,
+      "mean_all_cells_std_m": 456.4312824370024,
+      "mean_measured_only_std_m": 456.59987411474685,
+      "mean_tile_observed_fraction": 0.9911873070987655,
+      "metric": "within-tile elevation standard deviation in metres; not scale-corrected roughness",
+      "min_observed_fraction": 0.25,
+      "ordinal_rank_correlation": 0.9997540390187363,
+      "tile_size_pixels": 24,
+      "tiles_below_50_percent_measured": 0,
+      "top_decile_k": 180,
+      "top_decile_overlap_fraction": 0.9888888888888889,
+      "total_tiles": 1800
+    }
+  },
+  "qc": {
+    "claim_state": "MEGDR ingestion only; cross-body similarity NOT YET PROVEN",
+    "counts_sha256": "7e920ec43497b4beddf974650471600c7afd4916e2a8dd3500d6b14714365661",
+    "counts_unit": "ground-return shots per bin",
+    "interpolated_cells": 9137,
+    "min_count": 1,
+    "observed_cells": 1027663,
+    "retained_cells": 1027663,
+    "retained_fraction": 0.9911873070987655,
+    "retained_topography_max_m": 21134,
+    "retained_topography_min_m": -8068,
+    "shape": [
+      720,
+      1440
+    ],
+    "source": "https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg004/",
+    "topography_sha256": "25f16fb7aaf857898dcf98bc4f841341a24f8b9f7e98453ca083bc45d897ca2c",
+    "topography_unit": "m above MOLA areoid",
+    "total_cells": 1036800
+  },
+  "source_type": "official NASA PDS MOLA MEG004 raster bytes",
+  "tile_ablation": {
+    "eligible_tiles": 4050,
+    "excluded_tiles": 0,
+    "max_rank_displacement": 380,
+    "mean_all_cells_std_m": 365.365246087207,
+    "mean_measured_only_std_m": 365.6444604994193,
+    "mean_tile_observed_fraction": 0.9911873070987655,
+    "metric": "within-tile elevation standard deviation in metres; not scale-corrected roughness",
+    "min_observed_fraction": 0.25,
+    "ordinal_rank_correlation": 0.9998078755266816,
+    "tile_size_pixels": 16,
+    "tiles_below_50_percent_measured": 0,
+    "top_decile_k": 405,
+    "top_decile_overlap_fraction": 1,
+    "total_tiles": 4050
+  }
+}
