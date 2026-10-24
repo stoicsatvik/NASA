@@ -1,0 +1,352 @@
+{
+  "claim_state": "REAL EARTH INGESTION ONLY; E001 NOT YET MEASURED; CROSS-BODY SIMILARITY NOT YET PROVEN",
+  "experiment": "E214 real Earth SRTM-derived Mapzen Skadi ingestion and footprint sensitivity",
+  "limitations": [
+    "NASADEM OpenTopography public mirror returned HTTP 404 in prior CI; not ingested.",
+    "Site coordinates are research leads, not validated analogue labels.",
+    "Mapzen may blend SRTM with other sources and void fills; provenance is dataset-level, not per pixel.",
+    "2/4 km footprints do not validate crater-scale or planetary morphology.",
+    "Moon/Mars comparison and E001 known-site recovery NOT performed."
+  ],
+  "sites": [
+    {
+      "full_tile_shape": [
+        3601,
+        3601
+      ],
+      "label": "research lead only; NOT validated analogue ground truth",
+      "metrics": {
+        "derivative_valid_fraction": 1,
+        "elevation_range_m": 131,
+        "pixel_m": {
+          "east_west": 29.02938348653951,
+          "north_south": 30.887522287092473
+        },
+        "plane_detrended_relief_std_m": 43.425896850396775,
+        "shape": [
+          65,
+          69
+        ],
+        "slope_p50_dimensionless": 0.07091098092463277,
+        "slope_p90_dimensionless": 0.48274074504486597,
+        "valid_fraction": 1
+      },
+      "physical_window_bounds_lon_lat": [
+        76.50043115132272,
+        19.966006796362755,
+        76.5195688486773,
+        19.983993203637247
+      ],
+      "physical_window_km": 2,
+      "product": "MAPZEN_SKADI",
+      "raster_crs": "EPSG:4326",
+      "sha256": "99633e38befb5f7e78bac0eb53e79319085e767fa5181b0968347f89095547ea",
+      "site": "lonar_lead",
+      "site_lat_lon": [
+        19.975,
+        76.51
+      ],
+      "source_nodata": -32768,
+      "source_url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N19/N19E076.hgt.gz",
+      "tile_bounds_lon_lat": [
+        75.99986111111112,
+        18.99986111111111,
+        77.0001388888889,
+        20.000138888888888
+      ],
+      "vertical_units": "metres; planetary vertical datums differ"
+    },
+    {
+      "full_tile_shape": [
+        3601,
+        3601
+      ],
+      "label": "research lead only; NOT validated analogue ground truth",
+      "metrics": {
+        "derivative_valid_fraction": 1,
+        "elevation_range_m": 132,
+        "pixel_m": {
+          "east_west": 29.02938348653951,
+          "north_south": 30.887522287092473
+        },
+        "plane_detrended_relief_std_m": 30.717701809565906,
+        "shape": [
+          130,
+          138
+        ],
+        "slope_p50_dimensionless": 0.04727398728308852,
+        "slope_p90_dimensionless": 0.14182196184926554,
+        "valid_fraction": 1
+      },
+      "physical_window_bounds_lon_lat": [
+        76.49086230264543,
+        19.95701359272551,
+        76.52913769735459,
+        19.992986407274493
+      ],
+      "physical_window_km": 4,
+      "product": "MAPZEN_SKADI",
+      "raster_crs": "EPSG:4326",
+      "sha256": "99633e38befb5f7e78bac0eb53e79319085e767fa5181b0968347f89095547ea",
+      "site": "lonar_lead",
+      "site_lat_lon": [
+        19.975,
+        76.51
+      ],
+      "source_nodata": -32768,
+      "source_url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N19/N19E076.hgt.gz",
+      "tile_bounds_lon_lat": [
+        75.99986111111112,
+        18.99986111111111,
+        77.0001388888889,
+        20.000138888888888
+      ],
+      "vertical_units": "metres; planetary vertical datums differ"
+    },
+    {
+      "full_tile_shape": [
+        3601,
+        3601
+      ],
+      "label": "research lead only; NOT validated analogue ground truth",
+      "metrics": {
+        "derivative_valid_fraction": 1,
+        "elevation_range_m": 395,
+        "pixel_m": {
+          "east_west": 29.274217887173275,
+          "north_south": 30.887522287092473
+        },
+        "plane_detrended_relief_std_m": 75.81884911991553,
+        "shape": [
+          65,
+          68
+        ],
+        "slope_p50_dimensionless": 0.21219651015309893,
+        "slope_p90_dimensionless": 0.7508075644063756,
+        "valid_fraction": 1
+      },
+      "physical_window_bounds_lon_lat": [
+        73.49051118021843,
+        18.591006796362755,
+        73.50948881978157,
+        18.608993203637247
+      ],
+      "physical_window_km": 2,
+      "product": "MAPZEN_SKADI",
+      "raster_crs": "EPSG:4326",
+      "sha256": "73523b876c229607f421c529b8c91a5ed7dd9b504ba413064b5ab0fcb193361b",
+      "site": "western_ghats_lead",
+      "site_lat_lon": [
+        18.6,
+        73.5
+      ],
+      "source_nodata": -32768,
+      "source_url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N18/N18E073.hgt.gz",
+      "tile_bounds_lon_lat": [
+        72.99986111111112,
+        17.99986111111111,
+        74.0001388888889,
+        19.000138888888888
+      ],
+      "vertical_units": "metres; planetary vertical datums differ"
+    },
+    {
+      "full_tile_shape": [
+        3601,
+        3601
+      ],
+      "label": "research lead only; NOT validated analogue ground truth",
+      "metrics": {
+        "derivative_valid_fraction": 1,
+        "elevation_range_m": 531,
+        "pixel_m": {
+          "east_west": 29.274217887173275,
+          "north_south": 30.887522287092473
+        },
+        "plane_detrended_relief_std_m": 94.61938741148357,
+        "shape": [
+          130,
+          137
+        ],
+        "slope_p50_dimensionless": 0.1654426401540141,
+        "slope_p90_dimensionless": 0.5654258105779653,
+        "valid_fraction": 1
+      },
+      "physical_window_bounds_lon_lat": [
+        73.48102236043687,
+        18.58201359272551,
+        73.51897763956313,
+        18.617986407274493
+      ],
+      "physical_window_km": 4,
+      "product": "MAPZEN_SKADI",
+      "raster_crs": "EPSG:4326",
+      "sha256": "73523b876c229607f421c529b8c91a5ed7dd9b504ba413064b5ab0fcb193361b",
+      "site": "western_ghats_lead",
+      "site_lat_lon": [
+        18.6,
+        73.5
+      ],
+      "source_nodata": -32768,
+      "source_url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N18/N18E073.hgt.gz",
+      "tile_bounds_lon_lat": [
+        72.99986111111112,
+        17.99986111111111,
+        74.0001388888889,
+        19.000138888888888
+      ],
+      "vertical_units": "metres; planetary vertical datums differ"
+    },
+    {
+      "full_tile_shape": [
+        3601,
+        3601
+      ],
+      "label": "research lead only; NOT validated analogue ground truth",
+      "metrics": {
+        "derivative_valid_fraction": 1,
+        "elevation_range_m": 336,
+        "pixel_m": {
+          "east_west": 25.54646967112677,
+          "north_south": 30.887522287092473
+        },
+        "plane_detrended_relief_std_m": 48.24920695444129,
+        "shape": [
+          65,
+          78
+        ],
+        "slope_p50_dimensionless": 0.2133021816319782,
+        "slope_p90_dimensionless": 0.46646799036808007,
+        "valid_fraction": 1
+      },
+      "physical_window_bounds_lon_lat": [
+        77.58912656890153,
+        34.19100679636276,
+        77.61087343109845,
+        34.20899320363725
+      ],
+      "physical_window_km": 2,
+      "product": "MAPZEN_SKADI",
+      "raster_crs": "EPSG:4326",
+      "sha256": "9179642ad2f9ccd90266229b9e9d7c49044bda661ec731d0068879dd607f2c7c",
+      "site": "ladakh_lead",
+      "site_lat_lon": [
+        34.2,
+        77.6
+      ],
+      "source_nodata": -32768,
+      "source_url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N34/N34E077.hgt.gz",
+      "tile_bounds_lon_lat": [
+        76.99986111111112,
+        33.999861111111116,
+        78.0001388888889,
+        35.00013888888889
+      ],
+      "vertical_units": "metres; planetary vertical datums differ"
+    },
+    {
+      "full_tile_shape": [
+        3601,
+        3601
+      ],
+      "label": "research lead only; NOT validated analogue ground truth",
+      "metrics": {
+        "derivative_valid_fraction": 1,
+        "elevation_range_m": 742,
+        "pixel_m": {
+          "east_west": 25.54646967112677,
+          "north_south": 30.887522287092473
+        },
+        "plane_detrended_relief_std_m": 98.16181534658526,
+        "shape": [
+          130,
+          157
+        ],
+        "slope_p50_dimensionless": 0.2953623900429082,
+        "slope_p90_dimensionless": 0.665680155118198,
+        "valid_fraction": 1
+      },
+      "physical_window_bounds_lon_lat": [
+        77.57825313780309,
+        34.18201359272551,
+        77.6217468621969,
+        34.217986407274495
+      ],
+      "physical_window_km": 4,
+      "product": "MAPZEN_SKADI",
+      "raster_crs": "EPSG:4326",
+      "sha256": "9179642ad2f9ccd90266229b9e9d7c49044bda661ec731d0068879dd607f2c7c",
+      "site": "ladakh_lead",
+      "site_lat_lon": [
+        34.2,
+        77.6
+      ],
+      "source_nodata": -32768,
+      "source_url": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N34/N34E077.hgt.gz",
+      "tile_bounds_lon_lat": [
+        76.99986111111112,
+        33.999861111111116,
+        78.0001388888889,
+        35.00013888888889
+      ],
+      "vertical_units": "metres; planetary vertical datums differ"
+    }
+  ],
+  "source_note": "Mapzen Skadi AWS public terrain tiles, derived mainly from SRTM in India; not official NASADEM, not independent validation",
+  "within_site_2km_vs_4km_sensitivity": {
+    "ladakh_lead": {
+      "plane_detrended_relief_std_m": {
+        "four_km": 98.16181534658526,
+        "relative_change": 1.0344752078365416,
+        "two_km": 48.24920695444129
+      },
+      "slope_p50_dimensionless": {
+        "four_km": 0.2953623900429082,
+        "relative_change": 0.3847134041625178,
+        "two_km": 0.2133021816319782
+      },
+      "slope_p90_dimensionless": {
+        "four_km": 0.665680155118198,
+        "relative_change": 0.42706502667615803,
+        "two_km": 0.46646799036808007
+      }
+    },
+    "lonar_lead": {
+      "plane_detrended_relief_std_m": {
+        "four_km": 30.717701809565906,
+        "relative_change": -0.29264093461583296,
+        "two_km": 43.425896850396775
+      },
+      "slope_p50_dimensionless": {
+        "four_km": 0.04727398728308852,
+        "relative_change": -0.33333333333333326,
+        "two_km": 0.07091098092463277
+      },
+      "slope_p90_dimensionless": {
+        "four_km": 0.14182196184926554,
+        "relative_change": -0.7062150578648906,
+        "two_km": 0.48274074504486597
+      }
+    },
+    "western_ghats_lead": {
+      "plane_detrended_relief_std_m": {
+        "four_km": 94.61938741148357,
+        "relative_change": 0.24796654802597975,
+        "two_km": 75.81884911991553
+      },
+      "slope_p50_dimensionless": {
+        "four_km": 0.1654426401540141,
+        "relative_change": -0.2203328884407764,
+        "two_km": 0.21219651015309893
+      },
+      "slope_p90_dimensionless": {
+        "four_km": 0.5654258105779653,
+        "relative_change": -0.24690981100461082,
+        "two_km": 0.7508075644063756
+      }
+    }
+  },
+  "evidence_run": "https://github.com/stoicsatvik/NASA/actions/runs/40082499487",
+  "evidence_head_sha": "d25fef3cbeed0b30fadc6463624e5303804b61c4",
+  "execution_date_utc": "2026-10-24"
+}
