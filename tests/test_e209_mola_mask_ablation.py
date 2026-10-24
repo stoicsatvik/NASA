@@ -1,6 +1,6 @@
 """E209 synthetic controls, not Mars observations."""
 import unittest
-from research.e209_mola_mask_ablation import rank_sensitivity
+from research.e209_mola_mask_ablation import rank_sensitivity, latitude_coverage, region_ablation
 
 
 class RankSensitivityTests(unittest.TestCase):
@@ -23,6 +23,14 @@ class RankSensitivityTests(unittest.TestCase):
         counts = [1, 1, 1, 0] + [1] * 12
         result = rank_sensitivity(heights, counts, 4, 4, tile_size=2)
         self.assertLess(result["top_decile_overlap_fraction"], 1)
+
+    def test_latitude_coverage_and_equatorial_slice(self):
+        counts = [1] * 8 + [0] * 8
+        bands = latitude_coverage(counts, 4, 4, band_rows=2)
+        self.assertEqual([b["observed_fraction"] for b in bands], [1.0, 0.0])
+        heights = list(range(16))
+        result = region_ablation(heights, counts, 4, 4, 0, 2, (2,))
+        self.assertEqual(result["2"]["eligible_tiles"], 2)
 
     def test_invalid_inputs(self):
         with self.assertRaisesRegex(ValueError, "grid shape"):
