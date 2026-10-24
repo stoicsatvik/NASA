@@ -1,0 +1,66 @@
+{
+  "approx_equal_distance_footprint_km": {
+    "mars_2px": 29.5789674981739,
+    "moon_4px": 30.32335042414948
+  },
+  "claim_state": "REAL LUNAR INGESTION ONLY; CROSS-BODY SIMILARITY NOT YET PROVEN; E001 NOT YET MEASURED",
+  "equal_angle_4px_footprint_km": {
+    "mars": 59.1579349963478,
+    "moon": 30.32335042414948
+  },
+  "equatorial_pixel_north_south_km": {
+    "mars": 14.78948374908695,
+    "moon": 7.58083760603737
+  },
+  "experiment": "E212 real LOLA/MOLA raster ingestion and physical-footprint gate",
+  "grid_shape": [
+    720,
+    1440
+  ],
+  "latitude_window_deg": [
+    -10,
+    10
+  ],
+  "limitations": [
+    "LOLA SVS TIFF is an official derived visualization product, not independently masked shot-level data.",
+    "Equal-distance tiles still have unequal sample counts (Moon 16, Mars 4) and different instrument smoothing.",
+    "MOLA and LOLA vertical datums differ; subtracting local means removes offsets but not instrument bias.",
+    "Latitude affects east-west pixel scale; only +/-10 degrees examined.",
+    "No Earth reference, independent known-site labels or E001 recovery performed.",
+    "Numerical roughness summaries do NOT establish analogues or cross-body similarity."
+  ],
+  "lola_coverage": "NOT MEASURED: NASA SVS derivative has no per-bin observation-count mask",
+  "lola_vertical_unit": "km relative to lunar 1737.4-km sphere in TIFF; converted to m",
+  "mola_equatorial_observed_fraction": 0.9999913194444444,
+  "mola_vertical_unit": "m above MOLA areoid",
+  "physical_footprint_ratio_equal_angle": 1.950903649130885,
+  "sha256": {
+    "counts_label": "487004de9598296dc910b814ee8a256e7755abed7ade9f1180743208eccb8476",
+    "lola_tiff": "330afa2556a86fd05ac6ba2f912f246600fdade35de2a0d90593d50d07b01b65",
+    "mola_label": "5a3fe60256afa1c35fea5d551fe0ab0a9198fb2bcd2c2e161d078aa69627ebac",
+    "mola_megc": "7e920ec43497b4beddf974650471600c7afd4916e2a8dd3500d6b14714365661",
+    "mola_megt": "25f16fb7aaf857898dcf98bc4f841341a24f8b9f7e98453ca083bc45d897ca2c"
+  },
+  "sources": {
+    "lola": "https://svs.gsfc.nasa.gov/vis/a000000/a004700/a004720/ldem_4.tif",
+    "mola": "https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg004/"
+  },
+  "tile_std_m": {
+    "mars_2px_masked": {
+      "median": 58.95310633510253,
+      "n": 28800
+    },
+    "mars_4px_masked": {
+      "median": 140.87157833938545,
+      "n": 7200
+    },
+    "moon_4px": {
+      "median": 353.2275653863171,
+      "n": 7200
+    }
+  },
+  "experiment_id": "E212",
+  "execution_date_utc": "2026-10-24",
+  "evidence_run": "https://github.com/stoicsatvik/NASA/actions/runs/40078234718",
+  "exact_experiment_head_sha": "facc3cd7d1ae7732190c79a6b637622015e45673"
+}
