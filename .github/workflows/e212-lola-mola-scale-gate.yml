@@ -1,0 +1,57 @@
+name: E212 real LOLA/MOLA physical-scale evidence
+on:
+  push:
+    branches:
+      - foundry/e212-lola-mola-scale-gate-20261024
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-lola-scale-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install numerical raster readers
+        run: python -m pip install 'numpy>=2.0,<3' 'Pillow>=11,<13'
+      - name: Test synthetic geometry and missing-observation controls
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Download official NASA LOLA derivative and PDS MOLA paired rasters
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .data/e212
+          curl --fail --location --retry 2 --connect-timeout 20 --max-time 240 --silent --show-error \
+            'https://svs.gsfc.nasa.gov/vis/a000000/a004700/a004720/ldem_4.tif' \
+            --output .data/e212/ldem_4.tif
+          base='https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg004'
+          for file in megt90n000cb.img megc90n000cb.img megt90n000cb.lbl megc90n000cb.lbl; do
+            curl --fail --location --retry 2 --connect-timeout 20 --max-time 240 --silent --show-error \
+              "$base/$file" --output ".data/e212/$file"
+          done
+          test "$(wc -c < .data/e212/megt90n000cb.img)" -eq 2073600
+          test "$(wc -c < .data/e212/megc90n000cb.img)" -eq 2073600
+      - name: Evaluate physical-scale mismatch with real lunar and Martian data
+        shell: bash
+        run: |
+          set -euo pipefail
+          python research/e212_lola_mola_scale_gate.py \
+            --lola .data/e212/ldem_4.tif \
+            --mola .data/e212/megt90n000cb.img \
+            --counts .data/e212/megc90n000cb.img \
+            --mola-label .data/e212/megt90n000cb.lbl \
+            --counts-label .data/e212/megc90n000cb.lbl \
+            > .data/e212/e212_results.json
+          python -m json.tool .data/e212/e212_results.json > /dev/null
+          cat .data/e212/e212_results.json
+      - name: Preserve numerical evidence only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e212-lola-mola-evidence
+          path: .data/e212/e212_results.json
+          if-no-files-found: ignore
+          retention-days: 14
