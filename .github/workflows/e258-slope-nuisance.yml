@@ -1,0 +1,62 @@
+name: E258 real Earth slope-nuisance falsification
+on:
+  push:
+    branches:
+      - foundry/e258-terrain-slope-nuisance-20261025
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  slope-nuisance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install public raster dependencies
+        run: python -m pip install 'numpy>=2.0,<3' 'rasterio>=1.4,<2' 'Pillow>=11,<13'
+      - name: Run all deterministic controls
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Fetch fingerprinted public Earth tiles
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .data/e258
+          base='https://s3.amazonaws.com/elevation-tiles-prod/skadi'
+          for tile in N18E073 N34E077; do
+            band="${tile:0:3}"
+            curl --fail --location --retry 2 --connect-timeout 20 --max-time 240 --silent --show-error \
+              "$base/$band/$tile.hgt.gz" --output ".data/e258/$tile.hgt.gz"
+            gzip -dc ".data/e258/$tile.hgt.gz" > ".data/e258/$tile.hgt"
+          done
+      - name: Measure slope nuisance on real terrain
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m research.e258_slope_nuisance \
+            --ghats .data/e258/N18E073.hgt \
+            --ladakh .data/e258/N34E077.hgt > .data/e258/e258_results.json
+          python - <<'PY'
+          import json
+          d = json.load(open('.data/e258/e258_results.json'))
+          a = d['audit']
+          assert a['scenario_count'] == 48
+          assert len(a['synthetic_tilt_scenarios']) == 48
+          assert all(sum(r['grid_rank_vs_original_dense'][n].values()) == 256
+                     for r in a['synthetic_tilt_scenarios'] for n in ('2','4','8','16'))
+          print('E258_DENSE_REVERSALS', a['dense_reversal_count'])
+          print('E258_GRID_ANY_REVERSALS', a['per_grid_any_reversal_count'])
+          print('E258_MAX_DETRENDED_RESIDUAL_CHANGE_M', a['max_planar_residual_change_m'])
+          PY
+      - name: Preserve numerical receipt without raw rasters
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e258-real-earth-slope-nuisance
+          path: .data/e258/e258_results.json
+          if-no-files-found: ignore
+          retention-days: 30
