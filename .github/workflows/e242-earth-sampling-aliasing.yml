@@ -1,0 +1,61 @@
+name: E242 Earth sampling-density aliasing audit
+on:
+  push:
+    branches:
+      - foundry/e242-earth-planet-sampling-aliasing-20261025
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-earth-aliasing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install bounded numerical raster dependencies
+        run: python -m pip install 'numpy>=2.0,<3' 'rasterio>=1.4,<2' 'Pillow>=11,<13'
+      - name: Run deterministic synthetic controls and inherited regression tests
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Download two public Mapzen Skadi tiles read-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .data/e242
+          base='https://s3.amazonaws.com/elevation-tiles-prod/skadi'
+          for tile in N18E073 N34E077; do
+            band="${tile:0:3}"
+            curl --fail --location --retry 2 --connect-timeout 20 --max-time 240 --silent --show-error \
+              "$base/$band/$tile.hgt.gz" --output ".data/e242/$tile.hgt.gz"
+            gzip -dc ".data/e242/$tile.hgt.gz" > ".data/e242/$tile.hgt"
+          done
+      - name: Run real Earth 30-km aliasing experiment
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m research.e242_earth_sampling_aliasing \
+            --ghats .data/e242/N18E073.hgt \
+            --ladakh .data/e242/N34E077.hgt > .data/e242/e242_results.json
+          python -m json.tool .data/e242/e242_results.json > /dev/null
+          python - <<'PY'
+          import json
+          d=json.load(open('.data/e242/e242_results.json'))
+          assert len(d['sites'])==2
+          for s in d['sites']:
+              assert s['valid_fraction']==1.0
+              for n in (2,4,8,16):
+                  x=s['metrics'][f'grid_{n}x{n}']
+                  assert x['point_sample_phase_count']==16
+                  assert x['sample_count']==n*n
+          print(json.dumps(d,indent=2,sort_keys=True))
+          PY
+      - name: Preserve numerical receipt without raw terrain tiles
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e242-real-earth-aliasing-receipt
+          path: .data/e242/e242_results.json
+          if-no-files-found: ignore
+          retention-days: 30
