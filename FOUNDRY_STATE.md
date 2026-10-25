@@ -202,3 +202,15 @@ USGS Astrogeology DOI `10.5066/P9J72921` was accessed read-only via ScienceBase 
 **Claims:** official-source metadata and four real points SUPPORTED; source missingness/disagreement SUPPORTED; cross-body similarity NOT YET PROVEN; E001 NOT YET MEASURED; novel discovery, local advantage, challenge superiority NOT YET PROVEN.
 
 **Next:** Seek explicit site-to-target geological analogue pairs with validated coordinates/process and independent negative controls. Attempt E001 only with compatible measured descriptors. Re-rank all official challenge statements after 28 Oct; no competition solution build before event.
+
+## 2026-10-25: E242 real Earth sampling-density falsification
+
+**Executed, not merely proposed.** [Read-only exact-head workflow 40151130273](https://github.com/stoicsatvik/NASA/actions/runs/40151130273) downloaded two public Mapzen Skadi SRTM-derived Earth tiles and compared 30-km support windows at Western Ghats and Ladakh leads. The initial workflow [40151021226](https://github.com/stoicsatvik/NASA/actions/runs/40151021226) failed because E214's geometry helper deliberately caps windows at 20 km; E242 added an independently validated 30-km helper without weakening E214. Five deterministic synthetic controls and inherited tests passed.
+
+High-resolution plane-detrended relief SD was 144.09 m (Ghats) and 436.64 m (Ladakh). Under idealized **2×2 cell averaging**, the same descriptor fell to **5.3% and 26.0%** of the high-resolution reference; under **4×4 averaging**, to **36.2% and 69.5%**. Sixteen coarse point-sampling phases per grid also produced wide min/max ranges, including overestimates. The 2×2 planar-fit residual has only one degree of freedom; this is partly an **estimator identifiability failure**, not proof of actual instrument smoothing. The study does NOT emulate LOLA/MOLA point-spread functions.
+
+Provenance, source SHA-256s, full numerical receipt and limitations: `research/results/e242_real_earth_sampling_aliasing_20261025.json` and `research/E242_EARTH_SAMPLING_ALIASING_20261025.md`. No raw DEMs, field observations or invented analogue labels committed.
+
+**Claim states:** real Earth sampling-density sensitivity SUPPORTED for these two sites and this descriptor; physically comparable Earth/Moon/Mars similarity NOT YET PROVEN; **E001 known-site recovery NOT YET MEASURED**; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN; planetary challenge superiority NOT YET PROVEN.
+
+**Next:** avoid treating 2×2 Mars, 4×4 Moon and dense Earth roughness as comparable. Test instrument-aware common spatial-frequency descriptors, obtain independently sourced positive/negative geological labels, and attempt blinded E001. Re-rank all 14 official challenges when full statements arrive on October 28.
