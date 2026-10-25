@@ -1,0 +1,59 @@
+name: E247 Earth fixed physical-lag terrain contrast
+on:
+  push:
+    branches:
+      - foundry/e247-common-lag-terrain-20261025
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  common-lag:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install bounded public raster dependencies
+        run: python -m pip install 'numpy>=2.0,<3' 'rasterio>=1.4,<2' 'Pillow>=11,<13'
+      - name: Run deterministic tests
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Fetch fingerprinted public Earth elevation tiles
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .data/e247
+          base='https://s3.amazonaws.com/elevation-tiles-prod/skadi'
+          for tile in N18E073 N34E077; do
+            band="${tile:0:3}"
+            curl --fail --location --retry 2 --connect-timeout 20 --max-time 240 --silent --show-error \
+              "$base/$band/$tile.hgt.gz" --output ".data/e247/$tile.hgt.gz"
+            gzip -dc ".data/e247/$tile.hgt.gz" > ".data/e247/$tile.hgt"
+          done
+      - name: Measure 15-km-lag contrast and rank reversals
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m research.e247_common_lag_terrain \
+            --ghats .data/e247/N18E073.hgt \
+            --ladakh .data/e247/N34E077.hgt > .data/e247/e247_results.json
+          python - <<'PY'
+          import json
+          d=json.load(open('.data/e247/e247_results.json'))
+          assert d['nominal_lag_km'] == 15
+          assert len(d['metrics']) == 3
+          for metric, entry in d['metrics'].items():
+              for n in ('2','4','8','16'):
+                  row=entry['grid_results'][n]
+                  assert sum(row['independent_phase_counts'].values()) == 256
+                  print(metric, n, row['independent_phase_counts'], row['block_mean_rank'])
+          PY
+      - name: Preserve results without raw raster data
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e247-real-earth-common-lag-receipt
+          path: .data/e247/e247_results.json
+          if-no-files-found: ignore
+          retention-days: 30
