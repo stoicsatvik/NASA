@@ -8,17 +8,27 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 from pathlib import Path
 import numpy as np
 import rasterio
 from rasterio.windows import from_bounds
-from research.e214_earth_dem_site_qc import SITES, square_bounds, source_url
+from research.e214_earth_dem_site_qc import SITES, R, source_url
 
 PHASES = (0.125, 0.375, 0.625, 0.875)
 SITES_TO_TEST = ("western_ghats_lead", "ladakh_lead")
 WIDTH_KM = 30.0
 MOON_EQ_TILE_KM = 30.32335042414948
 MARS_EQ_TILE_KM = 29.5789674981739
+
+def footprint_bounds(lat: float, lon: float, width_km: float) -> tuple[float, float, float, float]:
+    """30-km geodesic approximation, independent of E214's <=20-km QC cap."""
+    if not all(math.isfinite(v) for v in (lat, lon, width_km)) or not (-85 < lat < 85 and -180 < lon < 180 and 0 < width_km <= 40):
+        raise ValueError("invalid footprint geometry")
+    half = width_km * 500 / R
+    dlat = math.degrees(half)
+    dlon = math.degrees(half / math.cos(math.radians(lat)))
+    return lon - dlon, lat - dlat, lon + dlon, lat + dlat
 
 def sha256(path: Path) -> str:
     h = hashlib.sha256()
@@ -86,7 +96,7 @@ def inspect(path: Path, site: str) -> dict:
     if site not in SITES_TO_TEST:
         raise ValueError("only tile-contained sites supported")
     lat, lon = SITES[site]
-    bounds = square_bounds(lat, lon, WIDTH_KM)
+    bounds = footprint_bounds(lat, lon, WIDTH_KM)
     with rasterio.open(path) as ds:
         if ds.count != 1 or ds.crs is None or ds.crs.to_epsg() != 4326:
             raise ValueError("expected one EPSG:4326 DEM band")
