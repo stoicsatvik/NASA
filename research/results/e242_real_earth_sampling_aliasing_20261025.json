@@ -1,0 +1,197 @@
+{
+  "claim_state": "EARTH SAMPLING-DENSITY SENSITIVITY ONLY; E001 NOT YET MEASURED; CROSS-BODY SIMILARITY NOT YET PROVEN",
+  "comparison_rationale": {
+    "lunar_equatorial_4x4_support_km": 30.32335042414948,
+    "martian_equatorial_2x2_support_km": 29.5789674981739,
+    "reference": "E212 real-data spherical footprint calculation"
+  },
+  "experiment": "E242 real Earth 30km downsampling aliasing audit",
+  "limitations": [
+    "Earth tiles are Mapzen Skadi SRTM-derived, not NASADEM or per-pixel provenance audited.",
+    "Coarse point samples are NOT instrument point-spread-function simulations.",
+    "Block means represent idealized anti-aliasing, not LOLA/MOLA processing.",
+    "Only two unvalidated Earth research leads, no positive or negative analogue labels.",
+    "2x2 planar detrending has one residual degree of freedom.",
+    "No Moon/Mars elevations matched, no labels evaluated, E001 NOT YET MEASURED."
+  ],
+  "physical_support_km": 30,
+  "sites": [
+    {
+      "metrics": {
+        "grid_16x16": {
+          "block_mean_detrended_relief_sd_m": 121.09883231961402,
+          "block_mean_fraction_of_high_res": 0.8404228489977682,
+          "point_sample_detrended_relief_sd_m": {
+            "maximum": 155.22401034722992,
+            "median": 145.08453755607172,
+            "minimum": 128.04794410558534
+          },
+          "point_sample_fraction_of_high_res": {
+            "maximum": 1.0772507257920836,
+            "median": 1.0068830397685715,
+            "minimum": 0.8886495099267198
+          },
+          "point_sample_phase_count": 16,
+          "sample_count": 256
+        },
+        "grid_2x2": {
+          "block_mean_detrended_relief_sd_m": 7.592693790878798,
+          "block_mean_fraction_of_high_res": 0.052693103848074845,
+          "point_sample_detrended_relief_sd_m": {
+            "maximum": 143,
+            "median": 24.125,
+            "minimum": 0.5
+          },
+          "point_sample_fraction_of_high_res": {
+            "maximum": 0.992416401584209,
+            "median": 0.1674268929246087,
+            "minimum": 0.003469987418126605
+          },
+          "point_sample_phase_count": 16,
+          "sample_count": 4
+        },
+        "grid_4x4": {
+          "block_mean_detrended_relief_sd_m": 52.16376402361493,
+          "block_mean_fraction_of_high_res": 0.3620152096881381,
+          "point_sample_detrended_relief_sd_m": {
+            "maximum": 187.71828959906918,
+            "median": 125.46358405165151,
+            "minimum": 82.18725285133942
+          },
+          "point_sample_fraction_of_high_res": {
+            "maximum": 1.3027602061220327,
+            "median": 0.870714116184601,
+            "minimum": 0.5703774666490754
+          },
+          "point_sample_phase_count": 16,
+          "sample_count": 16
+        },
+        "grid_8x8": {
+          "block_mean_detrended_relief_sd_m": 94.88429425882693,
+          "block_mean_fraction_of_high_res": 0.6584946145119037,
+          "point_sample_detrended_relief_sd_m": {
+            "maximum": 163.70783351730398,
+            "median": 143.41530600905966,
+            "minimum": 92.10785073105681
+          },
+          "point_sample_fraction_of_high_res": {
+            "maximum": 1.1361282451076193,
+            "median": 0.9952986148364278,
+            "minimum": 0.6392261662949011
+          },
+          "point_sample_phase_count": 16,
+          "sample_count": 64
+        },
+        "high_resolution": {
+          "detrended_relief_sd_m": 144.09274148606067,
+          "pixels": 995275
+        }
+      },
+      "patch_shape": [
+        971,
+        1025
+      ],
+      "sha256": "73523b876c229607f421c529b8c91a5ed7dd9b504ba413064b5ab0fcb193361b",
+      "site": "western_ghats_lead",
+      "site_lat_lon": [
+        18.6,
+        73.5
+      ],
+      "source": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N18/N18E073.hgt.gz",
+      "support_width_km": 30,
+      "tile": "N18E073.hgt",
+      "valid_fraction": 1,
+      "vertical_units": "metres in derived Skadi HGT"
+    },
+    {
+      "metrics": {
+        "grid_16x16": {
+          "block_mean_detrended_relief_sd_m": 410.54306109339,
+          "block_mean_fraction_of_high_res": 0.9402297992828336,
+          "point_sample_detrended_relief_sd_m": {
+            "maximum": 447.21054152542774,
+            "median": 435.86318940750266,
+            "minimum": 421.3250877500459
+          },
+          "point_sample_fraction_of_high_res": {
+            "maximum": 1.0242060274402485,
+            "median": 0.9982182088279609,
+            "minimum": 0.9649229039044305
+          },
+          "point_sample_phase_count": 16,
+          "sample_count": 256
+        },
+        "grid_2x2": {
+          "block_mean_detrended_relief_sd_m": 113.38118751480283,
+          "block_mean_fraction_of_high_res": 0.2596667226467679,
+          "point_sample_detrended_relief_sd_m": {
+            "maximum": 673.75,
+            "median": 217.62499999999994,
+            "minimum": 14.250000000000114
+          },
+          "point_sample_fraction_of_high_res": {
+            "maximum": 1.543028947023673,
+            "median": 0.498406938175921,
+            "minimum": 0.03263549164391468
+          },
+          "point_sample_phase_count": 16,
+          "sample_count": 4
+        },
+        "grid_4x4": {
+          "block_mean_detrended_relief_sd_m": 303.3072899240691,
+          "block_mean_fraction_of_high_res": 0.6946373702354587,
+          "point_sample_detrended_relief_sd_m": {
+            "maximum": 535.3592602169126,
+            "median": 412.0640249593124,
+            "minimum": 242.12022452698994
+          },
+          "point_sample_fraction_of_high_res": {
+            "maximum": 1.2260850991790357,
+            "median": 0.943713125846834,
+            "minimum": 0.5545061448682992
+          },
+          "point_sample_phase_count": 16,
+          "sample_count": 16
+        },
+        "grid_8x8": {
+          "block_mean_detrended_relief_sd_m": 382.41569928849697,
+          "block_mean_fraction_of_high_res": 0.8758122356934339,
+          "point_sample_detrended_relief_sd_m": {
+            "maximum": 464.37377342135966,
+            "median": 438.0627470084512,
+            "minimum": 397.9349084457746
+          },
+          "point_sample_fraction_of_high_res": {
+            "maximum": 1.0635134317295294,
+            "median": 1.0032556575090883,
+            "minimum": 0.9113544827651879
+          },
+          "point_sample_phase_count": 16,
+          "sample_count": 64
+        },
+        "high_resolution": {
+          "detrended_relief_sd_m": 436.6411928302362,
+          "pixels": 1139954
+        }
+      },
+      "patch_shape": [
+        971,
+        1174
+      ],
+      "sha256": "9179642ad2f9ccd90266229b9e9d7c49044bda661ec731d0068879dd607f2c7c",
+      "site": "ladakh_lead",
+      "site_lat_lon": [
+        34.2,
+        77.6
+      ],
+      "source": "https://s3.amazonaws.com/elevation-tiles-prod/skadi/N34/N34E077.hgt.gz",
+      "support_width_km": 30,
+      "tile": "N34E077.hgt",
+      "valid_fraction": 1,
+      "vertical_units": "metres in derived Skadi HGT"
+    }
+  ],
+  "evidence_run": "https://github.com/stoicsatvik/NASA/actions/runs/40151130273",
+  "evidence_head_sha": "cc13aa8022b8053a7a7be149ad8328246e5d85df",
+  "execution_date_utc": "2026-10-25"
+}
