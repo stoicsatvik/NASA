@@ -1,0 +1,59 @@
+name: E243 exact Earth sampling-phase rank stress
+on:
+  push:
+    branches:
+      - foundry/e243-earth-rank-phase-stress-20261025
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  rank-stress:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install bounded public raster dependencies
+        run: python -m pip install 'numpy>=2.0,<3' 'rasterio>=1.4,<2' 'Pillow>=11,<13'
+      - name: Deterministic tests including E242 controls
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Download two fingerprinted public Earth DEM tiles
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .data/e243
+          base='https://s3.amazonaws.com/elevation-tiles-prod/skadi'
+          for tile in N18E073 N34E077; do
+            band="${tile:0:3}"
+            curl --fail --location --retry 2 --connect-timeout 20 --max-time 240 --silent --show-error \
+              "$base/$band/$tile.hgt.gz" --output ".data/e243/$tile.hgt.gz"
+            gzip -dc ".data/e243/$tile.hgt.gz" > ".data/e243/$tile.hgt"
+          done
+      - name: Run exact 16 matched and 256 independent phase scenarios per grid
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m research.e243_earth_rank_phase_stress \
+            --ghats .data/e243/N18E073.hgt \
+            --ladakh .data/e243/N34E077.hgt > .data/e243/e243_results.json
+          python - <<'PY'
+          import json
+          d=json.load(open('.data/e243/e243_results.json'))
+          assert d['claim_state'].startswith('EARTH RANK STRESS ONLY')
+          for metric in d['metrics'].values():
+              for n in ('2','4','8','16'):
+                  row=metric['grid_results'][n]
+                  assert sum(row['matched_phase_counts'].values()) == 16
+                  assert sum(row['independent_phase_counts'].values()) == 256
+                  print(n, metric['dense_reference_higher'], row['independent_phase_counts'])
+          PY
+      - name: Preserve numerical receipt without raw raster tiles
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e243-real-earth-rank-phase-receipt
+          path: .data/e243/e243_results.json
+          if-no-files-found: ignore
+          retention-days: 30
