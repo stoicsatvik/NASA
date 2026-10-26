@@ -1,0 +1,35 @@
+name: E293 Diviner spatial missingness
+on:
+  push:
+    branches: ["foundry/e293-diviner-spatial-missingness-20261026"]
+  pull_request:
+    paths:
+      - "research/e293_diviner_spatial_missingness.py"
+      - "tests/test_e293_diviner_spatial_missingness.py"
+      - ".github/workflows/e293-diviner-spatial-missingness.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-source-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Deterministic spatial-null controls
+        run: python -m unittest discover -s tests -p 'test_e293_diviner_spatial_missingness.py' -v
+      - name: Official PDS three-row spatial-null experiment
+        run: python -m research.e293_diviner_spatial_missingness --output e293_spatial_receipt.json
+      - name: Preserve numerical receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e293-diviner-spatial-missingness
+          path: e293_spatial_receipt.json
+          if-no-files-found: ignore
+          retention-days: 30
