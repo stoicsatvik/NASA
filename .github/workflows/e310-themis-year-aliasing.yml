@@ -1,0 +1,51 @@
+name: E310 THEMIS year/time identifiability falsification
+
+on:
+  push:
+    branches:
+      - foundry/e310-themis-year-aliasing-20261027
+  pull_request:
+    paths:
+      - "research/e310_themis_year_aliasing.py"
+      - "research/E310_THEMIS_YEAR_ALIASING_20261027.md"
+      - "tests/test_e310_themis_year_aliasing.py"
+      - ".github/workflows/e310-themis-year-aliasing.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  exact-identifiability:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate inherited E305 and E310 source and algebra
+        run: |
+          python -m unittest discover -s tests -p 'test_e305_*.py' -v
+          python -m unittest discover -s tests -p 'test_e310_*.py' -v
+      - name: Verify reproducible receipt and negative claim
+        run: |
+          python -m research.e310_themis_year_aliasing
+          cp research/results/e310_themis_year_aliasing.json /tmp/e310-first.json
+          python -m research.e310_themis_year_aliasing
+          cmp /tmp/e310-first.json research/results/e310_themis_year_aliasing.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r = json.loads(Path("research/results/e310_themis_year_aliasing.json").read_text())["result"]
+          assert r["time_group_identifiable_conditional_on_year"] is False
+          assert r["pairs_from_different_mars_years"] == 7
+          assert r["year_only_design_rank"] == r["year_plus_time_design_rank"] == 9
+          PY
+      - name: Preserve published-source audit receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e310-themis-year-aliasing-receipt
+          path: research/results/e310_themis_year_aliasing.json
+          if-no-files-found: error
