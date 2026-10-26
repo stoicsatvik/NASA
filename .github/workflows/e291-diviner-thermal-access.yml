@@ -1,0 +1,35 @@
+name: E291 Diviner thermal-source access
+on:
+  push:
+    branches: ["foundry/e291-diviner-thermal-source-access-20261026"]
+  pull_request:
+    paths:
+      - "research/e291_diviner_access.py"
+      - "tests/test_e291_diviner_access.py"
+      - ".github/workflows/e291-diviner-thermal-access.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  access-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Deterministic source-integrity controls
+        run: python -m unittest discover -s tests -p 'test_e291_diviner_access.py' -v
+      - name: Attempt bounded official Diviner anomaly retrieval
+        run: python -m research.e291_diviner_access --output e291_diviner_receipt.json
+      - name: Preserve access outcome without raw thermal data
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e291-diviner-source-access
+          path: e291_diviner_receipt.json
+          if-no-files-found: ignore
+          retention-days: 30
