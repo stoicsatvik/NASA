@@ -1,0 +1,33 @@
+name: E295 THEMIS thermal product admissibility
+
+on:
+  pull_request:
+    paths:
+      - "research/e295_thermal_product_admissibility.py"
+      - "research/E295_THEMIS_THERMAL_ADMISSIBILITY_20261026.md"
+      - "tests/test_e295_thermal_product_admissibility.py"
+      - ".github/workflows/e295-themis-admissibility.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  admissibility:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Verify six deterministic falsification controls
+        run: python -m unittest discover -s tests -p 'test_e295_*.py' -v
+      - name: Preserve machine-readable counterexample
+        run: python -m research.e295_thermal_product_admissibility
+      - name: Upload synthetic-only evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: e295-thermal-product-admissibility
+          path: research/results/e295_thermal_product_admissibility.json
+          if-no-files-found: error
