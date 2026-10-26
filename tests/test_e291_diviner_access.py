@@ -3,7 +3,7 @@ import unittest
 from unittest.mock import patch
 from urllib.error import HTTPError
 
-from research.e291_diviner_access import parse_numeric_triplets, probe
+from research.e291_diviner_access import parse_numeric_triplets, probe, validate_pds_stn_label
 
 
 class DivinerAccessTests(unittest.TestCase):
@@ -20,6 +20,25 @@ class DivinerAccessTests(unittest.TestCase):
             with self.subTest(raw=raw):
                 with self.assertRaises(ValueError):
                     parse_numeric_triplets(raw)
+
+    def test_pds_stn_metadata_gate(self):
+        label = """DESCRIPTION = "deviation of rock-free regolith surface"
+LINES = 3840
+LINE_SAMPLES = 11520
+SAMPLE_TYPE = LSB_INTEGER
+SAMPLE_BITS = 16
+UNIT = K
+SCALING_FACTOR = 0.02
+OFFSET = 0.00
+MISSING_CONSTANT = -32768
+MAP_RESOLUTION = 32 <pix/degree>
+MAP_PROJECTION_TYPE = "SIMPLE CYLINDRICAL"
+"""
+        metadata = validate_pds_stn_label(label)
+        self.assertEqual(metadata["unit"], "K")
+        self.assertIn("NOT ABSOLUTE", metadata["semantic"])
+        with self.assertRaisesRegex(ValueError, "MISSING_CONSTANT"):
+            validate_pds_stn_label(label.replace("-32768", "0"))
 
     def test_http_failure_is_not_mislabeled_ingestion(self):
         with patch("research.e291_diviner_access.urlopen",
