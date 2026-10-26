@@ -1,0 +1,38 @@
+name: E305 published THEMIS time-confounding audit
+
+on:
+  pull_request:
+    paths:
+      - "research/e305_published_themis_time_audit.py"
+      - "research/data/e305_ahern_gale_bagnold_table4.csv"
+      - "research/E305_PUBLISHED_THEMIS_TIME_CONFOUNDING_20261026.md"
+      - "tests/test_e305_published_themis_time_audit.py"
+      - ".github/workflows/e305-published-themis-audit.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  published-measurement-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run four deterministic source and matching tests
+        run: python -m unittest discover -s tests -p 'test_e305_*.py' -v
+      - name: Reproduce published observation audit twice
+        run: |
+          python -m research.e305_published_themis_time_audit
+          cp research/results/e305_published_themis_time_audit.json /tmp/e305-first.json
+          python -m research.e305_published_themis_time_audit
+          cmp /tmp/e305-first.json research/results/e305_published_themis_time_audit.json
+      - name: Preserve machine-readable secondary-source receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: e305-published-themis-time-audit
+          path: research/results/e305_published_themis_time_audit.json
+          if-no-files-found: error
