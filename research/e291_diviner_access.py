@@ -115,7 +115,7 @@ def validate_pds_stn_label(text: str) -> dict:
         "MAP_PROJECTION_TYPE": '"SIMPLE CYLINDRICAL"',
     }
     for key, value in expected.items():
-        match = re.search(r"^\\s*" + re.escape(key) + r"\\s*=\\s*(.+)$",
+        match = re.search(r"^[ \t]*" + re.escape(key) + r"[ \t]*=[ \t]*(.+)$",
                           text, re.MULTILINE)
         if match is None or match.group(1).strip().split(" <")[0] != value:
             raise ValueError(f"PDS label {key} mismatch")
