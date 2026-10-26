@@ -246,3 +246,11 @@ Read-only [Actions 40235733739](https://github.com/stoicsatvik/NASA/actions/runs
 **Claim states:** real lunar/Mars sampling-support sensitivity SUPPORTED; E001 known-site recovery NOT YET MEASURED; cross-body similarity NOT YET PROVEN; novel analogue discovery NOT YET PROVEN; local field advantage NOT YET PROVEN; challenge superiority NOT YET PROVEN.
 
 **Next gate:** independently labelled analogue positives and negatives plus source-grounded observation geometry. Do not continue optimizing two unvalidated Earth leads. Reassess all 14 challenge statements when complete resources are released October 28; no pre-event competition solution work.
+
+## 2026-10-26 E291: first real Diviner thermal-anomaly sample
+
+On isolated `foundry/e291-diviner-thermal-source-access-20261026`, draft PR #22, official PDS GDR_L3 `DGDR_STN_AVG_CYL_032` metadata was verified and three 23,040-byte HTTP 206 equatorial/midlatitude rows were ingested, **not** the entire 88 MB raster. Source is a **nighttime regolith temperature deviation in K** (DN × 0.02, missing DN −32768), **not** absolute temperature or THEMIS thermal inertia. Valid cells at approx +40°, 0°, −40°: **10,920/11,520; 9,547/11,520; 10,812/11,520**. The 0° row has 1,973 missing cells versus 600/708 in the two other sampled rows. These are three descriptive rows, **not global coverage**. Exact-head [CI 40287923992](https://github.com/stoicsatvik/NASA/actions/runs/40287923992) SUCCESS with four deterministic controls and real PDS byte ranges; final documentation-head CI requires separate verification. Full hashes, source/units and limitations in `research/E291_DIVINER_THERMAL_SOURCE_GATE_20261026.md`.
+
+Two separate UCLA Level 4 `.xyz` sources failed TLS chain verification on the runner; **no TLS bypass** and no false ingestion claim. Alternative official PDS source worked.
+
+**Claim:** PDS Diviner STN bounded real-source ingestion SUPPORTED; cross-body thermophysical similarity NOT YET PROVEN; E001 known-site recovery NOT YET MEASURED; novel discovery, local field advantage and challenge superiority NOT YET PROVEN. Next: quantitative THEMIS and legitimate Earth thermal observables with physically justified calibration and masks; independently labelled E001 recovery before UX.
