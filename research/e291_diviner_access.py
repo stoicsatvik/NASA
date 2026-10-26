@@ -10,6 +10,8 @@ import argparse
 import hashlib
 import json
 import math
+import re
+import struct
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -90,11 +92,104 @@ def probe(name: str, url: str) -> dict:
     return result
 
 
+
+PDS_STN_BASE = (
+    "https://pds-geosciences.wustl.edu/lro/"
+    "urn-nasa-pds-lro_diviner_derived1/data_derived_gdr_l3/cylindrical/img/"
+)
+PDS_STN_NAME = "dgdr_stn_avg_cyl_032_img"
+
+
+def validate_pds_stn_label(text: str) -> dict:
+    """Require exact published geometry, encoding, units and missing value."""
+    expected = {
+        "LINES": "3840",
+        "LINE_SAMPLES": "11520",
+        "SAMPLE_TYPE": "LSB_INTEGER",
+        "SAMPLE_BITS": "16",
+        "UNIT": "K",
+        "SCALING_FACTOR": "0.02",
+        "OFFSET": "0.00",
+        "MISSING_CONSTANT": "-32768",
+        "MAP_RESOLUTION": "32",
+        "MAP_PROJECTION_TYPE": '"SIMPLE CYLINDRICAL"',
+    }
+    for key, value in expected.items():
+        match = re.search(r"^\\s*" + re.escape(key) + r"\\s*=\\s*(.+)$",
+                          text, re.MULTILINE)
+        if match is None or match.group(1).strip().split(" <")[0] != value:
+            raise ValueError(f"PDS label {key} mismatch")
+    if "deviation of rock-free regolith surface" not in text:
+        raise ValueError("PDS anomaly semantics absent")
+    return {
+        "lines": 3840, "line_samples": 11520,
+        "sample_type": "LSB_INTEGER", "sample_bits": 16,
+        "unit": "K", "scaling_factor": 0.02, "offset": 0.0,
+        "missing_constant": -32768, "projection": "SIMPLE CYLINDRICAL",
+        "pixels_per_degree": 32,
+        "semantic": "NIGHTTIME REGOLITH TEMPERATURE DEVIATION, NOT ABSOLUTE TEMPERATURE",
+    }
+
+
+def probe_pds_stn() -> dict:
+    """Read one equatorial 32ppd row by HTTP Range; never fetch full 88MB."""
+    label_url = PDS_STN_BASE + PDS_STN_NAME + ".lbl"
+    img_url = PDS_STN_BASE + PDS_STN_NAME + ".img"
+    result = {"label_url": label_url, "image_url": img_url, "ingested": False}
+    try:
+        with urlopen(Request(label_url, headers={
+            "User-Agent": "NASA-E291-ReadOnly-Research/1.0",
+        }), timeout=35) as response:
+            label_raw = response.read(20_001)
+        if len(label_raw) > 20_000:
+            raise ValueError("PDS label exceeds bounded limit")
+        metadata = validate_pds_stn_label(label_raw.decode("utf-8"))
+        result["label_sha256"] = hashlib.sha256(label_raw).hexdigest()
+        result["metadata"] = metadata
+        row = 1920  # Near equator, within published +/-60 degree coverage.
+        size = metadata["line_samples"] * 2
+        start = row * size
+        end = start + size - 1
+        with urlopen(Request(img_url, headers={
+            "User-Agent": "NASA-E291-ReadOnly-Research/1.0",
+            "Range": f"bytes={start}-{end}",
+        }), timeout=45) as response:
+            result["http_status"] = response.status
+            content_range = response.headers.get("Content-Range", "")
+            if response.status != 206 or not content_range.startswith(f"bytes {start}-{end}/"):
+                raise ValueError("server did not honor exact byte-range request")
+            raw = response.read(size + 1)
+        if len(raw) != size:
+            raise ValueError("unexpected sampled-row length")
+        values = struct.unpack("<" + str(metadata["line_samples"]) + "h", raw)
+        valid = [v * metadata["scaling_factor"] for v in values
+                 if v != metadata["missing_constant"]]
+        result["sample"] = {
+            "row_index": row, "bytes": len(raw),
+            "sha256": hashlib.sha256(raw).hexdigest(),
+            "valid_cells": len(valid), "missing_cells": len(values) - len(valid),
+            "minimum_anomaly_K": min(valid) if valid else None,
+            "maximum_anomaly_K": max(valid) if valid else None,
+            "sample_is_not_global_coverage": True,
+        }
+        result["ingested"] = bool(valid)
+        result["status"] = "PDS_ROW_INGESTED" if valid else "PDS_ROW_ALL_MISSING"
+    except (HTTPError, URLError, TimeoutError, ValueError, UnicodeError, OSError) as exc:
+        result["status"] = "PDS_ACCESS_OR_METADATA_UNVERIFIED"
+        result["error_type"] = type(exc).__name__
+        if isinstance(exc, HTTPError):
+            result["http_status"] = exc.code
+        result["error"] = str(exc)[:160]
+    return result
+
+
 def audit() -> dict:
     samples = [probe(name, url) for name, url in SOURCES.items()]
+    pds = probe_pds_stn()
     return {
         "experiment": "E291 Diviner thermal-anomaly access gate",
-        "sources": samples, "provenance": PROVENANCE,
+        "sources": samples, "pds_stn": pds, "provenance": PROVENANCE,
+        "real_pds_thermal_row_ingested": pds["ingested"],
         "access_count": sum(s["ingested"] for s in samples),
         "both_accessible": all(s["ingested"] for s in samples),
         "thermal_units_verified": False,
@@ -107,6 +202,8 @@ def audit() -> dict:
             "Text triplets are deliberately not geolocated or assigned units without format metadata.",
             "A successful download is not a physical-descriptor harmonization.",
             "A failed URL is an access observation, not proof the official archive lacks the data.",
+            "PDS STN is a nighttime temperature anomaly in K, not absolute surface temperature or thermal inertia.",
+            "One equatorial raster row is not global missingness or an independent site benchmark.",
             "No Earth/Moon/Mars known-site labels, negative controls or field data.",
         ],
     }
