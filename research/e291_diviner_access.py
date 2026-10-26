@@ -146,34 +146,37 @@ def probe_pds_stn() -> dict:
         metadata = validate_pds_stn_label(label_raw.decode("utf-8"))
         result["label_sha256"] = hashlib.sha256(label_raw).hexdigest()
         result["metadata"] = metadata
-        row = 1920  # Near equator, within published +/-60 degree coverage.
         size = metadata["line_samples"] * 2
-        start = row * size
-        end = start + size - 1
-        with urlopen(Request(img_url, headers={
-            "User-Agent": "NASA-E291-ReadOnly-Research/1.0",
-            "Range": f"bytes={start}-{end}",
-        }), timeout=45) as response:
-            result["http_status"] = response.status
-            content_range = response.headers.get("Content-Range", "")
-            if response.status != 206 or not content_range.startswith(f"bytes {start}-{end}/"):
-                raise ValueError("server did not honor exact byte-range request")
-            raw = response.read(size + 1)
-        if len(raw) != size:
-            raise ValueError("unexpected sampled-row length")
-        values = struct.unpack("<" + str(metadata["line_samples"]) + "h", raw)
-        valid = [v * metadata["scaling_factor"] for v in values
-                 if v != metadata["missing_constant"]]
-        result["sample"] = {
-            "row_index": row, "bytes": len(raw),
-            "sha256": hashlib.sha256(raw).hexdigest(),
-            "valid_cells": len(valid), "missing_cells": len(values) - len(valid),
-            "minimum_anomaly_K": min(valid) if valid else None,
-            "maximum_anomaly_K": max(valid) if valid else None,
-            "sample_is_not_global_coverage": True,
-        }
-        result["ingested"] = bool(valid)
-        result["status"] = "PDS_ROW_INGESTED" if valid else "PDS_ROW_ALL_MISSING"
+        samples = []
+        for row in (640, 1920, 3200):  # Approx +40, 0, -40 deg latitude.
+            start = row * size
+            end = start + size - 1
+            with urlopen(Request(img_url, headers={
+                "User-Agent": "NASA-E291-ReadOnly-Research/1.0",
+                "Range": f"bytes={start}-{end}",
+            }), timeout=45) as response:
+                result["http_status"] = response.status
+                content_range = response.headers.get("Content-Range", "")
+                if response.status != 206 or not content_range.startswith(f"bytes {start}-{end}/"):
+                    raise ValueError("server did not honor exact byte-range request")
+                raw = response.read(size + 1)
+            if len(raw) != size:
+                raise ValueError("unexpected sampled-row length")
+            values = struct.unpack("<" + str(metadata["line_samples"]) + "h", raw)
+            valid = [v * metadata["scaling_factor"] for v in values
+                     if v != metadata["missing_constant"]]
+            samples.append({
+                "row_index": row, "approx_latitude_deg": 60.0 - (row + 0.5) / 32,
+                "bytes": len(raw), "sha256": hashlib.sha256(raw).hexdigest(),
+                "valid_cells": len(valid), "missing_cells": len(values) - len(valid),
+                "minimum_anomaly_K": min(valid) if valid else None,
+                "maximum_anomaly_K": max(valid) if valid else None,
+                "sample_is_not_global_coverage": True,
+            })
+        result["samples"] = samples
+        result["sample"] = samples[1]  # Preserve center-row compatibility.
+        result["ingested"] = all(s["valid_cells"] > 0 for s in samples)
+        result["status"] = "PDS_THREE_ROWS_INGESTED" if result["ingested"] else "PDS_ROW_ALL_MISSING"
     except (HTTPError, URLError, TimeoutError, ValueError, UnicodeError, OSError) as exc:
         result["status"] = "PDS_ACCESS_OR_METADATA_UNVERIFIED"
         result["error_type"] = type(exc).__name__
