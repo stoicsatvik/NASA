@@ -62,13 +62,13 @@ def test_untrusted_uri_is_not_downloaded():
 
 
 def test_real_schema_coordinate_completeness_controls():
-    raw = ("\\n".join([
+    raw = (chr(10).join([
         "Field_Site,Center_Latitude,Center_Longitude,Dune_Type,References",
         "Alpha,19.5,76.1,barchan,doi:1",
         "Beta,not-a-lat,71.0,linear,",
         "Gamma,90.1,50.0,barchan,doi:3",
         "Delta,20.0,75.0,,",
-    ]) + "\\n").encode()
+    ]) + chr(10)).encode()
     result = _csv_profile(raw, "sites.csv")
     assert result["rows"] == 4
     assert result["valid_numeric_coordinate_pairs"] == 2
