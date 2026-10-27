@@ -185,6 +185,13 @@ def audit(item: dict, downloader=read_bounded) -> dict:
         "experiment": "E326_INDEPENDENT_USGS_TERRESTRIAL_ANALOG_INVENTORY",
         "source_doi": DOI, "source_item": ITEM_ID,
         "source_title": item["title"],
+        "metadata_keys": sorted(item),
+        "metadata_web_links": [{"title": str(w.get("title", ""))[:120],
+                                 "uri": str(w.get("uri", ""))[:300]}
+                                for w in item.get("webLinks", [])[:20]],
+        "metadata_facets": [str(f.get("name", f.get("className", "")))[:100]
+                            for f in item.get("facets", [])[:20]],
+        "has_children": item.get("hasChildren"),
         "declared_files": [{k: v for k, v in f.items() if k != "url"} for f in files],
         "download_profiles": profiles, "tabular_rows_profiled": records,
         "status": "TABULAR_SOURCE_INGESTED" if records else "NO_TABULAR_RECORDS_INGESTED",
@@ -212,7 +219,11 @@ def main() -> None:
     args.output.write_text(json.dumps(result, sort_keys=True, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({"status": result["status"], "source": DOI,
                       "rows": result["tabular_rows_profiled"],
-                      "profiles": result["download_profiles"]}, sort_keys=True))
+                      "profiles": result["download_profiles"],
+                      "metadata_keys": result["metadata_keys"],
+                      "web_links": result["metadata_web_links"],
+                      "facets": result["metadata_facets"],
+                      "has_children": result["has_children"]}, sort_keys=True))
 
 
 if __name__ == "__main__":
