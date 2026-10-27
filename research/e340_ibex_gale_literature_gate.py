@@ -27,7 +27,17 @@ def evaluate() -> dict:
     low, high = earth - tolerance, earth + tolerance
     return {
         "experiment": "E340 literature-only morphometry mismatch audit",
-        "source": {"ntrs": SOURCE, "pdf": PDF, "doi": DOI},
+        "source": {
+            "ntrs": SOURCE,
+            "pdf": PDF,
+            "doi": DOI,
+            "measurement_sections": {
+                "earth_lidar_precision": "3.5",
+                "mars_navcam_case_studies": "3.6",
+                "paired_mean_wavelengths": "4.1.3",
+            },
+            "mars_rover_sols": [706, 1788],
+        },
         "inputs": {
             "earth_ibex_reported_mean_wavelength_m": str(earth),
             "mars_gale_reported_mean_wavelength_m": str(mars),
