@@ -1,0 +1,43 @@
+name: E320 real PAAD spatial holdout audit
+on:
+  push:
+    branches:
+      - foundry/e320-paad-spatial-holdout-audit-20261027
+  pull_request:
+    paths:
+      - research/e320_paad_spatial_holdout.py
+      - tests/test_e320_paad_spatial_holdout.py
+      - .github/workflows/e320-paad-spatial-holdout.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  spatial-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Synthetic and inherited source controls
+        run: python -m pytest -q tests/test_e320_paad_spatial_holdout.py tests/test_e319_paad_mars_codebook_overlap.py tests/test_e317_paad_independent_source.py
+      - name: Download source-pinned real PAAD and audit geodesic holdout clusters
+        run: python -m research.e320_paad_spatial_holdout --output e320_real_paad_spatial_receipt.json
+      - name: Assert frozen source and evidence boundaries
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('e320_real_paad_spatial_receipt.json'))
+          assert x['site_count']==45
+          assert x['pair_count']==990
+          assert x['source_receipt']['sha256']=='5be67b4da584987d9ce5207f2ee3c90b5b3b5849469461847111eaab5aafcecd'
+          assert x['e001_known_site_recovery']=='NOT YET MEASURED'
+          for k in ('25','50','100'):
+              assert x['thresholds_km'][k]['nearby_pairs']<=990
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e320-real-paad-spatial-receipt
+          path: e320_real_paad_spatial_receipt.json
+          if-no-files-found: error
