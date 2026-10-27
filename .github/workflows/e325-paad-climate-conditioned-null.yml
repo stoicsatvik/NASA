@@ -1,0 +1,47 @@
+name: E325 real PAAD climate-conditioned label null
+on:
+  push:
+    branches:
+      - foundry/e325-paad-climate-conditioned-null-20261027
+  pull_request:
+    paths:
+      - research/e325_paad_climate_conditioned_null.py
+      - tests/test_e325_paad_climate_conditioned_null.py
+      - .github/workflows/e325-paad-climate-conditioned-null.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  climate-conditioned-null:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pytest
+        run: python -m pip install pytest
+      - name: Run E325 and inherited source tests
+        run: python -m pytest -q tests/test_e325_paad_climate_conditioned_null.py tests/test_e323_paad_spatial_label_null.py tests/test_e319_paad_mars_codebook_overlap.py tests/test_e317_paad_independent_source.py
+      - name: Run real source-pinned conditional null
+        run: python -m research.e325_paad_climate_conditioned_null --output e325_real_climate_null.json
+      - name: Enforce source and claim boundaries
+        run: |
+          python - <<'PY'
+          import json
+          r = json.load(open("e325_real_climate_null.json", encoding="utf-8"))
+          assert r["sites"] == 45
+          assert r["permutations_per_scheme"] == 999
+          assert r["source_receipt"]["sha256"] == "5be67b4da584987d9ce5207f2ee3c90b5b3b5849469461847111eaab5aafcecd"
+          assert r["e001_known_site_recovery"] == "NOT YET MEASURED"
+          assert r["cross_body_similarity"] == "NOT YET PROVEN"
+          assert abs(r["observed"]["name_only_jaccard"] - 0.3500529101) < 1e-8
+          assert abs(r["observed"]["drop_100_km"] - 0.1148148148) < 1e-8
+          assert set(r["conditional_permutations"]) == {"global", "climate_full", "climate_family"}
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e325-paad-climate-conditioned-null-receipt
+          path: e325_real_climate_null.json
+          if-no-files-found: error
