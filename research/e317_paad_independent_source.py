@@ -68,13 +68,46 @@ def _csv_profile(data: bytes, name: str) -> dict:
     if not headers or len(headers) > 100:
         raise ValueError("invalid table headers")
     count = 0
+    nonempty = {field: 0 for field in headers}
+    site_names = set()
+    valid_coordinates = 0
+    malformed_coordinates = 0
+    dune_types = {}
+    has_coords = {"Center_Latitude", "Center_Longitude"} <= set(headers)
     for row in rows:
         if not any(v and v.strip() for v in row.values() if isinstance(v, str)):
             continue
         count += 1
         if count > MAX_ROWS:
             raise ValueError("too many rows")
-    return {"file": name, "format": "csv", "rows": count, "columns": headers}
+        for field in headers:
+            if (row.get(field) or "").strip():
+                nonempty[field] += 1
+        site = (row.get("Field_Site") or "").strip()
+        if site:
+            site_names.add(site)
+        dune = (row.get("Dune_Type") or "").strip()
+        if dune:
+            dune_types[dune] = dune_types.get(dune, 0) + 1
+        if has_coords:
+            try:
+                lat = float((row.get("Center_Latitude") or "").strip())
+                lon = float((row.get("Center_Longitude") or "").strip())
+                if not (math.isfinite(lat) and math.isfinite(lon)
+                        and -90 <= lat <= 90 and -180 <= lon <= 180):
+                    raise ValueError("coordinate out of range")
+                valid_coordinates += 1
+            except ValueError:
+                malformed_coordinates += 1
+    return {
+        "file": name, "format": "csv", "rows": count, "columns": headers,
+        "nonempty_by_field": nonempty,
+        "distinct_nonempty_site_names": len(site_names),
+        "valid_numeric_coordinate_pairs": valid_coordinates if has_coords else None,
+        "invalid_or_missing_coordinate_pairs": malformed_coordinates if has_coords else None,
+        "dune_type_categories": dict(sorted(dune_types.items())),
+        "coordinate_validation": "numeric range only; no independent geodetic verification",
+    }
 
 
 def _xlsx_profile(data: bytes, name: str) -> dict:
