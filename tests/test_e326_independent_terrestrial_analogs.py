@@ -6,7 +6,7 @@ from zipfile import ZipFile
 
 from research.e326_independent_terrestrial_analogs import (
     ITEM_ID, audit, metadata_files, permitted_download,
-    profile_csv, profile_geojson, profile_zip,
+    profile_csv, profile_geojson, profile_zip, public_arcgis_base, arcgis_inventory,
 )
 
 
@@ -66,6 +66,40 @@ class TestE326(unittest.TestCase):
         self.assertEqual(result["tabular_rows_profiled"], 1)
         self.assertEqual(result["e001_known_site_recovery"], "NOT YET MEASURED")
         self.assertEqual(result["cross_body_similarity"], "NOT YET PROVEN")
+
+
+    def test_public_arcgis_link_strips_embedded_query_credentials(self):
+        from research.e326_independent_terrestrial_analogs import ARCGIS_PATH
+        original = "https://services.arcgis.com" + ARCGIS_PATH + "?token=EXAMPLE"
+        source = item()
+        source["webLinks"] = [{"title": "Arc REST Web Service", "uri": original}]
+        base = public_arcgis_base(source)
+        self.assertEqual(base, "https://services.arcgis.com" + ARCGIS_PATH)
+        self.assertNotIn("EXAMPLE", base)
+
+    def test_tokenless_public_feature_ingestion_and_auth_failure(self):
+        from research.e326_independent_terrestrial_analogs import ARCGIS_PATH
+        base = "https://services.arcgis.com" + ARCGIS_PATH
+        calls = []
+        def fake(url, maximum=5_000_000):
+            calls.append(url)
+            if url.endswith("?f=json"):
+                return b'{"layers":[{"id":0}]}'
+            if "returnCountOnly=true" in url:
+                return b'{"count":2}'
+            return json.dumps({"features": [
+                {"attributes": {"Type": "impact"}, "geometry": {"x": 1, "y": 2}},
+                {"attributes": {"Type": "volcanic"}, "geometry": {"x": 3, "y": 4}},
+            ]}).encode()
+        result = arcgis_inventory(base, fake)
+        self.assertEqual(result["status"], "PUBLIC_FEATURES_INGESTED")
+        self.assertEqual(result["rows"], 2)
+        self.assertEqual(result["features_with_geometry"], 2)
+        self.assertTrue(all("token=" not in url for url in calls))
+        denied = arcgis_inventory(base, lambda url, maximum=5_000_000:
+                                  b'{"error":{"code":498}}')
+        self.assertEqual(denied["status"], "PUBLIC_SERVICE_ERROR")
+        self.assertEqual(denied["error_code"], 498)
 
     def test_oversized_skipped(self):
         uri = "https://www.sciencebase.gov/catalog/file/get/" + ITEM_ID
