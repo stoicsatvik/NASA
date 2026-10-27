@@ -291,3 +291,14 @@ Official USGS OFR 2018-1164 ZIP (2,982,330 bytes, SHA-256 `92771c23cfa4a64dfcc38
 **Scientific boundary:** MGD3 2018 summary sheets contain source-reported mineral/thermal/stability variables, not automatically harmonized PAAD Earth dune-type labels. Sheet row totals are not distinct sites, and mapped Mars dune positives do not provide verified negatives. **E001 NOT YET MEASURED**, cross-body similarity NOT YET PROVEN, novel discovery NOT YET PROVEN, local validation advantage NOT YET PROVEN, challenge superiority NOT YET PROVEN. Full source and limitations: `research/E318_USGS_MGD3_REAL_MARS_SOURCE_20261027.md`.
 
 **Next:** obtain both official dune-type codebooks and independent positive/negative matched-site labels; test shared morphology descriptors with transparent random/majority baselines and held-out sites. Re-rank all fourteen 2026 challenges after full statements on October 28. No UI polishing or invented field observations.
+
+
+## 2026-10-27: E319 real PAAD↔Mars dune-codebook lexical gate
+
+Isolated research draft PR #29, `foundry/e319-paad-mars-codebook-overlap-20261027`. Exact-head read-only [Actions #40444987424](https://github.com/stoicsatvik/NASA/actions/runs/40444987424) SUCCESS: **14 synthetic/inherited tests passed** and the 45-site real PAAD CSV was independently re-downloaded with the E317 frozen SHA-256. Comparison against **Hayward et al. (2007), Table 1** source-documented Mars morphology codes (SS,D,B,Bd,T,L,S,U) was strictly case-sensitive and lexical.
+
+**Measured:** 21/45 PAAD sites have one dune-type token; 24/45 are multi-token. Only **8/45** have every raw token present in the published Mars code set; **21/45** have partial overlap, and **16/45** have no overlap. Nine distinct unsupported tokens were preserved (C,G,MG,P,R,RP,TIB,TR,WB), not guessed. Full source receipt and limitations: `research/E319_PAAD_MARS_CODEBOOK_GATE_20261027.md`.
+
+**Falsification:** direct PAAD↔Mars string-code joining is **REJECTED AS A VALIDATED BENCHMARK**. Exact code overlap is not semantic equivalence, and the 2018 Mars workbook data are mineral/thermal rather than verified linked 2007 morphology labels. No known-positive Earth↔Mars matched pairs or independent negatives exist in this experiment. This does **not** falsify aeolian analogy as a physical phenomenon.
+
+**Claim states unchanged:** E001 known-site recovery **NOT YET MEASURED**; cross-body similarity, novel analogue discovery, local field-validation advantage and challenge-selection superiority **NOT YET PROVEN**. Next: find the independent PAAD codebook and actual MGD3 dune-field morphology table with provenance, establish comparable physical descriptors and independent labels, or pivot the retrieval benchmark. Re-rank all 14 official challenges when full statements arrive 28 Oct. No competition solution work or submission.
