@@ -20,6 +20,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: Install test runner
+        run: python -m pip install pytest
       - name: Synthetic and inherited source controls
         run: python -m pytest -q tests/test_e320_paad_spatial_holdout.py tests/test_e319_paad_mars_codebook_overlap.py tests/test_e317_paad_independent_source.py
       - name: Download source-pinned real PAAD and audit geodesic holdout clusters
