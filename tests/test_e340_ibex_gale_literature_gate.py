@@ -24,6 +24,12 @@ class E340Tests(unittest.TestCase):
         self.assertEqual(upper * Decimal("0.69"), Decimal("2.20"))
         self.assertGreater(lower, Decimal(3))
 
+    def test_source_sections_and_rover_observations_remain_explicit(self):
+        source = evaluate()["source"]
+        self.assertEqual(source["measurement_sections"]["earth_lidar_precision"], "3.5")
+        self.assertEqual(source["measurement_sections"]["paired_mean_wavelengths"], "4.1.3")
+        self.assertEqual(source["mars_rover_sols"], [706, 1788])
+
     def test_no_fabricated_uncertainty_or_recovery(self):
         result = evaluate()
         self.assertIsNone(result["inputs"]["mars_mean_uncertainty_m"])
