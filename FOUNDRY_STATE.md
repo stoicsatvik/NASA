@@ -325,3 +325,12 @@ Source-fingerprinted 45-site USGS PAAD experiment re-ran E323 raw-token nearest-
 [Exact-head CI 40474399735](https://github.com/stoicsatvik/NASA/actions/runs/40474399735) SUCCESS, 28 tests; source fingerprint verified; [artifact 12720186077](https://github.com/stoicsatvik/NASA/actions/runs/40474399735/artifacts/12720186077). Full limitations in research/E325_PAAD_CLIMATE_CONDITIONED_NULL_20261027.md, draft PR #32.
 
 **Claim:** Earth-only spatial raw-token association survives two specified conditional permutation nulls, SUPPORTED for this dataset/analysis. Causal geology, independent validation, Earth–Mars comparability and challenge superiority NOT YET PROVEN. E001 known-site recovery NOT YET MEASURED. Next: authoritative morphology codebooks, matched positive/negative cross-body descriptors and blinded spatial holdouts, plus full challenge reassessment 28 October. No competition submission, fieldwork, outreach or main merge.
+
+
+## 2026-10-27 E326: independent terrestrial analogue inventory source falsification
+
+Hunter (2020) USGS `Known Terrestrial Analog Sites for Planetary Science` DOI 10.5066/P9J72921 was ingested through anonymous public ArcGIS FeatureServer reads. ScienceBase metadata itself has no downloadable tabular files (first negative access-path result). The linked ArcGIS URL contained a query credential; the research code discarded the entire query string and did not use any credential. Exact-head CI #40482249632 SUCCESS, 16 tests, machine-readable artifact #12723207792.
+
+**Measured source result:** exactly **4 public feature records**, all `AnalogType=Volcanic`; `AnalogBody` missing/null-like in 4/4; geometry present 4/4 but independent geodetic accuracy not verified. No dune positive/negative labels. This is an **independent publication**, not a scientifically independent dune recovery cohort, and does not validate the 45-site PAAD raw-code association. See `research/E326_INDEPENDENT_USGS_ANALOG_INVENTORY_20261027.md`.
+
+**Decision:** E001 known-site recovery NOT YET MEASURED; cross-body similarity, novel analogue discovery, local validation advantage, and planetary challenge superiority NOT YET PROVEN. Do not relabel these four volcanic sites as dune negatives or Mars matches. Next: independently defined cross-body morphology and true controls, plus full official challenge statement comparison after 28 Oct. No fieldwork, spending, deployment, outreach, or submission.
