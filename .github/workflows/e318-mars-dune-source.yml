@@ -1,0 +1,33 @@
+name: E318 USGS MGD3 Mars dune-source experiment
+on:
+  push:
+    branches:
+      - foundry/e318-usgs-mgd3-mars-dune-source-20261027
+  pull_request:
+    paths:
+      - 'research/e318_mars_dune_source.py'
+      - 'tests/test_e318_mars_dune_source.py'
+      - '.github/workflows/e318-mars-dune-source.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  mars-dune-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install pytest openpyxl pyshp
+      - name: Deterministic synthetic structural controls
+        run: python -m pytest -q tests/test_e318_mars_dune_source.py
+      - name: Bounded official USGS Mars dune data ingestion
+        run: python research/e318_mars_dune_source.py --output e318_mars_dune_receipt.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e318-mgd3-mars-source-receipt
+          path: e318_mars_dune_receipt.json
+          if-no-files-found: ignore
