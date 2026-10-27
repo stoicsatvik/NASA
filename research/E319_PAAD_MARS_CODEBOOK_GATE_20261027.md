@@ -19,12 +19,31 @@ python -m research.e319_paad_mars_codebook_overlap --output e319_label_gate_rece
 
 The first command uses synthetic controls only. The second downloads the source-fingerprinted **real** PAAD CSV through the allowlisted USGS ScienceBase endpoint and produces a machine-readable evidence receipt. The CI artifact retains actual counts, unsupported raw tokens, and the negative interpretation.
 
+## Real-source result (exact-head read-only CI)
+
+[Actions run #40444987424](https://github.com/stoicsatvik/NASA/actions/runs/40444987424) **SUCCESS**, **14 passed** (7 E319 synthetic controls plus 7 inherited E317 controls). The official PAAD CSV was downloaded again with exactly the same frozen SHA-256 as E317.
+
+| Real PAAD field audit | Measured |
+|---|---:|
+| Distinct Earth sites | **45** |
+| Rows with a single dune-type token | **21** |
+| Rows with multiple dune-type tokens | **24** |
+| Rows whose every token appears in the 2007 Mars Table 1 codebook | **8/45** |
+| Rows with some but not all tokens in that codebook | **21/45** |
+| Rows with no complete or partial match | **16/45** |
+
+Unsupported exact raw tokens and occurrence counts: `C:6, G:1, MG:8, P:14, R:1, RP:2, TIB:4, TR:17, WB:1`. These abbreviations have **not** been independently decoded and must not be assigned morphology by intuition. The 2007 Mars paper's assignment counts are not a paired dataset; this result says nothing about how accurately an analogue model would recover sites.
+
+**Decisive negative:** A naive exact-code join would have complete lexical coverage for only **8 of 45** Earth site rows, and even those eight do not have independently verified PAAD-to-Mars semantic equivalence. Thus a direct code-join benchmark is **REJECTED** as currently justified. This does not falsify planetary analogue science; it falsifies this proposed shortcut.
+
+The full source-fingerprinted receipt was uploaded as an Actions artifact. No raw CSV was committed.
+
 ## Claim boundary
 
 - Earth PAAD site data ingestion: **SUPPORTED** by E317.
 - Mars MGD3 2018 workbook ingestion: **SUPPORTED** by E318.
 - Hayward 2007 Table 1 code definitions: **SOURCE-DOCUMENTED**.
-- PAAD ↔ Mars lexical code overlap: **TO BE MEASURED BY E319 CI**.
+- PAAD ↔ Mars lexical code overlap: **MEASURED**, but only at the exact-string level, not a verified scientific label join.
 - Semantic equivalence of source labels: **NOT ESTABLISHED**.
 - E001 known-site recovery: **NOT YET MEASURED**.
 - Cross-body similarity, novel discovery, local field advantage, challenge-selection superiority: **NOT YET PROVEN**.
