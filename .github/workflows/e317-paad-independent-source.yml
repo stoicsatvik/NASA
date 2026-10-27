@@ -1,0 +1,33 @@
+name: E317 USGS PAAD independent analogue source
+on:
+  push:
+    branches:
+      - foundry/e317-usgs-paad-independent-aeolian-labels-20261027
+  pull_request:
+    paths:
+      - "research/e317_paad_independent_source.py"
+      - "tests/test_e317_paad_independent_source.py"
+      - ".github/workflows/e317-paad-independent-source.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  paad-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install pytest openpyxl pyshp
+      - name: Synthetic source-boundary tests
+        run: python -m pytest -q tests/test_e317_paad_independent_source.py
+      - name: Bounded public USGS source profile
+        run: python research/e317_paad_independent_source.py --output e317_paad_receipt.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e317-paad-source-receipt
+          path: e317_paad_receipt.json
+          if-no-files-found: ignore
