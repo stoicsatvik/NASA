@@ -124,7 +124,11 @@ def profile_table(data: bytes, name: str) -> list[dict]:
                     raw = f.read(MAX_EXPANDED + 1)
                 if len(raw) > MAX_EXPANDED:
                     raise ValueError("zip member decompression bound exceeded")
-                out.extend(profile_table(raw, m.filename))
+                try:
+                    out.extend(profile_table(raw, m.filename))
+                except (OSError, ValueError, BadZipFile, ImportError, UnicodeError) as exc:
+                    out.append({"file": m.filename, "status": "TABLE_PARSE_FAILED",
+                                "error_type": type(exc).__name__})
         return out
     return []
 
