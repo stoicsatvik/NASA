@@ -165,6 +165,14 @@ def audit(sites: list[dict], permutations: int = PERMUTATIONS,
         "permutations_per_scheme": permutations,
         "seed": seed,
         "climate_raw_distinct": len({s["climate_full"] for s in sites}),
+        "climate_full_counts": {
+            k: sum(s["climate_full"] == k for s in sites)
+            for k in sorted({s["climate_full"] for s in sites})
+        },
+        "climate_family_status": (
+            "NO_UNAMBIGUOUS_CODES" if all(s["climate_family"] == "UNCLASSIFIED" for s in sites)
+            else "PARTIAL_OR_COMPLETE_UNAMBIGUOUS_CODES"
+        ),
         "climate_family_counts": {
             k: sum(s["climate_family"] == k for s in sites)
             for k in sorted({s["climate_family"] for s in sites})
@@ -200,6 +208,8 @@ def main() -> None:
     print(json.dumps({
         "sites": result["sites"],
         "climate_family_counts": result["climate_family_counts"],
+        "climate_full_counts": result["climate_full_counts"],
+        "climate_family_status": result["climate_family_status"],
         "observed": result["observed"],
         "conditional_permutations": result["conditional_permutations"],
     }, sort_keys=True))
