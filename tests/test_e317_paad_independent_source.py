@@ -59,3 +59,20 @@ def test_untrusted_uri_is_not_downloaded():
     result = audit(metadata, downloader=lambda _: pytest.fail("unexpected download"))
     assert result["site_rows_observed"] == 0
     assert result["status"] == "NO_TABULAR_SOURCE_PROFILED"
+
+
+def test_real_schema_coordinate_completeness_controls():
+    raw = (
+        "Field_Site,Center_Latitude,Center_Longitude,Dune_Type,References\\n"
+        "Alpha,19.5,76.1,barchan,doi:1\\n"
+        "Beta,not-a-lat,71.0,linear,\\n"
+        "Gamma,90.1,50.0,barchan,doi:3\\n"
+        "Delta,20.0,75.0,,\\n"
+    ).replace("\\\\n", "\\n").encode()
+    result = _csv_profile(raw, "sites.csv")
+    assert result["rows"] == 4
+    assert result["valid_numeric_coordinate_pairs"] == 2
+    assert result["invalid_or_missing_coordinate_pairs"] == 2
+    assert result["distinct_nonempty_site_names"] == 4
+    assert result["dune_type_categories"] == {"barchan": 2, "linear": 1}
+    assert result["nonempty_by_field"]["References"] == 2
