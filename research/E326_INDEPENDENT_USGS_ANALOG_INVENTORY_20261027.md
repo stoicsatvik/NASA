@@ -11,7 +11,7 @@ Can the USGS *Known Terrestrial Analog Sites for Planetary Science* release (Hun
 - ScienceBase item: `5f88940b82cebb8c13d912ee`.
 - The item metadata exposes **no downloadable tabular files**. Initial CI #40482005252 therefore produced zero ingested rows, a real access-path negative.
 - The metadata instead exposes a USGS-associated ArcGIS REST FeatureServer. The public metadata's link contains a query credential. The code **strips the query string entirely** and requests only anonymous public feature access; no token is used, stored, or printed in final receipt.
-- Exact-head [CI #40482249632](https://github.com/stoicsatvik/NASA/actions/runs/40482249632) SUCCESS: **16 source/integrity tests passed** and **4 actual feature rows** were retrieved anonymously from layer 0. [Receipt artifact](https://github.com/stoicsatvik/NASA/actions/runs/40482249632/artifacts/12723555567) (artifact ID to be verified against Actions API).
+- Exact-head [CI #40482249632](https://github.com/stoicsatvik/NASA/actions/runs/40482249632) SUCCESS: **16 source/integrity tests passed** and **4 actual feature rows** were retrieved anonymously from layer 0. [Receipt artifact](https://github.com/stoicsatvik/NASA/actions/runs/40482249632/artifacts/12723207792) (verified against Actions API).
 - Source-reported schema: `AnalogBody`, `AnalogType`, `FID`, `Lat`, `Lon`, `Name`.
 - `AnalogType`: **Volcanic 4/4**. `AnalogBody`: three empty and one null-like value. Geometry present 4/4, but coordinate accuracy was not independently verified.
 - **No independently catalogued dune positive or negative** was observed in these four records. The 2020 source cannot validate the 45-site 2023 PAAD dune model under the tested criteria.
