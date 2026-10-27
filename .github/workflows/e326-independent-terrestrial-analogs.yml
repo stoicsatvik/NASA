@@ -1,0 +1,45 @@
+name: E326 independent USGS terrestrial analog inventory
+on:
+  push:
+    branches:
+      - foundry/e326-independent-terrestrial-analogs-20261027
+  pull_request:
+    paths:
+      - research/e326_independent_terrestrial_analogs.py
+      - tests/test_e326_independent_terrestrial_analogs.py
+      - .github/workflows/e326-independent-terrestrial-analogs.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  independent-inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install bounded parsing/test dependencies
+        run: python -m pip install pytest pyshp
+      - name: Run independent-source and inherited provenance tests
+        run: python -m pytest -q tests/test_e326_independent_terrestrial_analogs.py tests/test_e317_paad_independent_source.py
+      - name: Retrieve and profile real USGS 2020 inventory
+        run: python -m research.e326_independent_terrestrial_analogs --output e326_inventory_receipt.json
+      - name: Validate source identity and preserve scientific boundary
+        run: |
+          python - <<'PY'
+          import json
+          r = json.load(open("e326_inventory_receipt.json", encoding="utf-8"))
+          assert r["source_doi"] == "10.5066/P9J72921"
+          assert r["source_item"] == "5f88940b82cebb8c13d912ee"
+          assert r["e001_known_site_recovery"] == "NOT YET MEASURED"
+          assert r["cross_body_similarity"] == "NOT YET PROVEN"
+          assert r["status"] in ("TABULAR_SOURCE_INGESTED", "NO_TABULAR_RECORDS_INGESTED")
+          print("STATUS:", r["status"], "ROWS:", r["tabular_rows_profiled"])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e326-usgs-independent-analogs-receipt
+          path: e326_inventory_receipt.json
+          if-no-files-found: error
