@@ -1,0 +1,31 @@
+name: E340 published Ibex-Gale morphometry audit
+
+on:
+  push:
+    paths:
+      - 'research/e340_ibex_gale_literature_gate.py'
+      - 'tests/test_e340_ibex_gale_literature_gate.py'
+      - '.github/workflows/e340-ibex-gale-literature.yml'
+  pull_request:
+    paths:
+      - 'research/e340_ibex_gale_literature_gate.py'
+      - 'tests/test_e340_ibex_gale_literature_gate.py'
+      - '.github/workflows/e340-ibex-gale-literature.yml'
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Frozen arithmetic and claim-boundary tests
+        run: python -m unittest discover -s tests -p 'test_e340_ibex_gale_literature_gate.py' -v
+      - name: Preserve source-frozen numerical receipt
+        run: python research/e340_ibex_gale_literature_gate.py > e340_ibex_gale_receipt.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e340-ibex-gale-literature-receipt
+          path: e340_ibex_gale_receipt.json
