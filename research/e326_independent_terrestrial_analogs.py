@@ -13,7 +13,7 @@ import json
 import re
 from collections import Counter
 from pathlib import Path
-from urllib.parse import urlsplit
+from urllib.parse import urlsplit, urlunsplit, urlencode
 from urllib.request import Request, urlopen
 from zipfile import ZipFile, BadZipFile
 
@@ -26,6 +26,9 @@ MAX_TOTAL = 50_000_000
 MAX_MEMBER = 12_000_000
 MAX_ROWS = 200_000
 MAX_FILES = 16
+ARCGIS_HOST = "services.arcgis.com"
+ARCGIS_PATH = "/v01gqwM5QqNysAAi/ArcGIS/rest/services/Terrestrial_Analog_Sites_for_Planetary_Science/FeatureServer"
+MAX_ARCGIS_FEATURES = 10_000
 
 
 def permitted_download(url: str) -> bool:
@@ -150,7 +153,86 @@ def profile_zip(raw: bytes, name: str) -> list[dict]:
     return out
 
 
-def audit(item: dict, downloader=read_bounded) -> dict:
+
+def public_arcgis_base(item: dict) -> str | None:
+    """Discard publicly embedded query tokens; never send or retain them."""
+    for link in item.get("webLinks", []):
+        p = urlsplit(link.get("uri", ""))
+        if (p.scheme == "https" and p.hostname == ARCGIS_HOST
+                and p.path.rstrip("/") == ARCGIS_PATH
+                and not p.username and not p.password):
+            return urlunsplit((p.scheme, p.netloc, p.path.rstrip("/"), "", ""))
+    return None
+
+
+def read_public_arcgis(url: str, maximum: int = 5_000_000) -> bytes:
+    p = urlsplit(url)
+    if (p.scheme != "https" or p.hostname != ARCGIS_HOST
+            or not p.path.startswith(ARCGIS_PATH + "/")
+            and p.path != ARCGIS_PATH or p.username or p.password
+            or "token=" in p.query.lower()):
+        raise ValueError("nonpublic or unexpected ArcGIS URL")
+    with urlopen(Request(url, headers={"User-Agent": "NASA-E326-Public-Read/1.0"}),
+                 timeout=35) as response:
+        if urlsplit(response.geturl()).hostname != ARCGIS_HOST:
+            raise ValueError("ArcGIS redirect host mismatch")
+        data = response.read(maximum + 1)
+    if len(data) > maximum:
+        raise ValueError("ArcGIS response exceeds bound")
+    return data
+
+
+def arcgis_inventory(base: str, downloader=read_public_arcgis) -> dict:
+    """Use only tokenless public ArcGIS REST reads; fail closed on auth."""
+    service = json.loads(downloader(base + "?f=json"))
+    if "error" in service:
+        return {"status": "PUBLIC_SERVICE_ERROR", "error_code": service["error"].get("code")}
+    layers = service.get("layers", [])
+    if not layers:
+        return {"status": "NO_FEATURE_LAYERS", "layer_count": 0}
+    layer_id = layers[0].get("id")
+    if not isinstance(layer_id, int) or layer_id < 0:
+        raise ValueError("invalid public layer id")
+    layer_url = f"{base}/{layer_id}/query"
+    count_url = layer_url + "?" + urlencode({
+        "where": "1=1", "returnCountOnly": "true", "f": "json"})
+    count_obj = json.loads(downloader(count_url))
+    if "error" in count_obj:
+        return {"status": "PUBLIC_QUERY_ERROR", "error_code": count_obj["error"].get("code")}
+    count = count_obj.get("count")
+    if not isinstance(count, int) or count < 0 or count > MAX_ARCGIS_FEATURES:
+        return {"status": "COUNT_UNAVAILABLE_OR_TOO_LARGE", "reported_count": count}
+    rows = []
+    geometry_count = 0
+    for offset in range(0, count, 500):
+        url = layer_url + "?" + urlencode({
+            "where": "1=1", "outFields": "*", "returnGeometry": "true",
+            "outSR": "4326", "f": "json",
+            "resultOffset": offset, "resultRecordCount": min(500, count - offset),
+        })
+        obj = json.loads(downloader(url))
+        if "error" in obj:
+            return {"status": "PUBLIC_PAGE_ERROR", "error_code": obj["error"].get("code"),
+                    "rows_before_error": len(rows)}
+        features = obj.get("features", [])
+        if not features:
+            return {"status": "PUBLIC_PAGE_INCOMPLETE", "rows_before_error": len(rows)}
+        for feature in features:
+            rows.append(feature.get("attributes") or {})
+            geometry_count += bool(feature.get("geometry"))
+        if len(rows) > count:
+            raise ValueError("ArcGIS pagination returned excess records")
+    if len(rows) != count:
+        return {"status": "PUBLIC_PAGE_INCOMPLETE", "rows_before_error": len(rows)}
+    result = profile_records(rows, "arcgis_public_feature_service", f"layer_{layer_id}")
+    result["status"] = "PUBLIC_FEATURES_INGESTED"
+    result["declared_count"] = count
+    result["features_with_geometry"] = geometry_count
+    result["coordinate_reference"] = "outSR=4326 requested; per-feature spatial accuracy not independently verified"
+    return result
+
+
+def audit(item: dict, downloader=read_bounded, arcgis_downloader=read_public_arcgis) -> dict:
     files = metadata_files(item)
     profiles = []
     spent = 0
@@ -180,20 +262,27 @@ def audit(item: dict, downloader=read_bounded) -> dict:
         except (OSError, ValueError, BadZipFile, UnicodeError) as exc:
             profiles.append({"file": name, "status": "DOWNLOAD_OR_PARSE_FAILED",
                              "error_type": type(exc).__name__})
+    base = public_arcgis_base(item)
+    try:
+        arcgis = arcgis_inventory(base, arcgis_downloader) if base else {"status": "NO_PUBLIC_ARCGIS_LINK"}
+    except (OSError, ValueError, UnicodeError) as exc:
+        arcgis = {"status": "PUBLIC_ARCGIS_ACCESS_FAILED", "error_type": type(exc).__name__}
     records = sum(t.get("rows", 0) for p in profiles for t in p.get("tables", []))
+    records += arcgis.get("rows", 0)
     return {
         "experiment": "E326_INDEPENDENT_USGS_TERRESTRIAL_ANALOG_INVENTORY",
         "source_doi": DOI, "source_item": ITEM_ID,
         "source_title": item["title"],
         "metadata_keys": sorted(item),
         "metadata_web_links": [{"title": str(w.get("title", ""))[:120],
-                                 "uri": str(w.get("uri", ""))[:300]}
+                                 "uri_without_query": urlunsplit((*urlsplit(str(w.get("uri", "")))[:3], "", ""))[:300]}
                                 for w in item.get("webLinks", [])[:20]],
         "metadata_facets": [str(f.get("name", f.get("className", "")))[:100]
                             for f in item.get("facets", [])[:20]],
         "has_children": item.get("hasChildren"),
         "declared_files": [{k: v for k, v in f.items() if k != "url"} for f in files],
-        "download_profiles": profiles, "tabular_rows_profiled": records,
+        "download_profiles": profiles, "arcgis_public_profile": arcgis,
+        "tabular_rows_profiled": records,
         "status": "TABULAR_SOURCE_INGESTED" if records else "NO_TABULAR_RECORDS_INGESTED",
         "e001_known_site_recovery": "NOT YET MEASURED",
         "cross_body_similarity": "NOT YET PROVEN",
@@ -223,7 +312,8 @@ def main() -> None:
                       "metadata_keys": result["metadata_keys"],
                       "web_links": result["metadata_web_links"],
                       "facets": result["metadata_facets"],
-                      "has_children": result["has_children"]}, sort_keys=True))
+                      "has_children": result["has_children"],
+                      "arcgis": result["arcgis_public_profile"]}, sort_keys=True))
 
 
 if __name__ == "__main__":
