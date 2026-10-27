@@ -28,7 +28,7 @@ SEED = 325
 
 def climate_family(raw: str) -> str:
     """Only recognize an unambiguous single Köppen-like code; do not guess."""
-    if re.fullmatch(r"[ABCDE][A-Z0-9]*", raw.upper()):
+    if re.fullmatch(r"(?:A[FMWS]|B[WS][HK]|[CD][SWF][ABCD]|E[TF])", raw.upper()):
         return raw[0].upper()
     return "UNCLASSIFIED"
 
