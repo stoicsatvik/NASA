@@ -1,0 +1,48 @@
+name: E323 real PAAD raw-token spatial dependence
+on:
+  push:
+    branches:
+      - foundry/e323-paad-spatial-label-null-20261027
+  pull_request:
+    paths:
+      - research/e323_paad_spatial_label_null.py
+      - tests/test_e323_paad_spatial_label_null.py
+      - .github/workflows/e323-paad-spatial-label-null.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-pinned-spatial-null:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install test runner
+        run: python -m pip install pytest
+      - name: Run synthetic controls and inherited source tests
+        run: python -m pytest -q tests/test_e323_paad_spatial_label_null.py tests/test_e320_paad_spatial_holdout.py tests/test_e319_paad_mars_codebook_overlap.py tests/test_e317_paad_independent_source.py
+      - name: Run bounded source-pinned real PAAD permutation experiment
+        run: python -m research.e323_paad_spatial_label_null --output e323_real_paad_label_spatial_receipt.json
+      - name: Assert source and scientific claim boundaries
+        run: |
+          python - <<'PY'
+          import json
+          x = json.load(open('e323_real_paad_label_spatial_receipt.json'))
+          assert x['sites'] == 45
+          assert x['permutations'] == 999
+          assert x['source_receipt']['sha256'] == '5be67b4da584987d9ce5207f2ee3c90b5b3b5849469461847111eaab5aafcecd'
+          assert x['e001_known_site_recovery'] == 'NOT YET MEASURED'
+          assert x['cross_body_similarity'] == 'NOT YET PROVEN'
+          assert 0 <= x['name_only_nearest_jaccard'] <= 1
+          assert 0 < x['name_only_upper_tail_p'] <= 1
+          for k in ('25', '50', '100'):
+              assert x['spatial_block_km'][k]['eligible_holdouts'] <= 45
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e323-real-paad-spatial-label-null-receipt
+          path: e323_real_paad_label_spatial_receipt.json
+          if-no-files-found: error
