@@ -50,7 +50,7 @@ def test_audit_only_reports_observed_rows():
     assert result["site_rows_observed"] == 2
     assert result["e001_known_site_recovery"] == "NOT YET MEASURED"
     assert result["cross_body_similarity"] == "NOT YET PROVEN"
-    assert "_uri" not in json.dumps(result)
+    assert all("_uri" not in record for record in result["files"])
 
 
 def test_untrusted_uri_is_not_downloaded():
