@@ -33,6 +33,26 @@ def climate_family(raw: str) -> str:
     return "UNCLASSIFIED"
 
 
+
+# Explicit analyst grouping of source DESCRIPTIONS, not an official Köppen codebook.
+# Fail closed on unseen descriptive labels rather than inventing climate families.
+DESCRIPTOR_GROUPS = {
+    "Cold arid desert": "ARID",
+    "Cold arid steppe": "ARID",
+    "Hot arid desert": "ARID",
+    "Hot arid steppe": "ARID",
+    "Equatorial monsoonal": "EQUATORIAL",
+    "Equatorial, fully humid.": "EQUATORIAL",
+    "Polar frost": "POLAR",
+    "Snow steppe, warm summer": "SNOW",
+    "Snow, fully humid, cool summer": "SNOW",
+    "Snow, fully humid, warm summer": "SNOW",
+}
+
+
+def descriptor_group(raw: str) -> str:
+    return DESCRIPTOR_GROUPS.get(raw, "UNCLASSIFIED")
+
 def read_climate_sites(raw: bytes) -> list[dict]:
     sites = read_labeled_sites(raw)
     reader = csv.DictReader(io.StringIO(raw.decode("utf-8-sig")))
@@ -53,6 +73,7 @@ def read_climate_sites(raw: bytes) -> list[dict]:
         full = climates[site["name"]]
         site["climate_full"] = full
         site["climate_family"] = climate_family(full)
+        site["climate_descriptor_group"] = descriptor_group(full)
     return sites
 
 
@@ -61,7 +82,7 @@ def groups_for(sites: list[dict], scheme: str) -> list[list[int]]:
     for i, site in enumerate(sites):
         if scheme == "global":
             key = "ALL"
-        elif scheme in ("climate_full", "climate_family"):
+        elif scheme in ("climate_full", "climate_family", "climate_descriptor_group"):
             key = site[scheme]
         else:
             raise ValueError("unknown permutation scheme")
@@ -110,7 +131,7 @@ def audit(sites: list[dict], permutations: int = PERMUTATIONS,
     if len(sites) < 3 or len({s["name"] for s in sites}) != len(sites):
         raise ValueError("invalid site identities")
     sites = sorted(sites, key=lambda s: s["name"])
-    if any(not s.get("climate_full") or not s.get("climate_family")
+    if any(not s.get("climate_full") or not s.get("climate_family") or not s.get("climate_descriptor_group")
            or not isinstance(s["tokens"], frozenset) or not s["tokens"]
            for s in sites):
         raise ValueError("incomplete source labels")
@@ -132,7 +153,7 @@ def audit(sites: list[dict], permutations: int = PERMUTATIONS,
             observed_means["name_only"] - blocked if blocked is not None else None
         )
     schemes = {}
-    for offset, scheme in enumerate(("global", "climate_full", "climate_family")):
+    for offset, scheme in enumerate(("global", "climate_full", "climate_family", "climate_descriptor_group")):
         groups = groups_for(sites, scheme)
         rng = random.Random(seed + offset)
         nulls = {key: [] for key in observed}
@@ -173,6 +194,10 @@ def audit(sites: list[dict], permutations: int = PERMUTATIONS,
             "NO_UNAMBIGUOUS_CODES" if all(s["climate_family"] == "UNCLASSIFIED" for s in sites)
             else "PARTIAL_OR_COMPLETE_UNAMBIGUOUS_CODES"
         ),
+        "climate_descriptor_group_counts": {
+            k: sum(s["climate_descriptor_group"] == k for s in sites)
+            for k in sorted({s["climate_descriptor_group"] for s in sites})
+        },
         "climate_family_counts": {
             k: sum(s["climate_family"] == k for s in sites)
             for k in sorted({s["climate_family"] for s in sites})
@@ -209,6 +234,7 @@ def main() -> None:
         "sites": result["sites"],
         "climate_family_counts": result["climate_family_counts"],
         "climate_full_counts": result["climate_full_counts"],
+        "climate_descriptor_group_counts": result["climate_descriptor_group_counts"],
         "climate_family_status": result["climate_family_status"],
         "observed": result["observed"],
         "conditional_permutations": result["conditional_permutations"],

@@ -38,7 +38,7 @@ jobs:
           assert r["cross_body_similarity"] == "NOT YET PROVEN"
           assert abs(r["observed"]["name_only_jaccard"] - 0.3500529101) < 1e-8
           assert abs(r["observed"]["drop_100_km"] - 0.1148148148) < 1e-8
-          assert set(r["conditional_permutations"]) == {"global", "climate_full", "climate_family"}
+          assert set(r["conditional_permutations"]) == {"global", "climate_full", "climate_family", "climate_descriptor_group"}
           PY
       - uses: actions/upload-artifact@v4
         with:

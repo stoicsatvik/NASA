@@ -5,7 +5,7 @@ import random
 import unittest
 
 from research.e325_paad_climate_conditioned_null import (
-    audit, climate_family, groups_for, read_climate_sites,
+    audit, climate_family, descriptor_group, groups_for, read_climate_sites,
     shuffle_within_groups,
 )
 
@@ -37,6 +37,9 @@ class TestE325(unittest.TestCase):
         self.assertEqual(climate_family("Cfa"), "C")
         self.assertEqual(climate_family("BWh/BWk"), "UNCLASSIFIED")
         self.assertEqual(climate_family("desert"), "UNCLASSIFIED")
+        self.assertEqual(descriptor_group("Cold arid desert"), "ARID")
+        self.assertEqual(descriptor_group("Equatorial monsoonal"), "EQUATORIAL")
+        self.assertEqual(descriptor_group("unrecognized"), "UNCLASSIFIED")
 
     def test_shuffling_preserves_full_strata(self):
         s = sites()
@@ -56,7 +59,7 @@ class TestE325(unittest.TestCase):
         self.assertEqual(result["conditional_permutations"]["climate_full"]
                          ["permutable_sites"], 4)
         self.assertGreater(result["observed"]["name_only_jaccard"], 0.5)
-        for name in ("global", "climate_full", "climate_family"):
+        for name in ("global", "climate_full", "climate_family", "climate_descriptor_group"):
             self.assertTrue(0 < result["conditional_permutations"][name]
                             ["metrics"]["name_only_jaccard"]["upper_tail_p"] <= 1)
 
