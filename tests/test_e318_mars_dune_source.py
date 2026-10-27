@@ -63,3 +63,13 @@ def test_unknown_and_oversize_files_never_downloaded():
     result = audit(data, downloader=lambda *_: pytest.fail("unexpected download"))
     assert result["status"] == "NO_MARS_TABLES_PROFILED"
     assert [r["status"] for r in result["file_receipts"]] == ["NOT_ELIGIBLE", "NOT_ELIGIBLE"]
+
+
+def test_mislabeled_spreadsheet_does_not_hide_valid_zip_table():
+    f = io.BytesIO()
+    with ZipFile(f, "w") as z:
+        z.writestr("broken.xlsx", b"not actually an xlsx")
+        z.writestr("valid.csv", "Dune_Type,ID\nB,1\n")
+    rows = profile_table(f.getvalue(), "mixed.zip")
+    assert any(r.get("status") == "TABLE_PARSE_FAILED" for r in rows)
+    assert any(r.get("rows") == 1 for r in rows)
