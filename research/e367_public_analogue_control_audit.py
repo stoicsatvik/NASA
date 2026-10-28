@@ -80,7 +80,7 @@ def audit(catalog: dict, validation_code: str, readme: str) -> dict:
         "body_specific_positive_negative_pairs": {
             body: count * len(negatives) for body, count in by_body.items()
         },
-        "source_self_reports_auc_one": "1.00 on all five built-in targets" in readme,
+        "source_self_reports_auc_one": "1.00 on all five built-in targets" in readme.replace("**", ""),
         "independent_auc_reproduction": "NOT PERFORMED",
         "independently_blinded_earth_mars_site_matches": "NOT DOCUMENTED IN THIS CATALOG",
         "catalogued_negatives_are_editorial": "editorial" in catalog.get("provenance", "").lower(),
