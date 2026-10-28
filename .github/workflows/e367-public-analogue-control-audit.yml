@@ -1,0 +1,48 @@
+name: E367 independent public analogue-control audit
+
+on:
+  push:
+    branches:
+      - foundry/e367-public-analogue-validation-audit-20261028
+  pull_request:
+    paths:
+      - "research/e367_public_analogue_control_audit.py"
+      - "tests/test_e367_public_analogue_control_audit.py"
+      - "research/E367_PUBLIC_ANALOGUE_VALIDATION_GATE_20261028.md"
+      - ".github/workflows/e367-public-analogue-control-audit.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install test runner
+        run: python -m pip install 'pytest>=8,<9'
+      - name: Verify source-boundary and fail-closed controls
+        run: python -m pytest -q tests/test_e367_public_analogue_control_audit.py
+      - name: Audit exact public source commit without credentials
+        run: |
+          mkdir -p artifacts/e367
+          python -m research.e367_public_analogue_control_audit > artifacts/e367/public_control_audit.json
+          python -m json.tool artifacts/e367/public_control_audit.json > /dev/null
+          python - <<'PY'
+          import json
+          x=json.load(open('artifacts/e367/public_control_audit.json'))
+          print({k:x[k] for k in ('catalog_sites','environment_positive_sites','geology_only_sites_excluded_from_auc','editorial_negative_sites','environment_positive_by_body','source_self_reports_auc_one')})
+          PY
+      - name: Preserve source audit receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e367-public-analogue-control-receipt
+          path: artifacts/e367/public_control_audit.json
+          if-no-files-found: warn
+          retention-days: 30
