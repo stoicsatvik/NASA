@@ -27,7 +27,7 @@ SEARCH_RADIUS = 2
 
 
 def git_blob_id(data: bytes) -> str:
-    return hashlib.sha1(b"blob " + str(len(data)).encode() + b"\\0" + data).hexdigest()
+    return hashlib.sha1(b"blob " + str(len(data)).encode() + bytes([0]) + data).hexdigest()
 
 
 def fetch_pinned(path: str) -> bytes:
