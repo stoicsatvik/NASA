@@ -1,0 +1,47 @@
+name: E369 independent Earth-only single-feature control audit
+on:
+  push:
+    branches:
+      - research/e369-editorial-negative-single-feature-20261028
+  pull_request:
+    paths:
+      - research/e369_single_feature_control_baselines.py
+      - tests/test_e369_single_feature_control_baselines.py
+      - .github/workflows/e369-editorial-negative-baselines.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  independent-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install bounded numerical test dependencies
+        run: python -m pip install 'numpy>=1.26,<3' 'pytest>=8,<10'
+      - name: Run offline structural and negative controls
+        run: python -m pytest -q tests/test_e369_single_feature_control_baselines.py tests/test_e367_public_analogue_control_audit.py
+      - name: Fetch pinned public rasters and execute twice
+        run: |
+          python -m research.e369_single_feature_control_baselines > e369_receipt.json
+          python -m research.e369_single_feature_control_baselines > e369_repeat.json
+          cmp e369_receipt.json e369_repeat.json
+          python - <<'PY'
+          import json
+          r=json.load(open("e369_receipt.json",encoding="utf-8"))
+          assert r["source_commit"]=="f6c53ba50a9379d1c06f610b0e598395a0a54b43"
+          assert len(r["sha256"])==4
+          for feature in ("vegetation","precipitation"):
+              for mask in ("finite_only","land_fraction_ge_0_5"):
+                  for group in ("mars","moon","cold_polar"):
+                      x=r["results"][feature][mask]["groups"][group]
+                      assert x["positives_scored"]>=2 and x["negatives_scored"]>=6, x
+                      assert 0<=x["auc"]<=1, x
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e369-independent-public-raster-control-receipt
+          path: e369_receipt.json
