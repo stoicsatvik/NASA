@@ -16,7 +16,19 @@
 
 Permitted preparatory activity under the cited local guidance: learn general GIS, inspect public datasets, understand measurement units, explore scientific literature, compare public challenge summaries and plan team roles. **Do not assemble the final competition-specific solution, user interface or submission before the start.** The scientific project can continue independently only with clear separation from any future competition entry.
 
-**Age gate:** Under-18 registration, consent and supervision must be checked against the selected local event and global terms; do not assume one city's 18+ rule applies elsewhere. No autonomous registration/contact.
+**Age gate (updated E353):** Official 2026 global terms require guardian registration and continuous guardian accompaniment for under-18 participants. Selected local-event acceptance and any extra consent/waiver procedures still need verification. No autonomous registration/contact.
+
+## E353 | Official 2026 global participation terms verified on 28 October
+
+**Source:** NASA Space Apps, [2026 Participant Terms and Conditions](https://www.spaceappschallenge.org/legal/), updated 7 August 2026. This is a global NASA Space Apps terms page, not a local-event interpretation. The event's 2026 [registration timeline](https://www.spaceappschallenge.org/2026/) separately identifies 14–15 November as the hackathon and 15 November 23:59 local time as the submission deadline.
+
+**Age eligibility is now directly supported by the global terms:** participants **under 18** must (1) be registered **by a parent or legal guardian** and (2) be **accompanied by a parent or legal guardian at all times during the event**. The terms do not establish that remote/virtual attendance automatically waives accompaniment. Local-event registration and additional requirements must still be checked. This is an action gate for any minor teammate, not a scientific result. No autonomous registration or outreach.
+
+**Submission and intellectual-property boundaries:** the same official 2026 terms state that submitted original content must be freely available without restriction or licensed under an OSI-approved open-source license; if no OSI-compliant license is specified, NASA says it will distribute original content under Apache 2.0. Do not assume proprietary submission materials remain private. The terms also prohibit personally identifying information in solutions and say recognizable names, voices, and likenesses of minors should not appear in submissions or videos. The team must review these conditions before publication; no submissions were made.
+
+**Remaining uncertainty:** this global legal text does not independently settle the *pre-event solution-development* prohibition. E330's earlier cited organizer guidance remains a conservative operational gate; the selected event's instructions and official global FAQ must still be verified. Nor do these terms prove a particular local event accepts minors.
+
+**Research/competition separation:** This update documents eligibility and licensing only. It does not develop a 2026 challenge solution, change the E001 research status, or establish any scientific analogy.
 
 ## Scientific claims unchanged
 
