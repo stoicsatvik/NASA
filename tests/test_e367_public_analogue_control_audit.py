@@ -32,6 +32,7 @@ def test_counts_are_control_design_not_cross_body_validation():
     assert result["body_specific_positive_negative_pairs"] == {"mars": 1, "moon": 1}
     assert result["independent_auc_reproduction"] == "NOT PERFORMED"
     assert result["source_self_reports_auc_one"]
+    assert audit(catalog(), POLICY, "ROC-AUC **1.00** on all five built-in targets")["source_self_reports_auc_one"]
 
 
 def test_fail_closed_on_duplicate_missing_and_invalid_coordinates():
