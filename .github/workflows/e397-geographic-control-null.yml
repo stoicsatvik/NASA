@@ -1,0 +1,38 @@
+name: E397 exact geographic negative control
+on:
+  push:
+    branches:
+      - research/e397-geographic-control-null-20261029
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  geographic-null:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Offline exact-null controls
+        run: python -m unittest discover -s tests -p 'test_e397_geographic_control_null.py' -v
+      - name: Pinned public catalog, exact enumeration, deterministic repeat
+        run: |
+          python -m research.e397_geographic_control_null > e397_receipt.json
+          python -m research.e397_geographic_control_null > e397_repeat.json
+          cmp e397_receipt.json e397_repeat.json
+          python - <<'PY'
+          import json
+          r=json.load(open('e397_receipt.json',encoding='utf-8'))
+          assert r['source_blob_sha1']=='d75240ce203ddb00b2d9186e7981ab90720ff9a3'
+          assert r['permutations']==125970
+          assert r['positive_sites']==12 and r['editorial_negatives']==8
+          assert r['features']['abs_lat']['exceedances']==3614
+          assert r['features']['west_lon']['exceedances']==4352
+          assert r['max_feature_exceedances']==16547
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e397-pinned-catalog-exact-geographic-null
+          path: e397_receipt.json
