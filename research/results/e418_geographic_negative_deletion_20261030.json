@@ -1,0 +1,94 @@
+{
+  "experiment": "E418_GEOGRAPHIC_NEGATIVE_DELETION",
+  "date": "2026-10-30",
+  "source": {
+    "repository": "Yakiyo/terra-nova",
+    "commit": "f6c53ba50a9379d1c06f610b0e598395a0a54b43",
+    "path": "data/known_analogs.json",
+    "git_blob_sha1": "d75240ce203ddb00b2d9186e7981ab90720ff9a3",
+    "bytes": 6500
+  },
+  "population": {
+    "positives": 12,
+    "editorial_negatives": 8,
+    "remaining_negatives_per_run": 7
+  },
+  "features": [
+    "abs_lat",
+    "north_lat",
+    "negative_abs_lat",
+    "west_lon",
+    "abs_lon"
+  ],
+  "null": "exact conditional label exchangeability; max of five fixed geographic scores",
+  "rows": [
+    {
+      "omitted_negative": "Amazon rainforest",
+      "max_feature_auc": 0.7619047619047619,
+      "exceedances": 7808,
+      "permutations": 50388,
+      "familywise_p": 0.15495752957053266
+    },
+    {
+      "omitted_negative": "Congo Basin rainforest",
+      "max_feature_auc": 0.7261904761904762,
+      "exceedances": 13038,
+      "permutations": 50388,
+      "familywise_p": 0.2587520838294832
+    },
+    {
+      "omitted_negative": "Borneo rainforest",
+      "max_feature_auc": 0.7261904761904762,
+      "exceedances": 12765,
+      "permutations": 50388,
+      "familywise_p": 0.25333412717313647
+    },
+    {
+      "omitted_negative": "Iowa cropland",
+      "max_feature_auc": 0.8095238095238095,
+      "exceedances": 3404,
+      "permutations": 50388,
+      "familywise_p": 0.06755576724616973
+    },
+    {
+      "omitted_negative": "Dhaka, Bangladesh",
+      "max_feature_auc": 0.7380952380952381,
+      "exceedances": 11048,
+      "permutations": 50388,
+      "familywise_p": 0.2192585536238787
+    },
+    {
+      "omitted_negative": "West Siberian taiga",
+      "max_feature_auc": 0.8214285714285714,
+      "exceedances": 2654,
+      "permutations": 50388,
+      "familywise_p": 0.05267127093752481
+    },
+    {
+      "omitted_negative": "South-eastern US forest",
+      "max_feature_auc": 0.7857142857142857,
+      "exceedances": 5283,
+      "permutations": 50388,
+      "familywise_p": 0.10484639199809478
+    },
+    {
+      "omitted_negative": "Western Europe farmland",
+      "max_feature_auc": 0.8095238095238095,
+      "exceedances": 3384,
+      "permutations": 50388,
+      "familywise_p": 0.06715884734460587
+    }
+  ],
+  "verification": "Three independently written calculations: JavaScript recursive enumeration, JavaScript bitmask enumeration, Python combinations enumeration; all 8 exact counts agree. The Python reproduction used source-pinned coordinate values transcribed from GitHub connector, not an independent file download.",
+  "claim_states": {
+    "source_selection_sensitivity": "SUPPORTED FOR THIS PUBLIC EDITORIAL CATALOG",
+    "cross_body_similarity": "NOT YET PROVEN",
+    "e001_known_site_recovery": "NOT YET MEASURED",
+    "challenge_superiority": "NOT YET PROVEN"
+  },
+  "limitations": [
+    "Negatives are editorial, not independent adjudicated nonanalogues.",
+    "Conditional label permutation is a sensitivity null, not actual randomized sampling.",
+    "No Moon/Mars descriptors, physical matching or new field measurements."
+  ]
+}
