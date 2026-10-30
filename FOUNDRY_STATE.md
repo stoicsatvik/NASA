@@ -380,3 +380,13 @@ Fresh search-indexed **official Space Apps** pages revealed that `Lunar Landing 
 **Correction to E411 interpretation:** 13/14 *literal title* coverage SUPPORTED, but the stronger conclusion that E193's `CLPS lunar browser` is a substantively *different* challenge is **NOT SUPPORTED** by this source evidence. Treat lunar identity as CANDIDATE ALIAS / UNRESOLVED, not a proven stale task. E193's complete semantic coverage and lunar rating remain NOT YET PROVEN. E411 numerical sensitivity remains valid as arithmetic on frozen subjective ratings.
 
 **Next:** verify canonical IDs/redirects, full statements and resource links before relabeling; independently validate competing challenges and E001 physical analogue recovery. E001 known-site recovery NOT YET MEASURED; cross-body similarity, novel discovery, local validation advantage and challenge-selection superiority NOT YET PROVEN. No competition-specific solution developed.
+
+
+## 2026-10-30 E418: editorial negative deletion sensitivity
+
+- Branch `research/e418-geographic-negative-deletion-20261030`, stacked on E416 draft PR #43.
+- Pinned 12-positive/8-editorial-negative TerraNova source from E397. Deleting each negative in turn leaves 12/7 sites; exact C(19,12)=50,388 label allocations per deletion, max over the same five geographic scores.
+- Measured max geographic AUC range 0.726190–0.821429; eight exact conditional max-of-five p values range 0.052671–0.258752, none below 0.05. This is a **source-selection sensitivity**, not a randomized test, independent label set or cross-body model.
+- Three independent local implementations (two JavaScript, one Python) agreed on all eight exceedance counts; the committed Python source and offline tests were **not** executed under the repository runner. GitHub Actions quota reported exhausted; no paid CI triggered.
+- **SUPPORTED:** editorial-control deletion sensitivity. **NOT YET MEASURED:** E001 known-site recovery. **NOT YET PROVEN:** cross-body similarity, novel discovery, local advantage, planetary challenge superiority.
+- Next: independent physically characterized analogue pairs and credible hard negatives, frozen site-disjoint/spatial-blocked split and random/Euclidean/physically weighted controls. Avoid further circular tuning on editorial labels. See `research/E418_GEOGRAPHIC_NEGATIVE_DELETION_20261030.md`.
