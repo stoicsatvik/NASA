@@ -1,0 +1,37 @@
+name: E411 challenge coverage and ranking ablation
+on:
+  push:
+    branches:
+      - research/e411-challenge-validation-ablation-20261030
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  offline-challenge-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Frozen ranking and source-index tests
+        run: python -m unittest discover -s tests -p 'test_e411_challenge_validation_ablation.py' -v
+      - name: Deterministic independent repeat
+        run: |
+          python -m research.e411_challenge_validation_ablation > e411.json
+          python -m research.e411_challenge_validation_ablation > e411_repeat.json
+          cmp e411.json e411_repeat.json
+          python - <<'PY'
+          import json
+          r=json.load(open('e411.json'))
+          assert r['index_title_count']==14
+          assert r['matched_prior_aliases']==13
+          assert r['base_analogue_rank']==5
+          assert r['leave_one_criterion_out']['validation']['analogue_rank']==1
+          assert r['analogue_validation_score_for_tie_if_all_else_fixed']=='8.2'
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e411-offline-ranking-receipt
+          path: e411.json
