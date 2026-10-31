@@ -1,0 +1,126 @@
+{
+  "schema": "nasa/e463/mola128-bounded-real-data-coverage/v1",
+  "evidence_run": "https://github.com/stoicsatvik/NASA/actions/runs/41248747974",
+  "evidence_head_sha": "5df18c2374f8c94f908ae6ded1ee6e25cb71dad7",
+  "evidence_artifact_id": 13060456415,
+  "source_base": "https://pds-geosciences.wustl.edu/mgs/urn-nasa-pds-mgs_mola_topography_derived/meg128/",
+  "tile": "00n000hb",
+  "pds_product_version": "2.0",
+  "sampling": "three preregistered 9x9 windows, not a random global sample",
+  "pds3_labels_sha256": {
+    "megc": "b76f1851701c3268582f13cace1fbaa3958679b6d0a5b75fc6aa20fa994b0316",
+    "megt": "d27d0b5635a5024dd5d95845fd83477dc5f723976444d1e5882a675027b0da13"
+  },
+  "metadata": {
+    "megc": {
+      "lines": 5632,
+      "cols": 11520,
+      "ppd": 128,
+      "record_bytes": 11520,
+      "sample_bits": 8,
+      "sample_type": "UNSIGNED_INTEGER"
+    },
+    "megt": {
+      "lines": 5632,
+      "cols": 11520,
+      "ppd": 128,
+      "record_bytes": 23040,
+      "sample_bits": 16,
+      "sample_type": "MSB_INTEGER"
+    }
+  },
+  "topography_units": "metres above MOLA areoid",
+  "counts_units": "number of MOLA observations per grid cell; zero implies interpolated topography",
+  "full_file_sha256": null,
+  "full_file_downloaded": false,
+  "windows": [
+    {
+      "latitude_deg_requested": -0.5,
+      "longitude_deg_requested": 45,
+      "center_row_zero_based": 64,
+      "center_column_zero_based": 5760,
+      "sampled_cells": 81,
+      "measured_cells": 33,
+      "interpolated_cells": 48,
+      "count_min": 0,
+      "count_max": 4,
+      "measured_elevation_min_m": 1381,
+      "measured_elevation_max_m": 1448,
+      "sampled_count_range_sha256": "626647a6e4667440224176a30f6417a180d52c6f26bc4de92636f69146d70526",
+      "sampled_topo_range_sha256": "759e0861e2a56dddfbc75b1e5b53f428e094ca01bcbfaaf881231edca61723f9",
+      "sampled_count_byte_range": [
+        691200,
+        794879
+      ],
+      "sampled_topo_byte_range": [
+        1382400,
+        1589759
+      ],
+      "measured_fraction": 0.4074074074074074
+    },
+    {
+      "latitude_deg_requested": -20,
+      "longitude_deg_requested": 45,
+      "center_row_zero_based": 2560,
+      "center_column_zero_based": 5760,
+      "sampled_cells": 81,
+      "measured_cells": 15,
+      "interpolated_cells": 66,
+      "count_min": 0,
+      "count_max": 2,
+      "measured_elevation_min_m": 2866,
+      "measured_elevation_max_m": 2918,
+      "sampled_count_range_sha256": "750615619be20ca830ab30d28743fb8d192b5befa2ac8a10b730403a2466d258",
+      "sampled_topo_range_sha256": "e900955bdf2139f19db9dc1e4d2e0c9198148d8fc1cacf3cee03ed09348e6acf",
+      "sampled_count_byte_range": [
+        29445120,
+        29548799
+      ],
+      "sampled_topo_byte_range": [
+        58890240,
+        59097599
+      ],
+      "measured_fraction": 0.18518518518518517
+    },
+    {
+      "latitude_deg_requested": -40,
+      "longitude_deg_requested": 45,
+      "center_row_zero_based": 5120,
+      "center_column_zero_based": 5760,
+      "sampled_cells": 81,
+      "measured_cells": 38,
+      "interpolated_cells": 43,
+      "count_min": 0,
+      "count_max": 2,
+      "measured_elevation_min_m": -2374,
+      "measured_elevation_max_m": -2298,
+      "sampled_count_range_sha256": "48428a61919ff46145d7a40326f013642f9b436dafa0f53d0b8116002800bfdc",
+      "sampled_topo_range_sha256": "a586d02f45d4463b73c651e448b561277fc061d42c340f0ae98d930289559fbb",
+      "sampled_count_byte_range": [
+        58936320,
+        59039999
+      ],
+      "sampled_topo_byte_range": [
+        117872640,
+        118079999
+      ],
+      "measured_fraction": 0.4691358024691358
+    }
+  ],
+  "aggregate": {
+    "sampled_cells": 243,
+    "measured_cells": 86,
+    "interpolated_cells": 157,
+    "measured_fraction": 0.35390946502057613
+  },
+  "claim": "ONLY site-specific MOLA 128ppd observation coverage at three selected windows; no independent effective resolution",
+  "known_site_recovery": "NOT YET MEASURED",
+  "cross_body_similarity": "NOT YET PROVEN",
+  "limitations": [
+    "Samples are not geological analogues and were chosen before observing raster bytes.",
+    "Counts>0 establishes observed bins, not independent sample geometry, measurement uncertainty or optical resolution.",
+    "Sampled byte-range hashes are not full-file hashes; full product checksums were not verified.",
+    "No LOLA high-resolution sample, Earth matched descriptor, independent label, or E001 retrieval.",
+    "No raw data are committed to GitHub."
+  ]
+}
