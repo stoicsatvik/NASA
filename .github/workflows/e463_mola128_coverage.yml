@@ -1,0 +1,29 @@
+name: E463 MOLA128 bounded measured coverage
+on:
+  pull_request:
+    paths:
+      - 'research/e463_mola128_range_coverage.mjs'
+      - 'research/test_e463_mola128_range_coverage.mjs'
+      - '.github/workflows/e463_mola128_coverage.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Deterministic offline controls
+        run: node --test research/test_e463_mola128_range_coverage.mjs
+      - name: Read only bounded official PDS byte ranges
+        run: node research/e463_mola128_range_coverage.mjs > e463_receipt.json
+      - name: Archive source-fingerprinted numerical receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: e463-mola128-real-source-receipt
+          path: e463_receipt.json
+          if-no-files-found: error
