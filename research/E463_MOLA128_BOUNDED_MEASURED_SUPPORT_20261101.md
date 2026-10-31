@@ -38,7 +38,7 @@ Real LOLA high-resolution effective-resolution/spot-count masks, matched physica
 | 45°E, 40°S | 38/81 | 43/81 | 46.91% | -2374 to -2298 m |
 | **Pooled, nonrandom** | **86/243** | **157/243** | **35.39%** | Not pooled |
 
-**Falsified:** treating 128ppd grid cells as universally independent observed terrain cells. In the three preregistered 9×9 windows, 59.2–81.5% of nominal cells were filled with interpolated topography. This is a *finite local sample* with three selected latitudes at one longitude; it is not a global rate or a statistical population estimate. Counts>0 is necessary evidence of a sampled bin, but not sufficient for independent effective resolution or matched cross-instrument terrain descriptors.
+**Falsified:** treating 128ppd grid cells as universally independent observed terrain cells. In the three preregistered 9×9 windows, 53.1–81.5% of nominal cells were filled with interpolated topography. This is a *finite local sample* with three selected latitudes at one longitude; it is not a global rate or a statistical population estimate. Counts>0 is necessary evidence of a sampled bin, but not sufficient for independent effective resolution or matched cross-instrument terrain descriptors.
 
 **What changes next:** before E001, require per-window count/coverage and effective-resolution diagnostics, then obtain a matched LOLA high-resolution count/effective-resolution product. Do not rank Earth analogues using unmasked 128ppd topography alone. Cross-body similarity and novel analogue discovery NOT YET PROVEN; E001 known-site recovery NOT YET MEASURED.
 
