@@ -430,3 +430,12 @@ At predeclared 45°E, 0.5°S / 20°S / 40°S, count>0 in 18/81, 34/81, 80/81 cel
 **Claim states:** Real LOLA local count support SUPPORTED BY OFFICIAL SOURCE EXECUTION; MOLA E463 local support SUPPORTED; cross-body similarity NOT YET PROVEN; E001 known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local field advantage NOT YET PROVEN; challenge-selection superiority NOT YET PROVEN.
 
 **Next highest-EV gate:** confirm label pixel registration and scale/offset, derive physically matched count-masked terrain descriptors at equivalent metres per cell, then test independently sourced known Earth analogue labels against frozen random/Euclidean/physically weighted leave-one-site-out baselines. No geospatial UI polish before this gate.
+
+
+## 2026-11-01: E472 approximately matched 2 km LOLA/MOLA count-mask experiment
+
+Official PDS bounded row reads on isolated draft PR #54 now preserve the full 9x9 observed-bin masks for both planets and measure the central 5x5 Mars window against the 9x9 lunar window. The north-south spans are 1.848685 km Mars and 1.895209 km Moon (2.4853% relative difference), not equal angular footprints. At the three nonrandom 45°E windows, observed lunar bins were 18/81, 34/81, 80/81; matched central Martian bins were 11/25, 3/25, 15/25. E472 exact-head Actions #41285355814 succeeded, with independent artifact arithmetic verification. The 20°S central Mars fraction 12% differs from its prior 9x9 fraction 18.52%, demonstrating that aggregate support cannot replace a spatial mask.
+
+**SUPPORTED:** measured-bin counts at three approximately matched physical footprints, not effective independent resolution or terrain analogy. **NOT YET MEASURED:** E001 known-site recovery, physically matched Earth descriptors and independent effective resolution. **NOT YET PROVEN:** cross-body similarity, novel analogues, local field advantage or challenge superiority. Evidence: `research/E472_PAIRED_PHYSICAL_SUPPORT_20261101.md` and `research/results/e472_paired_support_20261101.json`.
+
+**Next:** independent geodetic registration/vertical scaling checks, mechanism-specific independently labelled analogue sites and hard negatives, then count-masked equal-support E001 with random/Euclidean/physical baselines. No UI/competition solution before evidence gate.
