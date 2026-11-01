@@ -35,3 +35,20 @@ Before reading lunar raster bytes, freeze longitude **45°E**, latitude **0.5°S
 If official ranges succeed, inspect the numerical receipt and label orientation, compare observed-bin fractions with E463 *only as descriptive instrument support*, then design physically matched windows and execute blinded known-site recovery with random/Euclidean/physical baselines. If ranges fail, preserve exact HTTP failure and pursue a legitimate independent PDS mirror or smaller LDEC product.
 
 **Claim states:** Mars E463 measured-bin coverage SUPPORTED; lunar high-resolution coverage NOT YET MEASURED until actual source success; cross-body similarity NOT YET PROVEN; E001 known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN; challenge-selection superiority NOT YET PROVEN.
+
+## 2026-11-01: Actual official lunar raster outcome
+
+**Executed real data:** [GitHub Actions #41273612028](https://github.com/stoicsatvik/NASA/actions/runs/41273612028) completed **SUCCESS** at experiment head `6c10352805531d922fec107315f5648c133a41be`. All **8/8** deterministic offline Node controls passed; official count and elevation label requests and six exact HTTP 206 bounded row-range requests passed; artifact `13069334715` preserves the original machine-readable receipt. A checked normalized transcription is committed as `research/results/e469_lola128_real_data_20261101.json`.
+
+| Preselected 45°E center | LOLA LDEC observed count>0 | Zero-count bins | Observed fraction | LDEM raw DN range |
+| --- | ---: | ---: | ---: | ---: |
+| 0.5°S | 18/81 | 63/81 | 22.22% | -3117 to -3091 |
+| 20°S | 34/81 | 47/81 | 41.98% | -2010 to -1266 |
+| 40°S | 80/81 | 1/81 | 98.77% | 943 to 2191 |
+| **Nonrandom pooled** | **132/243** | **111/243** | **54.32%** | Not pooled |
+
+The two official PDS3 labels both declare `SAMPLE_TYPE = LSB_INTEGER`, 16-bit little-endian signed samples, 23040×46080 pixels and 128 pixels/degree. The initial code mistakenly expected big-endian samples: [Actions #41273491100](https://github.com/stoicsatvik/NASA/actions/runs/41273491100) failed on the label gate; a diagnostic [Actions #41273568697](https://github.com/stoicsatvik/NASA/actions/runs/41273568697) exposed the actual `LSB_INTEGER` declaration. The code was corrected and additional little-endian tests were added. This failure is retained as evidence, not silently erased.
+
+**Interpretation:** LOLA 128ppd count support is highly site-dependent across these three windows. The observed fractions differ from E463 MOLA 128ppd (40.74%, 18.52%, 46.91%), but the samples are on *different planets* and at different physical pixel scales. Lunar nominal equatorial spacing ≈236.90m versus Martian ≈463.08m, a 1.955× difference; 128ppd is not a physical matching criterion. Do not interpret these fractions as relative instrument quality, global coverage or analogue similarity.
+
+**Remaining unknowns:** independently verify precise PDS pixel-registration/latitude orientation; normalize LDEM scaling/datum; quantify footprint/track correlation and effective resolution; obtain independent Earth known-analogue labels and E001 leave-one-site-out retrieval. The three windows are not established analogue locations. Cross-body similarity and challenge-selection superiority **NOT YET PROVEN**; E001 known-site recovery **NOT YET MEASURED**.
