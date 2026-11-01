@@ -1,0 +1,41 @@
+name: E472 paired physical-support real-source comparison
+on:
+  pull_request:
+    paths:
+      - 'research/e463_mola128_range_coverage.mjs'
+      - 'research/e469_lola128_bounded.mjs'
+      - 'research/e472_paired_support.mjs'
+      - 'research/test_e472_paired_support.mjs'
+      - '.github/workflows/e472_paired_support.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run offline falsification controls
+        run: |
+          node --test research/test_e463_mola128_range_coverage.mjs
+          node --test research/test_e469_lola128_bounded.mjs
+          node --test research/test_e472_paired_support.mjs
+      - name: Read official bounded MOLA 128ppd rows
+        run: node research/e463_mola128_range_coverage.mjs > e472_mars_source.json
+      - name: Read official bounded LOLA 128ppd rows
+        run: node research/e469_lola128_bounded.mjs > e472_moon_source.json
+      - name: Compare approximately matched physical support
+        run: node research/e472_paired_support.mjs e472_mars_source.json e472_moon_source.json > e472_paired_receipt.json
+      - name: Preserve exact real-source and paired receipts
+        uses: actions/upload-artifact@v4
+        with:
+          name: e472-paired-physical-support-receipts
+          path: |
+            e472_mars_source.json
+            e472_moon_source.json
+            e472_paired_receipt.json
+          if-no-files-found: error
