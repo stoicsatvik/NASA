@@ -1,0 +1,61 @@
+{
+  "schema": "nasa/e472/physical-support-count-mask-comparison/v1",
+  "execution_date_utc": "2026-11-01",
+  "evidence_run": "https://github.com/stoicsatvik/NASA/actions/runs/41285355814",
+  "evidence_head_sha": "1ffd417e8b218c2a89fa9742a6ae84a4d32969b1",
+  "artifact_id": 13075560235,
+  "source_experiments": [
+    "E212",
+    "E463",
+    "E469"
+  ],
+  "physical_support": {
+    "moon_9x9_span_north_south_km": 1.8952094015093426,
+    "mars_5x5_span_north_south_km": 1.8486854686358687,
+    "relative_span_difference": 0.024853226111912385,
+    "independent_effective_resolution": "NOT MEASURED"
+  },
+  "windows": [
+    {
+      "latitude_deg_requested": -0.5,
+      "longitude_deg_requested": 45,
+      "moon_9x9_observed": 18,
+      "moon_9x9_total": 81,
+      "mars_5x5_observed": 11,
+      "mars_5x5_total": 25,
+      "moon_count_range_sha256": "b7262efc7060816ba8cc6538a64c2273dd57bcf591b89bc02552272343a13ec5",
+      "mars_count_range_sha256": "626647a6e4667440224176a30f6417a180d52c6f26bc4de92636f69146d70526"
+    },
+    {
+      "latitude_deg_requested": -20,
+      "longitude_deg_requested": 45,
+      "moon_9x9_observed": 34,
+      "moon_9x9_total": 81,
+      "mars_5x5_observed": 3,
+      "mars_5x5_total": 25,
+      "moon_count_range_sha256": "6e372993ae435c7e693703b5aa696b090eb3e89384a34c7bc45e8adccee281aa",
+      "mars_count_range_sha256": "750615619be20ca830ab30d28743fb8d192b5befa2ac8a10b730403a2466d258"
+    },
+    {
+      "latitude_deg_requested": -40,
+      "longitude_deg_requested": 45,
+      "moon_9x9_observed": 80,
+      "moon_9x9_total": 81,
+      "mars_5x5_observed": 15,
+      "mars_5x5_total": 25,
+      "moon_count_range_sha256": "5570120e4207ebe173d219c297a994c4c057534cb789db9d1690ee98e50f40d6",
+      "mars_count_range_sha256": "48428a61919ff46145d7a40326f013642f9b436dafa0f53d0b8116002800bfdc"
+    }
+  ],
+  "validation": "E472 exact-head Actions succeeded, E463 and E469 companion workflows succeeded; independent Python verified masks, central counts, and geometry from artifact ZIP",
+  "claim": "Site-specific observed-bin support at approximately matched physical footprints SUPPORTED; effective resolution NOT MEASURED",
+  "known_site_recovery": "NOT YET MEASURED",
+  "cross_body_similarity": "NOT YET PROVEN",
+  "limitations": [
+    "Three nonrandom locations, not known analogues",
+    "Observation-count positivity is not effective resolution",
+    "Moon and Mars 9x9/5x5 masks have different instruments, tracks, geodetic datums and smoothing",
+    "Source hashes refer to bounded rows, not full PDS files",
+    "No Earth 2km matched descriptors, independent labels, negative controls, or E001"
+  ]
+}

@@ -113,6 +113,8 @@ export async function main() {
       measured_cells: measured.filter(Boolean).length,
       interpolated_cells: measured.filter((x) => !x).length,
       measured_fraction: measured.filter(Boolean).length / counts.length,
+      observed_mask_rows: Array.from({length: WIDTH}, (_, r) => measured.slice(r * WIDTH, (r + 1) * WIDTH).map(x => x ? '1' : '0').join('')),
+      center_5x5_observed_cells: measured.filter((x, i) => Math.floor(i / WIDTH) >= 2 && Math.floor(i / WIDTH) <= 6 && i % WIDTH >= 2 && i % WIDTH <= 6 && x).length,
       count_min: Math.min(...counts), count_max: Math.max(...counts),
       measured_elevation_min_m: measuredElevation.length ? Math.min(...measuredElevation) : null,
       measured_elevation_max_m: measuredElevation.length ? Math.max(...measuredElevation) : null,
