@@ -1,10 +1,12 @@
 """Deterministic E476 structural and provenance tests."""
 import tempfile
+import os
 import unittest
 from pathlib import Path
 from research.e476_stencil_support import mask, support, fixed_count_shuffle_null, load_pinned, evaluate
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(os.environ.get("E476_ARTIFACT_DIR", Path(__file__).resolve().parent))
+HAS_ARTIFACT = (ROOT / "e472_mars_source.json").is_file() and (ROOT / "e472_moon_source.json").is_file()
 
 
 class TestE476(unittest.TestCase):
@@ -26,10 +28,12 @@ class TestE476(unittest.TestCase):
             with self.assertRaises(ValueError):
                 mask(rows, 3)
 
+    @unittest.skipUnless(HAS_ARTIFACT, "requires archived E472 source JSON artifact")
     def test_exact_source_digest(self):
         for body in ("mars", "moon"):
             self.assertEqual(len(load_pinned(ROOT / ("e472_" + body + "_source.json"), body)["windows"]), 3)
 
+    @unittest.skipUnless(HAS_ARTIFACT, "requires archived E472 source JSON artifact")
     def test_tamper_rejected(self):
         with tempfile.TemporaryDirectory() as d:
             p = Path(d) / "bad.json"
@@ -44,6 +48,7 @@ class TestE476(unittest.TestCase):
     def test_null_no_anisotropy(self):
         self.assertEqual(fixed_count_shuffle_null(5, 0, 0, 100)["two_sided_mc_tail_plus_one"], 1)
 
+    @unittest.skipUnless(HAS_ARTIFACT, "requires archived E472 source JSON artifact")
     def test_actual_windows(self):
         d = evaluate(load_pinned(ROOT / "e472_mars_source.json", "mars"),
                      load_pinned(ROOT / "e472_moon_source.json", "moon"), 100)
