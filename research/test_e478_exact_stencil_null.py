@@ -51,3 +51,10 @@ def test_archived_source_cohort():
     assert [w['observed'] for w in result['windows'][:3]] == [11, 3, 15]
     assert [w['observed_cross'] for w in result['windows'][:3]] == [0, 0, 0]
     assert [w['cross'] for w in result['windows'][3:]] == [0, 0, 49]
+
+def test_inclusion_exclusion_and_95pct_screen():
+    for k, zero, total in ((3,2300,2300),(11,4122758,4457400),(15,1995810,3268760)):
+        assert e478.exact_any_stencil_probability(5,k) == pytest.approx(1-zero/total)
+    assert next(k for k in range(26) if e478.exact_any_stencil_probability(5,k)>=0.95)==21
+    assert e478.exact_any_stencil_probability(5,20) < 0.95
+    assert e478.exact_any_stencil_probability(5,21) > 0.95
