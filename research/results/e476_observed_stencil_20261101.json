@@ -1,0 +1,135 @@
+{
+  "schema": "nasa/e476/observed-stencil-admissibility/v1",
+  "execution_date_utc": "2026-11-01",
+  "evidence_source": "E472 exact-head artifact 13075465278",
+  "source_sha256": {
+    "mars": "2e70d84ca45cc4730c87e8931194c5ba1cd7a31bdd15e9a7883c5611578c9dfb",
+    "moon": "a4ed427e5996b8ef115e0bf8130f615089248bae8d89ec43cdd6fa2bf80f96c4"
+  },
+  "windows": [
+    {
+      "body": "moon",
+      "latitude_deg": -0.5,
+      "longitude_deg": 45,
+      "observed": 18,
+      "cells": 81,
+      "eligible_centers": 49,
+      "full_3x3_centers": 0,
+      "five_point_cross_centers": 0,
+      "horizontal_observed_edges": 2,
+      "vertical_observed_edges": 12,
+      "vertical_minus_horizontal_edges": 10,
+      "fixed_count_shuffle": {
+        "draws": 20000,
+        "seed": 476,
+        "extreme_draws": 0,
+        "two_sided_mc_tail_plus_one": 0.00004999750012499375
+      }
+    },
+    {
+      "body": "mars",
+      "latitude_deg": -0.5,
+      "longitude_deg": 45,
+      "observed": 11,
+      "cells": 25,
+      "eligible_centers": 9,
+      "full_3x3_centers": 0,
+      "five_point_cross_centers": 0,
+      "horizontal_observed_edges": 2,
+      "vertical_observed_edges": 8,
+      "vertical_minus_horizontal_edges": 6,
+      "fixed_count_shuffle": {
+        "draws": 20000,
+        "seed": 476,
+        "extreme_draws": 45,
+        "two_sided_mc_tail_plus_one": 0.0022998850057497125
+      }
+    },
+    {
+      "body": "moon",
+      "latitude_deg": -20,
+      "longitude_deg": 45,
+      "observed": 34,
+      "cells": 81,
+      "eligible_centers": 49,
+      "full_3x3_centers": 0,
+      "five_point_cross_centers": 0,
+      "horizontal_observed_edges": 16,
+      "vertical_observed_edges": 29,
+      "vertical_minus_horizontal_edges": 13,
+      "fixed_count_shuffle": {
+        "draws": 20000,
+        "seed": 476,
+        "extreme_draws": 0,
+        "two_sided_mc_tail_plus_one": 0.00004999750012499375
+      }
+    },
+    {
+      "body": "mars",
+      "latitude_deg": -20,
+      "longitude_deg": 45,
+      "observed": 3,
+      "cells": 25,
+      "eligible_centers": 9,
+      "full_3x3_centers": 0,
+      "five_point_cross_centers": 0,
+      "horizontal_observed_edges": 0,
+      "vertical_observed_edges": 2,
+      "vertical_minus_horizontal_edges": 2,
+      "fixed_count_shuffle": {
+        "draws": 20000,
+        "seed": 476,
+        "extreme_draws": 289,
+        "two_sided_mc_tail_plus_one": 0.014499275036248187
+      }
+    },
+    {
+      "body": "moon",
+      "latitude_deg": -40,
+      "longitude_deg": 45,
+      "observed": 80,
+      "cells": 81,
+      "eligible_centers": 49,
+      "full_3x3_centers": 48,
+      "five_point_cross_centers": 49,
+      "horizontal_observed_edges": 71,
+      "vertical_observed_edges": 71,
+      "vertical_minus_horizontal_edges": 0,
+      "fixed_count_shuffle": {
+        "draws": 20000,
+        "seed": 476,
+        "extreme_draws": 20000,
+        "two_sided_mc_tail_plus_one": 1
+      }
+    },
+    {
+      "body": "mars",
+      "latitude_deg": -40,
+      "longitude_deg": 45,
+      "observed": 15,
+      "cells": 25,
+      "eligible_centers": 9,
+      "full_3x3_centers": 0,
+      "five_point_cross_centers": 0,
+      "horizontal_observed_edges": 5,
+      "vertical_observed_edges": 11,
+      "vertical_minus_horizontal_edges": 6,
+      "fixed_count_shuffle": {
+        "draws": 20000,
+        "seed": 476,
+        "extreme_draws": 95,
+        "two_sided_mc_tail_plus_one": 0.0047997600119994
+      }
+    }
+  ],
+  "validation": "8/8 local artifact-backed unittest tests passed; Python compile; independent NumPy spatial-count oracle; exact-head GitHub CI NOT RUN",
+  "claim": "Observed-only complete five-point and 3x3 stencil support absent in five of six selected real-data windows",
+  "known_site_recovery": "NOT YET MEASURED",
+  "cross_body_similarity": "NOT YET PROVEN",
+  "limits": [
+    "Posthoc six nonrandom windows",
+    "Positive counts not independent resolution",
+    "Monte Carlo fixed-count shuffle is nonphysical structural control",
+    "No Earth descriptors or independently sourced analogue labels"
+  ]
+}
