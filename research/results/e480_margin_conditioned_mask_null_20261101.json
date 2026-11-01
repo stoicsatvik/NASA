@@ -1,0 +1,131 @@
+{
+  "schema": "nasa/e480/exact-margin-conditioned-mask-null/v1",
+  "date_utc": "2026-11-01",
+  "source": "E472 artifact 13075465278, official PDS-derived MOLA 128ppd count masks",
+  "source_mars_sha256": "2e70d84ca45cc4730c87e8931194c5ba1cd7a31bdd15e9a7883c5611578c9dfb",
+  "statistic": "D=vertical observed adjacencies minus horizontal observed adjacencies; exact one-sided P(D>=D_observed)",
+  "null": "uniform over binary 5x5 masks conditioned on row, column, or both occupancy margins; nonphysical",
+  "windows": [
+    {
+      "latitude_deg": -0.5,
+      "longitude_deg": 45,
+      "observed_cells": 11,
+      "row_margins": [
+        3,
+        2,
+        2,
+        2,
+        2
+      ],
+      "column_margins": [
+        0,
+        5,
+        1,
+        5,
+        0
+      ],
+      "horizontal_edges": 2,
+      "vertical_edges": 8,
+      "complete_stencils": 0,
+      "row_fixed": {
+        "total": 100000,
+        "tail": 316,
+        "zero_stencil": 100000
+      },
+      "column_fixed": {
+        "total": 5,
+        "tail": 5,
+        "zero_stencil": 5
+      },
+      "both_fixed": {
+        "total": 1,
+        "tail": 1,
+        "zero_stencil": 1
+      }
+    },
+    {
+      "latitude_deg": -20,
+      "longitude_deg": 45,
+      "observed_cells": 3,
+      "row_margins": [
+        1,
+        1,
+        1,
+        0,
+        0
+      ],
+      "column_margins": [
+        0,
+        0,
+        0,
+        0,
+        3
+      ],
+      "horizontal_edges": 0,
+      "vertical_edges": 2,
+      "complete_stencils": 0,
+      "row_fixed": {
+        "total": 125,
+        "tail": 5,
+        "zero_stencil": 125
+      },
+      "column_fixed": {
+        "total": 10,
+        "tail": 3,
+        "zero_stencil": 10
+      },
+      "both_fixed": {
+        "total": 1,
+        "tail": 1,
+        "zero_stencil": 1
+      }
+    },
+    {
+      "latitude_deg": -40,
+      "longitude_deg": 45,
+      "observed_cells": 15,
+      "row_margins": [
+        2,
+        3,
+        4,
+        3,
+        3
+      ],
+      "column_margins": [
+        3,
+        3,
+        0,
+        5,
+        4
+      ],
+      "horizontal_edges": 5,
+      "vertical_edges": 11,
+      "complete_stencils": 0,
+      "row_fixed": {
+        "total": 50000,
+        "tail": 489,
+        "zero_stencil": 25496
+      },
+      "column_fixed": {
+        "total": 500,
+        "tail": 4,
+        "zero_stencil": 500
+      },
+      "both_fixed": {
+        "total": 12,
+        "tail": 2,
+        "zero_stencil": 12
+      }
+    }
+  ],
+  "validation": "5/5 local pinned-source pytest; independent brute-force both-margin oracle; Python compile; exact-head Actions not run",
+  "claims": {
+    "conditional_mask_geometry": "SUPPORTED for selected windows",
+    "instrument_track_causation": "NOT YET PROVEN",
+    "known_site_recovery": "NOT YET MEASURED",
+    "cross_body_similarity": "NOT YET PROVEN",
+    "novel_analogue_discovery": "NOT YET PROVEN",
+    "local_validation_advantage": "NOT YET PROVEN",
+    "challenge_selection_superiority": "NOT YET PROVEN"
+  }
+}
