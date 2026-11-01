@@ -6,6 +6,9 @@ on:
       - 'research/e469_lola128_bounded.mjs'
       - 'research/e472_paired_support.mjs'
       - 'research/test_e472_paired_support.mjs'
+      - 'research/E472_PAIRED_PHYSICAL_SUPPORT_20261101.md'
+      - 'research/results/e472_paired_support_20261101.json'
+      - 'FOUNDRY_STATE.md'
       - '.github/workflows/e472_paired_support.yml'
   workflow_dispatch:
 permissions:
