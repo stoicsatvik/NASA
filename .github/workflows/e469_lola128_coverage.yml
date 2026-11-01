@@ -5,6 +5,9 @@ on:
       - 'research/e469_lola128_bounded.mjs'
       - 'research/test_e469_lola128_bounded.mjs'
       - '.github/workflows/e469_lola128_coverage.yml'
+      - 'research/results/e469_lola128_real_data_20261101.json'
+      - 'research/E469_LOLA128_BOUNDED_SUPPORT_20261101.md'
+      - 'FOUNDRY_STATE.md'
   workflow_dispatch:
 permissions:
   contents: read
