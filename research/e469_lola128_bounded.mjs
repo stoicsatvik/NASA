@@ -15,7 +15,7 @@ export function validateLabel(label,kind){
  const nums=['LINES','LINE_SAMPLES','SAMPLE_BITS','RECORD_BYTES','MAP_RESOLUTION'];
  const [rows,cols,bits,record,ppd]=nums.map(k=>Number(field(label,k).split(/\s+/)[0]));
  const sample=field(label,'SAMPLE_TYPE');
- if(rows!==ROWS||cols!==COLS||bits!==16||record!==COLS*2||ppd!==PPD||!['MSB_INTEGER','MSB_UNSIGNED_INTEGER'].includes(sample))throw Error('LOLA '+kind+' label geometry/type mismatch');
+ if(rows!==ROWS||cols!==COLS||bits!==16||record!==COLS*2||ppd!==PPD||!['MSB_INTEGER','MSB_UNSIGNED_INTEGER'].includes(sample))throw Error('LOLA '+kind+' label geometry/type mismatch: '+JSON.stringify({rows,cols,bits,record,ppd,sample}));
  if(kind==='count' && !/LDEC_128/i.test(label))throw Error('Wrong count product');
  if(kind==='elevation' && !/LDEM_128/i.test(label))throw Error('Wrong elevation product');
  return {rows,cols,bits,record,ppd,sample_type:sample};
