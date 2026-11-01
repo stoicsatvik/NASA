@@ -1,0 +1,112 @@
+{
+  "schema": "nasa/e469/lola128-bounded-count-coverage/v1",
+  "status": "EXACT_HEAD_GITHUB_ACTIONS_SUCCESS",
+  "source": "https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/cylindrical/img/",
+  "run_id": 41273612028,
+  "head_sha": "6c10352805531d922fec107315f5648c133a41be",
+  "artifact_id": 13069334715,
+  "source_labels_sha256": {
+    "count": "f9a6a2f1dbc5e7a43fe0a15fb636f603a102de3fb03b86bd46047b87efbded61",
+    "elevation": "85b1901def6901ee8a50415384f17a71e773af2d979beb7245fd6ac4d5e1671b"
+  },
+  "metadata": {
+    "count": {
+      "rows": 23040,
+      "cols": 46080,
+      "bits": 16,
+      "record": 92160,
+      "ppd": 128,
+      "sample_type": "LSB_INTEGER"
+    },
+    "elevation": {
+      "rows": 23040,
+      "cols": 46080,
+      "bits": 16,
+      "record": 92160,
+      "ppd": 128,
+      "sample_type": "LSB_INTEGER"
+    }
+  },
+  "windows": [
+    {
+      "latitude_deg_requested": -0.5,
+      "longitude_deg_requested": 45,
+      "row_zero_based": 11584,
+      "col_zero_based": 5760,
+      "sampled_cells": 81,
+      "observed_cells": 18,
+      "zero_count_cells": 63,
+      "observed_fraction": 0.2222222222222222,
+      "counts_min": 0,
+      "counts_max": 43,
+      "elevation_dn_min": -3117,
+      "elevation_dn_max": -3091,
+      "count_range_sha256": "b7262efc7060816ba8cc6538a64c2273dd57bcf591b89bc02552272343a13ec5",
+      "elevation_range_sha256": "49cb4e79c41f41ff262dd9d9a6a78a6bbcf46a45279e4db9a9be6b57fcb45bbc",
+      "byte_range": [
+        1067212800,
+        1068042239
+      ]
+    },
+    {
+      "latitude_deg_requested": -20,
+      "longitude_deg_requested": 45,
+      "row_zero_based": 14080,
+      "col_zero_based": 5760,
+      "sampled_cells": 81,
+      "observed_cells": 34,
+      "zero_count_cells": 47,
+      "observed_fraction": 0.41975308641975306,
+      "counts_min": 0,
+      "counts_max": 32,
+      "elevation_dn_min": -2010,
+      "elevation_dn_max": -1266,
+      "count_range_sha256": "6e372993ae435c7e693703b5aa696b090eb3e89384a34c7bc45e8adccee281aa",
+      "elevation_range_sha256": "212ac20f3fcfce2483f5dc35dc8582a7a716ef59fb2447541a057cd275b5f6a6",
+      "byte_range": [
+        1297244160,
+        1298073599
+      ]
+    },
+    {
+      "latitude_deg_requested": -40,
+      "longitude_deg_requested": 45,
+      "row_zero_based": 16640,
+      "col_zero_based": 5760,
+      "sampled_cells": 81,
+      "observed_cells": 80,
+      "zero_count_cells": 1,
+      "observed_fraction": 0.9876543209876543,
+      "counts_min": 0,
+      "counts_max": 32,
+      "elevation_dn_min": 943,
+      "elevation_dn_max": 2191,
+      "count_range_sha256": "5570120e4207ebe173d219c297a994c4c057534cb789db9d1690ee98e50f40d6",
+      "elevation_range_sha256": "b94ff372127b2ee4544cd3db25a02f8dd9683c2dd730d45a51e00c872d6721df",
+      "byte_range": [
+        1533173760,
+        1534003199
+      ]
+    }
+  ],
+  "pooled_nonrandom": {
+    "observed": 132,
+    "total": 243,
+    "observed_fraction": 0.5432098765432098
+  },
+  "full_file_downloaded": false,
+  "full_file_sha256": null,
+  "claims": {
+    "lunar_observed_bin_coverage": "SUPPORTED AT THESE THREE WINDOWS ONLY",
+    "cross_body_similarity": "NOT YET PROVEN",
+    "known_site_recovery": "NOT YET MEASURED"
+  },
+  "limitations": [
+    "Nonrandom windows, no global estimate",
+    "Counts>0 not independent effective resolution",
+    "PDS latitude orientation must be independently cross-checked",
+    "LDEM digital number not physically comparable to MOLA metres without datum/scale normalization",
+    "No Earth descriptors, independent labels or E001 retrieval",
+    "Sampled byte-range SHA256 not whole-file SHA256"
+  ]
+}
