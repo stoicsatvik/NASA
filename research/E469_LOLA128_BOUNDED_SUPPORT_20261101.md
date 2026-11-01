@@ -1,6 +1,6 @@
 # E469 | Independent LOLA 128ppd observed-bin support (bounded real-source experiment)
 
-Date: 2026-11-01. **Status: source probe implemented, remote real-data outcome PENDING.** Never report coverage percentages until exact-head source execution succeeds.
+Date: 2026-11-01. **Status: REAL LOLA SOURCE EXECUTED.** Initial fail-closed label rejection and final successful source run are documented below; do not generalize beyond three nonrandom windows.
 
 ## Falsifiable question
 
