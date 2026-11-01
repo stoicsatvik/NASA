@@ -38,6 +38,22 @@ def stencils(n, full=False):
 def count_stencils(mask, masks):
     return sum(mask & s == s for s in masks)
 
+def exact_any_stencil_probability(n, k, full=False):
+    """Exact inclusion-exclusion over all interior stencil unions; no simulation."""
+    if n != 5 or not 0 <= k <= 25:
+        raise ValueError('only 5x5 exact cohort')
+    masks = stencils(n, full)
+    favorable = 0
+    for subset in range(1, 1 << len(masks)):
+        union = 0
+        for i, stencil in enumerate(masks):
+            if subset & (1 << i):
+                union |= stencil
+        required = union.bit_count()
+        if k >= required:
+            favorable += (1 if subset.bit_count() % 2 else -1) * comb(25 - required, k - required)
+    return favorable / comb(25, k)
+
 def exact_fixed_count(n,k,threshold_cross,threshold_full):
     if n!=5 or k not in range(26):
         raise ValueError('only 5x5 exact cohort')
@@ -82,6 +98,7 @@ def evaluate(mars,moon):
                        'cross':count_stencils(mask,stencils(9)),'full':count_stencils(mask,stencils(9,True)),
                        'exact_fixed_count_null':'NOT COMPUTED: choose(81,k) too large'})
     return {'schema':'nasa/e478/exact-mars-fixed-count-stencil-null/v1',
+            'uniform_null_first_five_point_95pct_min_observed':next(k for k in range(26) if exact_any_stencil_probability(5,k)>=0.95),
             'source':'E472 artifact 13075465278; official PDS-derived MOLA/LOLA count masks',
             'source_sha256':SHA,'windows':result,
             'null':'exact uniform fixed-count binary placement, not physical altimetry track model',
