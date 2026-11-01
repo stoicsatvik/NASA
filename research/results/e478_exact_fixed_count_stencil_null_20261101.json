@@ -1,0 +1,74 @@
+{
+  "schema": "nasa/e478/exact-fixed-count-stencil-null/v1",
+  "date_utc": "2026-11-01",
+  "source": "Official PDS-derived MOLA/LOLA count masks archived in E472 GitHub Actions artifact 13075465278",
+  "source_sha256": {
+    "mars": "2e70d84ca45cc4730c87e8931194c5ba1cd7a31bdd15e9a7883c5611578c9dfb",
+    "moon": "a4ed427e5996b8ef115e0bf8130f615089248bae8d89ec43cdd6fa2bf80f96c4"
+  },
+  "null": "Exact enumeration of all equally likely binary 5x5 masks conditional on observed count; NOT an altimeter track model",
+  "rows": [
+    {
+      "body": "mars",
+      "latitude_deg": -0.5,
+      "observed_cells": 11,
+      "total_masks": 4457400,
+      "zero_five_point_masks": 4122758,
+      "zero_3x3_masks": 4456320,
+      "observed_five_point_centers": 0,
+      "observed_full_3x3_centers": 0,
+      "conditional_probability_zero_five_point": 0.9249243953874456,
+      "conditional_probability_zero_3x3": 0.9997577062861758
+    },
+    {
+      "body": "mars",
+      "latitude_deg": -20,
+      "observed_cells": 3,
+      "total_masks": 2300,
+      "zero_five_point_masks": 2300,
+      "zero_3x3_masks": 2300,
+      "observed_five_point_centers": 0,
+      "observed_full_3x3_centers": 0,
+      "conditional_probability_zero_five_point": 1,
+      "conditional_probability_zero_3x3": 1
+    },
+    {
+      "body": "mars",
+      "latitude_deg": -40,
+      "observed_cells": 15,
+      "total_masks": 3268760,
+      "zero_five_point_masks": 1995810,
+      "zero_3x3_masks": 3200192,
+      "observed_five_point_centers": 0,
+      "observed_full_3x3_centers": 0,
+      "conditional_probability_zero_five_point": 0.6105709810447999,
+      "conditional_probability_zero_3x3": 0.9790232381698258
+    }
+  ],
+  "moon_cross_centers": [
+    0,
+    0,
+    49
+  ],
+  "independent_oracle": "C++20 Gosper bitmask enumeration matched all 3 total/zero-cross/zero-3x3 integer counts",
+  "validation": "5/5 local pytest against archived source; Python compile; independent C++ exact oracle; no paid CI",
+  "claim_states": {
+    "zero_stencil_unusual_at_mars_40S": "REJECTED relative to uniform fixed-count null: probability 0.61057",
+    "insufficient_count_for_centered_stencils": "SUPPORTED for sampled windows",
+    "instrument_track_causality": "NOT YET PROVEN",
+    "known_site_recovery": "NOT YET MEASURED",
+    "cross_body_similarity": "NOT YET PROVEN",
+    "novel_analogue_discovery": "NOT YET PROVEN",
+    "local_validation_advantage": "NOT YET PROVEN"
+  },
+  "limitations": [
+    "Three preselected nonrandom locations; no independent ground-truth analogues",
+    "Null assumes exchangeable observed-bin placement, unlike real track geometry",
+    "Observation-count positivity does not establish independent effective spatial resolution",
+    "No actual slope values or physical descriptor comparisons; source archive includes masks, not per-cell elevations",
+    "21/25 is a 95% chance of at least one complete stencil only under a nonphysical uniform null, not a sufficient scientific sampling threshold"
+  ],
+  "uniform_null_first_five_point_95pct_min_observed": 21,
+  "uniform_null_probability_any_five_point_at_k20": 0.9309994353472615,
+  "uniform_null_probability_any_five_point_at_k21": 0.9760474308300395
+}
