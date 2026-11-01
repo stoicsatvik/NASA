@@ -439,3 +439,12 @@ Official PDS bounded row reads on isolated draft PR #54 now preserve the full 9x
 **SUPPORTED:** measured-bin counts at three approximately matched physical footprints, not effective independent resolution or terrain analogy. **NOT YET MEASURED:** E001 known-site recovery, physically matched Earth descriptors and independent effective resolution. **NOT YET PROVEN:** cross-body similarity, novel analogues, local field advantage or challenge superiority. Evidence: `research/E472_PAIRED_PHYSICAL_SUPPORT_20261101.md` and `research/results/e472_paired_support_20261101.json`.
 
 **Next:** independent geodetic registration/vertical scaling checks, mechanism-specific independently labelled analogue sites and hard negatives, then count-masked equal-support E001 with random/Euclidean/physical baselines. No UI/competition solution before evidence gate.
+
+
+## E476 observed-only stencil admissibility (1 November 2026)
+
+- Branch: research/e476-observed-stencil-admissibility-20261101; stacked on E472.
+- Reanalysed exact E472 official-PDS-derived count-mask artifact #13075465278 with pinned input SHA-256. Across three preselected Moon 9x9 and Mars 5x5 physical-support windows, **five of six** had zero fully observed 5-point or 3x3 centered stencils. Mars 40°S had 15/25 observed cells but 0/9 complete centered 5-point stencils; Moon 40°S had 49/49 complete 5-point stencils.
+- Fixed-count cell-shuffle anisotropy controls (20,000 draws/window) are exploratory/nonphysical, not an instrument model. Exact source-artifact local tests 8/8 passed, independent NumPy counts agreed; exact-head Actions NOT RUN.
+- **SUPPORTED locally:** aggregate observed-bin fraction does not establish observed-only 2D slope/roughness admissibility. **NOT YET MEASURED:** E001 known-site recovery. **NOT YET PROVEN:** cross-body similarity, novel analogue discovery, local validation advantage, challenge superiority.
+- **Next:** physical-lag directional descriptors with minimum observed-pair support, instrument/registration uncertainty gates, then independently labelled known-analogue retrieval and frozen baselines. Avoid interpolation-based false evidence.
