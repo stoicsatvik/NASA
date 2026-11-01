@@ -448,3 +448,13 @@ Official PDS bounded row reads on isolated draft PR #54 now preserve the full 9x
 - Fixed-count cell-shuffle anisotropy controls (20,000 draws/window) are exploratory/nonphysical, not an instrument model. Exact source-artifact local tests 8/8 passed, independent NumPy counts agreed; exact-head Actions NOT RUN.
 - **SUPPORTED locally:** aggregate observed-bin fraction does not establish observed-only 2D slope/roughness admissibility. **NOT YET MEASURED:** E001 known-site recovery. **NOT YET PROVEN:** cross-body similarity, novel analogue discovery, local validation advantage, challenge superiority.
 - **Next:** physical-lag directional descriptors with minimum observed-pair support, instrument/registration uncertainty gates, then independently labelled known-analogue retrieval and frozen baselines. Avoid interpolation-based false evidence.
+
+
+## 2026-11-01 E480: margin-conditioned real MOLA mask falsification
+
+- Branch `research/e480-margin-conditioned-mask-null-20261101`; draft PR #57 stacked on E478 #56.
+- Reused SHA-256-pinned archived E472 official PDS-derived MOLA 128ppd observation masks. At 40°S central 5x5 observed column margins [3,3,0,5,4] force **zero** centered five-point terrain stencils for every column-margin-preserving arrangement. E478's unstructured fixed-count P(zero)=0.61057 remains valid only under its different null.
+- Exact one-sided vertical-minus-horizontal adjacency tails after preserving BOTH row and column margins: 0.5°S 1/1, 20°S 1/1, 40°S 2/12=0.166667. Thus E476's small unstructured-shuffle tails do NOT establish unusual residual arrangement conditional on both margins. Two conditioned spaces are singletons. Physical track causation remains NOT YET PROVEN.
+- Five local pinned-source pytest tests and Python compilation PASS; independent brute-force 40°S both-margin oracle 12 total/2 extreme; GitHub source/test blobs match locally executed bytes. No E480-specific Actions run due reported included-minute exhaustion. See `research/E480_MARGIN_CONDITIONED_MASK_NULL_20261101.md` and numerical receipt.
+- **Claim states unchanged:** repo operating system SUPPORTED; cross-body similarity NOT YET PROVEN; E001 known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN; challenge superiority NOT YET PROVEN.
+- **Next:** stop count-mask-only nulls unless they alter descriptor admissibility. Obtain count-positive directional elevation pairs with physical lag/datum/uncertainty/independence gates; source independent positive/negative analogue labels; execute E001 frozen baselines with leave-one-site-out and false-positive inspection. No UI polish or autonomous outreach.
