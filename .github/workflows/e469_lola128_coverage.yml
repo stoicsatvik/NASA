@@ -1,0 +1,29 @@
+name: E469 LOLA128 bounded observed support
+on:
+  pull_request:
+    paths:
+      - 'research/e469_lola128_bounded.mjs'
+      - 'research/test_e469_lola128_bounded.mjs'
+      - '.github/workflows/e469_lola128_coverage.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Offline source geometry and range controls
+        run: node --test research/test_e469_lola128_bounded.mjs
+      - name: Bounded read-only official LOLA count and elevation ranges
+        run: node research/e469_lola128_bounded.mjs > e469_lola_receipt.json
+      - name: Preserve source-fingerprinted measured evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: e469-lola128-real-source-receipt
+          path: e469_lola_receipt.json
+          if-no-files-found: error
