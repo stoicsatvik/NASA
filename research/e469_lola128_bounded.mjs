@@ -15,7 +15,7 @@ export function validateLabel(label,kind){
  const nums=['LINES','LINE_SAMPLES','SAMPLE_BITS','RECORD_BYTES','MAP_RESOLUTION'];
  const [rows,cols,bits,record,ppd]=nums.map(k=>Number(field(label,k).split(/\s+/)[0]));
  const sample=field(label,'SAMPLE_TYPE');
- if(rows!==ROWS||cols!==COLS||bits!==16||record!==COLS*2||ppd!==PPD||!['MSB_INTEGER','MSB_UNSIGNED_INTEGER'].includes(sample))throw Error('LOLA '+kind+' label geometry/type mismatch: '+JSON.stringify({rows,cols,bits,record,ppd,sample}));
+ if(rows!==ROWS||cols!==COLS||bits!==16||record!==COLS*2||ppd!==PPD||!['MSB_INTEGER','MSB_UNSIGNED_INTEGER','LSB_INTEGER','LSB_UNSIGNED_INTEGER'].includes(sample))throw Error('LOLA '+kind+' label geometry/type mismatch: '+JSON.stringify({rows,cols,bits,record,ppd,sample}));
  if(kind==='count' && !/LDEC_128/i.test(label))throw Error('Wrong count product');
  if(kind==='elevation' && !/LDEM_128/i.test(label))throw Error('Wrong elevation product');
  return {rows,cols,bits,record,ppd,sample_type:sample};
@@ -24,14 +24,14 @@ export function checkRange(header,start,len){
  const m=/^bytes (\d+)-(\d+)\/(\d+)$/.exec(header||'');
  if(!m||Number(m[1])!==start||Number(m[2])!==start+len-1||Number(m[3])!==FULL)throw Error('Content-Range mismatch');
 }
-export function decodeWindow(buffer,centerColumn,width=WIDTH,signed=false){
+export function decodeWindow(buffer,centerColumn,width=WIDTH,signed=false,littleEndian=false){
  if(!Number.isInteger(width)||width<1||width%2!==1||buffer.length!==width*COLS*2)throw Error('Window geometry mismatch');
  const left=centerColumn-Math.floor(width/2);
  if(!Number.isInteger(centerColumn)||left<0||left+width>COLS)throw Error('Window column out of bounds');
  const values=[];
  for(let row=0;row<width;row++)for(let col=0;col<width;col++){
   const byte=2*(row*COLS+left+col);
-  values.push(signed?buffer.readInt16BE(byte):buffer.readUInt16BE(byte));
+  values.push(signed?(littleEndian?buffer.readInt16LE(byte):buffer.readInt16BE(byte)):(littleEndian?buffer.readUInt16LE(byte):buffer.readUInt16BE(byte)));
  }
  return values;
 }
@@ -47,8 +47,8 @@ export async function main(){
   if(startRow<0||startRow+WIDTH>ROWS)throw Error('Invalid latitude');
   const start=startRow*COLS*2,len=WIDTH*COLS*2;
   const [c,t]=await Promise.all([boundedGet(BASE+'ldec_128.img',start,len),boundedGet(BASE+'ldem_128.img',start,len)]);
-  const counts=decodeWindow(c,col,WIDTH,metadata.count.sample_type==='MSB_INTEGER');
-  const elevations=decodeWindow(t,col,WIDTH,true);
+  const counts=decodeWindow(c,col,WIDTH,metadata.count.sample_type.endsWith('_INTEGER')&&!metadata.count.sample_type.includes('UNSIGNED'),metadata.count.sample_type.startsWith('LSB'));
+  const elevations=decodeWindow(t,col,WIDTH,true,metadata.elevation.sample_type.startsWith('LSB'));
   if(counts.some(v=>v<0))throw Error('Negative observation count');
   const observed=counts.filter(v=>v>0).length;
   windows.push({latitude_deg_requested:lat,longitude_deg_requested:LON,row_zero_based:row,col_zero_based:col,sampled_cells:counts.length,observed_cells:observed,zero_count_cells:counts.length-observed,observed_fraction:observed/counts.length,counts_min:Math.min(...counts),counts_max:Math.max(...counts),elevation_dn_min:Math.min(...elevations),elevation_dn_max:Math.max(...elevations),count_range_sha256:sha(c),elevation_range_sha256:sha(t),byte_range:[start,start+len-1]});
