@@ -7,12 +7,14 @@ on:
       - 'research/e515_gistemp_block_null.py'
       - 'research/test_e515_gistemp_block_null.py'
       - 'research/gistemp_zonal_2001_2025_snapshot.csv'
+      - 'research/results/e515_gistemp_block_null_20261103.json'
       - '.github/workflows/e515-gistemp-null.yml'
   pull_request:
     paths:
       - 'research/e515_gistemp_block_null.py'
       - 'research/test_e515_gistemp_block_null.py'
       - 'research/gistemp_zonal_2001_2025_snapshot.csv'
+      - 'research/results/e515_gistemp_block_null_20261103.json'
       - '.github/workflows/e515-gistemp-null.yml'
   workflow_dispatch:
 jobs:
@@ -26,7 +28,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Six deterministic controls
+      - name: Seven deterministic controls
         run: python -m unittest discover -s research -p 'test_e515_gistemp_block_null.py' -v
       - name: Reproduce source-hash-bound real-data null receipt
         run: python -m research.e515_gistemp_block_null > /tmp/e515_result.json
