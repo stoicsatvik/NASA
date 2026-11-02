@@ -1,0 +1,40 @@
+name: E515 GISTEMP challenge-selection falsification
+on:
+  push:
+    branches:
+      - research/e515-gistemp-block-null-challenge-audit-20261103
+    paths:
+      - 'research/e515_gistemp_block_null.py'
+      - 'research/test_e515_gistemp_block_null.py'
+      - 'research/gistemp_zonal_2001_2025_snapshot.csv'
+      - '.github/workflows/e515-gistemp-null.yml'
+  pull_request:
+    paths:
+      - 'research/e515_gistemp_block_null.py'
+      - 'research/test_e515_gistemp_block_null.py'
+      - 'research/gistemp_zonal_2001_2025_snapshot.csv'
+      - '.github/workflows/e515-gistemp-null.yml'
+  workflow_dispatch:
+jobs:
+  e515:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Six deterministic controls
+        run: python -m unittest discover -s research -p 'test_e515_gistemp_block_null.py' -v
+      - name: Reproduce source-hash-bound real-data null receipt
+        run: python -m research.e515_gistemp_block_null > /tmp/e515_result.json
+      - name: Preserve numerical and negative evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e515-gistemp-block-null-result
+          path: /tmp/e515_result.json
+          if-no-files-found: ignore
+          retention-days: 14
