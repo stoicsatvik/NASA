@@ -1,4 +1,5 @@
 """E515 frozen deterministic exact-null controls, no network or hidden labels."""
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -40,6 +41,11 @@ class E515Tests(unittest.TestCase):
         self.assertAlmostEqual(contrast["observed_c_per_decade"], 0.484769231)
         self.assertEqual(contrast["block_extreme_two_sided"], 6)
         self.assertEqual(contrast["circular_extreme_two_sided"], 1)
+
+    def test_committed_receipt_matches_recomputation(self):
+        expected = json.loads((Path(__file__).with_name("results") / "e515_gistemp_block_null_20261103.json").read_text())
+        actual = run(Path(__file__).with_name("gistemp_zonal_2001_2025_snapshot.csv"))
+        self.assertEqual(actual, expected)
 
     def test_source_hash_is_stable(self):
         a = read_snapshot(Path(__file__).with_name("gistemp_zonal_2001_2025_snapshot.csv"))
