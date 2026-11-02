@@ -104,3 +104,29 @@ Pivot away from the planetary-analog track if any of these becomes clear:
 **Dataset access + known-analogue recovery.**
 
 The next substantive run should reduce one of these uncertainties, not add another planning document.
+
+
+## E514 real matched-footprint falsification (2026-11-03)
+
+- Draft research PR #68 on `research/e514-equal-physical-footprint-20261103`,
+  stacked on E513 PR #67. Main unchanged.
+- Official NASA PDS MOLA and NOAA ETOPO2022 downloads re-acquired and source
+  hashes preserved; six exact-head synthetic tests passed in Actions
+  https://github.com/stoicsatvik/NASA/actions/runs/41529678394.
+- Nominal MOLA-cell physical support used to area-average real Earth DEM.
+  Relative to E513 raw 5x5 pixel ranking, **3/5 nearest unverified Earth
+  candidates changed**.
+- **4/5 nearest candidates retained under all 500 spatial permutations**
+  of each frozen MOLA target, indicating that this descriptor ranking often
+  lacks discriminating spatial morphology. Five frozen targets are not
+  independent analogue labels.
+- Source-backed receipt and complete negative results:
+  `research/E514_EQUAL_FOOTPRINT_REAL_RESULT_20261103.md`.
+- **Claim:** equal-physical-support descriptive experiment SUPPORTED;
+  morphology-sensitive analogue recovery NOT YET PROVEN; E001 known-site
+  recovery NOT YET MEASURED; cross-body similarity, novel discovery and
+  challenge superiority NOT YET PROVEN.
+- **Highest-EV next:** independently labelled known analogue/non-analogue
+  Earth sites and georegistered planetary references, then frozen random,
+  histogram-only, physically weighted and leave-one-site-out E001 baselines.
+  Do not repeat unlabelled candidate ranking as a substitute for recovery.
