@@ -29,3 +29,18 @@ Six local synthetic controls pass: float-shape acceptance, nonfinite handling, w
 ## Next decisive gate
 
 If the TIFF is acquired, verify its spatial orientation and PDS grid equivalence; ingest MOLA numerical elevation and Earth DEM with explicit radius/areoid/projection differences, compute matched physical-scale descriptors and execute E001 known-site recovery with independent labels, random/Euclidean/physically weighted baselines, leave-one-site-out tests and nulls. If access fails, preserve exact HTTP/network failure and try a legitimate PDS-hosted bounded sample instead. No UI polish, competition submission, outreach or field work.
+
+
+## E501 exact-head real-source result (2 Nov 2026)
+
+**Real numerical ingestion succeeded** on [GitHub Actions #41430250840](https://github.com/stoicsatvik/NASA/actions/runs/41430250840), code head `916f0f7ae656d8042df492622b2dd2e91cdd5a80`. The job executed six synthetic parser/claim guards (6/6 passed), then downloaded the **actual NASA-hosted TIFF**, parsed it with pinned NumPy/tifffile, and uploaded the full JSON numerical receipt as artifact `e501-lola-numeric-receipt` (ID `13133867968`, 14-day retention). The ZIP was retrieved and its JSON inspected independently after CI.
+
+- Source bytes: **4,153,352**; SHA-256 `330afa2556a86fd05ac6ba2f912f246600fdade35de2a0d90593d50d07b01b65`.
+- Float32 raster: **720 × 1440 = 1,036,800 finite gridded values**, zero nonfinite values in this reformat. **Finite grid coverage is not direct laser-shot coverage.**
+- Min/max: **−8.878500 / +10.504001 km** relative to the 1737.4 km lunar radius; 1st/50th/99th percentiles: **−5.320000 / −0.794500 / +5.680501 km**.
+- Five fixed pixel-index 5×5 patches were preserved in the artifact. Center values in km: (90,720) −0.485500; (180,540) −0.919000; (360,720) −0.721500; (540,900) −0.243500; (630,360) +3.336500. **Pixel indices are not yet independently registered to lunar coordinates.**
+- Source and instrument metadata are NASA's, not self-measured. This is the first successfully ingested numerical LOLA elevation grid in this stream; it does not supersede the existing higher-resolution observed-count masks or prove geospatial comparability.
+
+**Updated claim:** real LOLA numeric TIFF acquisition and parsing **SUPPORTED BY EXACT-HEAD CI AND RETRIEVED RECEIPT**. Scientific pixel georeferencing, native PDS equality, observed-only physical support, MOLA/Earth numeric pairing, E001 known-site recovery, cross-body similarity, analogue discovery and local validation remain **NOT YET PROVEN / NOT YET MEASURED** as appropriate.
+
+**Next experiment:** independently register the raster to PDS geodetic conventions and verify source equivalence, then acquire MOLA 4ppd and Earth DEM numeric patches at matched physical footprints. Do not treat the 4ppd Moon grid as local meter-scale slope evidence.
