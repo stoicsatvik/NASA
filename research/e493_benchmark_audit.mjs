@@ -24,7 +24,7 @@ return {
   total_editorial_proxy_criteria: proxyCounts.reduce((a,b)=>a+b,0)
 };
 }
-function gitBlobSha(raw) { return createHash("sha1").update(Buffer.from("blob "+raw.length+"\\0")).update(raw).digest("hex"); }
+function gitBlobSha(raw) { return createHash("sha1").update(Buffer.from("blob "+raw.length+"\0")).update(raw).digest("hex"); }
 const [catalogPath, targetPath] = process.argv.slice(2);
 if (catalogPath && targetPath) {
  const [c,t] = await Promise.all([readFile(catalogPath),readFile(targetPath)]);
