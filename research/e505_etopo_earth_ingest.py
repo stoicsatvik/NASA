@@ -1,7 +1,7 @@
 """E505: bounded, provenance-preserving NOAA ETOPO2022 Earth DEM ingestion.
 
 This is a DEM access/registration test, not a planetary analogue detector.
-The N15E075 tile contains Lonar; coordinates are research sample locations,
+The N30E075 tile contains Lonar; coordinates are research sample locations,
 not labels or independent evidence of analogue quality.
 """
 from __future__ import annotations
@@ -17,7 +17,7 @@ import numpy as np
 import tifffile
 
 URL = ("https://www.ngdc.noaa.gov/mgg/global/relief/ETOPO2022/data/15s/"
-       "15s_surface_elev_gtif/ETOPO_2022_v1_15s_N15E075_surface.tif")
+       "15s_surface_elev_gtif/ETOPO_2022_v1_15s_N30E075_surface.tif")
 MAX_BYTES = 48 * 1024 * 1024
 SITES = {"Lonar_candidate": (19.976, 76.508),
          "Deccan_control": (19.5, 75.5),
@@ -51,7 +51,7 @@ def extract(data: bytes) -> dict:
         if abs(sx - 1/240) > 1e-6 or abs(sy - 1/240) > 1e-6:
             raise ValueError("unexpected 15 arcsecond resolution")
         if abs(tie[3] - 75.0) > sx or abs(tie[4] - 30.0) > sy:
-            raise ValueError(f"tile origin differs from N15E075: tie={tie}, scale={(sx,sy)}")
+            raise ValueError(f"tile origin differs from N30E075: tie={tie}, scale={(sx,sy)}")
         a = page.asarray()
         if a.ndim != 2 or a.shape not in ((3600, 3600), (3601, 3601)):
             raise ValueError(f"unexpected tile dimensions: {a.shape}")
