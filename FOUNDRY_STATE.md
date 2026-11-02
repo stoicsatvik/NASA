@@ -143,3 +143,11 @@ The next substantive run should reduce one of these uncertainties, not add anoth
 - **E001 known-site recovery NOT YET MEASURED; cross-body similarity, analogue discovery and local validation advantage NOT YET PROVEN.**
 - Evidence and limitations: `research/E515_CHALLENGE_SELECTION_GISTEMP_BLOCK_NULL_20261103.md`.
 - Highest-EV next: independent analogue/non-analogue labels and leave-one-site-out E001, or a genuine hyperlocal Martian Map / regional Earth Trend acceptance gate before committing the final competition sprint.
+
+## E516 competition eligibility boundary (2026-11-03)
+
+**Important official Space Apps 2026 rule:** Pre-event preparation may include learning tools and exploring public datasets, but teams **may not begin developing the solution they intend to submit before the official November 14–15 hackathon**. See the official Space Apps local-event notice: https://www.spaceappschallenge.org/2026/local-events/santiago-dominican-republic/ . A separate official 2024 participant FAQ states the same principle. This requirement supersedes earlier Foundry plans that treated deadline-bound challenge-specific implementation as unrestricted pre-event work.
+
+**Action:** Freeze further 2026 challenge-specific solution implementation and demo development until the official start. E501–E516 prior experiments are pre-event research, not work to misrepresent as built during the 48-hour event. Do not submit, relabel, conceal provenance, or automatically import these branches as a competition entry. Before any reuse of pre-event code, check current official rules and obtain organizer clarification if needed. Generic scientific education, legitimate independent research, dataset familiarization, rules review and team preparation can continue without creating the challenge submission.
+
+**Scientific claims unchanged:** E001 known-site recovery NOT YET MEASURED; cross-body similarity, novel analogue discovery, local validation advantage and challenge superiority NOT YET PROVEN. E516 retrospective GISTEMP baseline is SUPPORTED in the pinned data only. No autonomous competition submission.
