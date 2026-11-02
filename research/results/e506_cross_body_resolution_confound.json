@@ -1,0 +1,76 @@
+{
+  "experiment": "E506",
+  "date": "2026-11-02",
+  "claim": "Cross-grid pixel-resolution confounding SUPPORTED in inherited 5x5 numeric receipts; E001 NOT YET MEASURED",
+  "source_receipt_sha256": {
+    "lola": "84b72b67c9ea81bbccf6d0c6a301579a33925cb009ef7801b9a2076ee14bf7ae",
+    "mola": "eaa499260b4d15899e4a28c609b71f300e8669d00201bdbe55c2591b4020072d",
+    "earth": "db8c94a161c392626459f4032a40a850007e3b42d9f971ad6fdf5cc9009c6476"
+  },
+  "north_spacing_km": {
+    "earth": 0.46331219435232807,
+    "lola": 7.58083760603737,
+    "mola": 14.78948374908695
+  },
+  "targets": 10,
+  "earth_candidates": 3,
+  "planetary_samples": {
+    "lola": 5,
+    "mola": 5
+  },
+  "nearest_choice_reversals_by_assumed_planetary_latitude": {
+    "0": 5,
+    "30": 5,
+    "60": 5
+  },
+  "reversal_examples_at_latitude_zero": [
+    [
+      "lola",
+      2,
+      "Lonar_candidate",
+      "Northern_control"
+    ],
+    [
+      "mola",
+      0,
+      "Lonar_candidate",
+      "Northern_control"
+    ],
+    [
+      "mola",
+      1,
+      "Lonar_candidate",
+      "Northern_control"
+    ],
+    [
+      "mola",
+      2,
+      "Lonar_candidate",
+      "Deccan_control"
+    ],
+    [
+      "mola",
+      4,
+      "Lonar_candidate",
+      "Deccan_control"
+    ]
+  ],
+  "earth_median_adjacent_m": {
+    "Deccan_control": 1.684173583984375,
+    "Lonar_candidate": 20.912887573242188,
+    "Northern_control": 0.35262298583984375
+  },
+  "earth_median_gradient": {
+    "Deccan_control": 0.003638850041720717,
+    "Lonar_candidate": 0.046654322427906625,
+    "Northern_control": 0.000809080942081368
+  },
+  "limitations": [
+    "unregistered planetary sample latitude",
+    "unequal physical footprints",
+    "no independent known-analogue labels",
+    "not equal-frequency instrument harmonization",
+    "MOLA counts are not accuracy estimates"
+  ],
+  "validation": "local execution against three pinned receipt JSONs, plus six exact-final-head CI deterministic tests"
+}
