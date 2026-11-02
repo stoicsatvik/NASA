@@ -1,0 +1,20 @@
+name: E510 spatial permutation controls
+on:
+  push:
+    branches:
+      - research/e510-spatial-permutation-null-20261102
+  pull_request:
+    paths:
+      - 'research/e510_spatial_null.py'
+      - 'research/test_e510_spatial_null.py'
+      - '.github/workflows/e510-spatial-null.yml'
+jobs:
+  controls:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run deterministic controls
+        run: python -m unittest discover -s research -p 'test_e510_spatial_null.py' -v
