@@ -1,0 +1,27 @@
+name: E505 bounded real Earth DEM acquisition
+on:
+  push:
+    branches: [research/e505-etopo-earth-dem-20261102]
+  workflow_dispatch:
+jobs:
+  earth-dem:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install numpy tifffile
+      - run: python -m unittest discover -s tests -p 'test_e505*.py' -v
+      - run: python -m research.e505_etopo_earth_ingest /tmp/e505_earth_dem.json
+      - name: Preserve source-backed numerical receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e505-earth-dem-numeric-receipt
+          path: /tmp/e505_earth_dem.json
+          if-no-files-found: ignore
+          retention-days: 14
