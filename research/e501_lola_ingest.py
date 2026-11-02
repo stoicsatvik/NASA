@@ -24,7 +24,7 @@ def bounded_download(url=URL, max_bytes=MAX_BYTES):
         raw = response.read(max_bytes + 1)
     if len(raw) > max_bytes:
         raise ValueError('source exceeds bounded download size')
-    if len(raw) < 1024 or raw[:4] not in (b'II*\\x00', b'MM\\x00*'):
+    if len(raw) < 1024 or raw[:4] not in (bytes.fromhex('49492a00'), bytes.fromhex('4d4d002a')):
         raise ValueError('not a valid uncompressed TIFF header')
     return raw
 
@@ -66,7 +66,7 @@ def run(output='e501_lola.json'):
     result=summarize(data)
     result['source_sha256']=hashlib.sha256(raw).hexdigest()
     result['source_bytes']=len(raw)
-    Path(output).write_text(json.dumps(result,indent=2,sort_keys=True)+'\\n',encoding='utf-8')
+    Path(output).write_text(json.dumps(result,indent=2,sort_keys=True)+chr(10),encoding='utf-8')
     return result
 
 if __name__=='__main__':
