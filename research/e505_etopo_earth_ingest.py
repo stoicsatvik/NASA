@@ -51,7 +51,7 @@ def extract(data: bytes) -> dict:
         if abs(sx - 1/240) > 1e-6 or abs(sy - 1/240) > 1e-6:
             raise ValueError("unexpected 15 arcsecond resolution")
         if abs(tie[3] - 75.0) > sx or abs(tie[4] - 30.0) > sy:
-            raise ValueError("tile origin differs from N15E075")
+            raise ValueError(f"tile origin differs from N15E075: tie={tie}, scale={(sx,sy)}")
         a = page.asarray()
         if a.ndim != 2 or a.shape not in ((3600, 3600), (3601, 3601)):
             raise ValueError(f"unexpected tile dimensions: {a.shape}")
