@@ -20,10 +20,12 @@ def metadata(label: Path, product: str) -> dict:
     text = label.read_text(encoding="ascii")
 
     def field(name: str) -> str:
-        match = re.search(r"(?m)^\s*" + re.escape(name) + r"\s*=\s*(.*?)\s*$", text)
-        if not match:
+        matches = re.findall(r"(?m)^[ \\t]*" + re.escape(name) + r"[ \\t]*=[ \\t]*(.*?)[ \\t]*$", text)
+        if not matches:
             raise ValueError(f"missing {name} in {label}")
-        return match.group(1).strip().strip('"')
+        if len(matches) != 1:
+            raise ValueError(f"duplicate {name} in {label}")
+        return matches[0].strip().strip('"')
 
     if field("PRODUCT_ID").upper() != product.upper():
         raise ValueError("wrong product label")
