@@ -1,0 +1,28 @@
+name: E495 target control membership audit
+
+on:
+  push:
+    branches:
+      - research/e493-analogue-benchmark-falsification-20261102
+  pull_request:
+    paths:
+      - 'research/e493_benchmark_audit.mjs'
+      - 'tests/e495_validation_tag_membership.test.mjs'
+      - '.github/workflows/e495-target-controls.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  target-membership:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check audit syntax
+        run: node --check research/e493_benchmark_audit.mjs
+      - name: Test effective control selection (synthetic, offline)
+        run: node --test tests/e495_validation_tag_membership.test.mjs
