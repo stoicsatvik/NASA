@@ -84,7 +84,7 @@ class MolaMegdrContractTests(unittest.TestCase):
         ):
             with self.subTest(key=key):
                 self.top_lbl.write_text(
-                    label_text("MEGT90N000CB.IMG") + f"  {key} = {value}\\n",
+                    label_text("MEGT90N000CB.IMG") + f"  {key} = {value}\n",
                     encoding="ascii",
                 )
                 with self.assertRaisesRegex(ValueError, f"duplicate {key}"):
