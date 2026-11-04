@@ -75,6 +75,21 @@ class MolaMegdrContractTests(unittest.TestCase):
         self.assertEqual(metadata(self.top_lbl, "MEGT90N000CB.IMG"),
                          {"lines": ROWS, "samples": COLS})
 
+    def test_duplicate_critical_fields_are_rejected(self) -> None:
+        # Conflicting label keys must not silently use the first value.
+        for key, value in (
+            ("PRODUCT_VERSION_ID", '"1.0"'),
+            ("CENTER_LONGITUDE", "90.0 <DEGREE>"),
+            ("LINE_SAMPLES", "100"),
+        ):
+            with self.subTest(key=key):
+                self.top_lbl.write_text(
+                    label_text("MEGT90N000CB.IMG") + f"  {key} = {value}\\n",
+                    encoding="ascii",
+                )
+                with self.assertRaisesRegex(ValueError, f"duplicate {key}"):
+                    metadata(self.top_lbl, "MEGT90N000CB.IMG")
+
     def test_wrong_product_and_version_are_rejected(self) -> None:
         with self.assertRaisesRegex(ValueError, "wrong product label"):
             metadata(self.top_lbl, "MEGC90N000CB.IMG")
