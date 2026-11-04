@@ -1,0 +1,158 @@
+{
+  "input_sha256": "dc5d81e433b4687143e06b7f35471105aa9f12e9c9e1c6ea5304436ff48b44a2",
+  "null_note": "Five contiguous five-year blocks permuted exhaustively (5!=120), preserving order inside each block; exchangeability of block order is NOT established, so p values are conditional diagnostics, not physical climate attribution.",
+  "schema": "nasa/e492/gistemp-conditional-block-order-null/v1",
+  "series": {
+    "arctic": {
+      "delete_five_year_window_range": [
+        0.55947368,
+        0.83879699
+      ],
+      "exact_five_year_block_order_null": {
+        "n_permutations": 120,
+        "null_median_c_per_decade": 0.01830769,
+        "null_min_max_c_per_decade": [
+          -0.66938462,
+          0.706
+        ],
+        "observed_c_per_decade": 0.67869231,
+        "one_sided_positive_p": 0.01666667,
+        "two_sided_p": 0.01666667
+      },
+      "hac_95_intervals_by_lag": {
+        "1": [
+          0.502692,
+          0.854693
+        ],
+        "3": [
+          0.526681,
+          0.830704
+        ],
+        "5": [
+          0.536293,
+          0.821091
+        ]
+      },
+      "ols_c_per_decade": 0.67869231,
+      "theil_sen_95_interval": [
+        0.45333333,
+        0.9
+      ],
+      "theil_sen_c_per_decade": 0.62426471
+    },
+    "arctic_minus_tropics": {
+      "delete_five_year_window_range": [
+        0.30007519,
+        0.64097744
+      ],
+      "exact_five_year_block_order_null": {
+        "n_permutations": 120,
+        "null_median_c_per_decade": -0.00446154,
+        "null_min_max_c_per_decade": [
+          -0.52523077,
+          0.51630769
+        ],
+        "observed_c_per_decade": 0.48476923,
+        "one_sided_positive_p": 0.025,
+        "two_sided_p": 0.05
+      },
+      "hac_95_intervals_by_lag": {
+        "1": [
+          0.300718,
+          0.66882
+        ],
+        "3": [
+          0.30377,
+          0.665769
+        ],
+        "5": [
+          0.315362,
+          0.654177
+        ]
+      },
+      "ols_c_per_decade": 0.48476923,
+      "theil_sen_95_interval": [
+        0.22,
+        0.71052632
+      ],
+      "theil_sen_c_per_decade": 0.45586124
+    },
+    "global": {
+      "delete_five_year_window_range": [
+        0.22917293,
+        0.31639098
+      ],
+      "exact_five_year_block_order_null": {
+        "n_permutations": 120,
+        "null_median_c_per_decade": 0.01646154,
+        "null_min_max_c_per_decade": [
+          -0.22584615,
+          0.25876923
+        ],
+        "observed_c_per_decade": 0.25876923,
+        "one_sided_positive_p": 0.00833333,
+        "two_sided_p": 0.00833333
+      },
+      "hac_95_intervals_by_lag": {
+        "1": [
+          0.191489,
+          0.32605
+        ],
+        "3": [
+          0.19457,
+          0.322968
+        ],
+        "5": [
+          0.196271,
+          0.321268
+        ]
+      },
+      "ols_c_per_decade": 0.25876923,
+      "theil_sen_95_interval": [
+        0.18666667,
+        0.31666667
+      ],
+      "theil_sen_c_per_decade": 0.25
+    },
+    "tropics": {
+      "delete_five_year_window_range": [
+        0.17361345,
+        0.2593985
+      ],
+      "exact_five_year_block_order_null": {
+        "n_permutations": 120,
+        "null_median_c_per_decade": 0.02276923,
+        "null_min_max_c_per_decade": [
+          -0.15184615,
+          0.19738462
+        ],
+        "observed_c_per_decade": 0.19392308,
+        "one_sided_positive_p": 0.01666667,
+        "two_sided_p": 0.01666667
+      },
+      "hac_95_intervals_by_lag": {
+        "1": [
+          0.102264,
+          0.285582
+        ],
+        "3": [
+          0.120497,
+          0.267349
+        ],
+        "5": [
+          0.126436,
+          0.26141
+        ]
+      },
+      "ols_c_per_decade": 0.19392308,
+      "theil_sen_95_interval": [
+        0.08571429,
+        0.29090909
+      ],
+      "theil_sen_c_per_decade": 0.17958333
+    }
+  },
+  "source_git_blob": "0f8109a63a1e3b683a67d83bbb6ef8840ccfad45",
+  "source_note": "Manual 2026-10-10 transcription, not independently re-downloaded this run; 1951–1980 anomaly baseline.",
+  "source_url": "https://data.giss.nasa.gov/gistemp/tabledata_v4/ZonAnn.Ts%2BdSST.txt"
+}
