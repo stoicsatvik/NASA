@@ -1,6 +1,6 @@
 """Deterministic tests for E001 evaluation mechanics; synthetic data only."""
 import unittest
-from experiments.e001_baseline import evaluate, rank_fold
+from experiments.e001_baseline import evaluate, rank_fold, training_parameters
 
 
 class E001BaselineTests(unittest.TestCase):
@@ -18,8 +18,13 @@ class E001BaselineTests(unittest.TestCase):
         self.assertEqual(len(result["folds"]), 2)
 
     def test_held_out_features_do_not_affect_training_stats(self):
-        fold = rank_fold(self.rows, ["x"], self.rows[0])
-        self.assertEqual(fold["rank"], 1)
+        baseline = training_parameters(self.rows, ["x", "y"], "a")
+        perturbed = [dict(row) for row in self.rows]
+        perturbed[0]["x"] = 1e12
+        perturbed[0]["y"] = -1e12
+        self.assertEqual(baseline, training_parameters(perturbed, ["x", "y"], "a"))
+        self.assertEqual(rank_fold(self.rows, ["x"], self.rows[0])["rank"], 1)
+        self.assertNotEqual(rank_fold(perturbed, ["x"], perturbed[0])["rank"], 1)
 
     def test_missing_reference_rejected(self):
         with self.assertRaisesRegex(ValueError, "another same-family"):
