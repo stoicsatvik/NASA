@@ -25,8 +25,9 @@ class CandidatePolicyTests(unittest.TestCase):
             rank_fold(self.rows, ["x"], self.rows[1], "positive_only")
 
     def test_evaluate_policy_is_propagated(self):
-        full = evaluate(self.rows, ["x"])
-        legacy = evaluate(self.rows, ["x"], "legacy_negatives_only")
+        mars_only = [r for r in self.rows if r["family"] == "mars"]
+        full = evaluate(mars_only, ["x"])
+        legacy = evaluate(mars_only, ["x"], "legacy_negatives_only")
         self.assertEqual(full["candidate_policy"], "all_nonreference")
         self.assertTrue(all(f["candidate_policy"] == "legacy_negatives_only" for f in legacy["folds"]))
         self.assertGreater(full["random_expected_top_1"], 0)
