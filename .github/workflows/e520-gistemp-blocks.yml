@@ -1,0 +1,43 @@
+name: E520 GISTEMP contiguous-block falsification
+on:
+  push:
+    branches:
+      - research/e520-gistemp-contiguous-block-influence-20261107
+    paths:
+      - 'research/e520_gistemp_contiguous_block_influence.py'
+      - 'research/test_e520_gistemp_contiguous_block_influence.py'
+      - 'research/e519_gistemp_leave_one_year_out.py'
+      - 'research/e518_gistemp_rolling_mean_baselines.py'
+      - 'research/gistemp_zonal_2001_2025_snapshot.csv'
+      - '.github/workflows/e520-gistemp-blocks.yml'
+  pull_request:
+    paths:
+      - 'research/e520_gistemp_contiguous_block_influence.py'
+      - 'research/test_e520_gistemp_contiguous_block_influence.py'
+      - 'research/e519_gistemp_leave_one_year_out.py'
+      - 'research/e518_gistemp_rolling_mean_baselines.py'
+      - 'research/gistemp_zonal_2001_2025_snapshot.csv'
+      - '.github/workflows/e520-gistemp-blocks.yml'
+jobs:
+  e520:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Deterministic controls and pinned dataset regression
+        run: python -m unittest research.test_e520_gistemp_contiguous_block_influence -v
+      - name: Recompute full E520 result
+        run: python -m research.e520_gistemp_contiguous_block_influence > /tmp/e520_results.txt
+      - name: Preserve numerical evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e520-gistemp-contiguous-blocks
+          path: /tmp/e520_results.txt
+          if-no-files-found: ignore
+          retention-days: 14

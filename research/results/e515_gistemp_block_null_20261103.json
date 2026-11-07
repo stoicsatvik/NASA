@@ -1,0 +1,67 @@
+{
+  "claim": "Retrospective trend diagnostic SUPPORTED for this pinned transcription; NASA source revalidation and independent trend inference NOT YET PROVEN.",
+  "experiment": "E515",
+  "n_annual_observations": 25,
+  "null_warning": "Descriptive block-exchangeability/circular-shift diagnostics only; not calibrated statistical p-values or climate attribution.",
+  "official_source": "https://data.giss.nasa.gov/gistemp/tabledata_v4/ZonAnn.Ts%2BdSST.txt",
+  "results": {
+    "arctic_64N_90N_centi_c": {
+      "block_extreme_two_sided": 2,
+      "block_null_slope_range_c_per_decade": [
+        -0.669384615,
+        0.706
+      ],
+      "block_tail_fraction": 0.016666666666666666,
+      "circular_extreme_two_sided": 1,
+      "circular_shifts": 25,
+      "circular_tail_fraction": 0.04,
+      "five_year_block_permutations": 120,
+      "observed_c_per_decade": 0.678692308
+    },
+    "arctic_minus_tropics_centi_c": {
+      "block_extreme_two_sided": 6,
+      "block_null_slope_range_c_per_decade": [
+        -0.525230769,
+        0.516307692
+      ],
+      "block_tail_fraction": 0.05,
+      "circular_extreme_two_sided": 1,
+      "circular_shifts": 25,
+      "circular_tail_fraction": 0.04,
+      "five_year_block_permutations": 120,
+      "observed_c_per_decade": 0.484769231
+    },
+    "global_centi_c": {
+      "block_extreme_two_sided": 1,
+      "block_null_slope_range_c_per_decade": [
+        -0.225846154,
+        0.258769231
+      ],
+      "block_tail_fraction": 0.008333333333333333,
+      "circular_extreme_two_sided": 1,
+      "circular_shifts": 25,
+      "circular_tail_fraction": 0.04,
+      "five_year_block_permutations": 120,
+      "observed_c_per_decade": 0.258769231
+    },
+    "tropics_24S_24N_centi_c": {
+      "block_extreme_two_sided": 2,
+      "block_null_slope_range_c_per_decade": [
+        -0.151846154,
+        0.197384615
+      ],
+      "block_tail_fraction": 0.016666666666666666,
+      "circular_extreme_two_sided": 1,
+      "circular_shifts": 25,
+      "circular_tail_fraction": 0.04,
+      "five_year_block_permutations": 120,
+      "observed_c_per_decade": 0.193923077
+    }
+  },
+  "snapshot_sha256": "dc5d81e433b4687143e06b7f35471105aa9f12e9c9e1c6ea5304436ff48b44a2",
+  "source": "NASA GISTEMP v4 zonal annual snapshot manually transcribed 2026-10-10",
+  "years": [
+    2001,
+    2025
+  ]
+}

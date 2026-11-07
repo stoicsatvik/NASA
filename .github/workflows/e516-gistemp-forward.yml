@@ -1,0 +1,39 @@
+name: E516 GISTEMP rolling-origin falsification
+on:
+  push:
+    branches:
+      - research/e516-gistemp-rolling-origin-20261103
+    paths:
+      - 'research/e516_gistemp_forward_validation.py'
+      - 'research/test_e516_gistemp_forward_validation.py'
+      - 'research/E516_GISTEMP_ROLLING_ORIGIN_20261103.md'
+      - '.github/workflows/e516-gistemp-forward.yml'
+  pull_request:
+    paths:
+      - 'research/e516_gistemp_forward_validation.py'
+      - 'research/test_e516_gistemp_forward_validation.py'
+      - 'research/E516_GISTEMP_ROLLING_ORIGIN_20261103.md'
+      - '.github/workflows/e516-gistemp-forward.yml'
+jobs:
+  e516:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Six deterministic controls
+        run: python -m unittest discover -s research -p 'test_e516_gistemp_forward_validation.py' -v
+      - name: Recompute frozen numerical evidence
+        run: python -m research.e516_gistemp_forward_validation > /tmp/e516_result.json
+      - name: Preserve E516 numerical evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e516-gistemp-rolling-origin
+          path: /tmp/e516_result.json
+          if-no-files-found: ignore
+          retention-days: 14
