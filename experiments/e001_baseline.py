@@ -28,15 +28,24 @@ def load(path, features):
     return rows
 
 
+def training_parameters(rows, features, withheld_site_id):
+    """Fit normalization exclusively on non-withheld sites."""
+    train = [r for r in rows if r["site_id"] != withheld_site_id]
+    if not train:
+        raise ValueError("Need at least one training site")
+    means = {f: sum(r[f] for r in train) / len(train) for f in features}
+    scales = {f: math.sqrt(sum((r[f] - means[f]) ** 2 for r in train) / len(train)) for f in features}
+    scales = {f: (s if s > 1e-12 else 1.0) for f, s in scales.items()}
+    return means, scales
+
+
 def rank_fold(rows, features, withheld):
     train = [r for r in rows if r["site_id"] != withheld["site_id"]]
     refs = [r for r in train if r["is_analog"] == "1" and r["family"] == withheld["family"]]
     controls = [r for r in train if r["is_analog"] == "0"]
     if not refs or not controls:
         raise ValueError("Each fold needs another same-family positive and a negative control")
-    means = {f: sum(r[f] for r in train) / len(train) for f in features}
-    scales = {f: math.sqrt(sum((r[f] - means[f]) ** 2 for r in train) / len(train)) for f in features}
-    scales = {f: (s if s > 1e-12 else 1.0) for f, s in scales.items()}
+    means, scales = training_parameters(rows, features, withheld["site_id"])
     center = {f: sum((r[f] - means[f]) / scales[f] for r in refs) / len(refs) for f in features}
     def dist(row):
         return math.sqrt(sum(((row[f] - means[f]) / scales[f] - center[f]) ** 2 for f in features))
