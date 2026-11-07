@@ -15,11 +15,13 @@ class CandidateUniverseAudit(unittest.TestCase):
             {"site_id": "moon_positive", "family": "moon", "is_analog": "1", "x": 0.01},
             {"site_id": "hard_negative", "family": "mars", "is_analog": "0", "x": 10.0},
         ]
-        result = rank_fold(rows, ["x"], rows[1])
+        result = rank_fold(rows, ["x"], rows[1], candidate_policy="legacy_negatives_only")
         # Existing evaluator admits only is_analog=0 controls, so it excludes
         # moon_positive, despite that candidate being closer to the reference.
         self.assertEqual(result["rank"], 1)
         self.assertEqual(result["candidates"], 2)
+        full = rank_fold(rows, ["x"], rows[1])
+        self.assertEqual((full["rank"], full["candidates"]), (2, 3))
         # A fully specified non-reference candidate universe reverses the rank:
         # moon_positive distance .09 < mars_holdout distance .10.
         reference = rows[0]["x"]
