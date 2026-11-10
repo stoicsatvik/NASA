@@ -3,6 +3,9 @@ from __future__ import annotations
 import csv
 import io
 import json
+import sys
+from contextlib import redirect_stdout
+from unittest.mock import patch
 from pathlib import Path
 import tempfile
 import unittest
@@ -17,6 +20,7 @@ from experiments.e523_paad_acquisition import (
     safe_extract_zip,
     validate_item,
     write_normalized_csv,
+    main,
 )
 
 
@@ -138,6 +142,32 @@ class PAADIngestionTests(unittest.TestCase):
         self.assertTrue(metadata["attributes"]["Elevation"]["approximate"])
         self.assertEqual(metadata["attributes"]["Sand_Source"]["missing_value_conventions"][0]["value"], "NaN")
         self.assertEqual(metadata["attributes"]["Dune_Type"]["domain_values"][0]["definition"], "Barchan.")
+
+
+    def test_cli_summary_uses_receipt_metadata_key(self):
+        receipt = {
+            "status": "INGESTED",
+            "download_archive_sha256": "abc123",
+            "primary_table": {
+                "format": "csv",
+                "record_count": 45,
+                "count_matches_release_metadata": True,
+                "fields": ["Field_Site"],
+                "missing_counts": {},
+                "crs_wkt": "LOCAL_CS[\"fixture\"]",
+            },
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            output = io.StringIO()
+            with patch.object(sys, "argv", ["e523_paad_acquisition.py", "--out", tmp]):
+                with patch("experiments.e523_paad_acquisition.build_receipt", return_value=receipt):
+                    with redirect_stdout(output):
+                        exit_code = main()
+            self.assertEqual(exit_code, 0)
+            summary = json.loads(output.getvalue())
+            self.assertTrue(summary["count_matches_release_metadata"])
+            self.assertNotIn("count_matches_release_description", summary)
+
 
 
 if __name__ == "__main__":
