@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import argparse, csv, hashlib, io, json, urllib.parse, urllib.request, zipfile
+import argparse, csv, hashlib, io, json, re, urllib.parse, urllib.request, zipfile
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -12,12 +12,15 @@ EXPECTED_E318_SHA256 = "92771c23cfa4a64dfcc38f5ad29de00adfa41b9f321d3665beb2112e
 MAX_ARCHIVE_BYTES = 10 * 1024 * 1024
 USER_AGENT = "NASA-Analog-Research/0.1 (public USGS MGD3 2018 join)"
 
+
 def sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
+
 
 def safe_archive_url(url: str) -> bool:
     p = urllib.parse.urlparse(url)
     return p.scheme == "https" and p.hostname == "pubs.usgs.gov" and p.path.startswith("/of/2018/1164/") and p.path.lower().endswith(".zip")
+
 
 def fetch_archive(url: str = ARCHIVE_URL, limit: int = MAX_ARCHIVE_BYTES) -> tuple[bytes, str]:
     if not safe_archive_url(url):
@@ -44,6 +47,7 @@ def fetch_archive(url: str = ARCHIVE_URL, limit: int = MAX_ARCHIVE_BYTES) -> tup
         raise ValueError("USGS 2018 response is not a ZIP archive")
     return payload, final
 
+
 def normalize_id(value: Any) -> str | None:
     if value is None:
         return None
@@ -54,19 +58,35 @@ def normalize_id(value: Any) -> str | None:
         text = text[:-2]
     return text
 
+
+def _dune_id_field(fieldnames: list[str]) -> str | None:
+    exact = [
+        field for field in fieldnames
+        if re.sub(r"[^a-z0-9]", "", field.lower()) in {"duneid", "dunefieldid", "dfid"}
+    ]
+    if exact:
+        return exact[0] if len(exact) == 1 else None
+    candidates = [
+        field for field in fieldnames
+        if "dune" in field.lower()
+        and re.search(r"(?:^|[^a-z])id(?:$|[^a-z])", field.lower())
+    ]
+    return candidates[0] if len(candidates) == 1 else None
+
+
 def read_spatial_ids(path: Path) -> set[str]:
     with path.open("r", encoding="utf-8-sig", newline="") as handle:
         reader = csv.DictReader(handle)
         if not reader.fieldnames:
             raise ValueError("2007 spatial CSV has no header")
-        fields = {field.lower().replace("_", "").replace(" ", ""): field for field in reader.fieldnames}
-        id_field = fields.get("duneid")
+        id_field = _dune_id_field(reader.fieldnames)
         if not id_field:
-            raise ValueError("2007 spatial CSV lacks Dune_ID")
+            raise ValueError("2007 spatial CSV lacks Dune_ID or has ambiguous Dune_ID fields")
         ids = {value for row in reader if (value := normalize_id(row.get(id_field))) is not None}
     if not ids:
         raise ValueError("2007 spatial CSV has no nonempty dune IDs")
     return ids
+
 
 def _header_index(rows: list[tuple[Any, ...]]) -> tuple[int, list[str], int] | None:
     for row_index, row in enumerate(rows):
@@ -76,6 +96,7 @@ def _header_index(rows: list[tuple[Any, ...]]) -> tuple[int, list[str], int] | N
         if len(candidates) == 1:
             return row_index, fields, candidates[0]
     return None
+
 
 def profile_workbook(payload: bytes, source_name: str, spatial_ids: set[str]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     from openpyxl import load_workbook
@@ -129,6 +150,7 @@ def profile_workbook(payload: bytes, source_name: str, spatial_ids: set[str]) ->
         workbook.close()
     return profiles, joined_rows
 
+
 def inspect_archive(payload: bytes, spatial_ids: set[str]) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     profiles, joined_rows, files = [], [], []
     with zipfile.ZipFile(io.BytesIO(payload)) as archive:
@@ -163,6 +185,7 @@ def inspect_archive(payload: bytes, spatial_ids: set[str]) -> tuple[dict[str, An
         "claim_boundary": "An identifier join establishes cross-release record linkage only. It does not establish shared physical descriptors, analogue labels, or E001 recovery.",
     }, joined_rows
 
+
 def build_receipt(spatial_csv: Path, out: Path) -> dict[str, Any]:
     spatial_ids = read_spatial_ids(spatial_csv)
     payload, final_url = fetch_archive()
@@ -189,6 +212,7 @@ def build_receipt(spatial_csv: Path, out: Path) -> dict[str, Any]:
         "novel_analogue_discovery": "NOT YET PROVEN",
     }
 
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Join official USGS 2018 MGD3 workbook records to the 2007 MGD3 spatial Dune_ID index.")
     parser.add_argument("--spatial-csv", type=Path, required=True)
@@ -206,6 +230,7 @@ def main() -> int:
         receipt_path.write_text(json.dumps(failure, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         print(json.dumps(failure, indent=2, sort_keys=True))
         return 1
+
 
 if __name__ == "__main__":
     raise SystemExit(main())
