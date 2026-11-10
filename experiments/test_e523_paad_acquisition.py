@@ -201,5 +201,27 @@ class PAADIngestionTests(unittest.TestCase):
         self.assertEqual(shifted["mismatched_csv_sites"], 1)
 
 
+    
+    def test_spatial_cross_file_check_rejects_non_point_geometry(self):
+        import shapefile
+
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp) / "sites"
+            writer = shapefile.Writer(str(base), shapeType=shapefile.POLYLINE)
+            writer.field("Field_Site", "C")
+            writer.line([[[20.0, 10.0], [20.1, 10.1]]])
+            writer.record("A")
+            writer.close()
+            candidate = {
+                "rows": [{
+                    "Field_Site": "A",
+                    "Center_Latitude": "10.0000",
+                    "Center_Longitude": "20.0000",
+                }]
+            }
+            with self.assertRaisesRegex(ValueError, "must be POINT"):
+                inspect_spatial(Path(tmp), candidate)
+
+
 if __name__ == "__main__":
     unittest.main()
