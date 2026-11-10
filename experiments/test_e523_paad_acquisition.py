@@ -126,6 +126,10 @@ class PAADIngestionTests(unittest.TestCase):
             <attr><attrlabl>Dune_Type</attrlabl><attrdef>Bedform type.</attrdef>
               <attrdomv><edom><edomv>B</edomv><edomvd>Barchan.</edomvd></edom></attrdomv>
             </attr>
+            <attr><attrlabl>Coordinate_Test</attrlabl><attrdef>Coordinates are recorded in decimal degrees.</attrdef></attr>
+            <attr><attrlabl>Height_Test</attrlabl><attrdef>Estimated height values are reported in meters (m).</attrdef></attr>
+            <attr><attrlabl>Coverage_Test</attrlabl><attrdef>Areal coverage is reported in kilometers squared (km2).</attrdef></attr>
+            <attr><attrlabl>Areal_Coverage</attrlabl><attrdef>Areal coverage is reported in kilometers squared (km2).</attrdef></attr>
           </detailed></eainfo>
         </metadata>"""
         with tempfile.TemporaryDirectory() as tmp:
@@ -139,6 +143,16 @@ class PAADIngestionTests(unittest.TestCase):
         self.assertTrue(metadata["attributes"]["Elevation"]["approximate"])
         self.assertEqual(metadata["attributes"]["Sand_Source"]["missing_value_conventions"][0]["value"], "NaN")
         self.assertEqual(metadata["attributes"]["Dune_Type"]["domain_values"][0]["definition"], "Barchan.")
+        self.assertEqual(metadata["attributes"]["Coordinate_Test"]["units"], "decimal degrees")
+        self.assertEqual(metadata["attributes"]["Coordinate_Test"]["data_type"], "coordinate")
+        self.assertEqual(metadata["attributes"]["Height_Test"]["units"], "m")
+        self.assertTrue(metadata["attributes"]["Height_Test"]["approximate"])
+        self.assertEqual(metadata["attributes"]["Height_Test"]["approximation_basis"], "FGDC attribute definition")
+        self.assertEqual(metadata["attributes"]["Coverage_Test"]["units"], "km2")
+        self.assertFalse(metadata["attributes"]["Coverage_Test"]["approximate"])
+        self.assertEqual(metadata["attributes"]["Areal_Coverage"]["units"], "km2")
+        self.assertTrue(metadata["attributes"]["Areal_Coverage"]["approximate"])
+        self.assertIn("USGS data-release", metadata["attributes"]["Areal_Coverage"]["approximation_basis"])
 
 
     def test_console_summary_uses_v2_release_metadata_field(self):
