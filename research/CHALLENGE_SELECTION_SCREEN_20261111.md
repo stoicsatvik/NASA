@@ -40,7 +40,7 @@ The analog challenge is not currently the highest-readiness choice.
 
 ## Conditional decision gate
 
-- **Current provisional leader: Challenge 11, Interplanetary Survival Guide: Martian Map.** This is a readiness ranking only, not a final lock.
+- **Provisional top tier: Challenge 11, Interplanetary Survival Guide: Martian Map (4.10), and Challenge 9, MODIS/VIIRS Hot Spots (4.00), are effectively tied.** Their 0.10 difference is below the stated 0.25 meaningful-difference threshold. Martian Map receives only a weak portfolio-reuse tie-breaker from existing MOLA/CTX/HiRISE preparation and the possible MGD3 dune layer; this is not evidence of scientific superiority or judging advantage.
 - **Challenge 10 remains a conditional challenger.** It stays viable only if E527 produces a valid, provenance-complete MGD3 spatial layer and a subsequent E001 experiment recovers held-out known analog sites above transparent random/Euclidean/physically weighted baselines without identity leakage.
 - If known-site recovery fails or the cross-body representation is dominated by instrument/site identity, reject the analog thesis for this event rather than polishing the UI.
 - Before the event, run the official MGD3 archive acquisition and schema/CRS audit. Then test whether the MGD3 dune layer can be registered with a Mars base layer. If that integration is not reproducible, the Martian Map score falls and MODIS/VIIRS or CLPS should be rescored.
