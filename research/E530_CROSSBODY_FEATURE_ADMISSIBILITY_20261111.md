@@ -68,6 +68,12 @@ Do not run the E001 ranking on these tables. The current harness requires site_i
 
 This is a decisive negative result: E527/E528 solved data access and ID linkage, but they did not solve label validity or physical descriptor comparability. E001 known-site recovery remains NOT YET MEASURED; cross-body similarity remains NOT YET PROVEN; novel analogue discovery remains NOT YET PROVEN.
 
+## Validation
+
+- E527 exact-head Actions run #42904750899 passed on commit 03300510d932128df58f64dc91bf04bd0825617f.
+- Six E530 tests passed on an equivalent local harness. The committed branch test module was not executed in this runtime, and no E530 exact-head Actions run was triggered.
+- Both downloaded source-artifact ZIPs passed CRC checks and matched their GitHub artifact SHA-256 digests.
+
 ## Next experiment
 
 1. Ingest the separate public USGS 2020 “Known Terrestrial Analog Sites for Planetary Science” point layer as a candidate independent positive-site source. It is CC0, but it is not a negative-control set.
