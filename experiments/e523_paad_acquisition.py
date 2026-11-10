@@ -22,6 +22,7 @@ ITEM_URL = f"https://www.sciencebase.gov/catalog/item/{ITEM_ID}?format=json"
 DOWNLOAD_URL = f"https://www.sciencebase.gov/catalog/file/get/{ITEM_ID}"
 MAX_DOWNLOAD_BYTES = 100 * 1024 * 1024
 USER_AGENT = "NASA-Analog-Research/0.1 (public USGS PAAD provenance ingestion)"
+COORDINATE_MATCH_TOLERANCE_DEGREES = 1e-8
 
 
 def sha256(data: bytes) -> str:
@@ -456,12 +457,15 @@ def inspect_spatial(root: Path, csv_candidate: dict[str, Any]) -> dict[str, Any]
         return {"status": "NO_SHAPEFILE"}
     path = paths[0]
     reader = shapefile.Reader(str(path))
+    if reader.shapeTypeName != "POINT":
+        raise ValueError(f"PAAD spatial layer must be POINT geometry, got {reader.shapeTypeName}")
     field_names = [str(spec[0]) for spec in reader.fields[1:]]
     csv_rows = {
         str(row.get("Field_Site") or "").strip(): row
         for row in csv_candidate["rows"]
     }
     matched = mismatched = missing = 0
+    max_abs_lon_delta = max_abs_lat_delta = 0.0
     for record, shape in zip(reader.records(), reader.shapes()):
         record_map = dict(zip(field_names, list(record)))
         site = str(record_map.get("Field_Site") or "").strip()
@@ -476,9 +480,18 @@ def inspect_spatial(root: Path, csv_candidate: dict[str, Any]) -> dict[str, Any]
         except (TypeError, ValueError, KeyError):
             missing += 1
             continue
-        # The shapefile stores 3 decimal places while the CSV retains 4.
-        # This is a cross-file rounding check, not a positional-accuracy claim.
-        if abs(csv_lon - shape_lon) <= 0.00051 and abs(csv_lat - shape_lat) <= 0.00051:
+        lon_delta = abs(csv_lon - shape_lon)
+        lat_delta = abs(csv_lat - shape_lat)
+        max_abs_lon_delta = max(max_abs_lon_delta, lon_delta)
+        max_abs_lat_delta = max(max_abs_lat_delta, lat_delta)
+        # Compare the full-precision shapefile point geometry, not its DBF
+        # coordinate attributes (which are rounded to three decimal places).
+        # The threshold allows serialization noise only; it is not a location
+        # accuracy estimate.
+        if (
+            lon_delta <= COORDINATE_MATCH_TOLERANCE_DEGREES
+            and lat_delta <= COORDINATE_MATCH_TOLERANCE_DEGREES
+        ):
             matched += 1
         else:
             mismatched += 1
@@ -496,8 +509,10 @@ def inspect_spatial(root: Path, csv_candidate: dict[str, Any]) -> dict[str, Any]
             "matched_csv_sites": matched,
             "mismatched_csv_sites": mismatched,
             "missing_csv_pairs": missing,
-            "tolerance_degrees": 0.00051,
-            "tolerance_reason": "CSV stores four decimal places; shapefile coordinates are rounded to three. Tolerance is only a cross-file consistency check.",
+            "tolerance_degrees": COORDINATE_MATCH_TOLERANCE_DEGREES,
+            "max_abs_longitude_difference_degrees": max_abs_lon_delta,
+            "max_abs_latitude_difference_degrees": max_abs_lat_delta,
+            "tolerance_reason": "The comparison uses full-precision shapefile point geometry, not three-decimal DBF coordinate attributes; the threshold allows serialization noise only and is not positional accuracy.",
         },
     }
 
