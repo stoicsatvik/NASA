@@ -89,4 +89,24 @@ class E529Tests(unittest.TestCase):
         self.assertIn("dune_longitude",terms)
         self.assertIn("mean_dune_height",terms)
 
+    def test_windows_separator_paths_are_normalized_before_field_matching(self):
+        buf = io.BytesIO()
+        with zipfile.ZipFile(buf, "w") as z:
+            z.writestr(
+                r"Documentation\ReadMe_GIS.txt",
+                "Field 20: Mean_Dune_Height (MDHeight) - mean height in metres (m).\n",
+            )
+        result = inspect_archive("documentation", buf.getvalue())
+        document = result["field_definition_documents"][0]
+        self.assertEqual(document["name"], "Documentation/ReadMe_GIS.txt")
+        self.assertEqual(document["field_count"], 1)
+        self.assertEqual(document["fields"][0]["short_name"], "MDHeight")
+
+    def test_windows_separator_path_traversal_is_rejected(self):
+        buf = io.BytesIO()
+        with zipfile.ZipFile(buf, "w") as z:
+            z.writestr(r"Metadata\..\escape.txt", b"x")
+        with self.assertRaises(ValueError):
+            inspect_archive("metadata", buf.getvalue())
+
 if __name__=="__main__": unittest.main()
