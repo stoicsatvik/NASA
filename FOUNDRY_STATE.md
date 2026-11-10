@@ -296,3 +296,8 @@ Reproducible source: `experiments/e531_challenge_selection_sensitivity.py`; resu
 - Reproducible audit: `experiments/e532_public_catalogue_audit.py`; fixture tests: `experiments/test_e532_public_catalogue_audit.py`; CI receipt artifact: `e532-public-analogue-catalogue-audit`. The script pins the source commit, enforces URL/size limits, computes SHA-256, and does not store the external dataset.
 - Claim states unchanged: cross-body similarity **NOT YET PROVEN**; known-site recovery **NOT YET MEASURED**; novel analogue discovery **NOT YET PROVEN**; challenge-selection superiority **NOT YET PROVEN**.
 - Next: acquire the separate official USGS 2020 Known Terrestrial Analog Sites point layer (DOI `10.5066/P9J72921`) as candidate positives; independently review a predeclared subset and obtain defensible non-analogue controls plus matched physical descriptors. Absence from a positive catalogue is not a negative label.
+
+
+## E532 coordinate-type validation hardening — 2026-11-11
+
+Code review found that Python's `bool` subclasses `int`, so a malformed GeoJSON point such as `[true, 20.0]` could pass the previous numeric-coordinate predicate. The E532 audit now explicitly excludes booleans and adds a regression fixture. This does not change the pinned external dataset or its candidate-only status. The original live-source receipt #42924295331 remains valid for its earlier code head; the new predicate has focused local validation, while exact-head live-source rerun remains pending.
