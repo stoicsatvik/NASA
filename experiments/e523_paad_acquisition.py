@@ -368,7 +368,7 @@ def parse_fgdc_metadata(path: Path) -> dict[str, Any]:
             units = "km2"
 
         approximate = bool(
-            re.search(r"\\bapproximate(?:ly)?\\b|\\bestimat(?:e|ed|ion)\\b", definition_lower)
+            re.search(r"\bapproximate(?:ly)?\b|\bestimat(?:e|ed|ion)\b", definition_lower)
         )
         approximation_basis = "FGDC attribute definition" if approximate else None
         if label == "Areal_Coverage":
