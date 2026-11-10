@@ -221,3 +221,29 @@ The full 14-challenge screen is recorded in `research/CHALLENGE_SELECTION_SCREEN
 The best current execution candidate is therefore **Challenge 11: Interplanetary Survival Guide: Martian Map**, provisionally. Existing `stoicsatvik/martian` is preparation-only (not a solution) and records MOLA/CTX/HiRISE source families; the NASA MGD3 spatial ingestion can potentially supply a dune layer. Challenge 10 remains alive only behind the E527 archive/schema/CRS gate and a real E001 leave-one-site-out recovery result. MODIS/VIIRS and CLPS remain live alternatives.
 
 Do not lock or submit. Re-score after official MGD3 ingestion and a reproducible Mars-layer registration test. Keep observed terrain/environment layers separate from crew fatigue, oxygen assumptions and mission rules; RAD/REMS are local rover observations, not global safety forecasts. Challenge-selection superiority remains **NOT YET PROVEN**.
+
+
+## E527/E528 actual MGD3 acquisition and join (2026-11-11)
+
+Exact-head Actions run [#42922184681](https://github.com/stoicsatvik/NASA/actions/runs/42922184681) on the E527 branch passed **22 parser/provenance tests** and completed the live archive acquisition, 2018 workbook join and prior E529 keyword audit.
+
+- Official 2007 Shapefiles.zip: 60,597,152 bytes; SHA-256 `a43e8f842aa0e9b1edb920a2624a430ebf7fb6a059fc9c6f1ae37cc179635f34`.
+- Core layer: **547 POLYGON geometries, 547 nonempty unique Dune_IDs, zero duplicates**. CRS is Mars sinusoidal on the 3,396,190 m MOLA sphere; native coordinates are metres. The polygon bounding box is recorded in the receipt.
+- Official 2007 Tables.zip: SHA-256 `9f2e7fe86f813cafcabf34587648e2d6d31a6207046a6d32fb2a98953c8cadb1`. The same-release Softcopy table joined **547/547** unique IDs to the spatial layer using the long field name `Dune  Field Lon+Lat ID`.
+- Official 2018 workbook: 2,982,330 bytes; SHA-256 `92771c23cfa4a64dfcc38f5ad29de00adfa41b9f321d3665beb2112eefe3485e`, matching E318 exactly. E528 normalized **1,853** ID-bearing rows across eight worksheets and linked **535 unique Equatorial Dune_IDs** to the 2007 spatial inventory. Four worksheets contain matches. Each Equatorial Global Summary sheet has 58/58 IDs matched; the Stability Index has 535/786 unique IDs matched; the THEMIS ATI/TES modeling sheet has 40/53 rows matched. South Polar sheets have no matches because they lie outside the 2007 layer's equatorial coverage; they are not treated as negative sites.
+- The 2007 Dune_ID encoding decodes to longitude and aerocentric latitude at 0.1-degree precision. Those values are identifier-derived and are not independent coordinates or a positional-accuracy measurement.
+- The previous E529 audit verified 12 documentation entries and 20 metadata entries, preserving archive hashes. Its bounded keyword excerpts were insufficient for a full codebook crosswalk.
+
+## E529 full field-definition extraction (2026-11-11)
+
+The E529 parser now extracts complete numbered field definitions from `ReadMe_GIS.txt` and `ReadMe_Softcopy.txt`, preserves source-document SHA-256 values, decodes Windows-1252 en-dash separators, and distinguishes unit parentheses from field aliases. Three new parser-focused fixtures passed in an isolated Python harness. The current extractor has **not yet been rerun against the live USGS archives**; the 22-test exact-head workflow above predates this change. See `research/E529_MGD3_FIELD_DEFINITION_EXTRACTION_20261111.md`.
+
+E530 remains a decisive negative admissibility result: strict Dune_Type matches are S/SS; L remains a candidate; B is ambiguous because PAAD combines barchan/barchanoid while MGD3 separates B/Bd. Naively admitting B inflates coverage 1.81× on PAAD and 1.93× on MGD3. No directly shared quantitative physical-feature family is admitted. E001 remains NOT READY; no analogue recovery or cross-body similarity is claimed.
+
+## Current frontier after E531 (2026-11-11)
+
+- E531 keeps Martian Map and MODIS/VIIRS in a provisional top tier. Martian Map is the most frequent top choice in the tested perturbation families (83.97%, 65.40%, 54.34%), but its 5th-percentile score margin over MODIS/VIIRS is negative even at ±0.25. These are heuristic scorecard perturbations, not judging probabilities. Do not lock the challenge.
+- The 2007 MGD3 dune layer is now available as source-backed Mars context. It does **not** validate a route-safety model or a cross-body analogue model.
+- Highest-value next actions: (1) run the updated E529 full-field extractor on the official archives and inspect the exact Dune_Type, area, average-elevation and mean-height definitions; (2) only then update E530's conservative crosswalk if a source-backed equivalence exists; (3) test CRS/extent/coverage registration of MGD3 against the existing MOLA/CTX/HiRISE layers in `stoicsatvik/martian`. Keep observed terrain layers separate from crew fatigue, oxygen assumptions and mission rules.
+
+Claim states remain: cross-body similarity **NOT YET PROVEN**; known-site recovery **NOT YET MEASURED**; novel analogue discovery **NOT YET PROVEN**; route safety **NOT VALIDATED**; challenge-selection superiority **NOT YET PROVEN**.
