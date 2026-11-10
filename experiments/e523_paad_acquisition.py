@@ -652,7 +652,7 @@ def main() -> int:
             "archive_sha256": receipt["download_archive_sha256"],
             "primary_format": receipt["primary_table"]["format"],
             "record_count": receipt["primary_table"]["record_count"],
-            "count_matches_release_description": receipt["primary_table"]["count_matches_release_description"],
+            "count_matches_release_metadata": receipt["primary_table"]["count_matches_release_metadata"],
             "fields": receipt["primary_table"]["fields"],
             "missing_counts": receipt["primary_table"]["missing_counts"],
             "crs_wkt_present": bool(receipt["primary_table"]["crs_wkt"]),
