@@ -22,7 +22,7 @@ The gallery records do not supply numeric site-feature vectors, analysis coordin
 
 ## Independent source discovery
 
-1. USGS PAAD — Planetary Aeolian Analog Database, DOI https://doi.org/10.5066/P9IFVZEX. The USGS release describes 45 dune-field analog sites and core attributes including bedform type, climate class, sand source/composition, latitude, longitude, average elevation, and approximate areal coverage. It is CC0. This is a strong, narrower source for a Mars aeolian sub-campaign, not a general analogue benchmark. Source: https://www.usgs.gov/data/paad-planetary-aeolian-analog-database.
+1. USGS PAAD — Planetary Aeolian Analog Database, DOI https://doi.org/10.5066/P9IFVZEX. The USGS release describes 45 dune-field analog sites and core attributes including bedform type, climate class, sand source/composition, latitude, longitude, average elevation, and approximate areal coverage; it is CC0. Actual ingestion and source-fingerprinted analysis already exist in earlier stacked PRs #27-#32, so E522 does not repeat that acquisition. The prior work rejects direct raw-code joining to the Mars 2007 codebook and shows that 100 km spatial blocking changes Earth-only lexical agreement. Source: https://www.usgs.gov/data/paad-planetary-aeolian-analog-database.
 2. USGS Terrestrial Analogs Data Portal (TADP) provides ScienceBase-backed discovery and OGC WMS/WFS/CSW services. Source: https://tadp.astrogeology.usgs.gov/how-to-contribute.
 3. A separate public catalogue at https://github.com/rachellelecussan/planetary-analogue-catalogue contains 16 candidate site records and extensive references, but all 16 records are marked Draft in the inspected data/sites.geojson. It is a discovery lead only, not independent verified ground truth.
 
@@ -30,7 +30,7 @@ The gallery records do not supply numeric site-feature vectors, analysis coordin
 
 - NASA gallery pair inventory: SUPPORTED as a curated qualitative source.
 - Gallery directly usable as E001 feature/label matrix: REJECTED for this source's current schema.
-- USGS PAAD as an aeolian candidate data source: SUPPORTED as a source lead; ingestion not yet performed.
+- USGS PAAD 45-site Earth dune ingestion: SUPPORTED in prior E317-E319 work; cross-body semantic equivalence and E001 recovery: NOT YET PROVEN.
 - E001 known-site recovery: NOT YET MEASURED.
 - Cross-body similarity, novel analogue discovery, local validation advantage, and challenge-selection superiority: NOT YET PROVEN.
 
@@ -38,4 +38,4 @@ This is a source-admissibility falsification, not an analogue-recovery score and
 
 ## Next decisive move
 
-Acquire the actual PAAD table/vector through its ScienceBase/TADP service; preserve file hash, DOI, CRS, coordinate precision, site polygons/footprints, units and field-level provenance. Then pair one aeolian subset with a genuinely independent Mars reference and predeclared non-analog dune controls. Keep the broader gallery pairs outside training until mechanism-specific features and controls exist. No local field observations, new sensor readings, or site-access claims are made here.
+Do not repeat PAAD acquisition: the source-pinned 45-site CSV and the independent 2018 Mars MGD3 workbooks are already preserved in E317-E318. The next gate is an independently adjudicated semantic crosswalk between Earth and Mars dune descriptors plus predeclared non-analogue controls, followed by E001 leave-one-site-out and spatially blocked evaluation. E319's raw-token overlap is insufficient, E320/E323/E325 are Earth-only lexical/spatial diagnostics, and the source climate descriptions are not valid Köppen codes. No matched Earth-Mars positive/negative set or known-site recovery is established.
