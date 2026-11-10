@@ -8,6 +8,8 @@ on:
       - 'experiments/e532_public_catalogue_audit.py'
       - 'experiments/test_e532_public_catalogue_audit.py'
       - '.github/workflows/e532-public-catalogue-audit.yml'
+      - 'FOUNDRY_STATE.md'
+      - 'research/E532_PUBLIC_CATALOGUE_AUDIT_20261111.md'
   pull_request:
     paths:
       - 'experiments/e532_public_catalogue_audit.py'
