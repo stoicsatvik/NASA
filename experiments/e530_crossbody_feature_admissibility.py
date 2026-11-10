@@ -66,6 +66,21 @@ def summarize(paad, mgd3, join_rows):
         parsed.append({**row, "payload": payload})
     eq = [r for r in parsed if "Equatorial" in r.get("workbook", "")]
     matched = [r for r in eq if str(r.get("matched_2007_spatial", "")).lower() == "true"]
+    # Never trust an upstream match flag without checking its ID against the
+    # exact 2007 spatial inventory used by this audit.
+    if any(missing(r.get("Dune_ID")) for r in mgd3):
+        raise ValueError("2007 MGD3 spatial inventory contains missing Dune_ID values")
+    mgd3_ids = {str(r["Dune_ID"]).strip() for r in mgd3}
+    matched_values = [r.get("dune_id") for r in matched]
+    if any(missing(value) for value in matched_values):
+        raise ValueError("matched 2018 rows contain missing Dune_ID values")
+    matched_ids = {str(value).strip() for value in matched_values}
+    unknown_matched_ids = sorted(matched_ids - mgd3_ids)
+    if unknown_matched_ids:
+        raise ValueError(
+            "matched 2018 IDs are absent from the 2007 MGD3 spatial inventory: "
+            + ", ".join(unknown_matched_ids)
+        )
     stability = [r for r in eq if r.get("sheet") == "Stability Index"]
     stability_ids = [str(r["payload"].get("Dune_ID", "")) for r in stability]
     themis = [r for r in eq if r.get("sheet") == "THEMIS ATI, TES dune modeling"]
