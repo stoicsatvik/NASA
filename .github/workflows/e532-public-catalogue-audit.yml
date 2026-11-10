@@ -1,0 +1,40 @@
+name: E532 independent analogue-catalogue audit
+
+on:
+  push:
+    branches:
+      - research/e532-candidate-analogue-catalogue-audit-20261111
+    paths:
+      - 'experiments/e532_public_catalogue_audit.py'
+      - 'experiments/test_e532_public_catalogue_audit.py'
+      - '.github/workflows/e532-public-catalogue-audit.yml'
+  pull_request:
+    paths:
+      - 'experiments/e532_public_catalogue_audit.py'
+      - 'experiments/test_e532_public_catalogue_audit.py'
+      - '.github/workflows/e532-public-catalogue-audit.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run deterministic fixture tests
+        run: python -m unittest experiments.test_e532_public_catalogue_audit -v
+      - name: Fetch and audit pinned public candidate catalogue
+        run: python experiments/e532_public_catalogue_audit.py --out .artifacts/e532/result.json
+      - name: Preserve audit receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e532-public-analogue-catalogue-audit
+          path: .artifacts/e532/result.json
+          if-no-files-found: ignore
+          retention-days: 30
