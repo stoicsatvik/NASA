@@ -51,6 +51,9 @@ Coverage sensitivity across the 45 PAAD sites and 547 MGD3 fields:
 Naively accepting B inflates apparent coverage by 1.81× on PAAD and 1.93× on MGD3 relative to strict S/SS. This is a material ranking/coverage sensitivity, not evidence that the matched sites are physically analogous.
 
 ## Descriptor admissibility
+The 2018 report limits its detailed thermal/compositional analysis to dune fields of 300 km² or larger. Therefore the 58 Global Summary IDs are a selected large-field subset, not a representative sample of all 547 MGD3 fields.
+
+
 
 No directly shared quantitative physical feature is admitted from the current PAAD + MGD3 pair.
 
