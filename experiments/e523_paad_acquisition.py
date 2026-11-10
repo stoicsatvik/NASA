@@ -360,11 +360,11 @@ def parse_fgdc_metadata(path: Path) -> dict[str, Any]:
 
         definition_lower = definition.casefold()
         units = None
-        if re.search(r"\\bdecimal degrees?\\b", definition_lower):
+        if re.search(r"\bdecimal degrees?\b", definition_lower):
             units = "decimal degrees"
-        elif re.search(r"\\bmeters?\\s*\\(m\\)|\\bmeters?\\b", definition_lower):
+        elif re.search(r"\bmeters?\s*\(m\)|\bmeters?\b", definition_lower):
             units = "m"
-        elif re.search(r"\\bkilometers?\\s+squared\\b|\\bsquare kilometers?\\b|\\bkm\\s*\\^?\\s*2\\b", definition_lower):
+        elif re.search(r"\bkilometers?\s+squared\b|\bsquare kilometers?\b|\bkm\s*\^?\s*2\b", definition_lower):
             units = "km2"
 
         approximate = bool(
