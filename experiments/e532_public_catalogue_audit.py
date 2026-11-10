@@ -141,7 +141,7 @@ def audit(document: dict[str, Any], source_sha256: str | None = None,
             geometry.get("type") == "Point"
             and isinstance(coordinates, (list, tuple))
             and len(coordinates) >= 2
-            and all(isinstance(v, (int, float)) and math.isfinite(v) for v in coordinates[:2])
+            and all(not isinstance(v, bool) and isinstance(v, (int, float)) and math.isfinite(v) for v in coordinates[:2])
         ):
             valid_points += 1
 
