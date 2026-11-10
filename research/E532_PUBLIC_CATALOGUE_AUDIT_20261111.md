@@ -10,7 +10,7 @@ Can an independent, openly licensed Earth-site catalogue provide usable candidat
 - Source revision: `62e6339bdf308de3bc987388d0faa7130cf57de9`
 - File: `data/sites.geojson` (GeoJSON FeatureCollection; generated 2026-10-12)
 - Source README declares the `data/` directory CC BY 4.0, code MIT, and per-photo licences individually. No source photos or raw GeoJSON were copied into this repository.
-- The catalogue describes 16 sites, 96 references and 42 photos. It is an independent candidate catalogue, not an official USGS/NASA ground-truth dataset.
+- The catalogue describes 16 sites, 96 references and 42 photos. The CI-acquired file SHA-256 is `09ad7d62eefd40c86acaee945fb2d1f045b199c958830ba8715e7774311afb0d`. It is an independent candidate catalogue, not an official USGS/NASA ground-truth dataset.
 
 ## Audit results
 
@@ -44,7 +44,7 @@ The 12 Mars/Moon candidate records may be queued for source-by-source review aga
 
 - `experiments/e532_public_catalogue_audit.py` fetches the exact pinned raw file, enforces the URL and byte limit, computes SHA-256, and emits a machine-readable receipt.
 - `experiments/test_e532_public_catalogue_audit.py` covers source pinning, label/review accounting, control-population rejection, duplicate IDs and geometry validation.
-- The workflow stores the generated receipt as a 30-day Actions artifact. It does not commit the external dataset or photos.
+- Exact-head GitHub Actions run [#42924295331](https://github.com/stoicsatvik/NASA/actions/runs/42924295331) passed all **4 tests**, fetched the pinned source and emitted the receipt with the SHA-256 above. The workflow stores the generated receipt as a 30-day Actions artifact. It does not commit the external dataset or photos.
 
 ## Claim-state update
 
