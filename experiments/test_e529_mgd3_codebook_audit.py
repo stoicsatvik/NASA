@@ -33,18 +33,21 @@ class E529Tests(unittest.TestCase):
             "Field 4: Dune Type - This field lists dune forms.\n"
             "B - barchan dune.\n"
             "Bd - barchanoid dune.\n"
+            "Field 15: Dune Field Area (km2) - area of polygon (km2).\n"
             "Field 19: Dune_Area_km2_sinu (Area_sinu_) - area of polygon (km2).\n"
             "Field 20: Mean_Dune_Height (MDHeight) - mean height in metres (m).\n"
         )
         fields = extract_field_definitions(source)
-        self.assertEqual([item["field_number"] for item in fields], [4, 19, 20])
+        self.assertEqual([item["field_number"] for item in fields], [4, 15, 19, 20])
         self.assertEqual(fields[0]["label"], "Dune Type")
         self.assertIn("B - barchan dune", fields[0]["definition"])
         self.assertIn("Bd - barchanoid dune", fields[0]["definition"])
-        self.assertEqual(fields[1]["short_name"], "Area_sinu_")
-        self.assertIn("km2", fields[1]["definition"])
-        self.assertEqual(fields[2]["short_name"], "MDHeight")
-        self.assertIn("(m)", fields[2]["definition"])
+        self.assertEqual(fields[1]["label"], "Dune Field Area (km2)")
+        self.assertIsNone(fields[1]["short_name"])
+        self.assertEqual(fields[2]["short_name"], "Area_sinu_")
+        self.assertIn("km2", fields[2]["definition"])
+        self.assertEqual(fields[3]["short_name"], "MDHeight")
+        self.assertIn("(m)", fields[3]["definition"])
 
     def test_archive_exposes_full_field_definitions_with_source_hash(self):
         buf=io.BytesIO()
