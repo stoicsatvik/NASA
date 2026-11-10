@@ -6,6 +6,7 @@ on:
   pull_request:
     paths:
       - experiments/e001_spatial_scale_sensitivity.py
+      - experiments/e001_production_spatial_null.py
       - experiments/e001_baseline.py
       - experiments/e001_exact_label_null.py
       - .github/workflows/e001-spatial-scale-exact.yml
@@ -21,6 +22,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Run standalone production E001 spatial-block null fixture
+        run: python -m experiments.e001_production_spatial_null
       - name: Run production E001 spatial-scale sweep and embedded falsification assertions
         run: python -m experiments.e001_spatial_scale_sensitivity > /tmp/e001-spatial-scale.json
       - name: Verify exact enumeration and preserve negative evidence
