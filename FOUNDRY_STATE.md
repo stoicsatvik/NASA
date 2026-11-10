@@ -212,3 +212,12 @@ A source-to-source integration review of the E527→E528 path found a determinis
 Claim states unchanged: cross-body similarity **NOT YET PROVEN**; known-site recovery **NOT YET MEASURED**; novel analogue discovery **NOT YET PROVEN**; challenge-selection superiority **NOT YET PROVEN**.
 
 Next: obtain the exact-head E527-E529 workflow receipt, inspect archive hash/CRS/schema and matched/unmatched Dune IDs, then audit codebook definitions before any physical descriptor crosswalk.
+
+
+## 2026 challenge-selection falsification screen (2026-11-11)
+
+The full 14-challenge screen is recorded in `research/CHALLENGE_SELECTION_SCREEN_20261111.md`. First-pass weighted readiness screen (data 25%, measurable validation 25%, portfolio reuse 20%, differentiation 15%, 48-hour feasibility 15%) does **not** support planetary analog as the current default. Martian Map ranks first at 4.10/5, MODIS/VIIRS at 4.00, CLPS at 3.85, Earth System Trend Detective at 3.80; planetary analog scores 2.93 because known-site recovery and cross-body descriptors are still unmeasured. These are heuristic readiness scores, not judging predictions.
+
+The best current execution candidate is therefore **Challenge 11: Interplanetary Survival Guide: Martian Map**, provisionally. Existing `stoicsatvik/martian` is preparation-only (not a solution) and records MOLA/CTX/HiRISE source families; the NASA MGD3 spatial ingestion can potentially supply a dune layer. Challenge 10 remains alive only behind the E527 archive/schema/CRS gate and a real E001 leave-one-site-out recovery result. MODIS/VIIRS and CLPS remain live alternatives.
+
+Do not lock or submit. Re-score after official MGD3 ingestion and a reproducible Mars-layer registration test. Keep observed terrain/environment layers separate from crew fatigue, oxygen assumptions and mission rules; RAD/REMS are local rover observations, not global safety forecasts. Challenge-selection superiority remains **NOT YET PROVEN**.
