@@ -19,7 +19,7 @@ Weights (1–5, higher is better): public-data readiness 25%; measurable validat
 | 5 | Astronaut Health Monitoring Software | 2.5 | 2.0 | 1.5 | 2.5 | 2.0 | 2.10 | Sensitive health domain and risk of unsafe clinical interpretation; deprioritize |
 | 6 | Dancing with the SARs | 3.0 | 3.5 | 3.0 | 4.0 | 2.5 | 3.20 | High technical differentiation; SAR calibration, processing and expert burden are substantial |
 | 7 | Field Shift: Adapting Farms with NASA Data | 3.5 | 3.5 | 4.0 | 3.5 | 3.0 | 3.53 | Kaggriculture gives conceptual reuse, but its game data are not agronomic evidence; needs local soil/crop records |
-| 8 | Llama in Free Fall | 4.0 | 3.0 | 2.0 | 2.0 | 4.0 | 3.05 | Literature retrieval/synthesis is feasible; lower differentiation unless retrieval accuracy is independently evaluated |
+| 8 | Flame in Freefall | 4.0 | 3.0 | 2.0 | 2.0 | 4.0 | 3.05 | Literature retrieval/synthesis is feasible; lower differentiation unless retrieval accuracy is independently evaluated |
 | 9 | Harmonization of MODIS and VIIRS Hot Spots | 4.5 | 4.5 | 3.5 | 3.0 | 4.0 | 4.00 | Strong measurable sensor-harmonization problem with long public record; little existing portfolio code and likely crowded |
 | 10 | Identify Earth Locations that Analog the Permanent Moon Base Locations and Mars | 2.0 | 1.5 | 5.0 | 5.0 | 2.0 | 2.93 | Highest novelty and current research reuse, but no cross-body descriptor validity or known-site recovery yet |
 | 11 | Interplanetary Survival Guide: Martian Map | 4.0 | 4.0 | 4.5 | 3.5 | 4.5 | **4.10** | Best first-pass execution fit: MOLA/CTX/HiRISE preparation plus the MGD3 dune layer can support a source-backed layered map; no route-safety claim is needed |
