@@ -101,9 +101,9 @@ Pivot away from the planetary-analog track if any of these becomes clear:
 
 ## Next trigger
 
-**Dataset access + known-analogue recovery.**
+**Independent semantic crosswalk + non-analogue controls + E001 known-site recovery.**
 
-The next substantive run should reduce one of these uncertainties, not add another planning document.
+PAAD and MGD3 ingestion are already in E317-E318. The next substantive run must resolve label comparability and negative controls, not repeat data acquisition or add another planning document.
 
 
 ## E514 real matched-footprint falsification (2026-11-03)
