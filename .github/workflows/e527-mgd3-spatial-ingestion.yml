@@ -1,0 +1,38 @@
+name: E527 official USGS MGD3 spatial ingestion
+
+on:
+  push:
+    branches:
+      - research/e527-mgd3-spatial-ingestion-20261111
+    paths:
+      - 'experiments/e527_mgd3_spatial_ingestion.py'
+      - 'experiments/test_e527_mgd3_spatial_ingestion.py'
+      - '.github/workflows/e527-mgd3-spatial-ingestion.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  acquire-and-inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned shapefile parser
+        run: python -m pip install pyshp==2.3.1
+      - name: Run deterministic parser and provenance tests
+        run: python -m unittest experiments.test_e527_mgd3_spatial_ingestion -v
+      - name: Acquire official USGS MGD3 spatial and table archives
+        run: python experiments/e527_mgd3_spatial_ingestion.py --out .artifacts/e527
+      - name: Preserve source receipt and normalized attribute table
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e527-mgd3-spatial-ingestion
+          path: .artifacts/e527/**
+          if-no-files-found: ignore
+          retention-days: 30
