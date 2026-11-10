@@ -44,6 +44,12 @@ class E530Tests(unittest.TestCase):
         self.assertEqual(crosswalk["coverage_sensitivity"]["strict_exact"]["paad_sites"], 1)
         self.assertEqual(crosswalk["coverage_sensitivity"]["naive_including_B"]["paad_sites"], 2)
 
+    def test_matched_2018_ids_must_belong_to_2007_spatial_inventory(self):
+        paad, mgd3, join = self.fixture()
+        join[0]["dune_id"] = "999"
+        with self.assertRaisesRegex(ValueError, "absent from the 2007 MGD3 spatial inventory"):
+            summarize(paad, mgd3, join)
+
     def test_duplicate_source_ids_are_rejected(self):
         paad, mgd3, join = self.fixture()
         mgd3.append(dict(mgd3[0]))
