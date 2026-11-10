@@ -20,9 +20,9 @@ Commit [ed7db2b](https://github.com/stoicsatvik/NASA/commit/ed7db2b7163fc5474a3a
 
 The exact current E529 module and test file were fetched from the corrected branch head and executed in an isolated Python 3 harness:
 
-- E529 unit tests: **7/7 passed**.
+- E529 unit tests: **9/9 passed**.
 - Module import/compilation succeeded.
-- ZIP fixtures cover source URL allowlisting, archive CRC/path handling, HTML/text extraction, full numbered field definitions, code-list preservation, unit-vs-alias distinction, source hashes, and Windows-1252 en-dash decoding.
+- ZIP fixtures cover source URL allowlisting, archive CRC/path handling, Windows-separator normalization and traversal rejection, HTML/text extraction, full numbered field definitions, code-list preservation, unit-vs-alias distinction, source hashes, and Windows-1252 en-dash decoding.
 
 This is exact-file unit validation, not a full repository Actions run and not live archive extraction. The GitHub combined commit-status reader returned no statuses for the corrected commit; no exact-head Actions receipt is claimed.
 
