@@ -10,6 +10,7 @@ import zipfile
 
 from experiments.e523_paad_acquisition import (
     collect_file_info,
+    build_console_summary,
     choose_primary_table,
     parse_fgdc_metadata,
     inspect_csv,
@@ -138,6 +139,24 @@ class PAADIngestionTests(unittest.TestCase):
         self.assertTrue(metadata["attributes"]["Elevation"]["approximate"])
         self.assertEqual(metadata["attributes"]["Sand_Source"]["missing_value_conventions"][0]["value"], "NaN")
         self.assertEqual(metadata["attributes"]["Dune_Type"]["domain_values"][0]["definition"], "Barchan.")
+
+
+    def test_console_summary_uses_v2_release_metadata_field(self):
+        receipt = {
+            "status": "INGESTED",
+            "download_archive_sha256": "abc123",
+            "primary_table": {
+                "format": "csv",
+                "record_count": 45,
+                "count_matches_release_metadata": True,
+                "fields": ["Field_Site"],
+                "missing_counts": {},
+                "crs_wkt": "GEOGCS[\"WGS 84\"]",
+            },
+        }
+        summary = build_console_summary(receipt)
+        self.assertTrue(summary["count_matches_release_metadata"])
+        self.assertNotIn("count_matches_release_description", summary)
 
 
 if __name__ == "__main__":
