@@ -25,8 +25,11 @@ class E527Tests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"unsafe ZIP path"):
             member_path("..\\..\\escape.txt")
 
-    def test_id_field_rejects_ambiguous_candidates(self):
-        self.assertIsNone(_id_field(["Dune Field ID", "Dune Center ID"]))
+    def test_id_field_prefers_one_canonical_alias_over_noncanonical_id(self):
+        self.assertEqual(_id_field(["Dune Field ID", "Dune Center ID"]), "Dune Field ID")
+
+    def test_id_field_rejects_multiple_canonical_aliases(self):
+        self.assertIsNone(_id_field(["Dune Field ID", "Dune_ID"]))
 
     def test_core_layer_selection(self):
         self.assertEqual(core_shapefile(["background/outline.shp","layers/Dune_Field.shp","layers/Dune_Field_Craters.shp"]),"layers/Dune_Field.shp")
