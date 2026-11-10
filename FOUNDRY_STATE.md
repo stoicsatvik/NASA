@@ -244,7 +244,7 @@ E530 used the actual PAAD, 2007 MGD3 and 2018 MGD3 artifact tables. The reproduc
 - Strict S/SS coverage is 16/45 PAAD sites and 132/547 Mars fields. Adding candidate L gives 20/45 and 152/547. Naively including ambiguous B inflates apparent coverage to 29/45 and 255/547 (1.81× and 1.93× the strict coverage).
 - No directly shared quantitative feature family is admitted. Elevation and area require within-body normalization / support sensitivity; PAAD composition prose is not equivalent to MGD3 instrument-derived mineral abundances; Earth climate/sand-source fields have no MGD3 counterpart; Mars thermal inertia/albedo/mineral/stability fields are absent from PAAD.
 - E001 is NOT READY on these tables. Do not invent target-body labels, use unlisted sites as negatives, or run a ranking with fabricated controls.
-- Six local E530 regression tests passed. No new workflow run was triggered for this branch; E527 exact-head acquisition and the source artifacts are already validated separately.
+- Six local tests passed on an equivalent local harness. The committed branch test module was not executed on this runtime, and no E530 exact-head Actions run was triggered; E527 exact-head acquisition and the source artifacts are validated separately.
 
 Claim states remain: repo operating system SUPPORTED; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN; challenge-selection superiority NOT YET PROVEN.
 
