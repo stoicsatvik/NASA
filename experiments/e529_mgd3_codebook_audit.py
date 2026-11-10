@@ -79,7 +79,7 @@ def inspect_archive(kind: str, payload: bytes) -> dict:
         bad=z.testzip()
         if bad: raise ValueError(f"{kind} archive CRC failure at {bad}")
         for info in z.infolist():
-            name=info.filename.replace("\","/")
+            name=info.filename.replace("\\","/")
             if info.is_dir(): continue
             if name.startswith("/") or ".." in Path(name).parts: raise ValueError(f"unsafe archive path: {name}")
             names.append({"name":name,"bytes":info.file_size})
