@@ -58,3 +58,8 @@ The 12 Mars/Moon candidate records may be queued for source-by-source review aga
 ## Next decisive experiment
 
 Acquire and inspect the separate official USGS 2020 *Known Terrestrial Analog Sites for Planetary Science* point layer (DOI [10.5066/P9J72921](https://doi.org/10.5066/P9J72921)) as another candidate-positive source. Then independently verify a small, predeclared subset of candidate sites against primary literature and obtain a defensible non-analogue control set plus matched physical descriptors. Do not treat absence from a positive catalogue as a negative label.
+
+
+## Post-audit validation hardening — 2026-11-11
+
+Code inspection found that Python treats `bool` as a subclass of `int`, so the original coordinate predicate would count a malformed GeoJSON position such as `[true, 20.0]` as numeric. The audit now explicitly excludes booleans and adds a regression fixture. This is a validator correction, not a change to the pinned source or an additional analogue claim. The original exact-head live-source receipt remains evidence for the earlier code head; the new boolean check has passed its focused local test, but the live catalogue audit must be rerun on this head before claiming exact-head source revalidation.
