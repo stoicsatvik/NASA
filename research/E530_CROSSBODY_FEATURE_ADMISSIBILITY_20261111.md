@@ -77,6 +77,12 @@ This is a decisive negative result: E527/E528 solved data access and ID linkage,
 - Six E530 tests passed on an equivalent local harness. The committed branch test module was not executed in this runtime, and no E530 exact-head Actions run was triggered.
 - Both downloaded source-artifact ZIPs passed CRC checks and matched their GitHub artifact SHA-256 digests.
 
+## E530 source-join integrity gate
+
+The audit now independently checks every Equatorial 2018 row marked as matched against the exact 2007 MGD3 Dune_ID inventory. Missing IDs in the source inventory or in a row marked matched fail closed; a matched ID outside the inventory is rejected rather than counted toward the linkage denominator. A regression fixture deliberately marks ID 999 as matched against a three-ID source inventory and requires rejection.
+
+A dedicated lightweight workflow runs the E530 parser tests and compilation on this branch without repeating the larger archive-acquisition workflow.
+
 ## Next experiment
 
 1. Ingest the separate public USGS 2020 “Known Terrestrial Analog Sites for Planetary Science” point layer as a candidate independent positive-site source. It is CC0, but it is not a negative-control set.
