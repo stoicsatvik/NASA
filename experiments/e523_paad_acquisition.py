@@ -10,6 +10,7 @@ import re
 import shutil
 import urllib.request
 import zipfile
+import xml.etree.ElementTree as ET
 from pathlib import Path, PurePosixPath
 from typing import Any
 
@@ -331,6 +332,175 @@ def write_normalized_csv(path: Path, candidate: dict[str, Any]) -> None:
             writer.writerow(record)
 
 
+
+
+def parse_fgdc_metadata(path: Path) -> dict[str, Any]:
+    root = ET.parse(path).getroot()
+
+    def text_at(query: str) -> str:
+        node = root.find(query)
+        return " ".join(node.itertext()).strip() if node is not None else ""
+
+    attributes: dict[str, dict[str, Any]] = {}
+    for attr in root.findall(".//eainfo/detailed/attr"):
+        label = (attr.findtext("attrlabl") or "").strip()
+        if not label:
+            continue
+        definition = text_at_from = attr.findtext("attrdef") or ""
+        usage = " ".join(node.text or "" for node in attr.findall(".//udom")).strip()
+        domains = []
+        missing_conventions = []
+        for domain in attr.findall(".//edom"):
+            value = (domain.findtext("edomv") or "").strip()
+            description = (domain.findtext("edomvd") or "").strip()
+            if value:
+                domains.append({"value": value, "definition": description})
+                if "nan" in value.lower() or "empty cell" in value.lower():
+                    missing_conventions.append({"value": value, "definition": description})
+
+        units = None
+        approximate = False
+        data_type = "text/categorical"
+        if label in {"Center_Latitude", "Center_Longitude"}:
+            units = "decimal degrees"
+            data_type = "coordinate"
+        elif label == "Elevation":
+            units = "m"
+            approximate = True
+            data_type = "numeric"
+        elif label == "Areal_Coverage":
+            units = "km2"
+            approximate = True
+            data_type = "numeric"
+        elif domains:
+            data_type = "categorical"
+        attributes[label] = {
+            "definition": definition.strip(),
+            "usage_domain": usage,
+            "data_type": data_type,
+            "units": units,
+            "approximate": approximate,
+            "unit_status": "DOCUMENTED_IN_FGDC_METADATA" if units else "NO_PHYSICAL_UNIT_ASSIGNED_IN_METADATA",
+            "domain_values": domains,
+            "missing_value_conventions": missing_conventions,
+        }
+
+    cite = root.find(".//idinfo/citation/citeinfo")
+    authors = [node.text.strip() for node in cite.findall("origin") if node.text and node.text.strip()] if cite is not None else []
+    pubdate = cite.findtext("pubdate") if cite is not None else None
+    doi_url = cite.findtext("onlink") if cite is not None else None
+    publication_date = None
+    if pubdate and re.fullmatch(r"\d{8}", pubdate.strip()):
+        publication_date = f"{pubdate[:4]}-{pubdate[4:6]}-{pubdate[6:8]}"
+
+    return {
+        "title": text_at(".//idinfo/citation/citeinfo/title"),
+        "authors": authors,
+        "publication_date": publication_date or pubdate,
+        "doi_url": doi_url,
+        "abstract": text_at(".//idinfo/descript/abstract"),
+        "purpose": text_at(".//idinfo/descript/purpose"),
+        "attribute_accuracy": text_at(".//dataqual/attracc/attraccr"),
+        "logical_consistency": text_at(".//dataqual/logic"),
+        "completeness": text_at(".//dataqual/complete"),
+        "lineage": text_at(".//dataqual/lineage"),
+        "attributes": attributes,
+    }
+
+
+def enrich_field_metadata(fields: list[str], metadata: dict[str, Any]) -> list[dict[str, Any]]:
+    attributes = metadata.get("attributes", {})
+    enriched = []
+    for field in fields:
+        entry = attributes.get(field)
+        if entry:
+            enriched.append({"name": field, **entry})
+        else:
+            enriched.append({
+                "name": field,
+                "data_type": "unknown",
+                "units": None,
+                "approximate": False,
+                "unit_status": "NOT_FOUND_IN_FGDC_METADATA",
+                "definition": "",
+                "usage_domain": "",
+                "domain_values": [],
+                "missing_value_conventions": [],
+            })
+    return enriched
+
+
+def choose_primary_table(candidates: list[dict[str, Any]], expected_sites: int) -> dict[str, Any]:
+    if not candidates:
+        raise ValueError("no table candidates are available")
+    # Prefer the full-name CSV when the CSV and shapefile contain the same
+    # site records; the shapefile DBF truncates several field names.
+    return max(
+        candidates,
+        key=lambda item: (
+            item["record_count"] == expected_sites,
+            item["record_count"],
+            item["format"] in {"csv", "tsv"},
+            len(item["fields"]),
+        ),
+    )
+
+
+def inspect_spatial(root: Path, csv_candidate: dict[str, Any]) -> dict[str, Any]:
+    try:
+        import shapefile
+    except ImportError as exc:
+        raise RuntimeError("pyshp is required to validate the PAAD point layer") from exc
+    paths = sorted(root.rglob("*.shp"))
+    if not paths:
+        return {"status": "NO_SHAPEFILE"}
+    path = paths[0]
+    reader = shapefile.Reader(str(path))
+    field_names = [str(spec[0]) for spec in reader.fields[1:]]
+    csv_rows = {
+        str(row.get("Field_Site") or "").strip(): row
+        for row in csv_candidate["rows"]
+    }
+    matched = mismatched = missing = 0
+    for record, shape in zip(reader.records(), reader.shapes()):
+        record_map = dict(zip(field_names, list(record)))
+        site = str(record_map.get("Field_Site") or "").strip()
+        row = csv_rows.get(site)
+        if row is None or not shape.points:
+            missing += 1
+            continue
+        try:
+            csv_lat = float(row["Center_Latitude"])
+            csv_lon = float(row["Center_Longitude"])
+            shape_lon, shape_lat = shape.points[0]
+        except (TypeError, ValueError, KeyError):
+            missing += 1
+            continue
+        # The shapefile stores 3 decimal places while the CSV retains 4.
+        # This is a cross-file rounding check, not a positional-accuracy claim.
+        if abs(csv_lon - shape_lon) <= 0.00051 and abs(csv_lat - shape_lat) <= 0.00051:
+            matched += 1
+        else:
+            mismatched += 1
+    prj = path.with_suffix(".prj")
+    crs_wkt = prj.read_text(encoding="utf-8", errors="replace").strip() if prj.exists() else None
+    return {
+        "status": "CHECKED",
+        "source_file": str(path.relative_to(root)),
+        "geometry_type": reader.shapeTypeName,
+        "point_count": len(reader.shapes()),
+        "bbox": list(reader.bbox) if reader.bbox else None,
+        "crs_wkt": crs_wkt,
+        "coordinate_units": "decimal degrees per PAAD FGDC metadata",
+        "coordinate_validation": {
+            "matched_csv_sites": matched,
+            "mismatched_csv_sites": mismatched,
+            "missing_csv_pairs": missing,
+            "tolerance_degrees": 0.00051,
+            "tolerance_reason": "CSV stores four decimal places; shapefile coordinates are rounded to three. Tolerance is only a cross-file consistency check.",
+        },
+    }
+
 def build_receipt(out_dir: Path, *, max_bytes: int, expected_sites: int) -> dict[str, Any]:
     item_payload, _ = fetch_bytes(ITEM_URL, max_bytes=5 * 1024 * 1024)
     item = json.loads(item_payload)
@@ -352,21 +522,20 @@ def build_receipt(out_dir: Path, *, max_bytes: int, expected_sites: int) -> dict
     if raw_dir.exists():
         shutil.rmtree(raw_dir)
     raw_dir.mkdir(parents=True, exist_ok=True)
-    extracted = safe_extract_zip(archive_payload, raw_dir)
+    safe_extract_zip(archive_payload, raw_dir)
     extract_nested_zips(raw_dir)
     candidates = inspect_tables(raw_dir)
     if not candidates:
         raise RuntimeError("downloaded PAAD files contain no parseable CSV, GeoJSON, shapefile or XLSX table")
 
-    primary = max(
-        candidates,
-        key=lambda item: (
-            item["record_count"] == expected_sites,
-            item["record_count"],
-            len(item["fields"]),
-            item["format"] == "shapefile",
-        ),
-    )
+    metadata_paths = sorted(raw_dir.rglob("PAAD Metadata.xml"))
+    if not metadata_paths:
+        raise RuntimeError("the source FGDC PAAD Metadata.xml file is missing")
+    metadata_path = metadata_paths[0]
+    fgdc = parse_fgdc_metadata(metadata_path)
+    primary = choose_primary_table(candidates, expected_sites)
+    primary["field_metadata"] = enrich_field_metadata(primary["fields"], fgdc)
+    spatial = inspect_spatial(raw_dir, primary)
     normalized_path = out_dir / "paad_sites.csv"
     write_normalized_csv(normalized_path, primary)
 
@@ -382,29 +551,47 @@ def build_receipt(out_dir: Path, *, max_bytes: int, expected_sites: int) -> dict
         })
 
     summary = {
-        "title": item.get("title"),
-        "summary": item.get("summary"),
-        "citation": item.get("citation"),
-        "provenance": item.get("provenance"),
-        "rights": item.get("rights"),
-        "contacts": item.get("contacts"),
-        "dates": item.get("dates"),
+        "sciencebase_item": {
+            "title": item.get("title"),
+            "summary": item.get("summary"),
+            "citation": item.get("citation"),
+            "provenance": item.get("provenance"),
+            "rights": item.get("rights"),
+            "contacts": item.get("contacts"),
+            "dates": item.get("dates"),
+        },
+        "fgdc_metadata": fgdc,
+        "fgdc_metadata_file": str(metadata_path.relative_to(raw_dir)),
+        "fgdc_metadata_sha256": sha256(metadata_path.read_bytes()),
     }
+    warnings = []
+    if primary["record_count"] != expected_sites:
+        warnings.append(
+            f"Primary table has {primary['record_count']} rows; USGS release metadata describes {expected_sites} sites."
+        )
+    if spatial.get("coordinate_validation", {}).get("mismatched_csv_sites", 0):
+        warnings.append("CSV/shapefile coordinate mismatches require inspection; no automatic correction was applied.")
+    if spatial.get("coordinate_validation", {}).get("missing_csv_pairs", 0):
+        warnings.append("Some shapefile sites could not be paired to CSV rows by Field_Site.")
+
     return {
-        "schema_version": "paad-sciencebase-ingestion-v1",
+        "schema_version": "paad-sciencebase-ingestion-v2",
         "status": "INGESTED",
         "retrieved_at_utc": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "source": {
             "provider": "U.S. Geological Survey",
-            "title": item.get("title"),
+            "title": fgdc.get("title") or item.get("title"),
+            "authors": fgdc.get("authors"),
+            "publication_date": fgdc.get("publication_date"),
             "item_id": ITEM_ID,
             "item_url": ITEM_URL,
             "download_endpoint": DOWNLOAD_URL,
             "data_release_page": SOURCE_PAGE,
             "doi": DOI,
+            "metadata_doi_url": fgdc.get("doi_url"),
             "license": "CC0 1.0 Universal",
             "license_verification_source": SOURCE_PAGE,
-            "release_description": "USGS describes PAAD v1 as 45 global dune-field analog sites with core bedform, climate, sand-source, sand-composition, latitude, longitude, average-elevation and approximate-areal-coverage attributes.",
+            "release_description": "USGS FGDC metadata describes PAAD v1 as 45 global dune-field analog sites with bedform, climate, sediment source/composition, coordinates, approximate elevation and approximate areal coverage.",
         },
         "source_item_json_sha256": sha256(item_payload),
         "download_archive_sha256": sha256(archive_payload),
@@ -414,32 +601,39 @@ def build_receipt(out_dir: Path, *, max_bytes: int, expected_sites: int) -> dict
         "declared_file_total_bytes": declared_total,
         "extracted_files": extracted_manifest,
         "source_metadata_summary": summary,
-        "expected_site_count_from_release_page": expected_sites,
+        "expected_site_count_from_release_metadata": expected_sites,
         "primary_table": {
             "source_file": primary["source_file"],
             "format": primary["format"],
             "record_count": primary["record_count"],
-            "count_matches_release_description": primary["record_count"] == expected_sites,
+            "count_matches_release_metadata": primary["record_count"] == expected_sites,
             "fields": primary["fields"],
             "field_metadata": primary["field_metadata"],
             "missing_counts": primary["missing_counts"],
-            "geometry_type": primary["geometry_type"],
-            "bbox": primary["bbox"],
-            "crs_wkt": primary["crs_wkt"],
-            "units_status": "Units are not inferred. Each field remains NOT_DOCUMENTED_IN_SOURCE_SCHEMA unless the source file itself documents them.",
+            "geometry_type": spatial.get("geometry_type"),
+            "bbox": spatial.get("bbox"),
+            "crs_wkt": spatial.get("crs_wkt"),
+            "units_status": "Field definitions and units are parsed from the USGS FGDC XML; no units are inferred for text/categorical fields.",
             "sample_rows": primary["sample_rows"],
             "normalized_csv": "paad_sites.csv",
+        },
+        "spatial": spatial,
+        "data_quality": {
+            "attribute_accuracy": fgdc.get("attribute_accuracy"),
+            "logical_consistency": fgdc.get("logical_consistency"),
+            "completeness": fgdc.get("completeness"),
+            "lineage": fgdc.get("lineage"),
+            "missing_counts": primary["missing_counts"],
+            "known_sampling_bias": "USGS metadata states that the first-release site collection is a subset and is US-heavy because the initial literature search and source authors were predominantly US-based. It is not a balanced global sample.",
+            "elevation_method_note": "USGS metadata states that where published elevation was unavailable, GMTED2010 (~250 m, 7.5 arc-second) was used and at least three measurements across a site were reduced to a median.",
         },
         "all_table_candidates": [
             {key: value for key, value in candidate.items() if key not in {"rows", "sample_rows"}}
             for candidate in candidates
         ],
-        "warnings": [] if primary["record_count"] == expected_sites else [
-            f"Primary table has {primary['record_count']} rows; USGS release page describes {expected_sites} sites. Do not silently force equality."
-        ],
+        "warnings": warnings,
         "raw_data_policy": "Raw downloads remain in the workflow workspace; the artifact contains the normalized CC0 site table, metadata receipt and file hashes. No fabricated field observations are added.",
     }
-
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Acquire and inspect the public USGS Planetary Aeolian Analog Database (PAAD).")

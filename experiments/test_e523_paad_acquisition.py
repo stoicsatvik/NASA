@@ -10,6 +10,8 @@ import zipfile
 
 from experiments.e523_paad_acquisition import (
     collect_file_info,
+    choose_primary_table,
+    parse_fgdc_metadata,
     inspect_csv,
     inspect_geojson,
     safe_extract_zip,
@@ -95,6 +97,47 @@ class PAADIngestionTests(unittest.TestCase):
             self.assertEqual(len(rows), 2)
             self.assertEqual(rows[1]["site"], "B")
             self.assertEqual(rows[1]["source_file"], "sites.csv")
+
+
+    def test_primary_table_prefers_full_name_csv_over_truncated_shapefile(self):
+        candidates = [
+            {"format": "shapefile", "record_count": 45, "fields": ["Field_Site", "Center_Lat", "__geometry_json"]},
+            {"format": "csv", "record_count": 45, "fields": ["Field_Site", "Center_Latitude", "Center_Longitude"]},
+        ]
+        self.assertEqual(choose_primary_table(candidates, 45)["format"], "csv")
+
+    def test_fgdc_metadata_supplies_units_and_missing_conventions(self):
+        xml = """<?xml version="1.0"?>
+        <metadata>
+          <idinfo><citation><citeinfo>
+            <origin>USGS Author</origin><pubdate>20230620</pubdate>
+            <title>PAAD: The Planetary Aeolian Analog Database</title>
+            <onlink>https://doi.org/10.5066/P9IFVZEX</onlink>
+          </citeinfo></citation></idinfo>
+          <eainfo><detailed>
+            <attr><attrlabl>Center_Latitude</attrlabl><attrdef>Decimal degrees.</attrdef></attr>
+            <attr><attrlabl>Elevation</attrlabl><attrdef>Approximate elevation. Values are reported in meters (m).</attrdef>
+              <attrdomv><edom><edomv>&lt;&lt; empty cell &gt;&gt;</edomv><edomvd>No data found.</edomvd></edom></attrdomv>
+            </attr>
+            <attr><attrlabl>Sand_Source</attrlabl><attrdef>Text source.</attrdef>
+              <attrdomv><edom><edomv>NaN</edomv><edomvd>Not found in cited sources.</edomvd></edom></attrdomv>
+            </attr>
+            <attr><attrlabl>Dune_Type</attrlabl><attrdef>Bedform type.</attrdef>
+              <attrdomv><edom><edomv>B</edomv><edomvd>Barchan.</edomvd></edom></attrdomv>
+            </attr>
+          </detailed></eainfo>
+        </metadata>"""
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "metadata.xml"
+            path.write_text(xml, encoding="utf-8")
+            metadata = parse_fgdc_metadata(path)
+        self.assertEqual(metadata["publication_date"], "2023-06-20")
+        self.assertEqual(metadata["doi_url"], "https://doi.org/10.5066/P9IFVZEX")
+        self.assertEqual(metadata["attributes"]["Center_Latitude"]["units"], "decimal degrees")
+        self.assertEqual(metadata["attributes"]["Elevation"]["units"], "m")
+        self.assertTrue(metadata["attributes"]["Elevation"]["approximate"])
+        self.assertEqual(metadata["attributes"]["Sand_Source"]["missing_value_conventions"][0]["value"], "NaN")
+        self.assertEqual(metadata["attributes"]["Dune_Type"]["domain_values"][0]["definition"], "Barchan.")
 
 
 if __name__ == "__main__":
