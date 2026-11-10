@@ -346,7 +346,7 @@ def parse_fgdc_metadata(path: Path) -> dict[str, Any]:
         label = (attr.findtext("attrlabl") or "").strip()
         if not label:
             continue
-        definition = text_at_from = attr.findtext("attrdef") or ""
+        definition = attr.findtext("attrdef") or ""
         usage = " ".join(node.text or "" for node in attr.findall(".//udom")).strip()
         domains = []
         missing_conventions = []
@@ -635,6 +635,23 @@ def build_receipt(out_dir: Path, *, max_bytes: int, expected_sites: int) -> dict
         "raw_data_policy": "Raw downloads remain in the workflow workspace; the artifact contains the normalized CC0 site table, metadata receipt and file hashes. No fabricated field observations are added.",
     }
 
+
+def build_console_summary(receipt: dict[str, Any]) -> dict[str, Any]:
+    """Return a stable, compact view of the v2 ingestion receipt."""
+    primary = receipt["primary_table"]
+    return {
+        "status": receipt["status"],
+        "item_id": ITEM_ID,
+        "archive_sha256": receipt["download_archive_sha256"],
+        "primary_format": primary["format"],
+        "record_count": primary["record_count"],
+        "count_matches_release_metadata": primary["count_matches_release_metadata"],
+        "fields": primary["fields"],
+        "missing_counts": primary["missing_counts"],
+        "crs_wkt_present": bool(primary["crs_wkt"]),
+        "normalized_csv": "paad_sites.csv",
+    }
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Acquire and inspect the public USGS Planetary Aeolian Analog Database (PAAD).")
     parser.add_argument("--out", type=Path, required=True)
@@ -646,22 +663,11 @@ def main() -> int:
     try:
         receipt = build_receipt(args.out, max_bytes=args.max_bytes, expected_sites=args.expected_sites)
         receipt_path.write_text(json.dumps(receipt, indent=2, sort_keys=True, default=str) + "\n", encoding="utf-8")
-        print(json.dumps({
-            "status": receipt["status"],
-            "item_id": ITEM_ID,
-            "archive_sha256": receipt["download_archive_sha256"],
-            "primary_format": receipt["primary_table"]["format"],
-            "record_count": receipt["primary_table"]["record_count"],
-            "count_matches_release_description": receipt["primary_table"]["count_matches_release_description"],
-            "fields": receipt["primary_table"]["fields"],
-            "missing_counts": receipt["primary_table"]["missing_counts"],
-            "crs_wkt_present": bool(receipt["primary_table"]["crs_wkt"]),
-            "normalized_csv": "paad_sites.csv",
-        }, indent=2, sort_keys=True))
+        print(json.dumps(build_console_summary(receipt), indent=2, sort_keys=True))
         return 0
     except Exception as exc:
         failure = {
-            "schema_version": "paad-sciencebase-ingestion-v1",
+            "schema_version": "paad-sciencebase-ingestion-v2",
             "status": "FAILED",
             "retrieved_at_utc": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
             "source": {"item_id": ITEM_ID, "item_url": ITEM_URL, "doi": DOI, "data_release_page": SOURCE_PAGE},
