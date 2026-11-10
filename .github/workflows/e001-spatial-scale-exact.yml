@@ -1,0 +1,48 @@
+name: E001 exact spatial-scale sensitivity
+on:
+  push:
+    branches:
+      - research/e001-spatial-scale-sensitivity-20261108
+  pull_request:
+    paths:
+      - experiments/e001_spatial_scale_sensitivity.py
+      - experiments/e001_production_spatial_null.py
+      - experiments/e001_baseline.py
+      - experiments/e001_exact_label_null.py
+      - .github/workflows/e001-spatial-scale-exact.yml
+  workflow_dispatch:
+jobs:
+  exact-spatial-scale:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run standalone production E001 spatial-block null fixture
+        run: python -m experiments.e001_production_spatial_null
+      - name: Run production E001 spatial-scale sweep and embedded falsification assertions
+        run: python -m experiments.e001_spatial_scale_sensitivity > /tmp/e001-spatial-scale.json
+      - name: Verify exact enumeration and preserve negative evidence
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          rows = json.loads(Path('/tmp/e001-spatial-scale.json').read_text())
+          assert len(rows) == 20
+          assert all(row['unrestricted_n'] == 70 and row['blocked_n'] == 6 for row in rows)
+          assert all(row['blocked_p'] >= 1/6 for row in rows)
+          assert any(row['observed_top_1'] == 0 for row in rows)
+          print('Validated 20 synthetic geometries; block null minimum attainable p=1/6.')
+          PY
+      - name: Upload full synthetic sweep, including failed recovery geometries
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e001-spatial-scale-exact-results
+          path: /tmp/e001-spatial-scale.json
+          if-no-files-found: ignore
+          retention-days: 14
