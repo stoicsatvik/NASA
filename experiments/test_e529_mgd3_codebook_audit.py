@@ -30,11 +30,11 @@ class E529Tests(unittest.TestCase):
 
     def test_field_definition_extraction_preserves_units_aliases_and_codes(self):
         source = (
-            "Field 4: Dune Type - This field lists dune forms.\\n"
-            "B - barchan dune.\\n"
-            "Bd - barchanoid dune.\\n"
-            "Field 19: Dune_Area_km2_sinu (Area_sinu_) - area of polygon (km2).\\n"
-            "Field 20: Mean_Dune_Height (MDHeight) - mean height in metres (m).\\n"
+            "Field 4: Dune Type - This field lists dune forms.\n"
+            "B - barchan dune.\n"
+            "Bd - barchanoid dune.\n"
+            "Field 19: Dune_Area_km2_sinu (Area_sinu_) - area of polygon (km2).\n"
+            "Field 20: Mean_Dune_Height (MDHeight) - mean height in metres (m).\n"
         )
         fields = extract_field_definitions(source)
         self.assertEqual([item["field_number"] for item in fields], [4, 19, 20])
@@ -51,8 +51,8 @@ class E529Tests(unittest.TestCase):
         with zipfile.ZipFile(buf,"w") as z:
             z.writestr(
                 "Documentation/ReadMe_GIS.txt",
-                "Field 19: Dune_Area_km2_sinu (Area_sinu_) - polygon area (km2).\\n"
-                "Field 20: Mean_Dune_Height (MDHeight) - height in metres (m).\\n",
+                "Field 19: Dune_Area_km2_sinu (Area_sinu_) - polygon area (km2).\n"
+                "Field 20: Mean_Dune_Height (MDHeight) - height in metres (m).\n",
             )
         result=inspect_archive("documentation",buf.getvalue())
         document=result["field_definition_documents"][0]
@@ -62,7 +62,7 @@ class E529Tests(unittest.TestCase):
         self.assertEqual(result["field_definition_count"],2)
 
     def test_cp1252_documentation_decodes_en_dash_without_replacement(self):
-        text=extract_text("ReadMe_GIS.txt",b"Field 1: Dune - height \\x96 value")
+        text=extract_text("ReadMe_GIS.txt",b"Field 1: Dune - height \x96 value")
         self.assertIn("–",text)
         self.assertNotIn("�",text)
 
@@ -71,11 +71,11 @@ class E529Tests(unittest.TestCase):
         with zipfile.ZipFile(buf,"w") as z:
             z.writestr(
                 "Metadata/dune_field.txt",
-                "Dune_ID: unique site identifier.\\n"
-                "Dune Field Lon+Lat ID is the table identifier.\\n"
-                "Dune_Latitude_Aerocentric records latitude.\\n"
-                "Dune_Longitude_East records longitude.\\n"
-                "Mean_Dune_Height is derived from MOLA elevation.\\n",
+                "Dune_ID: unique site identifier.\n"
+                "Dune Field Lon+Lat ID is the table identifier.\n"
+                "Dune_Latitude_Aerocentric records latitude.\n"
+                "Dune_Longitude_East records longitude.\n"
+                "Mean_Dune_Height is derived from MOLA elevation.\n",
             )
         result=inspect_archive("metadata",buf.getvalue())
         matches=result["text_documents_with_relevant_terms"][0]["matches"]
