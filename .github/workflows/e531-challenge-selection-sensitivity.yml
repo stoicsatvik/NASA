@@ -1,0 +1,37 @@
+name: E531 challenge-selection sensitivity
+
+on:
+  push:
+    branches:
+      - research/e531-challenge-selection-sensitivity-20261111
+    paths:
+      - 'experiments/e531_challenge_selection_sensitivity.py'
+      - 'experiments/test_e531_challenge_selection_sensitivity.py'
+      - '.github/workflows/e531-challenge-selection-sensitivity.yml'
+  pull_request:
+    paths:
+      - 'experiments/e531_challenge_selection_sensitivity.py'
+      - 'experiments/test_e531_challenge_selection_sensitivity.py'
+      - '.github/workflows/e531-challenge-selection-sensitivity.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  sensitivity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run deterministic tests
+        run: python -m unittest experiments.test_e531_challenge_selection_sensitivity -v
+      - name: Recompute 200,000-draw sensitivity campaign
+        run: python experiments/e531_challenge_selection_sensitivity.py --draws 200000 --output /tmp/e531.json
+      - name: Verify committed result
+        run: cmp /tmp/e531.json research/results/E531_CHALLENGE_SELECTION_SENSITIVITY_20261111.json
+      - name: Compile experiment
+        run: python -m py_compile experiments/e531_challenge_selection_sensitivity.py
+      - name: Check patch whitespace
+        run: git diff --check
