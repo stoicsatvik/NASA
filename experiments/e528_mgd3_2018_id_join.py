@@ -81,10 +81,11 @@ def decode_dune_id(value: Any) -> dict[str, float] | None:
 
 
 def summarize_dune_ids(values: set[str] | list[str]) -> dict[str, Any]:
-    decoded = [decode_dune_id(value) for value in values]
+    ordered_values = sorted(str(value) for value in values)
+    decoded = [decode_dune_id(value) for value in ordered_values]
     valid = [item for item in decoded if item is not None]
     latitudes = [item["latitude_aerocentric_deg"] for item in valid]
-    unparsed = sorted(str(value) for value, item in zip(values, decoded) if item is None)
+    unparsed = [value for value, item in zip(ordered_values, decoded) if item is None]
     return {
         "encoding": "four longitude digits in 0.1-degree units, followed by signed three-digit latitude in 0.1-degree units",
         "coordinate_semantics": "identifier-derived centroid coordinates; not an independent geometry or positional-accuracy measurement",
