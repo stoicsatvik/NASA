@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - research/e523-paad-acquisition-20261110
+      - fix/e523-paad-cli-summary-key-20261110
     paths:
       - 'experiments/e523_paad_acquisition.py'
       - 'experiments/test_e523_paad_acquisition.py'
