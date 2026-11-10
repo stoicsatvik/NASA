@@ -2,7 +2,7 @@ from __future__ import annotations
 import io, tempfile, unittest, zipfile
 from pathlib import Path
 import shapefile
-from experiments.e527_mgd3_spatial_ingestion import discover_downloads, core_shapefile, safe_url, member_path, inspect_shapefile, inspect_tables, _extract_layer
+from experiments.e527_mgd3_spatial_ingestion import discover_downloads, core_shapefile, safe_url, member_path, inspect_shapefile, inspect_tables, _extract_layer, _id_field
 
 class E527Tests(unittest.TestCase):
     def test_discover_only_official_archives(self):
@@ -23,6 +23,20 @@ class E527Tests(unittest.TestCase):
 
     def test_core_layer_selection(self):
         self.assertEqual(core_shapefile(["background/outline.shp","layers/Dune_Field.shp","layers/Dune_Field_Craters.shp"]),"layers/Dune_Field.shp")
+
+    def test_id_field_does_not_confuse_centroid_with_id(self):
+        fields=["Dune  Field Lon+Lat ID","Crater centroid to Dune centroid Azimuth"]
+        self.assertEqual(_id_field(fields),"Dune  Field Lon+Lat ID")
+
+    def test_full_attribute_table_beats_repeated_image_index(self):
+        payload=io.BytesIO()
+        with zipfile.ZipFile(payload,"w") as z:
+            z.writestr("Tables/THEMIS_IR_ImageList.txt","Dune Field Lon+Lat ID\tTHEMIS IR Images\nA\tI1\nA\tI2\nB\tI3\n")
+            z.writestr("Tables/Softcopy.txt","Dune  Field Lon+Lat ID\tDune Type\tArea (km2)\nA\tB\t1.0\nB\tD\t2.0\n")
+        table=inspect_tables(payload.getvalue())["best_table"]
+        self.assertEqual(table["name"],"Tables/Softcopy.txt")
+        self.assertEqual(table["rows"],2)
+        self.assertEqual(table["unique_id_count"],2)
 
     def test_tables_archive_recovers_full_name_id_column(self):
         payload=io.BytesIO()
