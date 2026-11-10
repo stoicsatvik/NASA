@@ -24,7 +24,7 @@ Subtract:
 
 ### 1. Identify Earth Locations that Analog the Permanent Moon Base Locations and Mars
 
-**Current status: primary research target.**
+**Current status: provisional lead, not locked.**
 
 Why:
 - inherently geospatial/scientific;
@@ -147,6 +147,32 @@ Do not lock a challenge until the leading candidate clears all five:
 
 ## Next decision
 
-Current working target: **planetary analog identification**.
+Current provisional lead: **planetary analog identification**. Challenge-selection superiority remains NOT YET PROVEN.
 
 The next research sprint should try to *disprove* that choice rather than defend it.
+
+
+## 2026-11-11 evidence-based falsification update
+
+All 14 official challenge summaries are now tracked against current repo evidence. Missing audits remain UNKNOWN, not zero. No numeric re-ranking is justified until each candidate's decisive data/validation gate is executed.
+
+| Official challenge | Current evidence | Missing decisive gate |
+|---|---|---|
+| Abandoned but not Forgotten | No validated historical-source pipeline in the current portfolio audit | Provenance-backed mission-history reconstruction and factual evaluation |
+| Be An Earth System Trend Detective! | E515 reconciled 75/75 NASA GISTEMP values and ran OLS plus block/circular-shift diagnostics | Broader regional tool, calibrated inference and independent acceptance test |
+| Build a Junior Astronaut Mission Trainer | No tested trainer in the current portfolio audit | Frozen resource constraints and learner/usability validation |
+| Create Health Monitoring Software for Astronauts | No empirical astronaut-health dataset or validated model in this stream | Safe nonclinical scope, real data and domain review |
+| Dancing with the SARs | No paired NISAR time-series experiment in this stream | Georegistered NISAR pairs, change controls and uncertainty |
+| Field Shift: Adapting Farms with NASA Data | kaggriculture-argus exists, but no farmer/soil evidence was found in this audit | Local agronomy partner, legitimate soil/crop inputs and held-out recommendation validation |
+| Flame in Freefall | No microgravity combustion dataset/experiment ingested | Genuine microgravity measurements and controlled comparison |
+| Harmonization of MODIS and VIIRS Hot Spots | No paired cross-sensor calibration experiment in this stream | Co-located observations and independently verified event ground truth |
+| Identify Earth Locations that Analog the Permanent Moon Base Locations and Mars | E523 PAAD and E318 MGD3 workbook ingestion; E524 zero directly admissible descriptors in the current pair; E525 documents a separate MGD3 spatial source but it is not ingested | Verified spatial download, Dune ID join, matched Earth features, independent labels/controls and E001 recovery |
+| Interplanetary Survival Guide: Martian Map | MOLA numeric ingestion and a martian preparation repo exist; MGD3 spatial data may add dune context | Hyperlocal multisensor route model, hazard layers and route-safety validation |
+| Lunar Landing Site Navigator | LOLA numeric ingestion exists | Tested Sun/Earth horizon windows, illumination constraints and landing-site validation |
+| Planet X and SPHEREx | No multi-epoch SPHEREx detection/validation campaign in this stream | Source-pinned multi-epoch spectra and false-positive controls |
+| Space Mission Design Game | No validated resource-constrained game simulation in this stream | Frozen physical constraints, deterministic scenarios and user tests |
+| The Earth Information Jukebox | No source-pinned sonification/interaction evaluation in this stream | Accessible NASA imagery/audio mapping and listener tests |
+
+Planetary analog still has the most assembled cross-body source pipeline, but its core comparison is not scientifically admissible yet: E524 found zero directly comparable descriptors in the current PAAD/2018-workbook pair and E001 recovery is NOT YET MEASURED. E525 identifies a separate official MGD3 spatial route but does not ingest it. Earth Trend has a real source-verified numerical path; Martian Map has MOLA ingestion but no route-safety validation. Field Shift lacks local domain evidence. The remaining challenges are not ranked inferior where their audits are absent.
+
+**Conclusion: challenge-selection superiority remains NOT YET PROVEN.** Do not lock planetary analog until the spatial join and E001 baseline are run, and do not discard Earth Trend or Martian Map without their own acceptance gates.
