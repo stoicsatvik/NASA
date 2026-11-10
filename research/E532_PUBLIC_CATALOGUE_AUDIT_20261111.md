@@ -63,3 +63,5 @@ Acquire and inspect the separate official USGS 2020 *Known Terrestrial Analog Si
 ## Post-audit validation hardening — 2026-11-11
 
 Code inspection found that Python treats `bool` as a subclass of `int`, so the original coordinate predicate would count a malformed GeoJSON position such as `[true, 20.0]` as numeric. The audit now explicitly excludes booleans and adds a regression fixture. This is a validator correction, not a change to the pinned source or an additional analogue claim. The original exact-head live-source receipt remains evidence for the earlier code head; the new boolean check has passed its focused local test, but the live catalogue audit must be rerun on this head before claiming exact-head source revalidation.
+
+Focused local validation after the predicate correction: **5/5 E532 fixture tests passed**, including the new boolean-coordinate regression. The prior live-source Actions receipt (#42924295331) predates this change; a new exact-head live acquisition receipt is still required before asserting the boolean filter was applied to the pinned source file.
