@@ -7,7 +7,7 @@
 
 ## Outcome
 
-<badge>INGESTED</badge>
+**Status:** `INGESTED`
 
 The corrected E523 workflow completed successfully:
 
