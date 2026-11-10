@@ -1,6 +1,11 @@
 from __future__ import annotations
 import io, unittest, zipfile
-from experiments.e529_mgd3_codebook_audit import safe_url, inspect_archive, extract_text
+from experiments.e529_mgd3_codebook_audit import (
+    safe_url,
+    inspect_archive,
+    extract_text,
+    extract_field_definitions,
+)
 
 class E529Tests(unittest.TestCase):
     def test_source_scope_is_exact(self):
@@ -22,6 +27,44 @@ class E529Tests(unittest.TestCase):
     def test_html_text_extraction(self):
         text=extract_text("x.html",b"<p>Average elevation (m)</p>")
         self.assertIn("Average elevation (m)",text)
+
+    def test_field_definition_extraction_preserves_units_aliases_and_codes(self):
+        source = (
+            "Field 4: Dune Type - This field lists dune forms.\\n"
+            "B - barchan dune.\\n"
+            "Bd - barchanoid dune.\\n"
+            "Field 19: Dune_Area_km2_sinu (Area_sinu_) - area of polygon (km2).\\n"
+            "Field 20: Mean_Dune_Height (MDHeight) - mean height in metres (m).\\n"
+        )
+        fields = extract_field_definitions(source)
+        self.assertEqual([item["field_number"] for item in fields], [4, 19, 20])
+        self.assertEqual(fields[0]["label"], "Dune Type")
+        self.assertIn("B - barchan dune", fields[0]["definition"])
+        self.assertIn("Bd - barchanoid dune", fields[0]["definition"])
+        self.assertEqual(fields[1]["short_name"], "Area_sinu_")
+        self.assertIn("km2", fields[1]["definition"])
+        self.assertEqual(fields[2]["short_name"], "MDHeight")
+        self.assertIn("(m)", fields[2]["definition"])
+
+    def test_archive_exposes_full_field_definitions_with_source_hash(self):
+        buf=io.BytesIO()
+        with zipfile.ZipFile(buf,"w") as z:
+            z.writestr(
+                "Documentation/ReadMe_GIS.txt",
+                "Field 19: Dune_Area_km2_sinu (Area_sinu_) - polygon area (km2).\\n"
+                "Field 20: Mean_Dune_Height (MDHeight) - height in metres (m).\\n",
+            )
+        result=inspect_archive("documentation",buf.getvalue())
+        document=result["field_definition_documents"][0]
+        self.assertEqual(document["field_count"],2)
+        self.assertEqual(len(document["sha256"]),64)
+        self.assertEqual(document["fields"][0]["short_name"],"Area_sinu_")
+        self.assertEqual(result["field_definition_count"],2)
+
+    def test_cp1252_documentation_decodes_en_dash_without_replacement(self):
+        text=extract_text("ReadMe_GIS.txt",b"Field 1: Dune - height \\x96 value")
+        self.assertIn("–",text)
+        self.assertNotIn("�",text)
 
     def test_archive_audit_captures_identity_coordinate_and_height_semantics(self):
         buf=io.BytesIO()
