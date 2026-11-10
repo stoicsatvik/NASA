@@ -1,0 +1,12 @@
+pair_id,earth_site,earth_region,target_body,target_feature,mechanism,in_scope_moon_mars,source_url,source_accessed_utc
+lava-caves-ca-moon,Medicine Lake Volcano lava caves,California USA,Moon,natural lava caves and subsurface shelter,volcanic_cavity,1,https://science.nasa.gov/solar-system/analog-explorer/,2026-11-10
+basalt-kilauea-moon,Kilauea,Hawaii USA,Moon,basaltic volcanic terrain,basaltic_volcanism,1,https://science.nasa.gov/solar-system/analog-explorer/,2026-11-10
+utah-pilot-valley-mars,Pilot Valley,Utah USA,Mars,perchlorate salts and brines,salt_brine,1,https://science.nasa.gov/solar-system/analog-explorer/,2026-11-10
+atacama-mars,Atacama Desert,Chile,Mars,hyperarid soil and biosignature preservation,hyperarid_soil,1,https://science.nasa.gov/solar-system/analog-explorer/,2026-11-10
+iceland-vikursundar-mars,Vikursundar near Askja,Iceland,Mars,aeolian land ripples,aeolian_ripples,1,https://science.nasa.gov/solar-system/analog-explorer/,2026-11-10
+death-valley-mars,Death Valley National Park,California USA,Mars,rocky terrain and rover hazard reconnaissance,rocky_hazard,1,https://science.nasa.gov/solar-system/analog-explorer/,2026-11-10
+lake-salda-mars,Lake Salda,Turkey,Mars,carbonate and sedimentary lake deposits,lacustrine_carbonate,1,https://science.nasa.gov/solar-system/analog-explorer/,2026-11-10
+verde-valley-mars,Verde Valley,Arizona USA,Mars,biosignature preservation,biosignature_preservation,1,https://science.nasa.gov/solar-system/analog-explorer/,2026-11-10
+askja-iceland-moon,Askja volcano area,Iceland,Moon,buried ice and radar detection,subsurface_ice,1,https://science.nasa.gov/solar-system/analog-explorer/,2026-11-10
+aden-crater-venus,Aden Crater,New Mexico USA,Venus,shield volcanism,shield_volcanism,0,https://science.nasa.gov/solar-system/analog-explorer/,2026-11-10
+gulkana-enceladus,Gulkana Glacier,Alaska USA,Enceladus,subsurface ocean / icequake analogue,icequake,0,https://science.nasa.gov/solar-system/analog-explorer/,2026-11-10

@@ -1,0 +1,27 @@
+name: E522 NASA Analog Explorer catalogue admissibility
+on:
+  push:
+    branches:
+      - research/e522-analog-explorer-admissibility-20261110
+  pull_request:
+    paths:
+      - data/nasa_analog_explorer_pairs.csv
+      - experiments/e522_analog_catalogue_admissibility.py
+      - experiments/test_e522_analog_catalogue_admissibility.py
+      - .github/workflows/e522-catalogue-admissibility.yml
+  workflow_dispatch:
+jobs:
+  catalogue-admissibility:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run deterministic catalogue admission report
+        run: python -m experiments.e522_analog_catalogue_admissibility
+      - name: Run E522 regression tests
+        run: python -m unittest experiments.test_e522_analog_catalogue_admissibility -v
