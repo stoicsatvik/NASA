@@ -1,6 +1,6 @@
 # FOUNDRY_STATE — NASA
 
-Updated: 2026-10-05
+Updated: 2026-11-10
 Class: Tier A
 Time horizon: NASA Space Apps Challenge, 14–15 Nov 2026
 Working branch: `foundry/planetary-analog-v1`
@@ -28,7 +28,7 @@ Run `E001_KNOWN_ANALOG_RECOVERY` and the dataset-access spike before polishing U
 
 Priority order:
 
-1. verify ingestion of real LOLA / Diviner / MOLA / THEMIS / Earth datasets;
+1. verify remaining real lunar and Martian data ingestion and feature comparability; PAAD Earth and MGD3 Mars dune sources were already ingested in E317-E318;
 2. derive a small set of physically comparable descriptors;
 3. reproduce/recover known analogue environments using transparent baselines;
 4. perform ablations and uncertainty analysis;
@@ -153,7 +153,7 @@ PR #83, head d8362fd43e35983f5669ba94a6a91d42742c89f3 on research/e001-spatial-s
 
 The official NASA Analog Explorer gallery was transcribed into data/nasa_analog_explorer_pairs.csv with per-row source URL and access date. The inventory contains 11 pairs: 9 Moon/Mars pairs (6 Mars, 3 Moon) and 2 out-of-scope pairs (Venus, Enceladus). The deterministic admission script finds 9 singleton mechanism families. Grouping by target body meets a raw count minimum but mixes distinct physical mechanisms; grouping by mechanism leaves no reference centroid. The gallery supplies no numeric feature matrix, site coordinates/footprints, or negative controls, so it is not E001-ready. Four regression tests pass locally.
 
-Independent source discovery found USGS PAAD (DOI 10.5066/P9IFVZEX), a CC0 release describing 45 aeolian analog sites with coordinates, bedform, climate, sand-source/composition, elevation and coverage attributes. It is a promising narrow Mars aeolian sub-campaign; the data files have not yet been ingested. A separate 16-site public GitHub catalogue has all 16 records marked Draft and is not accepted as ground truth.
+Prior PAAD ingestion and analysis already exist in the separate E317-E325 branch chain (PRs #27-#32); do not repeat the download. E317's first synthetic fixture failed (0 rows versus 4 expected), but E318 later ingested the official 2018 Mars MGD3 ZIP (2,982,330 bytes; SHA-256 92771c23cfa4a64dfcc38f5ad29de00adfa41b9f321d3665beb2112eefe3485e) and E319 source-fingerprinted the 45-site PAAD CSV (SHA-256 5be67b4da584987d9ce5207f2ee3c90b5b3b5849469461847111eaab5aafcecd). E319 found 21 single-token and 24 multi-token rows; only 8/45 had all raw tokens in the Mars 2007 codebook, 21/45 had partial overlap, and 16/45 had none. Direct code joining was rejected. E320 found 990 coordinate pairs, nearest pair 6.824912 km, and spatial groups covering 9/45 sites at 25/50 km and 16/45 at 100 km. E323 found raw-token nearest-site Jaccard 0.350053; 25/50 km blocking did not reduce it, while 100 km blocking reduced it to 0.235238. E325 found conditional-null signals, but strict Köppen parsing returned 45/45 UNCLASSIFIED because source climate labels are English descriptions, not alphanumeric codes; analyst climate groups are not independent source labels. E326's separate 2020 inventory yielded four volcanic rows and no dune positives or negatives. These are Earth-only lexical/spatial results, not matched Earth-Mars labels or E001 recovery. A separate 16-site public GitHub catalogue has all 16 records marked Draft and is not accepted as ground truth.
 
 Exact claim states:
 - Repo operating system: SUPPORTED.
