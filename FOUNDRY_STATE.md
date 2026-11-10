@@ -236,7 +236,7 @@ Exact-head Actions run [#42922184681](https://github.com/stoicsatvik/NASA/action
 
 ## E529 full field-definition extraction (2026-11-11)
 
-The E529 parser now extracts complete numbered field definitions from `ReadMe_GIS.txt` and `ReadMe_Softcopy.txt`, preserves source-document SHA-256 values, decodes Windows-1252 en-dash separators, and distinguishes unit parentheses from field aliases. Three new parser-focused fixtures passed in an isolated Python harness. The current extractor has **not yet been rerun against the live USGS archives**; the 22-test exact-head workflow above predates this change. See `research/E529_MGD3_FIELD_DEFINITION_EXTRACTION_20261111.md`.
+The E529 parser now extracts complete numbered field definitions from `ReadMe_GIS.txt` and `ReadMe_Softcopy.txt`, preserves source-document SHA-256 values, decodes Windows-1252 en-dash separators, and distinguishes unit parentheses from field aliases. All seven E529 unit tests passed in an isolated local harness (including three new parser-focused fixtures); this is not a full repository CI run. The current extractor has **not yet been rerun against the live USGS archives**; the 22-test exact-head workflow above predates this change. See `research/E529_MGD3_FIELD_DEFINITION_EXTRACTION_20261111.md`.
 
 E530 remains a decisive negative admissibility result: strict Dune_Type matches are S/SS; L remains a candidate; B is ambiguous because PAAD combines barchan/barchanoid while MGD3 separates B/Bd. Naively admitting B inflates coverage 1.81× on PAAD and 1.93× on MGD3. No directly shared quantitative physical-feature family is admitted. E001 remains NOT READY; no analogue recovery or cross-body similarity is claimed.
 
