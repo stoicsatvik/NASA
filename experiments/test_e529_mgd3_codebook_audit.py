@@ -23,4 +23,24 @@ class E529Tests(unittest.TestCase):
         text=extract_text("x.html",b"<p>Average elevation (m)</p>")
         self.assertIn("Average elevation (m)",text)
 
+    def test_archive_audit_captures_identity_coordinate_and_height_semantics(self):
+        buf=io.BytesIO()
+        with zipfile.ZipFile(buf,"w") as z:
+            z.writestr(
+                "Metadata/dune_field.txt",
+                "Dune_ID: unique site identifier.\\n"
+                "Dune Field Lon+Lat ID is the table identifier.\\n"
+                "Dune_Latitude_Aerocentric records latitude.\\n"
+                "Dune_Longitude_East records longitude.\\n"
+                "Mean_Dune_Height is derived from MOLA elevation.\\n",
+            )
+        result=inspect_archive("metadata",buf.getvalue())
+        matches=result["text_documents_with_relevant_terms"][0]["matches"]
+        terms={match["term"] for match in matches}
+        self.assertIn("dune_id",terms)
+        self.assertIn("dune field lon+lat id",terms)
+        self.assertIn("dune_latitude",terms)
+        self.assertIn("dune_longitude",terms)
+        self.assertIn("mean_dune_height",terms)
+
 if __name__=="__main__": unittest.main()
