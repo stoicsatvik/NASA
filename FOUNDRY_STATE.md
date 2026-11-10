@@ -221,3 +221,32 @@ The full 14-challenge screen is recorded in `research/CHALLENGE_SELECTION_SCREEN
 The best current execution candidate is therefore **Challenge 11: Interplanetary Survival Guide: Martian Map**, provisionally. Existing `stoicsatvik/martian` is preparation-only (not a solution) and records MOLA/CTX/HiRISE source families; the NASA MGD3 spatial ingestion can potentially supply a dune layer. Challenge 10 remains alive only behind the E527 archive/schema/CRS gate and a real E001 leave-one-site-out recovery result. MODIS/VIIRS and CLPS remain live alternatives.
 
 Do not lock or submit. Re-score after official MGD3 ingestion and a reproducible Mars-layer registration test. Keep observed terrain/environment layers separate from crew fatigue, oxygen assumptions and mission rules; RAD/REMS are local rover observations, not global safety forecasts. Challenge-selection superiority remains **NOT YET PROVEN**.
+
+
+## E527-E529 exact-head acquisition and linkage correction (2026-11-11)
+
+The earlier E525/E528 preflight statements are superseded by the exact-head acquisition evidence below.
+
+- E527 workflow run #42904750899 succeeded on exact head 03300510d932128df58f64dc91bf04bd0825617f. The official 2007 MGD3 Shapefiles.zip and Tables.zip were acquired with source hashes preserved. The core Dune_Field layer has 547 polygons and 547 unique Dune_IDs in a Mars sinusoidal CRS. The same-release Softcopy table joins 547/547 IDs with no duplicates.
+- E528 parsed the official 2018 Equatorial and South Polar workbooks. The Equatorial workbook contains 956 worksheet rows; 535 unique 2007 IDs match and 12 of the 547 spatial IDs are absent from the 2018 workbook. This is record linkage only, not physical similarity.
+- The official 2018 report restricts detailed thermal/compositional analysis to dune fields >=300 km2. The 58 Global Summary IDs are therefore a selected large-field subset, not a representative sample of all 547 MGD3 spatial fields.
+- The 2018 Equatorial Global Summary sheets each contain 58 unique IDs, all matched to 2007; thermal inertia and albedo are present for 58/58. Mineral fields are present for 42/58 in the "ocks <7000" sheet and 52/58 in the "all ocks" sheet. Stability Index has 787 rows, 786 unique IDs, one duplicate and 535 matched rows. THEMIS ATI/TES modeling has 53 rows and 40 matched rows.
+- The South Polar workbook is outside the 2007 spatial layer's 65°S–65°N coverage; its unmatched rows are not treated as failed equatorial joins.
+- E529 inspected the official 2007 documentation and metadata archives. No crosswalk was accepted automatically from token overlap.
+
+Source artifacts: PAAD workflow #42902970540 / artifact 13804420438; MGD3 E527-E529 workflow #42904750899 / artifact 13804087352. Source archive SHA-256 values and exact URLs are preserved in the E530 report and JSON.
+
+## E530 — PAAD / MGD3 cross-body feature admissibility (2026-11-11)
+
+E530 used the actual PAAD, 2007 MGD3 and 2018 MGD3 artifact tables. The reproducible script and result are in experiments/e530_crossbody_feature_admissibility.py and research/E530_CROSSBODY_FEATURE_ADMISSIBILITY_20261111.md.
+
+- PAAD has 45 unique analog-site records, but no per-site target-body/family labels and no non-analogue controls. Missingness: composition 16/45, approximate area 12/45, sand source 3/45, elevation 1/45.
+- Strict Dune_Type matches are S (star) and SS (sand sheet). L (longitudinal vs linear) remains a candidate. B is rejected as ambiguous because PAAD combines barchan and barchanoid ridges while MGD3 separates B and Bd. TR (transverse ridge) is not equated with T (transverse dune).
+- Strict S/SS coverage is 16/45 PAAD sites and 132/547 Mars fields. Adding candidate L gives 20/45 and 152/547. Naively including ambiguous B inflates apparent coverage to 29/45 and 255/547 (1.81× and 1.93× the strict coverage).
+- No directly shared quantitative feature family is admitted. Elevation and area require within-body normalization / support sensitivity; PAAD composition prose is not equivalent to MGD3 instrument-derived mineral abundances; Earth climate/sand-source fields have no MGD3 counterpart; Mars thermal inertia/albedo/mineral/stability fields are absent from PAAD.
+- E001 is NOT READY on these tables. Do not invent target-body labels, use unlisted sites as negatives, or run a ranking with fabricated controls.
+- Six local tests passed on an equivalent local harness. The committed branch test module was not executed on this runtime, and no E530 exact-head Actions run was triggered; E527 exact-head acquisition and the source artifacts are validated separately.
+
+Claim states remain: repo operating system SUPPORTED; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN; challenge-selection superiority NOT YET PROVEN.
+
+Next: ingest the separate public USGS 2020 Known Terrestrial Analog Sites point layer as a candidate positive source (not a negative-control set), then acquire defensible non-analogue controls and Earthdata-derived Earth descriptors at matched physical support. Preserve all unlabelled sites as UNLABELLED. Do not lock the planetary-analog challenge; the current Martian Map lead remains provisional pending the next evidence gate.

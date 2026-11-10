@@ -1,0 +1,102 @@
+{
+  "experiment": "E530_CROSSBODY_FEATURE_ADMISSIBILITY",
+  "status": "AUDITED",
+  "paad": {
+    "rows": 45,
+    "unique_sites": 45,
+    "missing": {
+      "Composition_of_Sand": 16,
+      "Areal_Coverage": 12,
+      "Sand_Source": 3,
+      "Elevation": 1
+    },
+    "target_body_label_field_present": false,
+    "non_analogue_control_labels": 0
+  },
+  "mgd3_2007": {
+    "rows": 547,
+    "unique_dune_ids": 547,
+    "area_km2_nonmissing": 547,
+    "average_elevation_m_nonmissing": 547
+  },
+  "mgd3_2018_equatorial_join": {
+    "rows": 956,
+    "matched_rows": 691,
+    "unique_2007_dune_ids_matched": 535,
+    "unmatched_2007_dune_ids": 12,
+    "stability_index": {
+      "rows": 787,
+      "unique_ids": 786,
+      "duplicate_rows": 1,
+      "matched_rows": 535
+    },
+    "themis_ati_tes": {
+      "rows": 53,
+      "matched_rows": 40
+    },
+    "global_summary": {
+      "each_sheet_unique_ids": 58,
+      "matched_ids": 58,
+      "thermal_inertia": 58,
+      "albedo": 58,
+      "mineral_composition_ocks_lt7000": 42,
+      "mineral_composition_all_ocks": 52
+    }
+  },
+  "dune_type_crosswalk": {
+    "raw_shared_tokens": [
+      "B",
+      "L",
+      "S",
+      "SS"
+    ],
+    "strict_exact": [
+      "S",
+      "SS"
+    ],
+    "candidate": [
+      "L"
+    ],
+    "ambiguous_rejected": [
+      "B"
+    ],
+    "strict_coverage": {
+      "paad": "16/45",
+      "mgd3": "132/547"
+    },
+    "with_L": {
+      "paad": "20/45",
+      "mgd3": "152/547"
+    },
+    "naive_with_B": {
+      "paad": "29/45",
+      "mgd3": "255/547"
+    },
+    "naive_inflation_vs_strict": {
+      "paad": 1.8125,
+      "mgd3": 1.9318181818
+    }
+  },
+  "directly_shared_quantitative_features": [],
+  "e001_ready": false,
+  "reasons": [
+    "No per-site target-body/family labels in PAAD",
+    "No non-analogue controls",
+    "No directly admissible shared quantitative feature family",
+    "Partial/ambiguous dune-type taxonomy"
+  ],
+  "claim_states": {
+    "cross_body_similarity": "NOT YET PROVEN",
+    "known_site_recovery": "NOT YET MEASURED",
+    "novel_analogue_discovery": "NOT YET PROVEN"
+  },
+  "provenance": {
+    "paad_doi": "10.5066/P9IFVZEX",
+    "mgd3_2007_doi": "10.3133/ofr20071158",
+    "mgd3_2018_doi": "10.3133/ofr20181164",
+    "paad_archive_sha256": "404d938ec4d55e1bac4a6bb06d463434a4c7e2fdb291fca026fb8ef90bc2427e",
+    "mgd3_2007_shapefiles_sha256": "a43e8f842aa0e9b1edb920a2624a430ebf7fb6a059fc9c6f1ae37cc179635f34",
+    "mgd3_2007_tables_sha256": "9f2e7fe86f813cafcabf34587648e2d6d31a6207046a6d32fb2a98953c8cadb1",
+    "mgd3_2018_workbook_sha256": "92771c23cfa4a64dfcc38f5ad29de00adfa41b9f321d3665beb2112eefe3485e"
+  }
+}
