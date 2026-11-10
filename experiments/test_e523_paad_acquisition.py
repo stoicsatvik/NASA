@@ -17,6 +17,7 @@ from experiments.e523_paad_acquisition import (
     parse_fgdc_metadata,
     inspect_csv,
     inspect_geojson,
+    inspect_spatial,
     safe_extract_zip,
     validate_item,
     write_normalized_csv,
@@ -172,3 +173,32 @@ class PAADIngestionTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+    def test_spatial_cross_file_check_uses_geometry_precision_not_dbf_rounding(self):
+        import shapefile
+
+        def inspect_point(longitude):
+            with tempfile.TemporaryDirectory() as tmp:
+                base = Path(tmp) / "sites"
+                writer = shapefile.Writer(str(base), shapeType=shapefile.POINT)
+                writer.field("Field_Site", "C")
+                writer.point(longitude, 10.0)
+                writer.record("A")
+                writer.close()
+                candidate = {
+                    "rows": [{
+                        "Field_Site": "A",
+                        "Center_Latitude": "10.0000",
+                        "Center_Longitude": "20.0000",
+                    }]
+                }
+                return inspect_spatial(Path(tmp), candidate)["coordinate_validation"]
+
+        exact = inspect_point(20.0)
+        self.assertEqual(exact["matched_csv_sites"], 1)
+        self.assertEqual(exact["mismatched_csv_sites"], 0)
+        self.assertEqual(exact["tolerance_degrees"], 1e-8)
+
+        shifted = inspect_point(20.0001)
+        self.assertEqual(shifted["matched_csv_sites"], 0)
+        self.assertEqual(shifted["mismatched_csv_sites"], 1)
