@@ -358,28 +358,38 @@ def parse_fgdc_metadata(path: Path) -> dict[str, Any]:
                 if "nan" in value.lower() or "empty cell" in value.lower():
                     missing_conventions.append({"value": value, "definition": description})
 
+        definition_lower = definition.casefold()
         units = None
-        approximate = False
-        data_type = "text/categorical"
-        if label in {"Center_Latitude", "Center_Longitude"}:
+        if re.search(r"\\bdecimal degrees?\\b", definition_lower):
             units = "decimal degrees"
-            data_type = "coordinate"
-        elif label == "Elevation":
+        elif re.search(r"\\bmeters?\\s*\\(m\\)|\\bmeters?\\b", definition_lower):
             units = "m"
-            approximate = True
-            data_type = "numeric"
-        elif label == "Areal_Coverage":
+        elif re.search(r"\\bkilometers?\\s+squared\\b|\\bsquare kilometers?\\b|\\bkm\\s*\\^?\\s*2\\b", definition_lower):
             units = "km2"
+
+        approximate = bool(
+            re.search(r"\\bapproximate(?:ly)?\\b|\\bestimat(?:e|ed|ion)\\b", definition_lower)
+        )
+        approximation_basis = "FGDC attribute definition" if approximate else None
+        if label == "Areal_Coverage":
+            # The field definition gives km2, while the USGS release page
+            # explicitly describes this core attribute as approximate.
             approximate = True
-            data_type = "numeric"
-        elif domains:
-            data_type = "categorical"
+            approximation_basis = "USGS data-release description identifies areal coverage as approximate"
+
+        data_type = (
+            "coordinate" if units == "decimal degrees" else
+            "numeric" if units else
+            "categorical" if domains else
+            "text/categorical"
+        )
         attributes[label] = {
             "definition": definition.strip(),
             "usage_domain": usage,
             "data_type": data_type,
             "units": units,
             "approximate": approximate,
+            "approximation_basis": approximation_basis,
             "unit_status": "DOCUMENTED_IN_FGDC_METADATA" if units else "NO_PHYSICAL_UNIT_ASSIGNED_IN_METADATA",
             "domain_values": domains,
             "missing_value_conventions": missing_conventions,
