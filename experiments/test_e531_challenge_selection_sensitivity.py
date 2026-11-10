@@ -28,6 +28,13 @@ class E531ChallengeSensitivityTests(unittest.TestCase):
         self.assertIn("Interplanetary Survival Guide: Martian Map", result["winner_pct"])
         self.assertIn("Harmonization of MODIS and VIIRS Hot Spots", result["winner_pct"])
 
+
+    def test_martian_map_is_modal_under_small_perturbation_fixture(self):
+        result = run_sensitivity(0.25, draws=5000, seed=526)
+        martian = result["winner_pct"]["Interplanetary Survival Guide: Martian Map"]
+        modis = result["winner_pct"]["Harmonization of MODIS and VIIRS Hot Spots"]
+        self.assertGreater(martian, modis)
+
     def test_invalid_scenarios_fail_closed(self):
         with self.assertRaises(ValueError):
             run_sensitivity(-0.1, draws=100)
