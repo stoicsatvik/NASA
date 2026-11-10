@@ -26,7 +26,7 @@ The three new parser-focused fixture cases were run in an isolated Python unitte
 - archive field-definition extraction and SHA-256 preservation: PASS
 - Windows-1252 en-dash decoding: PASS
 
-**3/3 isolated parser tests passed.** This is not a full repository CI run and does not yet validate extraction from the live USGS archive.
+**7/7 E529 unit tests passed in an isolated local harness**, including all three new parser-focused cases. This is not a full repository CI run and does not yet validate extraction from the live USGS archive.
 
 The previous exact-head E527/E528/E529 workflow run [#42922184681](https://github.com/stoicsatvik/NASA/actions/runs/42922184681) passed 22 parser/provenance tests and acquired the official 2007 and 2018 archives. That run predates the new full-field extractor. The current parser changes are committed on `research/e527-mgd3-spatial-ingestion-20261111`; exact-head live archive re-execution remains pending.
 
