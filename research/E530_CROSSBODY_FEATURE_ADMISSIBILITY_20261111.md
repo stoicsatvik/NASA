@@ -74,7 +74,7 @@ This is a decisive negative result: E527/E528 solved data access and ID linkage,
 ## Validation
 
 - E527 exact-head Actions run #42904750899 passed on commit 03300510d932128df58f64dc91bf04bd0825617f.
-- Six E530 tests passed on an equivalent local harness. The committed branch test module was not executed in this runtime, and no E530 exact-head Actions run was triggered.
+- Exact-head E530 workflow [#42911904361](https://github.com/stoicsatvik/NASA/actions/runs/42911904361) passed **7/7 tests**, Python compilation and git diff check on the E530 branch. The added regression rejects a row marked matched when its Dune_ID is absent from the verified 2007 inventory.
 - Both downloaded source-artifact ZIPs passed CRC checks and matched their GitHub artifact SHA-256 digests.
 
 ## E530 source-join integrity gate
