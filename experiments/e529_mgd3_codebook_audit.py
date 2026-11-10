@@ -33,7 +33,7 @@ def extract_text(name: str, raw: bytes) -> str | None:
     suffix=Path(name).suffix.lower()
     if suffix not in {".txt",".html",".htm",".xml"}: return None
     text=raw.decode("utf-8-sig",errors="replace")
-    if "\\ufffd" in text:
+    if "\ufffd" in text:
         text=raw.decode("cp1252",errors="replace")
     if suffix in {".html",".htm",".xml"}:
         parser=TextOnly(); parser.feed(text); text=parser.text()
@@ -42,8 +42,8 @@ def extract_text(name: str, raw: bytes) -> str | None:
 
 def extract_field_definitions(text: str) -> list[dict]:
     """Extract complete numbered field definitions without assigning code equivalence."""
-    normalized=text.replace("\\r\\n","\\n").replace("\\r","\\n").replace("\\f","\\n")
-    starts=list(re.finditer(r"(?im)^\\s*Field\\s+(\\d+)\\s*:\\s*",normalized))
+    normalized=text.replace("\r\n","\n").replace("\r","\n").replace("\f","\n")
+    starts=list(re.finditer(r"(?im)^\s*Field\s+(\d+)\s*:\s*",normalized))
     definitions=[]
     for index,match in enumerate(starts):
         end=starts[index+1].start() if index+1<len(starts) else len(normalized)
@@ -52,16 +52,18 @@ def extract_field_definitions(text: str) -> list[dict]:
         if not lines:
             continue
         first=lines[0]
-        separator=re.search(r"\\s+(?:–|—|-)\\s+",first)
+        separator=re.search(r"\s+(?:–|—|-)\s+",first)
         if separator:
             label=first[:separator.start()].strip()
             definition_parts=[first[separator.end():].strip(),*lines[1:]]
         else:
             label=first
             definition_parts=lines[1:]
-        alias=re.search(r"\\(([^()]+)\\)\\s*$",label)
-        short_name=alias.group(1).strip() if alias else None
-        if alias:
+        alias=re.search(r"\(([^()]+)\)\s*$",label)
+        unit_tokens={"m","meter","meters","metre","metres","km","km2","km^2","km²","cm","mm","m2","m^2","m²","degree","degrees","deg"}
+        candidate=alias.group(1).strip() if alias else None
+        short_name=candidate if candidate and candidate.lower() not in unit_tokens else None
+        if alias and short_name:
             label=label[:alias.start()].strip()
         definitions.append({
             "field_number":int(match.group(1)),
@@ -77,7 +79,7 @@ def inspect_archive(kind: str, payload: bytes) -> dict:
         bad=z.testzip()
         if bad: raise ValueError(f"{kind} archive CRC failure at {bad}")
         for info in z.infolist():
-            name=info.filename.replace("\\","/")
+            name=info.filename.replace("\","/")
             if info.is_dir(): continue
             if name.startswith("/") or ".." in Path(name).parts: raise ValueError(f"unsafe archive path: {name}")
             names.append({"name":name,"bytes":info.file_size})
