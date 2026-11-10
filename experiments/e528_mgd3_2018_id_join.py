@@ -59,6 +59,47 @@ def normalize_id(value: Any) -> str | None:
     return text
 
 
+def decode_dune_id(value: Any) -> dict[str, float] | None:
+    """Decode the documented MGD3 Dune_ID coordinate code, not a measured position."""
+    text = normalize_id(value)
+    if text is None:
+        return None
+    match = re.fullmatch(r"(\d{4})([+-])(\d{3})", text)
+    if not match:
+        return None
+    longitude_tenths = int(match.group(1))
+    latitude_tenths = int(match.group(3))
+    if longitude_tenths > 3600 or latitude_tenths > 900:
+        return None
+    latitude = latitude_tenths / 10.0
+    if match.group(2) == "-":
+        latitude = -latitude
+    return {
+        "longitude_east_deg": longitude_tenths / 10.0,
+        "latitude_aerocentric_deg": latitude,
+    }
+
+
+def summarize_dune_ids(values: set[str] | list[str]) -> dict[str, Any]:
+    decoded = [decode_dune_id(value) for value in values]
+    valid = [item for item in decoded if item is not None]
+    latitudes = [item["latitude_aerocentric_deg"] for item in valid]
+    unparsed = sorted(str(value) for value, item in zip(values, decoded) if item is None)
+    return {
+        "encoding": "four longitude digits in 0.1-degree units, followed by signed three-digit latitude in 0.1-degree units",
+        "coordinate_semantics": "identifier-derived centroid coordinates; not an independent geometry or positional-accuracy measurement",
+        "decoded_id_count": len(valid),
+        "unparsed_id_count": len(unparsed),
+        "latitude_min_deg": min(latitudes) if latitudes else None,
+        "latitude_max_deg": max(latitudes) if latitudes else None,
+        "within_2007_65S_65N_count": sum(-65.0 <= value <= 65.0 for value in latitudes),
+        "south_of_65S_count": sum(value < -65.0 for value in latitudes),
+        "north_of_65N_count": sum(value > 65.0 for value in latitudes),
+        "at_65_degree_boundary_count": sum(abs(value) == 65.0 for value in latitudes),
+        "unparsed_id_samples": unparsed[:5],
+    }
+
+
 def _dune_id_field(fieldnames: list[str]) -> str | None:
     exact = [
         field for field in fieldnames
@@ -109,7 +150,7 @@ def profile_workbook(payload: bytes, source_name: str, spatial_ids: set[str]) ->
             if header is None:
                 continue
             header_row, fields, id_index = header
-            total_rows, missing_ids, ids = 0, 0, []
+            total_rows, missing_ids, ids, non_data_note_rows, non_data_note_samples = 0, 0, [], 0, []
             for row in sheet.iter_rows(min_row=header_row + 2, values_only=True):
                 if not row or not any(value is not None and str(value).strip() for value in row):
                     continue
@@ -118,6 +159,11 @@ def profile_workbook(payload: bytes, source_name: str, spatial_ids: set[str]) ->
                 dune_id = normalize_id(value)
                 if dune_id is None:
                     missing_ids += 1
+                    continue
+                if decode_dune_id(dune_id) is None and (len(dune_id) > 40 or any(character.isspace() for character in dune_id)):
+                    non_data_note_rows += 1
+                    if len(non_data_note_samples) < 3:
+                        non_data_note_samples.append(dune_id[:160])
                     continue
                 ids.append(dune_id)
                 record = {fields[i]: (str(row[i]) if i < len(row) and row[i] is not None else None) for i in range(len(fields))}
@@ -136,10 +182,15 @@ def profile_workbook(payload: bytes, source_name: str, spatial_ids: set[str]) ->
                 "header_row_1based": header_row + 1,
                 "id_field": fields[id_index],
                 "worksheet_rows_not_unique_sites": total_rows,
-                "nonempty_id_rows": len(ids),
+                "nonempty_id_rows": len(ids) + non_data_note_rows,
+                "valid_dune_id_rows": len(ids),
                 "missing_id_rows": missing_ids,
+                "non_data_note_rows": non_data_note_rows,
+                "non_data_note_samples": non_data_note_samples,
+                "unparsed_encoding_id_rows": sum(decode_dune_id(value) is None for value in ids),
                 "unique_ids": len(unique),
                 "duplicate_id_rows": len(ids) - len(unique),
+                "decoded_id_geography": summarize_dune_ids(unique),
                 "matched_2007_spatial_unique_ids": len(matched),
                 "unmatched_2018_unique_ids": len(unique - spatial_ids),
                 "2007_spatial_ids_absent_from_sheet": len(spatial_ids - unique),
@@ -198,12 +249,17 @@ def build_receipt(spatial_csv: Path, out: Path) -> dict[str, Any]:
         writer.writeheader()
         writer.writerows(joined_rows)
     return {
-        "schema_version": "mgd3-2018-id-join-v1",
+        "schema_version": "mgd3-2018-id-join-v2",
         "experiment": "E528_MGD3_2018_TO_2007_DUNE_ID_JOIN",
         "retrieved_at_utc": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "source": {"report_page": SOURCE_PAGE, "archive_url": ARCHIVE_URL, "final_url": final_url, "doi": SOURCE_DOI, "publisher": "U.S. Geological Survey"},
+        "id_encoding_basis": {
+            "description": "Dune_ID encodes east longitude first, then signed aerocentric latitude, each to one decimal place",
+            "sources": ["USGS Open-File Report 2007-1158 ReadMe_GIS", "USGS Open-File Report 2012-1259 South Polar Dune_Field metadata"],
+            "warning": "Decoded values are identifier-derived and are not independent coordinates or positional-accuracy measurements.",
+        },
         "archive": {"bytes": len(payload), "sha256": digest, "matches_prior_e318_receipt": digest == EXPECTED_E318_SHA256, "expected_e318_sha256": EXPECTED_E318_SHA256},
-        "spatial_2007": {"csv": str(spatial_csv), "unique_dune_ids": len(spatial_ids)},
+        "spatial_2007": {"csv": str(spatial_csv), "unique_dune_ids": len(spatial_ids), "decoded_id_geography": summarize_dune_ids(spatial_ids)},
         **audit,
         "normalized_join_table": {"path": csv_path.name, "rows": len(joined_rows)},
         "status": "JOINED" if audit["unique_matched_ids_union"] > 0 else "NO_MATCHED_IDS",
@@ -226,7 +282,7 @@ def main() -> int:
         print(json.dumps({"status": receipt["status"], "archive_sha256": receipt["archive"]["sha256"], "spatial_ids": receipt["spatial_2007"]["unique_dune_ids"], "worksheets": receipt["worksheets_with_dune_id"], "matched_union": receipt["unique_matched_ids_union"], "join_rows": receipt["normalized_join_table"]["rows"]}, sort_keys=True))
         return 0 if receipt["status"] == "JOINED" else 1
     except Exception as exc:
-        failure = {"schema_version": "mgd3-2018-id-join-v1", "experiment": "E528_MGD3_2018_TO_2007_DUNE_ID_JOIN", "retrieved_at_utc": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"), "source": {"report_page": SOURCE_PAGE, "archive_url": ARCHIVE_URL, "doi": SOURCE_DOI}, "status": "FAILED", "error_type": type(exc).__name__, "error": str(exc), "claim_boundary": "No cross-release join is claimed when the archive cannot be retrieved or parsed."}
+        failure = {"schema_version": "mgd3-2018-id-join-v2", "experiment": "E528_MGD3_2018_TO_2007_DUNE_ID_JOIN", "retrieved_at_utc": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"), "source": {"report_page": SOURCE_PAGE, "archive_url": ARCHIVE_URL, "doi": SOURCE_DOI}, "status": "FAILED", "error_type": type(exc).__name__, "error": str(exc), "claim_boundary": "No cross-release join is claimed when the archive cannot be retrieved or parsed."}
         receipt_path.write_text(json.dumps(failure, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         print(json.dumps(failure, indent=2, sort_keys=True))
         return 1
