@@ -1,0 +1,50 @@
+name: E523 public USGS PAAD ingestion
+
+on:
+  push:
+    branches:
+      - research/e523-paad-acquisition-20261110
+      - fix/e523-paad-cli-summary-key-20261110
+    paths:
+      - 'experiments/e523_paad_acquisition.py'
+      - 'experiments/test_e523_paad_acquisition.py'
+      - '.github/workflows/e523-paad-acquisition.yml'
+  pull_request:
+    branches:
+      - research/e522-analog-explorer-admissibility-20261110
+    paths:
+      - 'experiments/e523_paad_acquisition.py'
+      - 'experiments/test_e523_paad_acquisition.py'
+      - '.github/workflows/e523-paad-acquisition.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  acquire-and-inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install optional public-data parsers
+        run: python -m pip install pyshp==2.3.1 openpyxl==3.1.5
+      - name: Run deterministic parser and provenance tests
+        run: python -m unittest experiments.test_e523_paad_acquisition -v
+      - name: Acquire public USGS PAAD files and inspect real records
+        run: |
+          python experiments/e523_paad_acquisition.py \
+            --out .artifacts/paad \
+            --max-bytes 104857600 \
+            --expected-sites 45
+      - name: Preserve source receipt, normalized table and failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e523-paad-ingestion
+          path: .artifacts/paad/**
+          if-no-files-found: ignore
+          retention-days: 30
