@@ -1,0 +1,70 @@
+{
+  "experiment": "E524_PAAD_MGD3_FEATURE_ADMISSIBILITY",
+  "status": "WORKBOOK_ONLY_NO_DIRECT_SHARED_DESCRIPTOR_ADMITTED",
+  "source_receipts": {
+    "paad_normalized_csv_sha256": "0eb40273f9f685e4fd67181c63fa51e24e2fa348cc850cb1641d5e43af221334",
+    "mgd3_archive_sha256": "92771c23cfa4a64dfcc38f5ad29de00adfa41b9f321d3665beb2112eefe3485e"
+  },
+  "paad": {
+    "rows": 45,
+    "unique_site_names": 45,
+    "unique_coordinate_pairs": 45,
+    "dune_type_unique_raw_tokens": 13,
+    "missing_counts": {
+      "Composition_of_Sand": 16,
+      "Areal_Coverage": 12,
+      "Sand_Source": 3,
+      "Elevation": 1,
+      "Köppen_Geiger_Climate_Classification": 0
+    }
+  },
+  "mgd3_global_summary_profiles": [
+    {
+      "worksheet": "Equatorial <7000",
+      "worksheet_rows_not_unique_sites": 58,
+      "thermal_inertia_nonempty": 58,
+      "albedo_nonempty": 58,
+      "mineral_field_nonempty": 42
+    },
+    {
+      "worksheet": "Equatorial all",
+      "worksheet_rows_not_unique_sites": 59,
+      "thermal_inertia_nonempty": 58,
+      "albedo_nonempty": 58,
+      "mineral_field_nonempty": 52
+    },
+    {
+      "worksheet": "South Polar <7000",
+      "worksheet_rows_not_unique_sites": 51,
+      "thermal_inertia_nonempty": 51,
+      "albedo_nonempty": 51,
+      "mineral_field_nonempty": 37
+    },
+    {
+      "worksheet": "South Polar all",
+      "worksheet_rows_not_unique_sites": 53,
+      "thermal_inertia_nonempty": 51,
+      "albedo_nonempty": 51,
+      "mineral_field_nonempty": 48
+    }
+  ],
+  "directly_comparable_descriptor_count": 0,
+  "negative_label_status": "NO_INDEPENDENT_NON_ANALOGUE_LABELS",
+  "e001_known_site_recovery": "NOT YET MEASURED",
+  "cross_body_similarity": "NOT YET PROVEN",
+  "spatial_source_discovery": {
+    "status": "DOCUMENTED_NOT_INGESTED",
+    "source": "USGS OFR 2007-1158",
+    "url": "https://pubs.usgs.gov/of/2007/1158/",
+    "documented_features": [
+      "~550 dune-field polygons",
+      "37-column attribute table",
+      "dune type",
+      "area and volume",
+      "MOLA-based average elevation",
+      "dune orientation",
+      "THEMIS IR imagery at 100 m/pixel"
+    ],
+    "coverage_caveat": "Not exhaustive; small dune fields and areas without adequate coverage omitted."
+  }
+}

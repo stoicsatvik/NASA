@@ -1,9 +1,9 @@
 # FOUNDRY_STATE — NASA
 
-Updated: 2026-11-10
+Updated: 2026-11-11
 Class: Tier A
 Time horizon: NASA Space Apps Challenge, 14–15 Nov 2026
-Working branch: `foundry/planetary-analog-v1`
+Working branch: `research/e524-paad-mgd3-feature-admissibility-20261111`
 Main objective: maximize uncertainty eliminated per run and converge on a scientifically defensible Space Apps entry.
 
 ## Current thesis
@@ -28,7 +28,7 @@ Run `E001_KNOWN_ANALOG_RECOVERY` and the dataset-access spike before polishing U
 
 Priority order:
 
-1. verify remaining real lunar and Martian data ingestion and feature comparability; PAAD Earth and MGD3 Mars dune sources were already ingested in E317-E318;
+1. PAAD 45-site live ingestion is complete (E523); 2018 MGD3 workbook ingestion is complete (E318); the separate 2007 MGD3 spatial layer is documented but not ingested (E525); ingest and join that layer before feature comparison;
 2. derive a small set of physically comparable descriptors;
 3. reproduce/recover known analogue environments using transparent baselines;
 4. perform ablations and uncertainty analysis;
@@ -101,7 +101,7 @@ Pivot away from the planetary-analog track if any of these becomes clear:
 
 ## Next trigger
 
-**Independent semantic crosswalk + non-analogue controls + E001 known-site recovery.**
+**Ingest official MGD3 spatial polygons/attributes, verify CRS and Dune ID join to the 2018 workbook, then build a matched Earth/Mars descriptor matrix and run E001 against predeclared controls.**
 
 PAAD and MGD3 ingestion are already in E317-E318. The next substantive run must resolve label comparability and negative controls, not repeat data acquisition or add another planning document.
 
@@ -165,4 +165,32 @@ Exact claim states:
 - Local validation advantage: NOT YET PROVEN.
 - Planetary-analog challenge superiority over every official 2026 challenge: NOT YET PROVEN.
 
-The NASA challenge remains a candidate, not a locked selection. Next decisive step is actual PAAD data acquisition, metadata/hash verification, and a predeclared aeolian-specific E001 campaign with independent Mars reference data and negative controls. No fabricated measurements, local field data, or site-access claims.
+The NASA challenge remains a candidate, not a locked selection. E523 PAAD acquisition is complete. Next decisive step is official MGD3 spatial-layer ingestion, CRS/ID validation, join to the 2018 workbook, then a physically comparable Earth/Mars descriptor matrix and E001 leave-one-site-out evaluation with independent controls. No fabricated measurements, local field data, or site-access claims.
+
+
+## E524 — PAAD / MGD3 physical-feature admissibility (2026-11-11)
+
+Executed the source-pinned workbook-only audit in experiments/e524_paad_mgd3_feature_admissibility.py using the E523 PAAD normalized CSV SHA-256 0eb40273f9f685e4fd67181c63fa51e24e2fa348cc850cb1641d5e43af221334 and E318 2018 MGD3 ZIP SHA-256 92771c23cfa4a64dfcc38f5ad29de00adfa41b9f321d3665beb2112eefe3485e.
+
+- PAAD: 45 rows, 45 unique site names and coordinate pairs, 13 raw dune-type tokens. Missingness: composition 16/45, approximate area 12/45, sand source 3/45, elevation 1/45; climate descriptions 0/45 missing but are raw source text, not validated Köppen codes.
+- MGD3 2018 global-summary worksheet rows are 58, 59, 51 and 53 (not unique-site counts). Thermal inertia and albedo are present in 58, 58, 51 and 51 rows; mineral-field coverage is 42, 52, 37 and 48 rows respectively. The profiled summaries contain no coordinate/footprint fields.
+- Nine descriptor families were checked. Zero are directly admissible from the currently ingested PAAD CSV plus the profiled 2018 workbook summaries. Morphology taxonomies differ; PAAD mineralogy is heterogeneous prose while MGD3 is instrument-derived abundance; Earth thermal inertia/albedo are absent; the 2018 summary exposes area rank rather than physical area.
+- No independent non-analogue labels exist. No distance metric or E001 ranking is admissible from these two source tables alone.
+- Eight local tests passed, including literal-NaN missingness, duplicate-site rejection, source-hash gates, worksheet-row semantics and fail-closed label handling. Exact-head GitHub CI is pending.
+- Result: WORKBOOK-ONLY NO DIRECT SHARED DESCRIPTOR ADMITTED. This is not a conclusion about all MGD3 data.
+
+## E525 — MGD3 spatial-layer source discovery (2026-11-11)
+
+The official USGS 2007 MGD3 release documents approximately 550 dune-field polygons, a 37-column attribute table, dune type, area, volume, MOLA-based average elevation, dune orientation and THEMIS infrared imagery at 100 m/pixel. Primary source: https://pubs.usgs.gov/of/2007/1158/. This separate spatial source is DOCUMENTED_NOT_INGESTED; its CRS, geometry, field definitions and Dune ID compatibility with the 2018 workbook have not been verified.
+
+The inventory is not exhaustive: small dune fields and areas without adequate coverage are omitted. Absence is not a negative analogue label. The 100 m/pixel THEMIS support is not automatically the support of MOLA elevation or polygon area. E524 therefore remains a workbook-only audit.
+
+## E526 — 2026 challenge-selection falsification update (2026-11-11)
+
+All 14 official challenge summaries are compared in research/E526_CHALLENGE_RANKING_FALSIFICATION_20261111.md and the scorecard. Earth System Trend Detective retains a source-reconciled 75/75 GISTEMP numerical path (E515). Martian Map retains MOLA ingestion but no validated hyperlocal route-safety model. Field Shift has an ARGUS codebase but no farmer/soil evidence. Planetary analog has the most assembled cross-body source pipeline, but E524 found zero directly admissible descriptors in the currently ingested pair and E001 remains unmeasured; E525 creates a documented spatial-data path but does not execute it.
+
+Challenge-selection superiority remains NOT YET PROVEN. Do not lock the planetary-analog challenge or infer other challenges infeasible from missing audits.
+
+## Updated next decisive experiment
+
+Retrieve the official 2007 MGD3 spatial package through USGS download/ScienceBase/OGC endpoints; verify source hash, CRS, geometry and 37-column schema; join spatial features to the 2018 workbook by Dune ID; report matched/unmatched IDs; then construct the first physically comparable Earth/Mars feature matrix and run E001 leave-one-site-out against random, histogram-only and physically weighted baselines. Preserve nulls and unlabeled controls.
