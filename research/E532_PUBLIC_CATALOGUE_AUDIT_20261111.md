@@ -28,7 +28,7 @@ The catalogue uses `analogue_for_primary` and `analogue_for_other`, not a canoni
 
 ## Result
 
-<badge>NOT E001-READY</badge>
+**NOT E001-READY**
 
 The catalogue is useful as a **candidate-positive discovery index** and literature-navigation aid. It is **not** accepted as known-site ground truth:
 
