@@ -43,7 +43,7 @@ jobs:
         run: python experiments/e527_mgd3_spatial_ingestion.py --out .artifacts/e527
       - name: Join the official 2018 MGD3 workbooks to verified 2007 Dune_ID values
         run: python experiments/e528_mgd3_2018_id_join.py --spatial-csv .artifacts/e527/mgd3_2007_dune_fields.csv --out .artifacts/e528
-      - name: Inspect official 2007 MGD3 metadata and documentation codebooks
+      - name: Extract full official 2007 MGD3 field definitions and codebooks
         run: python experiments/e529_mgd3_codebook_audit.py --output .artifacts/e529/mgd3_2007_codebook_audit.json
       - name: Preserve source receipts and normalized tables
         if: always()
