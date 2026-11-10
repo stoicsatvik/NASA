@@ -6,7 +6,7 @@ from pathlib import Path
 BASE = "https://pubs.usgs.gov/of/2007/1158/"
 ARCHIVES = {"metadata": (BASE + "Metadata.zip", 2 * 1024 * 1024), "documentation": (BASE + "Documentation.zip", 20 * 1024 * 1024)}
 USER_AGENT = "NASA-Analog-Research/0.1 (public USGS MGD3 codebook audit)"
-TERMS = ("dune_type", "dune type", "barchan", "barchanoid", "transverse", "longitudinal", "parabolic", "sand sheet", "MOLA", "THEMIS", "average elevation", "area_sinu", "MDHeight", "CcDcAzimut")
+TERMS = ("dune_id", "dune id", "dune field lon+lat id", "dune_latitude", "dune_longitude", "mean_dune_height", "mean dune height", "dune_type", "dune type", "areal_coverage", "area_km2", "positional accuracy", "barchan", "barchanoid", "transverse", "longitudinal", "parabolic", "sand sheet", "average elevation", "MDHeight", "CcDcAzimut", "MOLA", "THEMIS", "100m/pixel")
 
 class TextOnly(html.parser.HTMLParser):
     def __init__(self): super().__init__(); self.parts=[]
