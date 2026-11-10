@@ -2,7 +2,7 @@ from __future__ import annotations
 import io, tempfile, unittest
 from pathlib import Path
 from openpyxl import Workbook
-from experiments.e528_mgd3_2018_id_join import safe_archive_url, normalize_id, read_spatial_ids, profile_workbook
+from experiments.e528_mgd3_2018_id_join import safe_archive_url, normalize_id, decode_dune_id, read_spatial_ids, profile_workbook
 
 
 class E528Tests(unittest.TestCase):
@@ -16,6 +16,17 @@ class E528Tests(unittest.TestCase):
         self.assertEqual(normalize_id(" 0289+501 "), "0289+501")
         self.assertEqual(normalize_id(101.0), "101")
         self.assertIsNone(normalize_id("NaN"))
+
+    def test_dune_id_decodes_documented_centroid_encoding(self):
+        self.assertEqual(
+            decode_dune_id("1225-345"),
+            {"longitude_east_deg": 122.5, "latitude_aerocentric_deg": -34.5},
+        )
+        self.assertEqual(
+            decode_dune_id("1167-722"),
+            {"longitude_east_deg": 116.7, "latitude_aerocentric_deg": -72.2},
+        )
+        self.assertIsNone(decode_dune_id("Asterisk indicates a new Dune Field ID"))
 
     def test_spatial_index_accepts_actual_long_usgs_field_name(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -46,21 +57,28 @@ class E528Tests(unittest.TestCase):
         ws = wb.active
         ws.title = "Equatorial <7000"
         ws.append(["Dune ID", "Thermal Inertia", "Albedo"])
-        ws.append(["A", 100, 0.2])
-        ws.append(["B", 110, 0.3])
-        ws.append(["B", 111, 0.31])
-        ws.append(["C", 120, 0.4])
+        ws.append(["1225-345", 100, 0.2])
+        ws.append(["0289+501", 110, 0.3])
+        ws.append(["0289+501", 111, 0.31])
+        ws.append(["1000+756", 120, 0.4])
+        ws.append(["Asterisk indicates a new Dune Field ID because this site is not part of the original release.", None, None])
         data = io.BytesIO()
         wb.save(data)
         wb.close()
-        profiles, rows = profile_workbook(data.getvalue(), "fixture.xlsx", {"A", "B", "D"})
+        profiles, rows = profile_workbook(data.getvalue(), "fixture.xlsx", {"1225-345", "0289+501", "1200+100"})
         p = profiles[0]
-        self.assertEqual(p["worksheet_rows_not_unique_sites"], 4)
+        self.assertEqual(p["worksheet_rows_not_unique_sites"], 5)
+        self.assertEqual(p["nonempty_id_rows"], 5)
+        self.assertEqual(p["valid_dune_id_rows"], 4)
+        self.assertEqual(p["non_data_note_rows"], 1)
         self.assertEqual(p["unique_ids"], 3)
         self.assertEqual(p["duplicate_id_rows"], 1)
         self.assertEqual(p["matched_2007_spatial_unique_ids"], 2)
         self.assertEqual(p["unmatched_2018_unique_ids"], 1)
         self.assertEqual(p["2007_spatial_ids_absent_from_sheet"], 1)
+        self.assertEqual(p["decoded_id_geography"]["within_2007_65S_65N_count"], 2)
+        self.assertEqual(p["decoded_id_geography"]["north_of_65N_count"], 1)
+        self.assertEqual(p["unparsed_encoding_id_rows"], 0)
         self.assertEqual(len(rows), 4)
 
 
