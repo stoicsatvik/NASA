@@ -12,6 +12,15 @@ on:
       - 'experiments/e529_mgd3_codebook_audit.py'
       - 'experiments/test_e529_mgd3_codebook_audit.py'
       - '.github/workflows/e527-mgd3-spatial-ingestion.yml'
+  pull_request:
+    paths:
+      - 'experiments/e527_mgd3_spatial_ingestion.py'
+      - 'experiments/test_e527_mgd3_spatial_ingestion.py'
+      - 'experiments/e528_mgd3_2018_id_join.py'
+      - 'experiments/test_e528_mgd3_2018_id_join.py'
+      - 'experiments/e529_mgd3_codebook_audit.py'
+      - 'experiments/test_e529_mgd3_codebook_audit.py'
+      - '.github/workflows/e527-mgd3-spatial-ingestion.yml'
   workflow_dispatch:
 
 permissions:
