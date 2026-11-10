@@ -170,10 +170,7 @@ class PAADIngestionTests(unittest.TestCase):
             self.assertNotIn("count_matches_release_description", summary)
 
 
-
-if __name__ == "__main__":
-    unittest.main()
-
+    
     def test_spatial_cross_file_check_uses_geometry_precision_not_dbf_rounding(self):
         import shapefile
 
@@ -202,3 +199,7 @@ if __name__ == "__main__":
         shifted = inspect_point(20.0001)
         self.assertEqual(shifted["matched_csv_sites"], 0)
         self.assertEqual(shifted["mismatched_csv_sites"], 1)
+
+
+if __name__ == "__main__":
+    unittest.main()
