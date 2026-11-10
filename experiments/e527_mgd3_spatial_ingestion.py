@@ -91,7 +91,7 @@ def _norm_id(value: Any) -> str | None:
 
 def _id_field(fields: list[str]) -> str | None:
     hits=[f for f in fields if re.sub(r"[^a-z0-9]","",f.lower()) in {"duneid","dunefieldid","dfid"}]
-    if not hits: hits=[f for f in fields if "dune" in f.lower() and "id" in f.lower()]
+    if not hits: hits=[f for f in fields if "dune" in f.lower() and re.search(r"(?:^|[^a-z])id(?:$|[^a-z])",f.lower())]
     return hits[0] if len(hits)==1 else None
 
 def inspect_shapefile(path: Path) -> tuple[dict[str,Any],list[dict[str,Any]]]:
@@ -143,7 +143,8 @@ def inspect_tables(payload: bytes) -> dict[str,Any]:
             ids=[_norm_id(row[id_index] if id_index < len(row) else None) for row in rows] if id_index is not None else []
             ids=[v for v in ids if v is not None]
             candidates.append({"name":name,"delimiter":"tab" if delim=="\t" else "comma","rows":len(rows),"fields":fields,"id_field":idf,"nonempty_id_count":len(ids),"unique_id_count":len(set(ids)),"ids":ids,"rows_data":rows})
-        best=sorted(candidates,key=lambda c:(c["id_field"] is not None,c["rows"],len(c["fields"])),reverse=True)[0] if candidates else None
+        # Prefer the full attribute table over repeated image-reference rows.
+        best=sorted(candidates,key=lambda c:(c["id_field"] is not None,len(c["fields"]),c["rows"]),reverse=True)[0] if candidates else None
         return {"entries":entries,"tabular_candidates":[{k:v for k,v in c.items() if k not in {"ids","rows_data"}} for c in candidates],"best_table":best}
 
 def build_receipt(out: Path) -> dict[str,Any]:
