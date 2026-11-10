@@ -78,5 +78,14 @@ class E532PublicCatalogueAuditTests(unittest.TestCase):
         self.assertEqual(result["valid_point_geometry_count"], 1)
 
 
+    def test_boolean_coordinate_is_not_a_numeric_point(self):
+        invalid = feature("boolean-coordinate", "Mars")
+        invalid["geometry"]["coordinates"] = [True, 20.0]
+        result = audit({
+            "type": "FeatureCollection",
+            "features": [invalid],
+        })
+        self.assertEqual(result["valid_point_geometry_count"], 0)
+
 if __name__ == "__main__":
     unittest.main()
