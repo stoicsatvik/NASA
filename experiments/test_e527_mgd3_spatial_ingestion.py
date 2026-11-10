@@ -31,6 +31,9 @@ class E527Tests(unittest.TestCase):
     def test_id_field_rejects_multiple_canonical_aliases(self):
         self.assertIsNone(_id_field(["Dune Field ID", "Dune_ID"]))
 
+    def test_id_field_rejects_ambiguous_noncanonical_fallbacks(self):
+        self.assertIsNone(_id_field(["Dune Feature ID", "Dune Center ID"]))
+
     def test_core_layer_selection(self):
         self.assertEqual(core_shapefile(["background/outline.shp","layers/Dune_Field.shp","layers/Dune_Field_Craters.shp"]),"layers/Dune_Field.shp")
 
