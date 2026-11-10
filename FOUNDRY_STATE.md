@@ -3,7 +3,7 @@
 Updated: 2026-11-11
 Class: Tier A
 Time horizon: NASA Space Apps Challenge, 14–15 Nov 2026
-Working branch: `research/e527-mgd3-spatial-ingestion-20261111`
+Working branch: `research/e531-challenge-selection-sensitivity-20261111`
 Main objective: maximize uncertainty eliminated per run and converge on a scientifically defensible Space Apps entry.
 
 ## Current thesis
@@ -24,16 +24,16 @@ This is **NOT YET PROVEN** to be the best challenge.
 
 ## Highest-value frontier
 
-Run `E001_KNOWN_ANALOG_RECOVERY` and the dataset-access spike before polishing UI.
+Evidence before UI. E001 is not ready until independent Earth positive sites, defensible non-analogue controls and physically comparable features exist.
 
 Priority order:
 
-1. PAAD 45-site live ingestion is complete (E523); 2018 MGD3 workbook ingestion is complete (E318); the separate 2007 MGD3 spatial layer is documented but not ingested (E525); ingest and join that layer before feature comparison;
-2. derive a small set of physically comparable descriptors;
-3. reproduce/recover known analogue environments using transparent baselines;
-4. perform ablations and uncertainty analysis;
-5. try to falsify the current challenge ranking;
-6. only then build the polished geospatial product.
+1. E527 acquired the official 2007 MGD3 spatial package (547 polygons/IDs); E528 linked 535/547 unique IDs to the 2018 workbook. E530 then found no directly admissible shared quantitative physical-feature family in the current PAAD/MGD3 pair.
+2. Preserve the E530 negative result: PAAD has 45 known-analogue records but no target-body/family labels or non-analogue controls; strict Dune_Type overlap is S/SS, L is a candidate and B is ambiguous. Do not treat a codebook ID join as physical comparability.
+3. Seek independent legitimate Earth positive-site data and defensible non-analogue controls; derive only features with compatible physical meaning, support and uncertainty. Run E001 only after those inputs exist.
+4. Keep the all-14 challenge screen open. E531 found Martian Map remains the most frequent top score under tested perturbations, but its margin over MODIS/VIIRS is not robust to moderate subjective score uncertainty.
+5. Martian Map is a serious alternative with MOLA/CTX/HiRISE preparation and a verified MGD3 context layer, but route-safety validation is absent. Respect the preparation-only boundary in the `martian` repo; no competition solution code before the official event window.
+6. Perform ablations and uncertainty analysis before any geospatial UX polish.
 
 ## Evidence gate
 
@@ -101,9 +101,9 @@ Pivot away from the planetary-analog track if any of these becomes clear:
 
 ## Next trigger
 
-**Ingest official MGD3 spatial polygons/attributes, verify CRS and Dune ID join to the 2018 workbook, then build a matched Earth/Mars descriptor matrix and run E001 against predeclared controls.**
+**Acquire an independent, source-backed Earth positive-site layer and a defensible non-analogue control population; then test whether any physically comparable descriptor survives support/uncertainty audits before attempting E001.**
 
-PAAD and MGD3 ingestion are already in E317-E318. The next substantive run must resolve label comparability and negative controls, not repeat data acquisition or add another planning document.
+E527/E528 spatial acquisition and ID joining are complete. E530 found no directly admissible shared quantitative features in the current PAAD/MGD3 pair. The next run must address independent labels/controls or falsify another feature family, not repeat ingestion or polish UI.
 
 
 ## E514 real matched-footprint falsification (2026-11-03)
@@ -250,3 +250,34 @@ E530 used the actual PAAD, 2007 MGD3 and 2018 MGD3 artifact tables. The reproduc
 Claim states remain: repo operating system SUPPORTED; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN; challenge-selection superiority NOT YET PROVEN.
 
 Next: ingest the separate public USGS 2020 Known Terrestrial Analog Sites point layer as a candidate positive source (not a negative-control set), then acquire defensible non-analogue controls and Earthdata-derived Earth descriptors at matched physical support. Preserve all unlabelled sites as UNLABELLED. Do not lock the planetary-analog challenge; the current Martian Map lead remains provisional pending the next evidence gate.
+
+
+## E527–E530 — MGD3 spatial acquisition, join and cross-body feature-admissibility falsification (2026-11-11)
+
+- E527 acquired the official USGS 2007 MGD3 spatial package. The archive contains **547 dune-field polygons/IDs**. E528 linked **535/547 unique IDs** to the 2018 MGD3 Equatorial workbook. E527 exact-head Actions run [#42904750899](https://github.com/stoicsatvik/NASA/actions/runs/42904750899) passed on commit `03300510d932128df58f64dc91bf04bd0825617f`.
+- E530 evaluated the actual PAAD/MGD3 artifacts. PAAD has 45 known-analogue records but no target-body/family labels and no non-analogue control population. No directly admissible shared quantitative physical-feature family exists in the current PAAD/2018-workbook pair.
+- Strict Dune_Type overlap is S/SS; L remains a candidate and B is ambiguous. Naively admitting B inflates apparent coverage 1.81x on PAAD and 1.93x on MGD3. Do not convert ambiguous codebook overlap into physical similarity.
+- E530 exact workflow run [#42911904361](https://github.com/stoicsatvik/NASA/actions/runs/42911904361) passed on commit `1b6e44b0fba6aaae6ba0c0a2fcf7053c99881206`; six local tests also passed on the equivalent harness. The later current PR #89 head includes documentation/state updates; no new scientific claim is implied by those updates.
+- E001 known-site recovery remains **NOT YET MEASURED**, not BLOCKED. Independent Earth positive sites, defensible non-analogue controls and physically comparable descriptors remain viable computational avenues.
+
+## E531 — all-14 challenge score sensitivity (2026-11-11)
+
+A deterministic 200,000-draw Monte Carlo sensitivity experiment was run for each score perturbation amplitude +/-0.25, +/-0.50 and +/-0.75. Five base weights were independently perturbed by multiplicative uniform [0.8,1.2] factors and renormalized; each of the 14x5 subjective scores was independently perturbed and clipped to [1,5]. Seed 526 is frozen.
+
+- At +/-0.25, Martian Map is top in 83.97% of perturbation draws and MODIS/VIIRS in 15.88%.
+- At +/-0.50, Martian Map is top in 65.40%, MODIS/VIIRS in 27.46%, CLPS in 4.75% and Earth Trend in 2.38%.
+- At +/-0.75, Martian Map is top in 54.34%, MODIS/VIIRS in 28.55%, CLPS in 10.48% and Earth Trend in 6.32%.
+- The 5th percentile of the Martian Map minus MODIS/VIIRS score gap is negative even at +/-0.25 and becomes more negative as score uncertainty grows.
+
+This is a **heuristic scorecard robustness diagnostic**, not a probability of judging success. Martian Map remains the most frequent top option in these scenarios, but challenge-selection superiority remains **NOT YET PROVEN**. Keep Martian Map and MODIS/VIIRS as a provisional top tier.
+
+Reproducible source: `experiments/e531_challenge_selection_sensitivity.py`; result: `research/results/E531_CHALLENGE_SELECTION_SENSITIVITY_20261111.json`; report: `research/E531_CHALLENGE_SELECTION_SENSITIVITY_20261111.md`.
+
+## Current claim-state restatement (2026-11-11)
+
+- Repo operating system: **SUPPORTED**
+- Cross-body similarity: **NOT YET PROVEN**
+- Known-site recovery: **NOT YET MEASURED**
+- Novel analogue discovery: **NOT YET PROVEN**
+- Local validation advantage: **NOT YET PROVEN**
+- Space Apps challenge-selection superiority: **NOT YET PROVEN**

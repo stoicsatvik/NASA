@@ -1,0 +1,72 @@
+{
+  "base_weights": {
+    "data_readiness": 0.25,
+    "differentiation": 0.15,
+    "feasibility": 0.15,
+    "portfolio_reuse": 0.2,
+    "validation": 0.25
+  },
+  "challenge_count": 14,
+  "experiment": "E531",
+  "method_warning": "Heuristic robustness diagnostic only. Winner frequencies are not probabilities of judging success, challenge quality, or actual project outcomes.",
+  "scenarios": [
+    {
+      "draws": 200000,
+      "martian_minus_modis_score_difference_quantiles": {
+        "p05": -0.0645,
+        "p50": 0.101,
+        "p95": 0.2646
+      },
+      "score_perturbation": "independent uniform [-0.25, +0.25], clipped to [1, 5]",
+      "score_perturbation_amplitude": 0.25,
+      "seed": 526,
+      "weight_perturbation": "independent multiplicative uniform [0.8, 1.2], then renormalized",
+      "winner_pct": {
+        "Be An Earth System Trend Detective": 0.02,
+        "CLPS Lunar Mission Browser": 0.13,
+        "Harmonization of MODIS and VIIRS Hot Spots": 15.88,
+        "Interplanetary Survival Guide: Martian Map": 83.97
+      }
+    },
+    {
+      "draws": 200000,
+      "martian_minus_modis_score_difference_quantiles": {
+        "p05": -0.2146,
+        "p50": 0.1012,
+        "p95": 0.4152
+      },
+      "score_perturbation": "independent uniform [-0.5, +0.5], clipped to [1, 5]",
+      "score_perturbation_amplitude": 0.5,
+      "seed": 526,
+      "weight_perturbation": "independent multiplicative uniform [0.8, 1.2], then renormalized",
+      "winner_pct": {
+        "Be An Earth System Trend Detective": 2.38,
+        "CLPS Lunar Mission Browser": 4.75,
+        "Field Shift: Adapting Farms with NASA Data": 0.01,
+        "Harmonization of MODIS and VIIRS Hot Spots": 27.46,
+        "Interplanetary Survival Guide: Martian Map": 65.4
+      }
+    },
+    {
+      "draws": 200000,
+      "martian_minus_modis_score_difference_quantiles": {
+        "p05": -0.3497,
+        "p50": 0.1041,
+        "p95": 0.5595
+      },
+      "score_perturbation": "independent uniform [-0.75, +0.75], clipped to [1, 5]",
+      "score_perturbation_amplitude": 0.75,
+      "seed": 526,
+      "weight_perturbation": "independent multiplicative uniform [0.8, 1.2], then renormalized",
+      "winner_pct": {
+        "Abandoned but Not Forgotten": 0.0,
+        "Be An Earth System Trend Detective": 6.32,
+        "CLPS Lunar Mission Browser": 10.48,
+        "Field Shift: Adapting Farms with NASA Data": 0.31,
+        "Harmonization of MODIS and VIIRS Hot Spots": 28.55,
+        "Interplanetary Survival Guide: Martian Map": 54.34
+      }
+    }
+  ],
+  "source": "research/CHALLENGE_SELECTION_SCREEN_20261111.md"
+}
