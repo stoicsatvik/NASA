@@ -7,6 +7,8 @@ on:
     paths:
       - 'experiments/e527_mgd3_spatial_ingestion.py'
       - 'experiments/test_e527_mgd3_spatial_ingestion.py'
+      - 'experiments/e528_mgd3_2018_id_join.py'
+      - 'experiments/test_e528_mgd3_2018_id_join.py'
       - '.github/workflows/e527-mgd3-spatial-ingestion.yml'
   workflow_dispatch:
 
@@ -23,16 +25,20 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install pinned shapefile parser
-        run: python -m pip install pyshp==2.3.1
+        run: python -m pip install pyshp==2.3.1 openpyxl==3.1.5
       - name: Run deterministic parser and provenance tests
-        run: python -m unittest experiments.test_e527_mgd3_spatial_ingestion -v
+        run: python -m unittest experiments.test_e527_mgd3_spatial_ingestion experiments.test_e528_mgd3_2018_id_join -v
       - name: Acquire official USGS MGD3 spatial and table archives
         run: python experiments/e527_mgd3_spatial_ingestion.py --out .artifacts/e527
-      - name: Preserve source receipt and normalized attribute table
+      - name: Join the official 2018 MGD3 workbooks to verified 2007 Dune_ID values
+        run: python experiments/e528_mgd3_2018_id_join.py --spatial-csv .artifacts/e527/mgd3_2007_dune_fields.csv --out .artifacts/e528
+      - name: Preserve source receipts and normalized tables
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: e527-mgd3-spatial-ingestion
-          path: .artifacts/e527/**
+          name: e527-e528-mgd3-spatial-and-2018-join
+          path: |
+            .artifacts/e527/**
+            .artifacts/e528/**
           if-no-files-found: ignore
           retention-days: 30
