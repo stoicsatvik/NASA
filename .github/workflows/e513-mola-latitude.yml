@@ -1,0 +1,25 @@
+name: E513 MOLA latitude and footprint controls
+on:
+  push:
+    branches:
+      - research/e513-mola-registered-latitude-20261103
+  pull_request:
+    paths:
+      - 'research/e513_mola_latitude_audit.py'
+      - 'research/test_e513_mola_latitude_audit.py'
+      - '.github/workflows/e513-mola-latitude.yml'
+permissions:
+  contents: read
+jobs:
+  coordinate-controls:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Source and test compilation
+        run: python -m py_compile research/e513_mola_latitude_audit.py research/test_e513_mola_latitude_audit.py
+      - name: Deterministic controls
+        run: python -m unittest discover -s research -p 'test_e513_mola_latitude_audit.py' -v

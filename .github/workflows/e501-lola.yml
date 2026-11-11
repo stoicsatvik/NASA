@@ -1,0 +1,35 @@
+name: E501 bounded LOLA numeric ingestion
+on:
+  push:
+    branches: [research/e501-lola-numeric-ingest-20261102]
+  pull_request:
+    paths:
+      - research/e501_lola_ingest.py
+      - tests/test_e501_lola_ingest.py
+      - .github/workflows/e501-lola.yml
+
+jobs:
+  lola-numeric:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned open-source TIFF dependencies
+        run: python -m pip install numpy==2.3.5 tifffile==2026.5.15
+      - name: Run deterministic synthetic parser/claim guards
+        run: python -m unittest discover -s tests -p 'test_e501*.py' -v
+      - name: Download and inspect real NASA LOLA TIFF
+        run: python -m research.e501_lola_ingest /tmp/e501_lola.json
+      - name: Preserve numeric receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e501-lola-numeric-receipt
+          path: /tmp/e501_lola.json
+          if-no-files-found: ignore
+          retention-days: 14

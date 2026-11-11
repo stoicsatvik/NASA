@@ -1,0 +1,20 @@
+name: E511 exact crop-window sensitivity controls
+on:
+  push:
+    branches:
+      - research/e511-exact-crop-window-ablation-20261103
+  pull_request:
+    paths:
+      - 'research/e511_window_sensitivity.py'
+      - 'research/test_e511_window_sensitivity.py'
+      - '.github/workflows/e511-crop-window.yml'
+jobs:
+  controls:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run deterministic controls
+        run: python -m unittest discover -s research -p 'test_e511_window_sensitivity.py' -v

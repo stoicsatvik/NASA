@@ -1,0 +1,22 @@
+name: E506 scale-confound controls
+on:
+  push:
+    branches:
+      - 'research/e506-cross-body-resolution-confound-20261102'
+  pull_request:
+    paths:
+      - 'research/e506_scale_confounds.py'
+      - 'research/test_e506_scale_confounds.py'
+      - '.github/workflows/e506-scale-confounds.yml'
+jobs:
+  deterministic-controls:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check synthetic deterministic controls
+        run: python -m unittest discover -s research -p 'test_e506_scale_confounds.py' -v
