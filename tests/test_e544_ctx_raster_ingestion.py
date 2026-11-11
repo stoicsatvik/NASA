@@ -1,5 +1,3 @@
-from io import BytesIO
-
 import numpy as np
 import pytest
 import rasterio
@@ -69,7 +67,7 @@ def test_source_url_is_pinned_to_exact_public_usgs_product():
         validate_source_url(SOURCE_URL + "?download=1")
 
 
-@pytest.mark.parametrize("magic", [b"II*\\x00", b"MM\\x00*", b"II+\\x00", b"MM\\x00+"])
+@pytest.mark.parametrize("magic", [b"II*\x00", b"MM\x00*", b"II+\x00", b"MM\x00+"])
 def test_tiff_magic_accepts_classic_and_bigtiff(magic):
     assert is_tiff(magic + b"payload")
 
