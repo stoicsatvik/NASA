@@ -1,4 +1,6 @@
+import json
 import unittest
+from unittest.mock import patch
 
 from experiments.e561_arcgis_analogue_service_audit import (
     E561Error,
@@ -8,12 +10,53 @@ from experiments.e561_arcgis_analogue_service_audit import (
     SERVICE_ITEM_ID,
     count_query_url,
     fetch_portal_item_metadata,
+    fetch_json,
     endpoint_is_allowed,
     validate_count,
     validate_layer,
     validate_portal_item,
     validate_service,
 )
+
+
+class FakeHeaders:
+    def __init__(self, content_type):
+        self.content_type = content_type
+
+    def get_content_type(self):
+        return self.content_type
+
+    def get(self, name):
+        return None
+
+
+class FakeResponse:
+    status = 200
+
+    def __init__(self, url, content_type, payload):
+        self.url = url
+        self.headers = FakeHeaders(content_type)
+        self.payload = payload
+
+    def geturl(self):
+        return self.url
+
+    def read(self, limit):
+        return self.payload
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        return False
+
+
+class FakeOpener:
+    def __init__(self, response):
+        self.response = response
+
+    def open(self, request, timeout):
+        return self.response
 
 
 class E561Tests(unittest.TestCase):
@@ -175,6 +218,22 @@ class E561Tests(unittest.TestCase):
         self.assertEqual(result["outcome"], "PORTAL_ITEM_METADATA_UNAVAILABLE")
         self.assertEqual([item["format"] for item in result["attempts"]], ["json", "pjson"])
         self.assertFalse(result["raw_item_metadata_retained"])
+
+    def test_fetch_json_accepts_arcgis_text_plain_when_body_is_valid_json(self):
+        url = PORTAL_ITEM_URL + "?f=json"
+        response = FakeResponse(url, "text/plain", b'{"id":"ok"}')
+        with patch("experiments.e561_arcgis_analogue_service_audit.urllib.request.build_opener",
+                   return_value=FakeOpener(response)):
+            self.assertEqual(fetch_json(url), {"id": "ok"})
+
+    def test_fetch_json_rejects_html_even_when_endpoint_is_allowlisted(self):
+        url = PORTAL_ITEM_URL + "?f=json"
+        response = FakeResponse(url, "text/html", b"<html>login</html>")
+        with patch("experiments.e561_arcgis_analogue_service_audit.urllib.request.build_opener",
+                   return_value=FakeOpener(response)):
+            with self.assertRaises(E561Error) as caught:
+                fetch_json(url)
+        self.assertEqual(caught.exception.outcome, "ARCGIS_RESPONSE_NOT_JSON:text/html")
 
     def test_count_only_response_accepts_integer_and_rejects_rows(self):
         self.assertEqual(validate_count({"count": 192}), 192)
