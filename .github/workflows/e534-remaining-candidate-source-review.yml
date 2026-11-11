@@ -12,7 +12,9 @@ on:
       - research/E534_REMAINING_CANDIDATE_SOURCE_REVIEW_20261111.csv
       - .github/workflows/e534-remaining-candidate-source-review.yml
   pull_request:
-    branches: [main]
+    branches:
+      - main
+      - research/e533-candidate-label-source-review-20261111
     paths:
       - experiments/e534_remaining_candidate_source_review.py
       - experiments/test_e534_remaining_candidate_source_review.py
