@@ -1,0 +1,171 @@
+{
+  "schema": "nasa/e552/hirise-nodata-missingness/v1",
+  "source": {
+    "e550_experiment": "E550 nine-patch spatial CTX/HiRISE residual campaign",
+    "e550_run_id": 43025458917,
+    "e550_artifact_id": 13855824623,
+    "e550_artifact_zip_sha256": "a1cd14c272ed122f82edaac5f72e788d799ad7311bd488f8beffd989f487ccb1",
+    "e550_receipt_json_sha256": "bb13f638136d038ec10d683b26fdc48d684fce38957360bc60f121b6d3401123",
+    "e549_experiment": "E549 matched-support Jezero CTX versus HiRISE elevation comparison",
+    "e549_run_id": 43024579396,
+    "e549_artifact_id": 13856547599,
+    "e549_artifact_zip_sha256": "67b51cc53cc00dda6e90ee7df0c771fecacd2443a587f4e9b996d2344ec9fed6",
+    "e549_receipt_json_sha256": "8e5ef2ed9f33f304a6cda63ec4c775e1434984814dd2caa60aa2e7a7a021f532",
+    "hirise_doi": "10.5066/P9REJ9JN",
+    "nodata_value": -3.4028226550889045e+38,
+    "nodata_source": "GeoTIFF GDAL_NODATA from E549 receipt",
+    "sample_dtype_for_digest": "<f4",
+    "sample_shape": [
+      113,
+      113
+    ],
+    "all_nodata_window_sha256": "939e55e9e3abcb6ee16e1ef5761cb7de68a2794c13b91e173db9698310bf3179",
+    "residual_definition": "CTX elevation minus area-weighted HiRISE elevation, metres"
+  },
+  "patches": [
+    {
+      "patch_id": "x15_y15",
+      "fraction_x": 0.15,
+      "fraction_y": 0.15,
+      "center_x": 4580576,
+      "center_y": 1088353.2,
+      "ctx_valid_cells": 25,
+      "common_valid_cells": 0,
+      "hirise_window": {
+        "col_off": 3171,
+        "row_off": 18218,
+        "width": 113,
+        "height": 113
+      },
+      "hirise_sample_sha256": "939e55e9e3abcb6ee16e1ef5761cb7de68a2794c13b91e173db9698310bf3179"
+    },
+    {
+      "patch_id": "x50_y15",
+      "fraction_x": 0.5,
+      "fraction_y": 0.15,
+      "center_x": 4588066,
+      "center_y": 1088353.2,
+      "ctx_valid_cells": 25,
+      "common_valid_cells": 25,
+      "hirise_window": {
+        "col_off": 10651,
+        "row_off": 18218,
+        "width": 113,
+        "height": 113
+      },
+      "hirise_sample_sha256": "a6996d95d87f48f9d974c428984a900d81fba7f97413aa8212a6f63961679e31"
+    },
+    {
+      "patch_id": "x85_y15",
+      "fraction_x": 0.85,
+      "fraction_y": 0.15,
+      "center_x": 4595556,
+      "center_y": 1088353.2,
+      "ctx_valid_cells": 25,
+      "common_valid_cells": 25,
+      "hirise_window": {
+        "col_off": 18151,
+        "row_off": 18218,
+        "width": 113,
+        "height": 113
+      },
+      "hirise_sample_sha256": "567429b0d781d1c015521b40b452053b786b57aa7be640b0cf98f8cd083fa2fa"
+    },
+    {
+      "patch_id": "x15_y50",
+      "fraction_x": 0.15,
+      "fraction_y": 0.5,
+      "center_x": 4580576,
+      "center_y": 1095874,
+      "ctx_valid_cells": 25,
+      "common_valid_cells": 25,
+      "hirise_window": {
+        "col_off": 3171,
+        "row_off": 10698,
+        "width": 113,
+        "height": 113
+      },
+      "hirise_sample_sha256": "7ca9830e40922d74cb27aedeee902237f07d70f66f839657183868ce355f407c"
+    },
+    {
+      "patch_id": "x50_y50",
+      "fraction_x": 0.5,
+      "fraction_y": 0.5,
+      "center_x": 4588066,
+      "center_y": 1095874,
+      "ctx_valid_cells": 25,
+      "common_valid_cells": 25,
+      "hirise_window": {
+        "col_off": 10651,
+        "row_off": 10698,
+        "width": 113,
+        "height": 113
+      },
+      "hirise_sample_sha256": "c20cb1b4346257d237108a6e2605843176e8b308c4f9ff1424655bd6349ee524"
+    },
+    {
+      "patch_id": "x85_y50",
+      "fraction_x": 0.85,
+      "fraction_y": 0.5,
+      "center_x": 4595556,
+      "center_y": 1095874,
+      "ctx_valid_cells": 25,
+      "common_valid_cells": 25,
+      "hirise_window": {
+        "col_off": 18151,
+        "row_off": 10698,
+        "width": 113,
+        "height": 113
+      },
+      "hirise_sample_sha256": "370972d5c7f572a0b52e80a61b7091306335d672ecdef2c6b84071fe761797b7"
+    },
+    {
+      "patch_id": "x15_y85",
+      "fraction_x": 0.15,
+      "fraction_y": 0.85,
+      "center_x": 4580576,
+      "center_y": 1103394.8,
+      "ctx_valid_cells": 25,
+      "common_valid_cells": 25,
+      "hirise_window": {
+        "col_off": 3171,
+        "row_off": 3178,
+        "width": 113,
+        "height": 113
+      },
+      "hirise_sample_sha256": "2970ec260b9dc3f26eedbccd7a84829822adb3888c066dbe508cb8ef1af30142"
+    },
+    {
+      "patch_id": "x50_y85",
+      "fraction_x": 0.5,
+      "fraction_y": 0.85,
+      "center_x": 4588066,
+      "center_y": 1103394.8,
+      "ctx_valid_cells": 25,
+      "common_valid_cells": 0,
+      "hirise_window": {
+        "col_off": 10651,
+        "row_off": 3178,
+        "width": 113,
+        "height": 113
+      },
+      "hirise_sample_sha256": "939e55e9e3abcb6ee16e1ef5761cb7de68a2794c13b91e173db9698310bf3179"
+    },
+    {
+      "patch_id": "x85_y85",
+      "fraction_x": 0.85,
+      "fraction_y": 0.85,
+      "center_x": 4595556,
+      "center_y": 1103394.8,
+      "ctx_valid_cells": 25,
+      "common_valid_cells": 0,
+      "hirise_window": {
+        "col_off": 18151,
+        "row_off": 3178,
+        "width": 113,
+        "height": 113
+      },
+      "hirise_sample_sha256": "939e55e9e3abcb6ee16e1ef5761cb7de68a2794c13b91e173db9698310bf3179"
+    }
+  ]
+}
