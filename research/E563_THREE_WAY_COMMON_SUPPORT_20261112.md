@@ -1,0 +1,60 @@
+# E563 — three-way MOLA / CTX / HiRISE common-point-support audit (12 November 2026)
+
+## Question
+
+Do the actually observed MOLA bins in the frozen Jezero 33×33 window fall on valid pixels in both the pinned CTX and HiRISE rasters after applying the published MOLA-to-Mars-2015 map-coordinate transformation?
+
+This closes a specific gap left by E545 and E550: MOLA has local laser-shot support, CTX/HiRISE have partial common support, but no experiment has yet measured their three-way common support at the same points.
+
+## Frozen inputs
+
+- MOLA MEGDR v2.0 topography and companion shot-count rasters, PDS Geosciences Node.
+- The same 33×33 MOLA window centered at 18.3995°N, 77.27025°E used by E545.
+- USGS Mars 2020 TRN CTX DTM mosaic, DOI 10.5066/P906QQT8.
+- USGS Mars 2020 TRN HiRISE DTM mosaic, DOI 10.5066/P9REJ9JN.
+- HiRISE PDS3 label and GeoTIFF georeferencing metadata.
+
+## Method
+
+1. Re-acquire exact MOLA label and image row ranges; validate dimensions, units, projection, byte ranges and HTTP 206 receipts.
+2. Mark a MOLA bin observed only when its companion count is greater than zero. Interpolated topography bins are excluded from the denominator.
+3. Derive MOLA pixel-center planetocentric latitude/longitude from the pinned 44°N–0°N, 0°E–90°E simple-cylindrical grid.
+4. Derive the target equirectangular CRS from the HiRISE PDS3 label, including its Mars 2015 radius and map scale.
+5. Confirm that the CTX raster CRS is equivalent to the PDS3-derived HiRISE CRS before using shared projected coordinates.
+6. Sample CTX validity at each observed MOLA bin center. For HiRISE, acquire only bounded row strips spanning observed MOLA point columns; enforce exact byte-range checks and a 2.5 MB transfer cap.
+7. Report MOLA-observed, CTX-valid, HiRISE-valid and three-way common point counts. No elevation residual or correction is fitted.
+
+## Interpretation boundary
+
+This is a **point-center support** test, not an area-coverage fraction. A valid sample means the point falls on a finite, non-nodata pixel in the corresponding product. It does not establish horizontal control-point accuracy, vertical datum equivalence, route safety, analogue similarity or known-site recovery.
+
+MOLA's IAU2000 / 3,396.0 km reference and the CTX/HiRISE Mars 2015 reference are not independently tied by control points here. The coordinate transformation preserves planetocentric longitude/latitude and applies the target projection; it does not estimate a datum shift.
+
+## Exact-head result
+
+- Draft PR #122, branch research/e563-mola-ctx-hirise-common-support-20261112, stacked on E562; main unchanged.
+- Exact-head GitHub Actions run [#43089994108](https://github.com/stoicsatvik/NASA/actions/runs/43089994108) succeeded. All 6 deterministic geometry/mask tests passed; bounded live acquisition completed; compact artifact [#13887368321](https://github.com/stoicsatvik/NASA/actions/runs/43089994108/artifacts/13887368321) was emitted. The earlier same-head run #43089442518 independently reported the same support counts.
+- MOLA re-acquisition: 33×33 bins; **346/1,089 (31.7723%)** have count > 0. The 743 zero-count/interpolated bins are excluded from the support denominator. The two exact image ranges returned HTTP 206 and matched their pinned byte counts and Content-Range values.
+- CTX: all **346/346** observed MOLA point centers fell on valid CTX pixels. The pinned 9,662,387-byte GeoTIFF hash matched the E549 source contract.
+- HiRISE: **256/346** observed MOLA point centers fall inside the raster bounds, but only **164/346** fall on finite, non-nodata pixels. Of those, 90 were outside the raster bounds and 92 were inside the bounding box but landed on nodata.
+- The live TIFF reader emitted a nonfatal `tifffile` warning while interpreting the `GDAL_NODATA` tag as float32. E563's explicit PDS3/GeoTIFF nodata resolver still recovered `-3.4028226550889045e+38` from the tag and excluded all 92 in-bounds nodata points. The warning is preserved as a parser diagnostic, not suppressed.
+- Three-way common point support: **164/346 = 47.3988%** of observed MOLA bins. This is partial point support, not an area fraction. The 2.5 MB HiRISE cap was respected: 29 row-range requests transferred 959,660 bytes. CTX transfer was 9,662,387 bytes.
+- The PDS3-derived HiRISE CRS and CTX raster CRS are pyproj-equivalent. The mathematical transform round-trip error was 8.4×10⁻¹⁰ m; this is only a numerical inverse-transform check, **not** an independent horizontal registration residual. The source radii differ by 190 m (MOLA 3,396,000 m; Mars 2015 3,396,190 m).
+- Outcome: **THREE_WAY_POINT_SUPPORT_MEASURED**. Within this bounded window, CTX support is complete for observed MOLA points; HiRISE support is materially partial. Do not treat the metadata bounding box as common valid coverage.
+
+
+
+## Claim states
+
+- Bounded MOLA observed-shot support: SUPPORTED by E545; re-acquired in E563.
+- CTX/HiRISE CRS parameter equivalence: SUPPORTED by E550; re-checked in E563.
+- Three-way MOLA/CTX/HiRISE common point support: **PARTIAL FOR THIS BOUNDED WINDOW** (164/346 observed MOLA point centers; 47.3988%).
+- Local horizontal registration residual: NOT YET MEASURED.
+- Cross-body similarity: NOT YET PROVEN.
+- E001 known-site recovery: NOT YET MEASURED.
+- Novel analogue discovery: NOT YET PROVEN.
+- Route safety: NOT CLAIMED.
+
+## Next gate
+
+The measured support is partial. Do not score routes or infer safety from the metadata envelope. Next, characterize the spatial clustering of the 90 out-of-bounds and 92 in-bounds-nodata observed MOLA points without retaining raw raster values, then obtain independent horizontal-control provenance if available. This still does not repair the missing independent Earth positive-site and non-analogue-control labels required for E001. Do not impute, shift or substitute unsupported pixels.
