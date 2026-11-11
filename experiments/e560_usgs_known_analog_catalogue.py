@@ -64,7 +64,7 @@ def xml_urls(payload):
         local=str(node.tag).split("}")[-1].lower()
         if local not in {"onlink","linkage","networkr","networka","url"} or not node.text:
             continue
-        for value in re.findall(r"https?://[^\\s<>\"']+",node.text.strip()):
+        for value in re.findall(r"https?://\S+",node.text.strip()):
             found.add(value.rstrip(".,);]"))
     return sorted(found)
 
