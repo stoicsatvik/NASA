@@ -4,11 +4,13 @@ from experiments.e561_arcgis_analogue_service_audit import (
     E561Error,
     LAYER_NAME,
     LAYER_URL,
+    PORTAL_ITEM_URL,
     SERVICE_ITEM_ID,
     count_query_url,
     endpoint_is_allowed,
     validate_count,
     validate_layer,
+    validate_portal_item,
     validate_service,
 )
 
@@ -37,6 +39,8 @@ class E561Tests(unittest.TestCase):
         self.assertFalse(endpoint_is_allowed(count_query_url() + "&token=not-used"))
         self.assertFalse(endpoint_is_allowed(LAYER_URL + "?f=json&f=json"))
         self.assertFalse(endpoint_is_allowed(LAYER_URL + "?f=json#fragment"))
+        self.assertTrue(endpoint_is_allowed(PORTAL_ITEM_URL + "?f=json"))
+        self.assertFalse(endpoint_is_allowed(PORTAL_ITEM_URL + "?f=json&token=not-used"))
 
     def test_count_query_is_strictly_count_only(self):
         from urllib.parse import parse_qs, urlsplit
@@ -103,6 +107,40 @@ class E561Tests(unittest.TestCase):
         }
         with self.assertRaises(E561Error):
             validate_layer(document)
+
+    def test_portal_item_identity_access_owner_and_version_metadata_are_required(self):
+        document = {
+            "id": SERVICE_ITEM_ID,
+            "title": "Terrestrial_Analog_Sites_for_Planetary_Science",
+            "type": "Feature Service",
+            "access": "public",
+            "owner": "usgs",
+            "created": 1600000000000,
+            "modified": 1720636669000,
+            "url": "https://services.arcgis.com/v01gqwM5QqNysAAi/ArcGIS/rest/services/"
+                   "Terrestrial_Analog_Sites_for_Planetary_Science/FeatureServer",
+        }
+        result = validate_portal_item(document)
+        self.assertEqual(result["id"], SERVICE_ITEM_ID)
+        self.assertEqual(result["access"], "public")
+        self.assertFalse(result["raw_item_url_retained"])
+        document["access"] = "private"
+        with self.assertRaises(E561Error):
+            validate_portal_item(document)
+
+    def test_portal_item_url_must_match_exact_service_identity(self):
+        document = {
+            "id": SERVICE_ITEM_ID,
+            "title": "Terrestrial Analog Sites for Planetary Science",
+            "type": "Feature Service",
+            "access": "public",
+            "owner": "usgs",
+            "created": 1600000000000,
+            "modified": 1720636669000,
+            "url": "https://services.arcgis.com/other/FeatureServer",
+        }
+        with self.assertRaises(E561Error):
+            validate_portal_item(document)
 
     def test_count_only_response_accepts_integer_and_rejects_rows(self):
         self.assertEqual(validate_count({"count": 192}), 192)
