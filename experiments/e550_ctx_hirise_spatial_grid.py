@@ -11,7 +11,7 @@ import requests
 import tifffile
 
 from experiments.e548_hirise_pixel_window import (
-    RangeReader, TIFF_URL, _read_small_label, parse_pds3_label, _resolve_nodata,
+    RangeReader, TIFF_URL, LABEL_URL, _read_small_label, parse_pds3_label, _resolve_nodata,
     _geo_summary, _first_float, ProbeError
 )
 from experiments.e549_ctx_hirise_matched_support import (
