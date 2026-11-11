@@ -65,3 +65,15 @@ Acquire and inspect the separate official USGS 2020 *Known Terrestrial Analog Si
 Code inspection found that Python treats `bool` as a subclass of `int`, so the original coordinate predicate would count a malformed GeoJSON position such as `[true, 20.0]` as numeric. The audit now explicitly excludes booleans and adds a regression fixture. This is a validator correction, not a change to the pinned source or an additional analogue claim. The original exact-head live-source receipt remains evidence for the earlier code head; the new boolean check has passed its focused local test, but the live catalogue audit must be rerun on this head before claiming exact-head source revalidation.
 
 Focused local validation after the predicate correction: **5/5 E532 fixture tests passed**, including the new boolean-coordinate regression. The prior live-source Actions receipt (#42924295331) predates this change; a new exact-head live acquisition receipt is still required before asserting the boolean filter was applied to the pinned source file.
+
+
+## Exact-head revalidation after boolean-coordinate correction — 2026-11-11
+
+The earlier post-audit note said a new live-source run was still pending. That gate is now closed for this branch head:
+
+- GitHub Actions run [#42927215461](https://github.com/stoicsatvik/NASA/actions/runs/42927215461) completed successfully on PR #91's merge ref, incorporating head commit `fe110bed603bf53f70c01c553ffb4528612c4534`.
+- **5/5 fixture tests passed**, including `test_boolean_coordinate_is_not_a_numeric_point`.
+- The live pinned GeoJSON acquisition and audit also succeeded.
+- The source SHA-256 remained `09ad7d62eefd40c86acaee945fb2d1f045b199c958830ba8715e7774311afb0d`; the 16-record, all-Draft catalogue result is unchanged.
+
+The boolean exclusion is now covered by both the exact-head fixture suite and a successful live-source audit. E532 remains a candidate-positive index only and remains **NOT E001-READY**; no known-site recovery or analogue-discovery claim is promoted.
