@@ -79,3 +79,11 @@ The five-weight, 14-challenge scorecard was stress-tested with 200,000 determini
 | +/-0.75 | 54.34% | 28.55% | 10.48% | 6.32% | +0.1041 |
 
 Martian Map remains the most frequent top choice under these perturbation families, but its 5th-percentile gap versus MODIS/VIIRS is negative even at +/-0.25 and becomes more negative as score uncertainty grows. This is a robustness diagnostic, not a probability of judging success. Keep Martian Map and MODIS/VIIRS as a provisional top tier; challenge-selection superiority remains NOT YET PROVEN. Full method and results: `research/E531_CHALLENGE_SELECTION_SENSITIVITY_20261111.md` and `research/results/E531_CHALLENGE_SELECTION_SENSITIVITY_20261111.json`.
+
+## E535 independent Earth aeolian dataset discovery (2026-11-11)
+
+USGS source review identified the Grand Falls Dune Field, Navajo Nation, Arizona, as a candidate positive site with independent public field-data releases from 2013–2024. The release family includes wind/sediment-flux measurements, time-lapse imagery, photogrammetry-derived DEMs and orthomosaics; USGS explicitly describes the active dune field as a Mars analogue. The 2022–2023 and 2023–2024 products provide DEM/orthomosaic and meteorological/imagery components; 2023–2024 weather is 15-minute in the windy season and hourly in calmer months, cameras are 10-minute, and passive sediment samplers are retrieved about every two weeks in the windy season.
+
+This raises the evidence potential of the planetary-analog track for a narrow **aeolian-process** experiment. It does not yet make the data E001-ready: raw files have not been downloaded or hashed, CRS/resolution/nodata/units are uninspected, and no non-analogue controls or Mars/Earth matched-support descriptors exist. The heuristic score is unchanged; Martian Map and MODIS/VIIRS remain the provisional top tier pending data ingestion and validation.
+
+Source report: `research/E535_GRAND_FALLS_AEOLIAN_DATA_SOURCE_AUDIT_20261111.md`; registry: `data/grand_falls_source_registry.csv`. Public data access is not field-access permission; the site is on Navajo Nation land and new geological fieldwork requires applicable permits. No fieldwork, sampling or contact was performed.
