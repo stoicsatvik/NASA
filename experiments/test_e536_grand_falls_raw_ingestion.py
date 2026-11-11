@@ -61,7 +61,7 @@ class E536ScienceBaseProbeTests(unittest.TestCase):
     def test_item_archive_budget_requires_complete_catalogue_sizes(self):
         files = [{"size_bytes": 1171078}, {"size_bytes": 441}, {"size_bytes": 1170},
                  {"size_bytes": 21475}, {"size_bytes": 619492}, {"size_bytes": 46617552}]
-        self.assertEqual(_catalogue_total_bytes(files), 48429208)
+        self.assertEqual(_catalogue_total_bytes(files), 48431208)
         self.assertLess(_catalogue_total_bytes(files), MAX_DOWNLOAD_BYTES)
         self.assertGreater(_catalogue_total_bytes([{"size_bytes": MAX_DOWNLOAD_BYTES + 1}]), MAX_DOWNLOAD_BYTES)
         self.assertIsNone(_catalogue_total_bytes([{"size_bytes": 100}, {"size_bytes": None}]))
