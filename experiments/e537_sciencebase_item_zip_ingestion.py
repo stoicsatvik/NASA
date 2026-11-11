@@ -72,7 +72,9 @@ def parse_fgdc(xml_bytes: bytes) -> dict:
     wanted = {
         "altunits", "altsys", "altdatum", "horizdn", "geogunit",
         "mapprojn", "projcsn", "geogcsn", "rowres", "colres",
-        "nrows", "ncols", "rasttype", "rasterobj",
+        "nrows", "ncols", "rasttype", "rasterobj", "westbc", "eastbc",
+        "northbc", "southbc", "begdate", "enddate", "attrdef",
+        "attrlabl", "placekey",
     }
     fields: dict[str, list[str]] = {}
     for element in root.iter():
@@ -197,6 +199,23 @@ def download_and_inspect(output_dir: Path) -> dict:
                 "catalogue_size_matches": len(dem_bytes) == CATALOGUE_DEM_BYTES,
             })
             receipt["source"]["fgdc_fields"] = parse_fgdc(fgdc_bytes)
+            fields = receipt["source"]["fgdc_fields"]
+            receipt["source"]["site_bounds_lonlat"] = {
+                key: (fields.get(key) or [None])[0]
+                for key in ("westbc", "southbc", "eastbc", "northbc")
+            }
+            receipt["source"]["acquisition_period"] = {
+                "start": (fields.get("begdate") or [None])[0],
+                "end": (fields.get("enddate") or [None])[0],
+            }
+            receipt["source"]["elevation_definition"] = fields.get("attrdef", [])
+            receipt["source"]["crs_fields_present"] = any(
+                fields.get(key) for key in ("projcsn", "geogcsn", "horizdn", "mapprojn")
+            )
+            receipt["source"]["vertical_unit_fields_present"] = bool(fields.get("altunits"))
+            receipt["source"]["resolution_fields_present"] = bool(
+                fields.get("rowres") or fields.get("colres")
+            )
             if len(dem_bytes) != CATALOGUE_DEM_BYTES:
                 raise ValueError(
                     f"DEM ZIP member size {len(dem_bytes)} != catalogue size {CATALOGUE_DEM_BYTES}"
@@ -205,6 +224,7 @@ def download_and_inspect(output_dir: Path) -> dict:
             dem_path.write_bytes(dem_bytes)
             profile = inspect_dem(dem_bytes, fgdc_bytes)
             receipt["download"]["success"] = True
+            receipt["experiment_outcome"] = "RAW_RASTER_INGESTED"
             receipt["raster_inspection"] = profile
             receipt["claim_state"] = {
                 "raw_earth_raster_ingestion": "SUPPORTED" if profile["crs"] else "PARTIAL",
@@ -218,6 +238,25 @@ def download_and_inspect(output_dir: Path) -> dict:
             Path(tmp_name).unlink(missing_ok=True)
     except Exception as exc:
         receipt["download"]["error"] = f"{type(exc).__name__}: {exc}"
+        if receipt["download"].get("archive_members") and (
+            receipt["download"].get("selected_dem_member_bytes") != CATALOGUE_DEM_BYTES
+        ):
+            receipt["experiment_outcome"] = "NEGATIVE_RESULT_PUBLIC_ZIP_OMITS_RASTER"
+            receipt["download"]["blocker"] = (
+                "The public item ZIP contains a zero-byte DEM member despite the 619492-byte "
+                "catalogue listing. The manager/cloud file path requires an authenticated "
+                "ScienceBase session; no access-control bypass or credential use was attempted."
+            )
+            receipt["claim_state"] = {
+                "source_site_bounds_and_dates": "SUPPORTED",
+                "raw_earth_raster_ingestion": "NOT YET INGESTED",
+                "crs_vertical_units_resolution_nodata": "NOT YET RESOLVED",
+                "cross_body_similarity": "NOT YET PROVEN",
+                "known_site_recovery": "NOT YET MEASURED",
+                "novel_analogue_discovery": "NOT YET PROVEN",
+            }
+        else:
+            receipt["experiment_outcome"] = "ERROR"
     finally:
         if response is not None:
             response.close()
@@ -231,5 +270,5 @@ def download_and_inspect(output_dir: Path) -> dict:
 if __name__ == "__main__":
     result = download_and_inspect(Path(".artifacts/e537"))
     print(json.dumps(result, indent=2, sort_keys=True))
-    if not result["download"].get("success"):
+    if result.get("experiment_outcome") == "ERROR":
         raise SystemExit(1)
