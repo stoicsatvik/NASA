@@ -42,11 +42,13 @@ class E537ScienceBaseItemZipTests(unittest.TestCase):
                 _select_members(archive)
 
     def test_parses_only_explicit_fgdc_unit_and_projection_fields(self):
-        xml = b"""<metadata><spref><vertdef><altsys><altdatum>Local datum</altdatum><altunits>meters</altunits></altsys></vertdef><horizsys><planar><mapproj><mapprojn>UTM</mapprojn></mapproj></planar></horizsys></spref></metadata>"""
+        xml = b"""<metadata><spref><vertdef><altsys><altdatum>Local datum</altdatum><altunits>meters</altunits></altsys></vertdef><horizsys><planar><mapproj><mapprojn>UTM</mapprojn></mapproj></planar></horizsys></spref><spdom><bounding><westbc>-111.18</westbc><eastbc>-111.14</eastbc><northbc>35.44</northbc><southbc>35.42</southbc></bounding></spdom><eainfo><detailed><attr><attrlabl>Value</attrlabl><attrdef>Surface elevation with no coordinate reference system.</attrdef></attr></detailed></eainfo></metadata>"""
         fields = parse_fgdc(xml)
         self.assertEqual(fields["altunits"], ["meters"])
         self.assertEqual(fields["altdatum"], ["Local datum"])
         self.assertEqual(fields["mapprojn"], ["UTM"])
+        self.assertEqual(fields["westbc"], ["-111.18"])
+        self.assertEqual(fields["attrdef"], ["Surface elevation with no coordinate reference system."])
 
 
 if __name__ == "__main__":
