@@ -710,3 +710,8 @@ Next highest-information work: find and verify an independent, analysis-grade Ea
 - The live `tifffile` reader emitted a nonfatal GDAL_NODATA-to-float32 parsing warning; the explicit nodata resolver recovered the tag value and excluded all 92 in-bounds nodata points. Warning preserved, not suppressed.
 - Result: three-way spatial point support is PARTIAL in this bounded Jezero window. This weakens full-layer readiness for Martian Map; it does not prove the map challenge infeasible and does not validate route safety.
 
+
+
+## E564 — unsupported HiRISE point clustering diagnostic (12 November 2026)
+
+A draft follow-up branch, research/e564-hirise-support-clustering-20261112, is stacked on E563 PR #122. It reuses only E563's in-memory boolean support masks and adds four-neighbor component sizes plus a fixed-count random-label reference for CTX-invalid, HiRISE-outside and HiRISE-inside-nodata bins. The reference is descriptive, not an inferential p-value, because the uniform-label null does not model raster footprint geometry or nodata generation. No raster values or point coordinates are persisted. Exact-head live results are pending; do not claim a physical cause, registration correction, route safety or analogue recovery.
