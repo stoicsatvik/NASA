@@ -789,4 +789,4 @@ E568 is the next gate: sample the actual 2025 DTM at the same 346 point centers 
 - Current branch head 630f1eabd8016734ce1ff07733ee89bb8f9add5e passed exact-head Actions [#43117959720](https://github.com/stoicsatvik/NASA/actions/runs/43117959720): 11 tests, live FOM point-support acquisition, artifact #13899432519. The measured counts remain 329 inside / 259 valid of 346 observed MOLA points. This rerun is on the documentation-reconciled head; the sampler and result are unchanged.
 
 
-E567 branch now ends at 17e23088d0a228f69e65969327749ea37b800562 after documentation-only report/state updates; measured code head 630f1eabd8016734ce1ff07733ee89bb8f9add5e was rerun successfully by #43117959720. No sampler code changed after that exact-head acquisition.
+Subsequent commits after measured code head 630f1eabd8016734ce1ff07733ee89bb8f9add5e are documentation-only; that code head was rerun successfully by #43117959720. No sampler code changed after that exact-head acquisition.
