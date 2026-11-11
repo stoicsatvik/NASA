@@ -125,7 +125,7 @@ class E546ZipRangeTests(unittest.TestCase):
 
     def test_zip64_end_record_parses_large_entry_counts_and_offsets(self):
         data = struct.pack(
-            "<4sQ2H2I4Q", b"PK\\x06\\x06", 44, 45, 45, 0, 0, 70000, 70000, 123456, 987654
+            "<4sQ2H2I4Q", b"PK\x06\x06", 44, 45, 45, 0, 0, 70000, 70000, 123456, 987654
         )
         result = parse_zip64_eocd(data)
         self.assertEqual(result["entries_total"], 70000)
