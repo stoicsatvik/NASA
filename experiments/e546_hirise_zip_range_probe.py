@@ -162,7 +162,7 @@ def parse_eocd(tail: bytes, tail_start: int, archive_size: int) -> dict:
         if zip64_disk != 0 or disk_count != 1:
             raise ProbeError("MULTI_DISK_ZIP64", "Multi-disk ZIP64 archives are not admitted")
         result.update({"zip64": True, "zip64_eocd_offset": zip64_offset})
-    if result["central_directory_offset"] + result["central_directory_size"] > archive_size:
+    if not result["zip64"] and result["central_directory_offset"] + result["central_directory_size"] > archive_size:
         raise ProbeError("CENTRAL_DIRECTORY_OUT_OF_BOUNDS", "Central directory exceeds archive size")
     return result
 
@@ -233,7 +233,13 @@ def parse_central_directory(data: bytes, expected_entries: int) -> list[dict]:
             name = name_bytes.decode(encoding)
         except UnicodeDecodeError as exc:
             raise ProbeError("FILENAME_ENCODING_INVALID", "ZIP member filename is not decodable") from exc
-        if name.startswith(("/", "\\")) or ".." in Path(name).parts:
+        normalized_name = name.replace("\\", "/")
+        name_parts = normalized_name.split("/")
+        if (
+            name.startswith(("/", "\\"))
+            or any(part == ".." for part in name_parts)
+            or (name_parts and name_parts[0].endswith(":"))
+        ):
             raise ProbeError("UNSAFE_MEMBER_PATH", "Archive contains an absolute or traversal member path")
         if disk_start != 0:
             raise ProbeError("MULTI_DISK_MEMBER", "Member references another ZIP disk")
@@ -381,9 +387,11 @@ def probe(session=None) -> dict:
         "dtm_candidate_count": len(candidates),
         "outcome": outcome,
     }
-    transferred = tail_receipt["bytes"] + central_receipt["bytes"]
-    if isinstance(tail_receipt, dict) and "zip64_eocd" in tail_receipt:
-        transferred += tail_receipt["zip64_eocd"]["bytes"]
+    if "tail" in tail_receipt:
+        transferred = tail_receipt["tail"]["bytes"] + tail_receipt["zip64_eocd"]["bytes"]
+    else:
+        transferred = tail_receipt["bytes"]
+    transferred += central_receipt["bytes"]
     if selected is not None:
         if selected["encrypted"]:
             result["outcome"] = "ENCRYPTED_DTM_MEMBER"

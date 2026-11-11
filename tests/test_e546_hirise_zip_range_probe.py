@@ -8,6 +8,7 @@ from experiments.e546_hirise_zip_range_probe import (
     parse_central_directory,
     parse_eocd,
     parse_local_header,
+    parse_zip64_eocd,
     validate_url,
 )
 
@@ -115,11 +116,21 @@ class E546ZipRangeTests(unittest.TestCase):
         self.assertEqual(rows[0]["compression_method"], 0)
         self.assertEqual(rows[0]["local_header_offset"], 200)
 
-    def test_central_directory_rejects_path_traversal(self):
-        data = make_central_entry("../Jezero_DTM.tif")
-        with self.assertRaises(ProbeError) as ctx:
-            parse_central_directory(data, 1)
-        self.assertEqual(ctx.exception.outcome, "UNSAFE_MEMBER_PATH")
+    def test_central_directory_rejects_posix_and_windows_path_traversal(self):
+        for name in ("../Jezero_DTM.tif", r"..\\Jezero_DTM.tif", r"C:\\temp\\Jezero_DTM.tif"):
+            data = make_central_entry(name)
+            with self.subTest(name=name), self.assertRaises(ProbeError) as ctx:
+                parse_central_directory(data, 1)
+            self.assertEqual(ctx.exception.outcome, "UNSAFE_MEMBER_PATH")
+
+    def test_zip64_end_record_parses_large_entry_counts_and_offsets(self):
+        data = struct.pack(
+            "<4sQ2H2I4Q", b"PK\\x06\\x06", 44, 45, 45, 0, 0, 70000, 70000, 123456, 987654
+        )
+        result = parse_zip64_eocd(data)
+        self.assertEqual(result["entries_total"], 70000)
+        self.assertEqual(result["central_directory_size"], 123456)
+        self.assertEqual(result["central_directory_offset"], 987654)
 
     def test_local_header_requires_central_directory_agreement(self):
         name = b"DTM/Jezero_DTM.tif"
