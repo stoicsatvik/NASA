@@ -58,3 +58,26 @@ Pending E568 Actions run.
 ## Next gate
 
 If the 2025 DTM provides materially better valid support, inspect the DTM scale/offset, MOLA control limitations and FOM categories before any terrain-feature comparison. Do not promote point support into route safety or independent registration accuracy.
+
+
+## Exact-head result (12 November 2026)
+
+Dedicated Actions run [#43115633885](https://github.com/stoicsatvik/NASA/actions/runs/43115633885) succeeded on head `0d692a630d30ed7cf2bb4b2e19b1a1f56804149c`; receipt artifact [#13899160705](https://github.com/stoicsatvik/NASA/actions/runs/43115633885/artifacts/13899160705).
+
+- 2025 DTM valid support: **259/346** observed MOLA point centers (74.86%); 329/346 are inside raster bounds, with 259/329 valid among those inside.
+- FOM_Confidence valid support: **259/346**, exactly the same mask as the DTM at these point centers (259 both valid, 87 both invalid, zero one-sided-valid points).
+- Raw FOM code 14 is most frequent (112), followed by 13 (52), 15 (49), and 12 (23); codes remain uninterpreted categories, not calibrated confidence values.
+- 712 HTTP ranges transferred 742,395,283 bytes under the 850 MiB cap. The full archive and orthoimage were not downloaded. Temporary rasters were deleted; no point coordinates or raw per-point values were retained.
+
+The 2025 aggregate count is 95 points higher than E563's 2020 count (164/346 versus 259/346, +27.46 percentage points). This is **not a paired comparison** because E563 did not retain its per-point mask. It is not evidence of a causal improvement or independent registration. The 2025 mosaic is CTX-aligned, and FOM codes are not interpreted.
+
+## Updated claim states
+
+- 2025 DTM GeoTIFF readability: SUPPORTED for the pinned member.
+- 2025 DTM valid support at 346 observed MOLA points: MEASURED for this bounded window.
+- DTM/FOM validity-mask agreement: MEASURED for this bounded window.
+- 2020-versus-2025 aggregate support difference: MEASURED; paired pointwise difference NOT YET MEASURED.
+- Independent horizontal registration: NOT YET MEASURED.
+- Cross-body similarity: NOT YET PROVEN; known-site recovery: NOT YET MEASURED; novel analogue discovery: NOT YET PROVEN; local validation advantage: NOT YET PROVEN; route safety: NOT CLAIMED.
+
+Next: only if this coverage difference is decision-relevant, run a paired 346-point 2020/2025 support-mask comparison and CRS sensitivity. Do not promote point support into route safety or known-analogue recovery.
