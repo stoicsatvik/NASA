@@ -726,3 +726,31 @@ A draft follow-up branch, research/e564-hirise-support-clustering-20261112, is s
 - Interpretation: nodata clustering remains pronounced after conditioning on the raster footprint; this does not identify the physical cause, validate a horizontal registration correction, establish vertical agreement or route safety, recover known analogues, or prove cross-body similarity. Do not promote the upper-tail fraction to a p-value.
 - Claim states remain unchanged: bounded MOLA support SUPPORTED; CRS parameter equivalence SUPPORTED; three-way point support PARTIAL FOR THIS BOUNDED WINDOW; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN; route safety NOT CLAIMED.
 - Next highest-information move: inspect the pinned HiRISE product's nodata/quality-mask semantics and seek an overlapping or independent DTM coverage source for the same area. Avoid further same-window permutation variants unless they preserve a materially stronger spatial null. Reassess Martian Map readiness against MODIS/VIIRS only when a scored evidence factor changes; no challenge is locked.
+
+
+## E566 — 2025 USGS HiRISE DTM/confidence archive access (2026-11-12)
+
+The official USGS 2025 Mars Sample Return HiRISE DTM/Orthoimage archive (DOI 10.5066/P13CPYYU) was tested through its exact published S3 URL without credentials. Exact-head Actions run 43113419588 passed 6/6 deterministic fixtures and successfully read the ZIP central directory using HTTP Range only.
+
+Measured:
+- Archive size: 5,468,062,403 bytes; Accept-Ranges: bytes.
+- 17 ZIP members; 4 TIFF members: one DTM, two confidence rasters, one orthoimage.
+- DTM: 675,625,590 compressed / 711,891,990 uncompressed bytes.
+- FOM_ColorConfidence: 95,525,154 compressed / 1,540,258,047 uncompressed bytes.
+- FOM_Confidence: 65,308,185 compressed / 66,059,236 uncompressed bytes.
+- All four TIFF prefixes have valid TIFF magic. The three science members use ZIP deflate, so direct random access within the ZIP is not available; a selected member must be decompressed first.
+- 17 range requests transferred 20,311 bytes under the 32 MiB cap. No pixel values, raw member contents or point coordinates were retained.
+
+Claim update:
+- Public archive range access without credentials: **SUPPORTED**.
+- DTM and confidence member presence: **SUPPORTED at archive level**.
+- GeoTIFF georeferencing and confidence semantics: **NOT YET MEASURED**.
+- 2025 valid-pixel support at the E563 observed-MOLA points: **NOT YET MEASURED**.
+- Replacement of 2020 HiRISE nodata: **NOT YET MEASURED**.
+- Independent horizontal registration: **NOT YET MEASURED**; the 2025 product is aligned to CTX.
+- Cross-body similarity: **NOT YET PROVEN**.
+- E001 known-site recovery: **NOT YET MEASURED**.
+- Novel analogue discovery: **NOT YET PROVEN**.
+- Route safety: **NOT CLAIMED**.
+
+The highest-value next gate is to decompress only the 65.3 MB FOM_Confidence member, inspect its GeoTIFF metadata/semantics, and sample the frozen 346 observed-MOLA point centers. Decompress the 675.6 MB DTM member only if that confidence audit shows useful coverage. This is a data-readiness result for Martian Map #11, not evidence that #11 is superior to every official challenge.
