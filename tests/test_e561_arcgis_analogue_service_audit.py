@@ -7,6 +7,7 @@ from experiments.e561_arcgis_analogue_service_audit import (
     PORTAL_ITEM_URL,
     SERVICE_ITEM_ID,
     count_query_url,
+    fetch_portal_item_metadata,
     endpoint_is_allowed,
     validate_count,
     validate_layer,
@@ -41,6 +42,8 @@ class E561Tests(unittest.TestCase):
         self.assertFalse(endpoint_is_allowed(LAYER_URL + "?f=json#fragment"))
         self.assertTrue(endpoint_is_allowed(PORTAL_ITEM_URL + "?f=json"))
         self.assertFalse(endpoint_is_allowed(PORTAL_ITEM_URL + "?f=json&token=not-used"))
+        self.assertTrue(endpoint_is_allowed(PORTAL_ITEM_URL + "?f=pjson"))
+        self.assertFalse(endpoint_is_allowed(PORTAL_ITEM_URL + "?f=pjson&token=not-used"))
 
     def test_count_query_is_strictly_count_only(self):
         from urllib.parse import parse_qs, urlsplit
@@ -141,6 +144,37 @@ class E561Tests(unittest.TestCase):
         }
         with self.assertRaises(E561Error):
             validate_portal_item(document)
+
+    def test_portal_item_metadata_fallback_records_html_failure_without_aborting(self):
+        valid = {
+            "id": SERVICE_ITEM_ID,
+            "title": "Terrestrial_Analog_Sites_for_Planetary_Science",
+            "type": "Feature Service",
+            "access": "public",
+            "owner": "usgs",
+            "created": 1600000000000,
+            "modified": 1720636669000,
+            "url": "https://services.arcgis.com/v01gqwM5QqNysAAi/ArcGIS/rest/services/"
+                   "Terrestrial_Analog_Sites_for_Planetary_Science/FeatureServer",
+        }
+        calls = []
+        def fetcher(url):
+            calls.append(url)
+            if url.endswith("?f=json"):
+                raise E561Error("ARCGIS_RESPONSE_NOT_JSON:text/html")
+            return valid
+        result = fetch_portal_item_metadata(fetcher)
+        self.assertEqual(result["outcome"], "PORTAL_ITEM_METADATA_CONFIRMED")
+        self.assertEqual(calls[-1], PORTAL_ITEM_URL + "?f=pjson")
+        self.assertEqual(result["attempts"][0]["outcome"], "ARCGIS_RESPONSE_NOT_JSON:text/html")
+
+    def test_portal_item_metadata_unavailability_is_preserved(self):
+        result = fetch_portal_item_metadata(
+            lambda url: (_ for _ in ()).throw(E561Error("ARCGIS_RESPONSE_NOT_JSON:text/html"))
+        )
+        self.assertEqual(result["outcome"], "PORTAL_ITEM_METADATA_UNAVAILABLE")
+        self.assertEqual([item["format"] for item in result["attempts"]], ["json", "pjson"])
+        self.assertFalse(result["raw_item_metadata_retained"])
 
     def test_count_only_response_accepts_integer_and_rejects_rows(self):
         self.assertEqual(validate_count({"count": 192}), 192)
