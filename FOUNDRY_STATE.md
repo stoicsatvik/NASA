@@ -3,7 +3,7 @@
 Updated: 2026-11-11
 Class: Tier A
 Time horizon: NASA Space Apps Challenge, 14–15 Nov 2026
-Working branch: `research/e552-e550-missingness-sensitivity-20261111`
+Working branch: `research/e554-hirise-nodata-neighborhood-20261111`
 Main objective: maximize uncertainty eliminated per run and converge on a scientifically defensible Space Apps entry.
 
 ## Current thesis
@@ -558,3 +558,8 @@ Claim states remain: common support PARTIAL (six of nine positions); local verti
 - Report: `research/E553_MISSINGNESS_SENSITIVITY_20261111.md`; result: `research/results/E553_MISSINGNESS_SENSITIVITY_20261111.json`.
 - Claim states: six-patch gradient **NOT SUPPORTED BY E551 NULL**; nine-position gradient **NOT IDENTIFIABLE**; conditional missingness sensitivity diagnostic **SUPPORTED**; cross-body similarity **NOT YET PROVEN**; known-site recovery **NOT YET MEASURED**; novel analogue discovery **NOT YET PROVEN**; route safety **NOT CLAIMED**.
 - Next: recover valid support at the three nodata positions through a separately verified footprint or preserve the partial-coverage result. E001 still requires independently labelled Earth positive sites, hard negatives and physically comparable descriptors. No field data or route-safety validation was created.
+
+
+## E554 exact-head update (2026-11-11)
+
+The E554 bounded neighborhood workflow [#43044286332](https://github.com/stoicsatvik/NASA/actions/runs/43044286332) passed 6/6 tests. All three E550 unsupported positions had 16,384/16,384 finite nodata pixels, zero non-finite pixels, zero usable pixels, and zero usable pixels in the central 64×64. The three sampled windows share the same constant-nodata byte digest. Transfer was 368,991 bytes across 394 exact ranges. This establishes local 128 m support gaps, not their cause. The next gate is product-specific FOM/footprint provenance; no imputation, correction plane, or route-safety claim.
