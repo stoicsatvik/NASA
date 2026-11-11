@@ -52,9 +52,6 @@ class E560Tests(unittest.TestCase):
         self.assertIn("not coordinate",result["PAAD"]["meaning"])
         self.assertEqual(normalise("Lonar Crater, India"),"lonarcraterindia")
 
-if __name__=="__main__": unittest.main()
-
-
     def test_metadata_xml_exposes_only_allowlisted_vector_links(self):
         xml=b'<metadata><onlink>https://www.sciencebase.gov/catalog/file/get/123/sites.zip</onlink><onlink>https://doi.org/10.5066/P9J72921</onlink></metadata>'
         urls=xml_urls(xml)
@@ -62,3 +59,5 @@ if __name__=="__main__": unittest.main()
         self.assertEqual(len(candidates),1)
         self.assertEqual(candidates[0]["name"],"sites.zip")
         self.assertEqual(candidates[0]["url"],"https://www.sciencebase.gov/catalog/file/get/123/sites.zip")
+
+if __name__=="__main__": unittest.main()
