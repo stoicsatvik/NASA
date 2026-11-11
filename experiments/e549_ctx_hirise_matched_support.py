@@ -79,7 +79,7 @@ def _read_ctx(session):
     finally: response.close()
     digest=hashlib.sha256(body).hexdigest()
     if digest!=CTX_SHA256: raise ExperimentError("CTX_HASH_MISMATCH","CTX bytes differ from E544 pinned source hash",{"sha256":digest})
-    if not (body.startswith(b"II*\\x00") or body.startswith(b"MM\\x00*") or body.startswith(b"II+\\x00") or body.startswith(b"MM\\x00+")):
+    if body[:4] not in (bytes((73,73,42,0)), bytes((77,77,0,42)), bytes((73,73,43,0)), bytes((77,77,0,43))):
         raise ExperimentError("CTX_NON_TIFF","Pinned CTX object lacks TIFF magic")
     return body,{"url":location,"bytes":len(body),"sha256":digest,"content_type":final_type}
 
@@ -97,7 +97,6 @@ def _read_hirise_array(reader,page,window):
     rows=[]; raw=bytearray()
     for rr in range(r,r+h):
         start=offsets[rr]+c*4
-        payload=reader.seek(start) and reader.read(w*4) if False else None
         reader.seek(start); payload=reader.read(w*4)
         raw.extend(payload); rows.append(np.frombuffer(payload,dtype=page.dtype,count=w).copy())
     return np.vstack(rows),hashlib.sha256(raw).hexdigest()
@@ -193,7 +192,7 @@ def run():
         if size<=0 or head.headers.get("Accept-Ranges","").lower()!="bytes":
             raise ExperimentError("HIRISE_RANGE_UNAVAILABLE","HiRISE object size/range support unavailable")
     finally: head.close()
-    hi_x0=4577366.0; hi_y0=1106618.0; hi_sx=hi_sy=1.0
+    hi_x0=geo["raster_bounds_map_units"]["xmin"]; hi_y0=geo["raster_bounds_map_units"]["ymax"]; hi_sx,hi_sy=geo["model_pixel_scale"]
     hi_window={
         "col_off":math.floor((block_xmin-hi_x0)/hi_sx)-6,
         "row_off":math.floor((hi_y0-block_ymax)/hi_sy)-6,
@@ -262,7 +261,10 @@ def run():
             "common_valid_area_cells_at_zero_shift":zero["matched_cells"]},
         "zero_shift_residual_ctx_minus_hirise_m":zero,
         "translation_sensitivity_grid_m":shifts,
-        "published_context":{"hiresectx_median_vertical_offset_m_approx":0.4,
+        "transport":{"hirise_range_requests":len(reader.ranges),"hirise_bytes_transferred":reader.transferred,
+            "hirise_transfer_cap_bytes":MAX_HIRISE_BYTES,"ctx_bytes_downloaded":ctx_transport["bytes"]},
+        "ctx_raster_metadata":ctx_meta,
+        "published_context":{"hirise_ctx_median_vertical_offset_m_approx":0.4,
             "source":"USGS HiRISE product metadata; CTX mosaic reported to float above HiRISE",
             "not_reproduced_by_metadata_only":True,
             "horizontal_feature_alignment_context":"USGS reports 94.1% of matched orthomosaic features below 6 m; not a DEM residual."},
