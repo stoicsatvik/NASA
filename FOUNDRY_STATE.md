@@ -101,7 +101,7 @@ Pivot away from the planetary-analog track if any of these becomes clear:
 
 ## Next trigger
 
-**Do not repeat URL guesses or treat partial raster support as a spatial signal. Recover common valid support at the three all-nodata CTX/HiRISE positions only through a separately verified product footprint; otherwise preserve partial coverage. Continue independent Earth positive-site/control discovery before E001.**
+**E554 finds all three missing positions remain all-nodata across 128×128 (128 m) neighborhoods. Stop further local pixel probes. Next: obtain independent USGS footprint/quality-mask provenance; if it cannot establish valid common support, preserve partial coverage. Continue independent Earth positive-site/control discovery before E001.**
 
 E527/E528 spatial acquisition and ID joining are complete. E530 found no directly admissible shared quantitative features in the current PAAD/MGD3 pair. The next run must address independent labels/controls or falsify another feature family, not repeat ingestion or polish UI.
 
@@ -563,3 +563,12 @@ Claim states remain: common support PARTIAL (six of nine positions); local verti
 ## E554 exact-head update (2026-11-11)
 
 The E554 bounded neighborhood workflow [#43044286332](https://github.com/stoicsatvik/NASA/actions/runs/43044286332) passed 6/6 tests. All three E550 unsupported positions had 16,384/16,384 finite nodata pixels, zero non-finite pixels, zero usable pixels, and zero usable pixels in the central 64×64. The three sampled windows share the same constant-nodata byte digest. Transfer was 368,991 bytes across 394 exact ranges. This establishes local 128 m support gaps, not their cause. The next gate is product-specific FOM/footprint provenance; no imputation, correction plane, or route-safety claim.
+
+
+## E554 — HiRISE nodata-neighborhood audit (2026-11-11)
+
+Draft PR #114, branch `research/e554-hirise-nodata-neighborhood-20261111`. Exact-head Actions run [#43044286332](https://github.com/stoicsatvik/NASA/actions/runs/43044286332) succeeded. Three 128×128 neighborhoods centered on the E550 unsupported positions each contained 16,384/16,384 nodata pixels and zero usable pixels, including the central 64×64. The live probe used 394 exact HTTP Range requests / 368,991 bytes under the 1 MB cap. The GeoTIFF nodata value is -3.4028226550889045e+38. The nearby-support-boundary explanation is not supported within these sampled 128 m neighborhoods, but the physical cause remains NOT DETERMINED (footprint exclusion, quality/terrain mask, or another product rule remain viable).
+
+Claim: local 128 m nodata neighborhoods MEASURED; common support at the three positions NOT RECOVERED; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; route safety NOT CLAIMED.
+
+Next: stop repeated local pixel probes. Seek independent USGS footprint/quality-mask provenance or preserve partial coverage; return effort to independent Earth positive-site/control discovery before E001.
