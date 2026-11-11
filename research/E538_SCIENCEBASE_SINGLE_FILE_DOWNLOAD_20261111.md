@@ -35,3 +35,17 @@ PENDING exact-head Actions. A successful metadata response alone will not count 
 ## Claim boundary
 
 A valid Earth photogrammetry DEM may be inspected. This does not establish Mars/Earth physical comparability, analogue recovery, negative controls, or novel analogue discovery. The Grand Falls data are a candidate Earth aeolian-process source only.
+
+
+## Exact-head result
+
+- Commit: 91c14ea0ed9c03c06c6bf7bbfa36661e5807d177.
+- Actions run [#42965502695](https://github.com/stoicsatvik/NASA/actions/runs/42965502695): **7/7 deterministic tests passed**.
+- The anonymous HTTPS request to the documented single-file catalog endpoint returned **HTTP 404**.
+- No response payload, TIFF bytes, or TIFF metadata were acquired. This is a valid negative acquisition result, not a test-suite failure.
+
+## Interpretation
+
+The tested ?name= endpoint does not work for this cloud-hosted file in the current public context. It does not establish that all official ScienceBase/S3 download paths are unavailable. The next bounded step is to inspect only the public item metadata for an explicitly exposed anonymous cloud/download URL. If no such URL is present, stop repeated endpoint guessing and preserve this result.
+
+No credentials, cookies, access-control bypass, site contact, or fieldwork were used. The claim boundary remains unchanged: no raw DEM, CRS, resolution, nodata, vertical datum, calibrated pixel values, cross-body comparability, or analogue recovery is established.
