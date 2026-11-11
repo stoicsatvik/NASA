@@ -3,7 +3,7 @@
 Updated: 2026-11-11
 Class: Tier A
 Time horizon: NASA Space Apps Challenge, 14–15 Nov 2026
-Working branch: `research/e557-copernicus-glo30-lonar-sample-20261111`
+Working branch: `research/e560-usgs-known-analog-catalogue-20261111`
 Main objective: maximize uncertainty eliminated per run and converge on a scientifically defensible Space Apps entry.
 
 ## Current thesis
@@ -101,10 +101,11 @@ Pivot away from the planetary-analog track if any of these becomes clear:
 
 ## Next trigger
 
-**E556 resolved NASADEM HGT tile N19E076 for both frozen Maharashtra points through CMR, but the only returned data path is Earthdata-protected. No credentials or raster bytes were used. Stop anonymous NASADEM retries. E557 now tests the anonymous Copernicus GLO-30 public COG as an auxiliary Earth DEM; keep DSM semantics and challenge-specific NASA-resource eligibility separate. Continue seeking independently labelled Earth positives and defensible controls before E001.**
+**E560 has now completed the bounded official USGS ScienceBase metadata audit (11 Nov 2026).** Exact-head Actions run #43068609889 passed 13/13 deterministic tests and acquired the pinned metadata anonymously. The item JSON returned HTTP 200 (19,203 bytes); the only file was the 9,406-byte FGDC XML. The live receipt reports a catalogue MD5 mismatch, zero vector links, and no feature payload. The XML itself says the 192 points are for discovery/reference rather than analysis and may be displaced by up to 10 km from feature centroids. Its 0.6096 m coordinate-resolution field is not positional accuracy. Do not pursue this item/WFS as an E001 analytical label source. Preserve the checksum discrepancy and do not claim 192 acquired features.
 
-E527/E528 spatial acquisition and ID joining are complete. E530 found no directly admissible shared quantitative features in the current PAAD/MGD3 pair. The next run must address independent labels/controls or falsify another feature family, not repeat ingestion or polish UI.
+The planetary-analog challenge remains **NOT YET PROVEN** as the best challenge. The all-14 screen and E541 factor ablation still put Martian Map (#11, 4.10) and MODIS/VIIRS (#9, 4.00) in a provisional top tier; the 0.10 gap is below the predeclared 0.25 threshold, and MODIS/VIIRS wins when portfolio reuse is removed. Planetary analog (#10, 2.93) remains a conditional research challenger, not the current readiness leader. No challenge is locked.
 
+Next highest-information work: test actual CRS registration and spatial coverage for the Martian Map layers on one pinned Mars area, and independently verify a no-credential public MODIS/VIIRS data path with a measurable validation target. Reassess the 14-challenge screen only when those results change a scored factor. Keep analog work focused on independent positive sites, defensible non-analogue controls and physically comparable features. No UI polish before the evidence gate.
 
 ## E514 real matched-footprint falsification (2026-11-03)
 
@@ -623,6 +624,16 @@ Next: stop repeated local pixel probes. Seek independent USGS footprint/quality-
 - **SUPPORTED:** public quality-mask and source-lineage acquisition for this exact Copernicus tile; water-edited status at the frozen Lonar coordinate. **NOT ESTABLISHED:** local bare-earth elevation, any analogue label, cross-body similarity, known-site recovery, novel discovery, or local validation advantage.
 - E559's CLI summary initially referenced a nonexistent key and then mislabeled filename equality as layer presence. Both integration defects were corrected; the exact-head 11-test run now reports actual layer presence separately from handbook filename equality. Earlier failed run #43062858434 is preserved as a failure; no data result was claimed from that failed process.
 
+## E560 - USGS catalogue acquisition result (2026-11-11)
+
+- Exact ScienceBase item JSON returned HTTP 200 (19,203 bytes) for item 5f88940b82cebb8c13d912ee; title and ID matched.
+- The item listed one file, AnalogSites_metadata.xml (9,406 bytes). The downloaded size matched; no vector file or vector URL was exposed in the downloaded FGDC XML. Initial live result: [E560 run #43067276665](https://github.com/stoicsatvik/NASA/actions/runs/43067276665).
+- The XML provisionally declares 192 entity points, fields FID/Shape/Name/AnalogType/Lat/Lon/AnalogBody, Mercator_1SP / WGS_1984 / meters, and AnalogType values Impact Crater, Dunes and Volcanic Eruption.
+- The XML explicitly says it is for identification/discovery, not for analysis, and that point locations may be wrong by up to 10 km from feature centroids. It is marked In work / update as needed; lineage is None / Unknown. Treat as a candidate discovery index only, never precise ground truth or a training label set.
+- Integrity discrepancy: item JSON MD5 def5fcdca1a6e7dd4389def926c3c1f1 versus computed XML MD5 d514547ac0dd7e68a302e03cd4c59d9f; size matches at 9,406 bytes, XML SHA-256 0b38af81da5fd638f830b066c4d6c6626b899ef0c1aad16a4cecef33821ef855. FGDC claims remain provisional until this is reconciled.
+- E560 code now pins item identity/title, refuses redirects, redacts URL query values, parses FGDC limits and records checksum status. The 13-test revision is not yet confirmed by exact-head Actions; helper checks against the actual artifact passed. Earlier failed CI runs remain recorded; the earlier 7/7 run is not evidence for the current head.
+- No vector features or coordinates were acquired. No overlap, known-site recovery, controls or E001 result.
+
 ## Updated next decisive gate
 
-Do not sample the flat Lonar centre as terrain. Acquire and parse the independent USGS CC0 *Known Terrestrial Analog Sites for Planetary Science* point layer (DOI `10.5066/P9J72921`), verify archive hash/schema/CRS/feature IDs and candidate-site overlap with PAAD and the 16-site catalogue, and preserve it as a candidate-positive inventory rather than ground truth. Then choose coordinate-precision-appropriate unedited terrain windows and independently sourced controls before E001. No E001 recovery or cross-body similarity claim is yet admissible.
+Do not use the E560 metadata as a quantitative label source. Query the official ScienceBase GeoServer WFS GetCapabilities endpoint once, bounded, and look for an item/title-matched feature type. If found, use DescribeFeatureType and a count-only query before retrieving any features. If no service exists, stop this catalogue route and use an independently documented source. The TADP documentation says ScienceBase-backed data may be exposed through WMS/WFS/CSW, but this specific item has not been shown to have a published service. No follow-up to the previously contacted nonresponder.
