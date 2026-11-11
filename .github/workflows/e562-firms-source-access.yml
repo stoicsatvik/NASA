@@ -1,0 +1,38 @@
+name: E562 NASA FIRMS source-access audit
+
+on:
+  pull_request:
+    branches:
+      - research/e561-arcgis-public-analogue-service-20261111
+    paths:
+      - experiments/e562_firms_source_access.py
+      - tests/test_e562_firms_source_access.py
+      - .github/workflows/e562-firms-source-access.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e562-firms-source-access-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run deterministic tests
+        run: python -m unittest tests.test_e562_firms_source_access -v
+      - name: Run bounded live source audit
+        run: python experiments/e562_firms_source_access.py --out .artifacts/e562/receipt.json
+      - name: Preserve compact receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: e562-firms-source-access
+          path: .artifacts/e562/receipt.json
+          retention-days: 7

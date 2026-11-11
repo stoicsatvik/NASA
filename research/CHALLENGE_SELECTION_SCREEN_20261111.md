@@ -111,3 +111,14 @@ All 14 were rescored. The top five for each ablation and the exact method are in
 Claim states remain unchanged: challenge-selection superiority NOT YET PROVEN; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN.
 
 Next decisive experiment remains MOLA/CTX/HiRISE geometry/CRS registration and actual coverage on one pinned Mars area. If that fails, lower #11 and reassess #9. No challenge is locked.
+
+
+## E562 data-access addendum (2026-11-12)
+
+The official FIRMS sample endpoint is anonymously accessible and yielded 74,605 VIIRS SNPP records for 2023-07-12 (14 fields, zero missing values, SHA-256 `edf79f62b35ba4485d7c85e01be5f6f61d30ab7b4addcf2eea00e2581982c30f`). This is a static VIIRS-only sample, not a current or historical paired MODIS/VIIRS cohort.
+
+A pinned South Asia daily VIIRS file returned HTTP 303 without credentials; a bounded FIRMS area request with placeholder `NO_KEY` returned HTTP 400 / MAP_KEY_REQUIRED. The official Active Fire page requires Earthdata Login for daily text downloads and the API requires a free MAP_KEY. No credentials were created or used.
+
+**Scoring decision:** do not change the 14-challenge numeric scores from this one access audit. MODIS/VIIRS (#9) remains viable if a legitimate participant credential is available, but its no-credential data path is not established. Keep #9 and Martian Map (#11) as a provisional top tier; their 0.10 baseline gap and reversal when portfolio reuse is removed remain below the predeclared 0.25 meaningful-difference threshold. Challenge-selection superiority remains NOT YET PROVEN.
+
+Next factor-changing test: measure actual CRS registration, pixel support and nodata overlap for MOLA/CTX/HiRISE over one pinned Mars footprint. If the common support or registration fails, reduce Martian Map data readiness and rerun the all-14 screen.

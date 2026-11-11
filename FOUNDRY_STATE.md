@@ -1,9 +1,9 @@
 # FOUNDRY_STATE — NASA
 
-Updated: 2026-11-11
+Updated: 2026-11-12
 Class: Tier A
 Time horizon: NASA Space Apps Challenge, 14–15 Nov 2026
-Working branch: `research/e560-usgs-known-analog-catalogue-20261111`
+Working branch: `research/e562-firms-source-access-audit-20261112`
 Main objective: maximize uncertainty eliminated per run and converge on a scientifically defensible Space Apps entry.
 
 ## Current thesis
@@ -658,3 +658,25 @@ Reconcile the ArcGIS service item/version and the ScienceBase XML checksum discr
 - Count-only query still returns **4**, versus the provisional FGDC count 192. No feature rows or coordinates were acquired.
 - Final exact-head PR workflow [#43073044735](https://github.com/stoicsatvik/NASA/actions/runs/43073044735) passed **14/14 tests** and completed the live metadata/schema/count audit. Artifact [#13879985771](https://github.com/stoicsatvik/NASA/actions/runs/43073044735/artifacts/13879985771).
 - Earlier negative attempts are preserved: Portal item `f=json`/`f=pjson` initially returned `text/plain` and was rejected; accepting parseable JSON exposed a case-only path difference, now recorded explicitly. The ScienceBase XML MD5 mismatch remains unresolved.
+
+
+## E562 — FIRMS credential-free data-access audit (2026-11-12)
+
+Exact-head PR #121 on `research/e562-firms-source-access-audit-20261112`, stacked on E561; main unchanged. Dedicated Actions run #43085578996 passed 6/6 deterministic tests and the bounded live audit. Artifact #13886920824 records:
+
+- Official FIRMS tutorial sample returned HTTP 200, 6,077,404 bytes, SHA-256 `edf79f62b35ba4485d7c85e01be5f6f61d30ab7b4addcf2eea00e2581982c30f`; 74,605 rows × 14 fields; one acquisition date (2023-07-12); VIIRS only; versions 2.0NRT and 2.0URT; no missing values in the sample.
+- Exact listed South Asia daily VIIRS file returned HTTP 303 without credentials; redirect not followed.
+- A bounded area API request using literal placeholder `NO_KEY` returned HTTP 400 and was classified MAP_KEY_REQUIRED.
+- No Earthdata token or MAP_KEY was created, read, stored or used. No raw rows were retained.
+
+Claim updates:
+- Public static VIIRS sample ingestion: SUPPORTED.
+- Current/historical MODIS+VIIRS access without credentials: NOT YET PROVEN.
+- Cross-sensor harmonization and regional/global fire calendar: NOT YET MEASURED.
+- All challenge-selection superiority claims remain NOT YET PROVEN. E541's provisional #11/#9 top tier and reversal under removal of portfolio-reuse weight remain unchanged; no challenge is locked.
+
+The official FIRMS page requires Earthdata Login for daily text downloads; the area/data-availability API requires a free MAP_KEY. The static 2023 VIIRS sample is a parser/visualization fixture, not a paired MODIS/VIIRS validation cohort. See `research/E562_FIRMS_CREDENTIAL_FREE_ACCESS_AUDIT_20261112.md`.
+
+### Next decisive gate (deadline-aware)
+
+Run one pinned-footprint MOLA/CTX/HiRISE CRS-registration and common-support experiment. Record coordinate transforms, pixel/ground resolution, nodata masks, valid overlap and registration error. Re-score Martian Map data readiness only from that measured result. Do not add UI polish or competition solution code before the data/route-safety gate.
