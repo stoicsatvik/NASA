@@ -56,7 +56,7 @@ The E560 branch now:
 - Compares the downloaded metadata bytes with the catalogue checksum.
 - Records web-link metadata without storing query values.
 
-The last successful Actions run (#43067276665) validated an earlier 7-test revision and completed the bounded metadata read. The later 13-test revision has **not yet received a confirmed exact-head Actions run**. Independent helper checks against the downloaded artifact passed for FGDC extraction, the 10 km limit, checksum mismatch detection, exact item identity, redirect refusal and query-value redaction.
+The earlier 7-test run (#43067276665) is preserved. The current exact-head Actions run [#43068609889](https://github.com/stoicsatvik/NASA/actions/runs/43068609889), on code head `82d8dc49f5b85c58eec876a5307d3078f42132c9`, passed **13/13 deterministic tests** and completed the bounded live metadata read. The workflow uploaded compact receipt artifact [#13876209183](https://github.com/stoicsatvik/NASA/actions/runs/43068609889/artifacts/13876209183) (4,937 bytes; seven-day retention). The live outcome was `METADATA_XML_CHECKSUM_MISMATCH`, secondary `METADATA_XML_NO_VECTOR_LINK`; no vector file or feature coordinates were acquired.
 
 Earlier failures are retained:
 - #43066415267: one incorrect expected value in the normalized-name overlap test.
