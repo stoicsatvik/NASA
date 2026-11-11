@@ -40,18 +40,26 @@ This is a coverage/quality-source gate for the Martian Map alternative. The 2025
 
 ## Validation
 
-Pending exact-head GitHub Actions run. Deterministic tests use synthetic ZIP fixtures and a fake HTTP range server. The live workflow uses no credentials and stores only a compact receipt.
+Exact-head GitHub Actions run #43113419588 succeeded: **6/6 deterministic tests passed**. The live run used no credentials and emitted receipt artifact #13897481736 (1,818 bytes; SHA-256 e236f52e23ab60dd32a0a12accd8d3b9af24ad20260366db68bf68e184e87944).
 
 ## Exact-head result
 
-Pending.
+- Branch head: `1762cd613440aafac6fa19c137471607f6fa03df`.
+- Actions run [#43113419588](https://github.com/stoicsatvik/NASA/actions/runs/43113419588): **6/6 tests passed**; live archive audit completed.
+- The exact official S3 object returned `Accept-Ranges: bytes`, HTTP-range access worked without credentials, and the object size was **5,468,062,403 bytes** (ETag `c6a0cc297fd60568c81e77071745ff2b-1043`).
+- The ZIP central directory contained **17 members**, including one DTM TIFF, two confidence TIFFs and one orthoimage TIFF. All four TIFF prefixes passed the TIFF-magic check.
+- DTM member: `MSR_hirise_soc_003_DTM_MOLATopography_DeltaGeoid_1m_Eqc_latTs0_lon0_Blend40.tif`, 675,625,590 compressed / 711,891,990 uncompressed bytes.
+- Confidence members: `MSR_hirise_soc_003_FOM_ColorConfidence_1m_Eqc_latTs0_lon0.tif` (95,525,154 compressed / 1,540,258,047 uncompressed bytes) and `MSR_hirise_soc_003_FOM_Confidence_1m_Eqc_latTs0_lon0.tif` (65,308,185 compressed / 66,059,236 uncompressed bytes).
+- All three scientific raster members use ZIP deflate (method 8). Therefore the TIFF members are **not directly random-accessible inside the ZIP**; a selected member must be decompressed before internal TIFF windows can be read.
+- The audit made **17 HTTP range requests and transferred 20,311 bytes**, far below the 32 MiB cap. No raster pixel values or full member contents were read or retained.
+- Outcome: `ARCHIVE_INDEXED_WITH_DTM_AND_CONFIDENCE`. Archive-level DTM/confidence presence and public range access are SUPPORTED. Actual raster georeferencing, confidence semantics, valid-pixel coverage and replacement of the 2020 HiRISE nodata are NOT YET MEASURED.
 
 ## Claim states
 
-- 2025 archive range access: NOT YET MEASURED.
-- 2025 DTM member presence: NOT YET MEASURED.
-- Confidence member presence: NOT YET MEASURED.
-- 2025 member random access: NOT YET MEASURED.
+- 2025 archive range access: SUPPORTED without credentials for the pinned public S3 object.
+- 2025 DTM member presence: SUPPORTED at archive level.
+- Confidence member presence: SUPPORTED at archive level (two TIFF members).
+- 2025 member random access: NOT SUPPORTED directly inside the ZIP; ZIP deflate requires full member decompression.
 - Replacement of 2020 HiRISE nodata: NOT YET MEASURED.
 - Independent horizontal registration: NOT YET MEASURED.
 - Cross-body similarity: NOT YET PROVEN.
@@ -61,4 +69,4 @@ Pending.
 
 ## Next gate
 
-If the archive supports bounded member access, pin the DTM and confidence TIFF names and their GeoTIFF/PDS metadata. Then sample only the 92 previously observed-MOLA points that landed on 2020 HiRISE nodata, preserving the exact point denominator and confidence-mask semantics. If the archive is not range-addressable, reject this product for the current 48-hour event rather than downloading 5.3 GB. Do not call the 2025 mosaic an independent registration validation.
+The archive index is range-addressable, but its members are deflated. The lowest-cost next gate is to decompress only the 65.3 MB FOM_Confidence member (not the 675.6 MB DTM), inspect its GeoTIFF metadata and semantics, then sample the frozen 346 observed-MOLA point centers. If confidence coverage is meaningful, decide whether the DTM's 675.6 MB member is worth a bounded full-member decompression. Do not call the 2025 mosaic an independent registration validation.
