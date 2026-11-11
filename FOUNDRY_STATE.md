@@ -507,3 +507,18 @@ Exact-head GitHub Actions run 43013238079 succeeded (11 November 2026):
 - E548 supports bounded 2020 HiRISE pixel acquisition only. Common valid-pixel support, local CTX/HiRISE residual, cross-body similarity, E001 known-site recovery, novel analogue discovery and local validation advantage remain NOT ESTABLISHED / NOT YET MEASURED / NOT YET PROVEN as applicable. No raw pixels were retained or uploaded.
 
 Next: reconstruct the user-defined HiRISE projection, verify parameter equivalence with the E544 CTX CRS, and run an area-matched CTX-versus-HiRISE elevation comparison with nodata masks and preregistered ±6 m shift sensitivity. Preserve the published ~0.4 m median offset as external context, not as a result of this local sample.
+
+
+## E549 — matched-support Jezero CTX / HiRISE comparison (2026-11-11)
+
+- Draft PR #109, stacked on E548 / PR #108; main unchanged.
+- Actions #43024094876 passed 5/5 deterministic geometry/area-weighting tests and completed the live comparison.
+- The HiRISE PDS3-derived equirectangular CRS is parameter-equivalent to the E544 CTX ESRI:103885 CRS under pyproj. Both use a 3,396,190 m spherical radius, centre latitude/longitude 0°, and metre map units; derived HiRISE scale is exactly 1 m/pixel.
+- CTX source bytes: 9,662,387; SHA-256 16a1aa66c3f48c1bca252795827db7b417876217aff0f5e1aff18027fab2327b, matching E544. HiRISE acquisition: 223 exact Range requests / 353,859 bytes, below the 1 MB cap.
+- The preregistered 10×10 CTX block has 100/100 valid cells and 100/100 HiRISE area coverage at 100% under the ≥99% rule.
+- Zero-shift CTX-minus-area-weighted-HiRISE residual: median −2.7484 m, mean −2.7088 m, SD 1.3677 m, MAE 2.7088 m, RMSE 3.0345 m, p95 absolute 4.8544 m, range −6.2199 to −0.1766 m.
+- The fixed ±6 m translation sensitivity grid retains negative medians from −2.4270 m to −3.0173 m. No shift was fitted.
+- This local result is discordant with the USGS product metadata's ~+0.4 m median offset statement and description of CTX floating above HiRISE. It is one 200 m patch, not a global contradiction or proof of product error. Plausible explanations: local seam/vertical bias, spatially varying registration, local terrain/surface differences, or unresolved product metadata interpretation. The CTX metadata separately reports 3.8 m vertical registration between component DTMs after HRSC alignment.
+- Claim state: physical map-definition equivalence SUPPORTED; common valid-area support for this patch SUPPORTED; local vertical difference MEASURED; local horizontal registration residual NOT YET MEASURED; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN.
+
+Next decisive experiment: E550 spatially replicate this comparison at a preregistered 3×3 grid of 100 m patches across the full metadata overlap. Determine whether the negative residual is local or systematic, preserve all patch results, and retain a fixed ±6 m translation sensitivity without fitting a corrective shift.
