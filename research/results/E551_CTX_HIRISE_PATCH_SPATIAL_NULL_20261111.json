@@ -1,0 +1,103 @@
+{
+  "experiment": "E551 exact patch-level spatial permutation null for E550 CTX/HiRISE residuals",
+  "source": {
+    "experiment": "E550 nine-position CTX/HiRISE spatial residual campaign",
+    "github_actions_run": 43025458917,
+    "github_artifact_id": 13855824623,
+    "artifact_zip_sha256": "a1cd14c272ed122f82edaac5f72e788d799ad7311bd488f8beffd989f487ccb1",
+    "receipt_json_sha256": "bb13f638136d038ec10d683b26fdc48d684fce38957360bc60f121b6d3401123",
+    "ctx_doi": "10.5066/P906QQT8",
+    "hirise_doi": "10.5066/P9REJ9JN",
+    "residual_definition": "CTX elevation minus area-weighted HiRISE elevation, metres"
+  },
+  "grid_positions": 9,
+  "measured_patches": 6,
+  "unsupported_patches": [
+    "x15_y15",
+    "x50_y85",
+    "x85_y85"
+  ],
+  "patch_medians": [
+    {
+      "patch_id": "x50_y15",
+      "fraction_x": 0.5,
+      "fraction_y": 0.15,
+      "median_residual_m": -1.5152992918465316
+    },
+    {
+      "patch_id": "x85_y15",
+      "fraction_x": 0.85,
+      "fraction_y": 0.15,
+      "median_residual_m": -3.152290503237964
+    },
+    {
+      "patch_id": "x15_y50",
+      "fraction_x": 0.15,
+      "fraction_y": 0.5,
+      "median_residual_m": -5.013924693674653
+    },
+    {
+      "patch_id": "x50_y50",
+      "fraction_x": 0.5,
+      "fraction_y": 0.5,
+      "median_residual_m": -2.727160244659899
+    },
+    {
+      "patch_id": "x85_y50",
+      "fraction_x": 0.85,
+      "fraction_y": 0.5,
+      "median_residual_m": 2.4249066823599605
+    },
+    {
+      "patch_id": "x15_y85",
+      "fraction_x": 0.15,
+      "fraction_y": 0.85,
+      "median_residual_m": -2.4269258962831373
+    }
+  ],
+  "observed_plane": {
+    "r2_descriptive": 0.5843077228043019,
+    "slope_x_m_per_km": 0.3525777217055718,
+    "slope_y_m_per_km": 0.25594097524326664,
+    "slope_norm_m_per_km": 0.4356797363334288,
+    "n_patches": 6
+  },
+  "exact_permutation": {
+    "permutations": 720,
+    "r2_null_median": 0.3585725160000141,
+    "r2_null_p95": 0.8117561623187289,
+    "r2_null_max": 0.9161746219338609,
+    "p_r2_ge_observed": 0.24444444444444444,
+    "slope_norm_null_median": 0.2795537256486085,
+    "slope_norm_null_p95": 0.517062931539894,
+    "slope_norm_null_max": 0.5943293701197304,
+    "p_slope_norm_ge_observed": 0.15,
+    "exchangeability_boundary": "Six measured patch medians permuted across six fixed locations; three unsupported locations excluded, so spatially informative missingness remains unresolved."
+  },
+  "sign_test": {
+    "n_nonzero": 6,
+    "negative": 5,
+    "positive": 1,
+    "one_sided_negative_p": 0.109375,
+    "two_sided_p": 0.21875
+  },
+  "leave_one_patch_out": {
+    "r2_min": 0.10693105003706926,
+    "r2_max": 0.9145172763086398
+  },
+  "outcome": "SPATIAL_PLANE_NOT_SUPPORTED_BY_SIX_PATCH_EXACT_NULL",
+  "claim_state": {
+    "common_support": "PARTIAL: six of nine positions",
+    "spatial_gradient": "NOT SUPPORTED BY THIS SIX-PATCH PERMUTATION TEST",
+    "cross_body_similarity": "NOT YET PROVEN",
+    "known_site_recovery": "NOT YET MEASURED",
+    "novel_analogue_discovery": "NOT YET PROVEN",
+    "route_safety": "NOT CLAIMED"
+  },
+  "limitations": [
+    "Permutation exchangeability applies only to the six measured patch medians.",
+    "Three unsupported positions are excluded; missingness may be spatially informative.",
+    "Patch-level units avoid pixel pseudo-replication but n=6 remains small.",
+    "This is not a global vertical datum, geophysical model or correction surface."
+  ]
+}
