@@ -16,9 +16,15 @@ SOURCE_URL = (
     "JEZ_ctx_B_soc_008_DTM_MOLAtopography_DeltaGeoid_20m_Eqc_latTs0_lon0.tif"
 )
 SOURCE_PAGE = "https://astrogeology.usgs.gov/search/map/mars_2020_terrain_relative_navigation_ctx_dtm_mosaic"
+SOURCE_INDEX = "https://asc-pds-services.s3.us-west-2.amazonaws.com/mosaic/mars2020_trn/CTX/index.html"
 SOURCE_DOI = "10.5066/P906QQT8"
-ALLOWED_HOST = "planetarymaps.usgs.gov"
-ALLOWED_PATH = (
+SOURCE_HOST = "planetarymaps.usgs.gov"
+SOURCE_PATH = (
+    "/mosaic/mars2020_trn/CTX/"
+    "JEZ_ctx_B_soc_008_DTM_MOLAtopography_DeltaGeoid_20m_Eqc_latTs0_lon0.tif"
+)
+S3_HOST = "asc-pds-services.s3.us-west-2.amazonaws.com"
+S3_PATH = (
     "/mosaic/mars2020_trn/CTX/"
     "JEZ_ctx_B_soc_008_DTM_MOLAtopography_DeltaGeoid_20m_Eqc_latTs0_lon0.tif"
 )
@@ -35,14 +41,25 @@ class AcquisitionError(RuntimeError):
         self.details = details or {}
 
 
-def validate_source_url(url: str, *, exact_path: bool = True) -> None:
+def _validate_https_url(url: str) -> tuple[str, str]:
     parsed = urlsplit(url)
-    if parsed.scheme != "https" or parsed.hostname != ALLOWED_HOST or parsed.port not in (None, 443):
-        raise ValueError("source URL is outside the pinned HTTPS USGS host")
+    if parsed.scheme != "https" or parsed.port not in (None, 443):
+        raise ValueError("URL must use standard-port HTTPS")
     if parsed.username or parsed.password or parsed.query or parsed.fragment:
-        raise ValueError("source URL contains credentials, query parameters or a fragment")
-    if exact_path and parsed.path != ALLOWED_PATH:
-        raise ValueError("source URL path does not match the pinned CTX product")
+        raise ValueError("URL contains credentials, query parameters or a fragment")
+    return parsed.hostname or "", parsed.path
+
+
+def validate_source_url(url: str = SOURCE_URL) -> None:
+    host, path = _validate_https_url(url)
+    if host != SOURCE_HOST or path != SOURCE_PATH:
+        raise ValueError("source URL does not match the pinned USGS product page link")
+
+
+def validate_final_url(url: str) -> None:
+    host, path = _validate_https_url(url)
+    if (host, path) not in {(SOURCE_HOST, SOURCE_PATH), (S3_HOST, S3_PATH)}:
+        raise ValueError("final URL is not the exact source object or its documented USGS PDS S3 object")
 
 
 def is_tiff(data: bytes) -> bool:
@@ -81,13 +98,14 @@ def fetch_raster_bytes(url: str = SOURCE_URL, opener=urlopen) -> tuple[bytes, di
             status = response.getcode()
         final_url = response.geturl()
         try:
-            validate_source_url(final_url, exact_path=False)
+            validate_final_url(final_url)
         except ValueError as exc:
+            parsed_final = urlsplit(final_url)
             raise AcquisitionError(
                 "REDIRECT_OUTSIDE_ALLOWLIST",
-                "The official URL redirected outside the pinned USGS host",
+                "The official URL redirected outside the exact USGS source-object allowlist",
                 result_class="NEGATIVE_RESULT",
-                details={"final_host": urlsplit(final_url).hostname},
+                details={"final_host": parsed_final.hostname, "final_path": parsed_final.path},
             ) from exc
 
         content_type = response.headers.get("Content-Type", "").split(";", 1)[0].strip().lower()
@@ -126,13 +144,19 @@ def fetch_raster_bytes(url: str = SOURCE_URL, opener=urlopen) -> tuple[bytes, di
                 "prefix_hex": data[:16].hex(),
             },
         )
+    parsed_final = urlsplit(final_url)
     return data, {
         "http_status": int(status),
         "content_type": content_type,
         "content_length": content_length,
         "bytes": len(data),
-        "final_host": urlsplit(final_url).hostname,
+        "final_host": parsed_final.hostname,
+        "final_path": parsed_final.path,
     }
+
+
+def _finite_or_none(value):
+    return float(value) if value is not None and math.isfinite(float(value)) else None
 
 
 def _window_stats(dataset, label: str, col: int, row: int, size: int) -> dict:
@@ -211,10 +235,10 @@ def inspect_raster(data: bytes) -> dict:
                         float(dataset.bounds.right), float(dataset.bounds.top),
                     ],
                     "resolution_crs_units": [float(v) for v in dataset.res],
-                    "nodata_band_1": float(dataset.nodata) if dataset.nodata is not None else None,
+                    "nodata_band_1": _finite_or_none(dataset.nodata),
                     "unit_band_1": units,
-                    "band_1_scale": float(dataset.scales[0]) if dataset.scales else None,
-                    "band_1_offset": float(dataset.offsets[0]) if dataset.offsets else None,
+                    "band_1_scale": _finite_or_none(dataset.scales[0]) if dataset.scales else None,
+                    "band_1_offset": _finite_or_none(dataset.offsets[0]) if dataset.offsets else None,
                     "area_or_point": safe_tags.get("AREA_OR_POINT"),
                     "dataset_tags": safe_tags,
                     "band_tags": safe_band_tags,
@@ -241,7 +265,10 @@ def run() -> dict:
     return {
         "experiment": "E544 bounded official Jezero CTX TRN DTM acquisition and sample audit",
         "status": "COMPLETE",
-        "source": {"url": SOURCE_URL, "page": SOURCE_PAGE, "doi": SOURCE_DOI, "publisher": "USGS Astrogeology Science Center"},
+        "source": {
+            "url": SOURCE_URL, "page": SOURCE_PAGE, "index": SOURCE_INDEX,
+            "doi": SOURCE_DOI, "publisher": "USGS Astrogeology Science Center",
+        },
         "transport": transport,
         "sha256": hashlib.sha256(data).hexdigest(),
         "raster": raster,
@@ -278,7 +305,10 @@ def main() -> None:
             "error_kind": exc.kind,
             "message": str(exc),
             "details": exc.details,
-            "source": {"url": SOURCE_URL, "page": SOURCE_PAGE, "doi": SOURCE_DOI, "publisher": "USGS Astrogeology Science Center"},
+            "source": {
+                "url": SOURCE_URL, "page": SOURCE_PAGE, "index": SOURCE_INDEX,
+                "doi": SOURCE_DOI, "publisher": "USGS Astrogeology Science Center",
+            },
             "claim_boundary": {
                 "raw_ctx_raster_acquired": False,
                 "cross_body_similarity": "NOT YET PROVEN",
