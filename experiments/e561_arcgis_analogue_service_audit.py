@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -15,6 +16,7 @@ SERVICE_URL = (
 LAYER_URL = SERVICE_URL + "/0"
 QUERY_URL = LAYER_URL + "/query"
 SERVICE_ITEM_ID = "db564f72235f49b39c4147df36fd3308"
+PORTAL_ITEM_URL = "https://www.arcgis.com/sharing/rest/content/items/" + SERVICE_ITEM_ID
 LAYER_NAME = "TerrestrialAnalogs"
 REQUIRED_FIELDS = {"FID", "Name", "AnalogType", "Lat", "Lon", "AnalogBody"}
 PROVISIONAL_FGDC_COUNT = 192
@@ -35,16 +37,15 @@ class NoRedirectHandler(urllib.request.HTTPRedirectHandler):
 
 def endpoint_is_allowed(url: str) -> bool:
     parsed = urllib.parse.urlsplit(url)
-    allowed_paths = {
+    service_paths = {
         urllib.parse.urlsplit(SERVICE_URL).path,
         urllib.parse.urlsplit(LAYER_URL).path,
         urllib.parse.urlsplit(QUERY_URL).path,
     }
+    portal_path = urllib.parse.urlsplit(PORTAL_ITEM_URL).path
     if (
         parsed.scheme != "https"
-        or parsed.hostname != "services.arcgis.com"
         or parsed.port not in (None, 443)
-        or parsed.path not in allowed_paths
         or parsed.username
         or parsed.password
         or parsed.fragment
@@ -57,9 +58,13 @@ def endpoint_is_allowed(url: str) -> bool:
     params = dict(pairs)
     if len(params) != len(pairs):
         return False
-    if parsed.path == urllib.parse.urlsplit(QUERY_URL).path:
-        return params == {"where": "1=1", "returnCountOnly": "true", "f": "json"}
-    return params == {"f": "json"}
+    if parsed.hostname == "services.arcgis.com" and parsed.path in service_paths:
+        if parsed.path == urllib.parse.urlsplit(QUERY_URL).path:
+            return params == {"where": "1=1", "returnCountOnly": "true", "f": "json"}
+        return params == {"f": "json"}
+    if parsed.hostname == "www.arcgis.com" and parsed.path == portal_path:
+        return params == {"f": "json"}
+    return False
 
 
 def count_query_url() -> str:
@@ -177,6 +182,57 @@ def validate_layer(document: dict) -> dict:
     }
 
 
+def validate_portal_item(document: dict) -> dict:
+    if document.get("id") != SERVICE_ITEM_ID:
+        raise E561Error("ARCGIS_PORTAL_ITEM_ID_MISMATCH")
+    if str(document.get("type", "")).casefold() != "feature service":
+        raise E561Error("ARCGIS_PORTAL_ITEM_TYPE_MISMATCH")
+    if str(document.get("access", "")).casefold() != "public":
+        raise E561Error("ARCGIS_PORTAL_ITEM_NOT_PUBLIC")
+    owner = document.get("owner")
+    if not isinstance(owner, str) or not owner.strip():
+        raise E561Error("ARCGIS_PORTAL_ITEM_OWNER_MISSING")
+    title = str(document.get("title", "")).strip()
+    title_words = set(re.split(r"[^a-z]+", title.casefold()))
+    if not {"terrestrial", "analog", "sites", "planetary", "science"}.issubset(title_words):
+        raise E561Error("ARCGIS_PORTAL_ITEM_TITLE_MISMATCH")
+    service_url = urllib.parse.urlsplit(str(document.get("url", "")))
+    expected_service = urllib.parse.urlsplit(SERVICE_URL)
+    if (
+        service_url.scheme != "https"
+        or service_url.hostname != expected_service.hostname
+        or service_url.port not in (None, 443)
+        or service_url.path != expected_service.path
+        or service_url.username
+        or service_url.password
+        or service_url.fragment
+    ):
+        raise E561Error("ARCGIS_PORTAL_ITEM_SERVICE_URL_MISMATCH")
+    try:
+        item_url_pairs = urllib.parse.parse_qsl(service_url.query, keep_blank_values=True, strict_parsing=True)
+    except ValueError as error:
+        raise E561Error("ARCGIS_PORTAL_ITEM_SERVICE_URL_QUERY_INVALID") from error
+    item_query_names = sorted({key for key, _ in item_url_pairs})
+    created = document.get("created")
+    modified = document.get("modified")
+    if any(isinstance(value, bool) or not isinstance(value, int) or value <= 0 for value in (created, modified)):
+        raise E561Error("ARCGIS_PORTAL_ITEM_TIMESTAMPS_INVALID")
+    return {
+        "id": SERVICE_ITEM_ID,
+        "title": title,
+        "type": "Feature Service",
+        "access": "public",
+        "owner": owner,
+        "created_unix_ms": created,
+        "modified_unix_ms": modified,
+        "service_url_identity": expected_service.hostname + expected_service.path,
+        "service_url_query_parameter_names": item_query_names,
+        "service_url_has_token_parameter": "token" in item_query_names,
+        "raw_item_url_retained": False,
+        "raw_item_metadata_retained": False,
+    }
+
+
 def validate_count(document: dict) -> int:
     count = document.get("count")
     if isinstance(count, bool) or not isinstance(count, int) or count < 0:
@@ -188,6 +244,7 @@ def validate_count(document: dict) -> int:
 
 
 def run_live() -> dict:
+    portal_item = validate_portal_item(fetch_json(PORTAL_ITEM_URL + "?f=json"))
     service_doc = fetch_json(SERVICE_URL + "?f=json")
     service = validate_service(service_doc)
     layer_doc = fetch_json(LAYER_URL + "?f=json")
@@ -205,6 +262,7 @@ def run_live() -> dict:
             "credentials_used": False,
             "token_used": False,
         },
+        "portal_item": portal_item,
         "service": service,
         "layer": layer,
         "count_query": {
