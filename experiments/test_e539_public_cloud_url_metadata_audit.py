@@ -8,29 +8,44 @@ from experiments.e539_public_cloud_url_metadata_audit import (
 
 
 class PublicUrlMetadataAuditTests(unittest.TestCase):
-    def test_manager_preview_is_not_direct(self):
+    def test_sciencebase_manager_download_is_a_file_uri_candidate(self):
         record = _url_record(
-            "https://www.sciencebase.gov/manager/item/abc/file/123",
-            "fixture.manager",
+            "https://sciencebase.usgs.gov/manager/download/abc",
+            "item:abc.files[4].downloadUri",
         )
-        self.assertEqual(record["classification"], "manager_preview_not_direct")
-        self.assertFalse(record["anonymous_candidate"])
+        self.assertEqual(record["classification"], "sciencebase_manager_download_candidate")
+        self.assertTrue(record["file_download_uri_candidate"])
 
-    def test_catalog_file_endpoint_is_only_a_candidate(self):
+    def test_manager_preview_is_not_a_file_download_candidate(self):
         record = _url_record(
-            "https://www.sciencebase.gov/catalog/file/get/abc",
-            "fixture.file",
+            "https://sciencebase.usgs.gov/manager/item/abc/file/123",
+            "item:abc.files[4].url",
+        )
+        self.assertEqual(record["classification"], "manager_preview_or_ui_not_direct")
+        self.assertFalse(record["file_download_uri_candidate"])
+
+    def test_catalog_file_route_requires_file_specific_query_and_field(self):
+        record = _url_record(
+            "https://www.sciencebase.gov/catalog/file/get/abc?f=123",
+            "item:abc.files[0].downloadUri",
         )
         self.assertEqual(record["classification"], "sciencebase_catalog_file_endpoint")
-        self.assertTrue(record["anonymous_candidate"])
+        self.assertTrue(record["file_download_uri_candidate"])
 
-    def test_signed_cloud_url_is_not_anonymous(self):
+    def test_item_wide_zip_route_is_not_a_file_specific_candidate(self):
+        record = _url_record(
+            "https://www.sciencebase.gov/catalog/file/get/abc",
+            "item:abc.distributionLinks[0].uri",
+        )
+        self.assertFalse(record["file_download_uri_candidate"])
+
+    def test_signed_cloud_url_is_not_anonymous_candidate(self):
         record = _url_record(
             "https://example-bucket.s3.amazonaws.com/dem.tif?X-Amz-Signature=secret&X-Amz-Credential=secret",
-            "fixture.cloud",
+            "item:abc.files[4].downloadUri",
         )
         self.assertEqual(record["classification"], "signed_or_tokenized_url_not_anonymous")
-        self.assertFalse(record["anonymous_candidate"])
+        self.assertFalse(record["file_download_uri_candidate"])
         self.assertEqual(
             record["query_key_names"],
             ["x-amz-credential", "x-amz-signature"],
@@ -38,11 +53,11 @@ class PublicUrlMetadataAuditTests(unittest.TestCase):
 
     def test_query_values_are_never_recorded(self):
         record = _url_record(
-            "https://example.org/file.tif?token=do-not-store&download=1",
-            "fixture.query",
+            "https://www.sciencebase.gov/catalog/file/get/abc?f=do-not-store&download=1",
+            "item:abc.files[0].downloadUri",
         )
         self.assertNotIn("do-not-store", str(record))
-        self.assertEqual(record["query_key_names"], ["download", "token"])
+        self.assertEqual(record["query_key_names"], ["download", "f"])
 
     def test_recursive_walker_finds_only_url_like_fields(self):
         payload = {
@@ -56,9 +71,11 @@ class PublicUrlMetadataAuditTests(unittest.TestCase):
         self.assertTrue(any("href" in path for path, _ in found))
 
     def test_non_https_candidate_is_not_anonymous(self):
-        record = _url_record("http://example.org/file.tif", "fixture.http")
-        self.assertEqual(record["classification"], "non_https_url_rejected")
-        self.assertFalse(record["anonymous_candidate"])
+        record = _url_record(
+            "http://sciencebase.usgs.gov/manager/download/abc",
+            "item:abc.files[4].downloadUri",
+        )
+        self.assertFalse(record["file_download_uri_candidate"])
 
 
 if __name__ == "__main__":
