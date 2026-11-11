@@ -231,7 +231,7 @@ def main():
     args.out.write_text(json.dumps(result,indent=2,sort_keys=True,allow_nan=False)+"\n",encoding="utf-8")
     print(json.dumps({"experiment":result["experiment"],"outcome":result["outcome"],
         "patches":len(result.get("patches",[])),"matched_cells":sum(p.get("common_valid_cells_at_zero_shift",0) for p in result.get("patches",[])),
-        "global_median_m":result.get("aggregate_zero_shift_ctx_minus_hirise_m",{}).get("median"),
+        "pooled_median_m":result.get("aggregate_zero_shift_ctx_minus_hirise_m",{}).get("median"),
         "hirise_bytes":result.get("transport",{}).get("hirise_bytes_transferred")},sort_keys=True))
     return 0 if result["outcome"]=="NINE_PATCHES_MEASURED" else 1
 
