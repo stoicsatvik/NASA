@@ -48,7 +48,7 @@ class E560Tests(unittest.TestCase):
     def test_overlap_is_name_only_and_exact(self):
         result=overlap({"Atacama Desert"},{"LeCussan16":{"Atacama Desert","Dallol"},"PAAD":{"atacama-desert"}})
         self.assertEqual(result["LeCussan16"]["exact"],["Atacama Desert"])
-        self.assertEqual(result["PAAD"]["normalized_full_string"],[])
+        self.assertEqual(result["PAAD"]["normalized_full_string"],[("Atacama Desert","atacama-desert")])
         self.assertIn("not coordinate",result["PAAD"]["meaning"])
         self.assertEqual(normalise("Lonar Crater, India"),"lonarcraterindia")
 
