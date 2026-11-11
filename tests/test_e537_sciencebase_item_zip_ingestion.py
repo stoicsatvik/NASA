@@ -1,0 +1,97 @@
+import io
+import unittest
+import zipfile
+
+from experiments.e537_sciencebase_item_zip_ingestion import (
+    DEM_NAME, FGDC_NAME, ITEM_ID, CatalogueSizeMismatchError, build_zip_url,
+    _allowed_host, _select_members, classify_ingestion_failure, parse_fgdc,
+)
+
+
+class E537ScienceBaseItemZipTests(unittest.TestCase):
+    def test_uses_documented_server_side_item_zip_endpoint(self):
+        self.assertEqual(
+            build_zip_url(),
+            f"https://www.sciencebase.gov/catalog/file/get/{ITEM_ID}",
+        )
+
+    def test_rejects_non_sciencebase_redirects(self):
+        self.assertTrue(_allowed_host("https://www.sciencebase.gov/catalog/file/get/x"))
+        self.assertTrue(_allowed_host("https://sciencebase.usgs.gov/manager/file/x"))
+        self.assertFalse(_allowed_host("https://example.com/file.zip"))
+        self.assertFalse(_allowed_host("http://www.sciencebase.gov/file.zip"))
+
+    def test_archive_selection_is_exact_and_path_safe(self):
+        buffer = io.BytesIO()
+        with zipfile.ZipFile(buffer, "w") as archive:
+            archive.writestr(f"folder/{DEM_NAME}", b"II*\x00" + b"x" * 20)
+            archive.writestr(f"folder/{FGDC_NAME}", b"<metadata/>")
+        with zipfile.ZipFile(io.BytesIO(buffer.getvalue())) as archive:
+            dem, fgdc = _select_members(archive)
+            self.assertEqual(dem.file_size, 24)
+            self.assertEqual(fgdc.file_size, len(b"<metadata/>"))
+
+    def test_rejects_duplicate_or_missing_dem(self):
+        buffer = io.BytesIO()
+        with zipfile.ZipFile(buffer, "w") as archive:
+            archive.writestr(DEM_NAME, b"II*\x00")
+            archive.writestr("copy/" + DEM_NAME, b"II*\x00")
+            archive.writestr(FGDC_NAME, b"<metadata/>")
+        with zipfile.ZipFile(io.BytesIO(buffer.getvalue())) as archive:
+            with self.assertRaisesRegex(ValueError, "exactly one"):
+                _select_members(archive)
+
+    def test_parses_only_explicit_fgdc_unit_and_projection_fields(self):
+        xml = b"""<metadata><spref><vertdef><altsys><altdatum>Local datum</altdatum><altunits>meters</altunits></altsys></vertdef><horizsys><planar><mapproj><mapprojn>UTM</mapprojn></mapproj></planar></horizsys></spref><spdom><bounding><westbc>-111.18</westbc><eastbc>-111.14</eastbc><northbc>35.44</northbc><southbc>35.42</southbc></bounding></spdom><eainfo><detailed><attr><attrlabl>Value</attrlabl><attrdef>Surface elevation with no coordinate reference system.</attrdef></attr></detailed></eainfo></metadata>"""
+        fields = parse_fgdc(xml)
+        self.assertEqual(fields["altunits"], ["meters"])
+        self.assertEqual(fields["altdatum"], ["Local datum"])
+        self.assertEqual(fields["mapprojn"], ["UTM"])
+        self.assertEqual(fields["westbc"], ["-111.18"])
+        self.assertEqual(fields["attrdef"], ["Surface elevation with no coordinate reference system."])
+
+
+    def test_zero_byte_dem_is_a_completed_negative_not_a_runner_error(self):
+        result = classify_ingestion_failure(
+            CatalogueSizeMismatchError(0, 619492)
+        )
+        self.assertEqual(
+            result["experiment_outcome"],
+            "NEGATIVE_RESULT_ZERO_BYTE_DEM_MEMBER",
+        )
+        self.assertTrue(result["experiment_completed"])
+        self.assertIn("0 bytes", result["blocker"])
+        self.assertIn("access requirements for other endpoints were not tested", result["blocker"])
+
+    def test_nonzero_catalogue_size_mismatch_is_a_distinct_negative(self):
+        result = classify_ingestion_failure(
+            CatalogueSizeMismatchError(1024, 619492)
+        )
+        self.assertEqual(
+            result["experiment_outcome"],
+            "NEGATIVE_RESULT_DEM_SIZE_MISMATCH",
+        )
+        self.assertTrue(result["experiment_completed"])
+        self.assertIn("1024 bytes", result["blocker"])
+
+    def test_missing_duplicate_or_unsafe_member_errors_are_not_called_zero_byte(self):
+        for message in (
+            "expected exactly one DEM member, found 0",
+            "expected exactly one DEM member, found 2",
+            "unsafe archive member path",
+            "DEM member matched catalogue size but was not a TIFF",
+        ):
+            with self.subTest(message=message):
+                result = classify_ingestion_failure(ValueError(message))
+                self.assertEqual(result["experiment_outcome"], "ERROR")
+                self.assertFalse(result["experiment_completed"])
+
+    def test_size_mismatch_exception_rejects_invalid_or_equal_sizes(self):
+        for observed, catalogue in ((-1, 10), (True, 10), (10, 10)):
+            with self.subTest(observed=observed, catalogue=catalogue):
+                with self.assertRaises(ValueError):
+                    CatalogueSizeMismatchError(observed, catalogue)
+
+
+if __name__ == "__main__":
+    unittest.main()
