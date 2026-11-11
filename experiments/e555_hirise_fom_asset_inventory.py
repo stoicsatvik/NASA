@@ -121,7 +121,7 @@ def _read_bounded(session: requests.Session, url: str, expected_path: str, cap: 
 
 
 def _asset_name_from_href(href: str) -> str | None:
-    if "\\\\" in href or "../" in href or href.startswith("../"):
+    if "\\" in href or "../" in href or href.startswith("../"):
         raise E555Error("INDEX_PATH_TRAVERSAL", "Directory index contains a path-traversal link")
     parsed = urlsplit(href)
     if parsed.query or parsed.fragment:
@@ -294,7 +294,7 @@ def main() -> int:
             "raw_pixels_requested": False,
         }
     args.out.parent.mkdir(parents=True, exist_ok=True)
-    args.out.write_text(json.dumps(result, indent=2, sort_keys=True, allow_nan=False) + "\\n", encoding="utf-8")
+    args.out.write_text(json.dumps(result, indent=2, sort_keys=True, allow_nan=False) + "\n", encoding="utf-8")
     print(json.dumps({
         "experiment": result["experiment"],
         "outcome": result["outcome"],
