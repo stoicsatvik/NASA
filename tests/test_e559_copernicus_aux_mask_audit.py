@@ -8,6 +8,7 @@ from experiments.e559_copernicus_aux_mask_audit import (
     PREVIEW,
     E559Error,
     expected_key,
+    find_layer_object,
     object_url,
     parse_listing,
     summarize_kml,
@@ -40,6 +41,19 @@ def test_expected_handbook_keys_use_exact_dged_names_and_folders():
     assert expected_key(prefix, "SRC").endswith("/PREVIEW/Copernicus_DSM_10_N19_00_E076_00_SRC.kml")
     assert expected_key(prefix, "ACM").endswith("/AUXFILES/Copernicus_DSM_10_N19_00_E076_00_ACM.kml")
     assert AUXFILES == "AUXFILES" and PREVIEW == "PREVIEW"
+
+
+def test_listing_driven_layer_match_accepts_actual_cog_basename_without_guessing():
+    prefix = "tile/AUXFILES/"
+    listed = {
+        "key": prefix + "Copernicus_DSM_COG_10_N19_00_E076_00_DEM_WBM.tif",
+        "size_bytes": 110065,
+    }
+    assert find_layer_object([listed], prefix, "WBM") == listed
+    assert find_layer_object([], prefix, "WBM") is None
+    with pytest.raises(E559Error) as caught:
+        find_layer_object([listed, dict(listed, key=prefix + "duplicate_WBM.tif")], prefix, "WBM")
+    assert caught.value.outcome == "AMBIGUOUS_LAYER_OBJECT"
 
 
 def test_object_key_validation_rejects_prefix_escape_and_path_traversal():
@@ -106,7 +120,7 @@ def test_hem_sentinel_is_excluded_from_height_error_statistics():
 
 def test_kml_summary_extracts_metadata_without_retaining_raw_xml():
     xml = b"""<kml xmlns="http://www.opengis.net/kml/2.2"><Document>
-    <Placemark><name>Scene A</name><ExtendedData>
+    <Placemark><name>Scene A</name><description>Acquisition scene details</description><ExtendedData>
     <Data name="acquisition_date"><value>2014-02-03</value></Data>
     <Data name="scene_id"><value>ABC123</value></Data>
     </ExtendedData></Placemark></Document></kml>"""
@@ -114,4 +128,5 @@ def test_kml_summary_extracts_metadata_without_retaining_raw_xml():
     assert result["placemark_count"] == 1
     assert result["field_names"] == ["acquisition_date", "scene_id"]
     assert result["sample_features"][0]["name"] == "Scene A"
+    assert result["sample_features"][0]["description_prefix"] == "Acquisition scene details"
     assert result["raw_kml_retained"] is False
