@@ -522,3 +522,16 @@ Next: reconstruct the user-defined HiRISE projection, verify parameter equivalen
 - Claim state: physical map-definition equivalence SUPPORTED; common valid-area support for this patch SUPPORTED; local vertical difference MEASURED; local horizontal registration residual NOT YET MEASURED; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN.
 
 Next decisive experiment: E550 spatially replicate this comparison at a preregistered 3×3 grid of 100 m patches across the full metadata overlap. Determine whether the negative residual is local or systematic, preserve all patch results, and retain a fixed ±6 m translation sensitivity without fitting a corrective shift.
+
+
+## E550 — nine-patch spatial CTX / HiRISE residual campaign (2026-11-11)
+
+- Draft PR #110, stacked on E549 / PR #109; main unchanged.
+- Actions #43025080316 passed 3/3 deterministic design tests and completed the live nine-patch campaign.
+- Nine 100 m patches were selected at 15%, 50%, and 85% of the CTX/HiRISE metadata-overlap envelope. Only 6/9 had common valid HiRISE support; the other three (x15_y15, x50_y85, x85_y85) had none. The six supported patches had 25/25 cells each: **150/225 common cells (66.7%)**. Metadata-envelope overlap is therefore not common valid-pixel support.
+- CTX source hash matched E544; 9,662,387 bytes downloaded. HiRISE acquisition used 223 exact Range requests / 353,859 bytes, below the 1 MB cap.
+- Six supported patch medians (CTX minus area-weighted HiRISE): −1.515, −3.152, −5.014, −2.727, +2.425, −2.427 m. Pooled 150-cell median −2.3149 m, mean −2.2881 m, SD 3.0036 m, MAE 3.0621 m, RMSE 3.7764 m, p95 absolute 6.9772 m, range −13.9472 to +3.1226 m.
+- Residual sign varies spatially: one supported patch is positive while five are negative. Fixed cardinal ±6 m sensitivity does not yield one translation that resolves the pattern. The published USGS ~+0.4 m median offset is not reproduced by this non-random six-patch sample; no global contradiction or product defect is inferred.
+- Claim state: CRS parameter equivalence SUPPORTED; metadata envelope versus common support distinction MEASURED; sampled-grid common support PARTIAL; local residual distribution MEASURED; global offset reproduction NOT ESTABLISHED; local horizontal registration residual NOT YET MEASURED; cross-body similarity NOT YET PROVEN; E001 known-site recovery NOT YET MEASURED.
+
+Next: inspect CTX component-DTM seam/quality provenance and seek independent HRSC/MOLA reference data for the six supported patches. Do not fit a correction. Then run E001 known-analogue recovery with transparent random, Euclidean and physically weighted baselines.
