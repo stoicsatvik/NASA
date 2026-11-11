@@ -40,12 +40,16 @@ class RangeReadError(RuntimeError):
 class HTTPRangeFile:
     """Small seekable file adapter backed only by exact HTTP byte ranges."""
 
-    def __init__(self, session: requests.Session, url: str):
+    def __init__(self, session: requests.Session, url: str, *, max_total_bytes: int = MAX_TOTAL_RANGE_BYTES, cache_block_bytes: int = 0):
         self.session = session
         self.url = url
         self.position = 0
         self.closed = False
         self.transferred = 0
+        self.max_total_bytes = int(max_total_bytes)
+        self.cache_block_bytes = int(cache_block_bytes)
+        self.cache_start = -1
+        self.cache_data = b""
         self.ranges: list[dict] = []
         response = session.head(
             url,
@@ -98,26 +102,20 @@ class HTTPRangeFile:
     def seekable(self) -> bool:
         return not self.closed
 
-    def read(self, size: int = -1) -> bytes:
-        if self.closed:
-            raise ValueError("I/O operation on closed range file")
-        if size is None or size < 0:
-            size = self.size - self.position
-        size = min(int(size), self.size - self.position)
-        if size <= 0:
+    def _fetch_range(self, start: int, end: int) -> bytes:
+        length = end - start + 1
+        if length <= 0:
             return b""
-        if size > MAX_REQUEST_BYTES:
+        if length > MAX_REQUEST_BYTES:
             raise RangeReadError(
                 "RANGE_REQUEST_TOO_LARGE",
                 "A single requested range exceeds the frozen byte cap",
             )
-        if self.transferred + size > MAX_TOTAL_RANGE_BYTES:
+        if self.transferred + length > self.max_total_bytes:
             raise RangeReadError(
                 "RANGE_TRANSFER_CAP_EXCEEDED",
                 "The cumulative range-read cap would be exceeded",
             )
-        start = self.position
-        end = start + size - 1
         response = self.session.get(
             self.url,
             headers={
@@ -148,17 +146,47 @@ class HTTPRangeFile:
                     "Content-Range does not match the requested archive interval",
                 )
             payload = response.content
-            if len(payload) != size:
+            if len(payload) != length:
                 raise RangeReadError(
                     "RANGE_BYTE_COUNT_MISMATCH",
                     "Range body length differs from the requested interval",
                 )
         finally:
             response.close()
-        self.position += size
-        self.transferred += size
-        self.ranges.append({"start": start, "end": end, "bytes": size})
+        self.transferred += length
+        self.ranges.append({"start": start, "end": end, "bytes": length})
         return payload
+
+    def read(self, size: int = -1) -> bytes:
+        if self.closed:
+            raise ValueError("I/O operation on closed range file")
+        if size is None or size < 0:
+            size = self.size - self.position
+        remaining = min(int(size), self.size - self.position)
+        if remaining <= 0:
+            return b""
+        output = bytearray()
+        while remaining > 0:
+            if self.cache_block_bytes > 0:
+                cache_end = self.cache_start + len(self.cache_data)
+                if self.cache_start <= self.position < cache_end:
+                    offset = self.position - self.cache_start
+                    take = min(remaining, cache_end - self.position)
+                    output.extend(self.cache_data[offset : offset + take])
+                    self.position += take
+                    remaining -= take
+                    continue
+                block_start = self.position
+                block_end = min(self.size - 1, block_start + self.cache_block_bytes - 1)
+                self.cache_data = self._fetch_range(block_start, block_end)
+                self.cache_start = block_start
+            else:
+                take = min(remaining, MAX_REQUEST_BYTES)
+                payload = self._fetch_range(self.position, self.position + take - 1)
+                output.extend(payload)
+                self.position += take
+                remaining -= take
+        return bytes(output)
 
     def readinto(self, buffer) -> int:
         payload = self.read(len(buffer))
