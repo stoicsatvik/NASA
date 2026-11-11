@@ -1,6 +1,13 @@
 name: E564 HiRISE unsupported-point spatial clustering diagnostic
 
 on:
+  push:
+    branches:
+      - research/e564-hirise-support-clustering-20261112
+    paths:
+      - experiments/e563_three_way_common_support.py
+      - tests/test_e564_hirise_support_clustering.py
+      - .github/workflows/e564-hirise-support-clustering.yml
   pull_request:
     branches:
       - research/e563-mola-ctx-hirise-common-support-20261112
