@@ -34,11 +34,11 @@ Does the 2025 USGS Mars Sample Return HiRISE FOM_Confidence raster contain reada
 ## Exact-head result
 
 - Actions run [#43114632592](https://github.com/stoicsatvik/NASA/actions/runs/43114632592) completed successfully; deterministic fixtures passed and the live member audit produced artifact #13896649509.
-- The 65,308,185-byte compressed member decompressed to 66,059,236 bytes; SHA-256 `ea48d7e849c5b07c983f2d2e9e4b9b61d4e33c8a0a3f6cb3b0a5d2c2b0a6f5f8`.
-- GeoTIFF: 157,000 × 209,000, one `uint8` band, nodata 0, 1 m × 1 m, `ESRI:104903` (Mars 2015 equirectangular; radius 3,396,190 m), bounds 77.057–77.380°E and 18.135–18.588°N.
+- The 65,308,185-byte compressed member decompressed to 66,059,236 bytes; SHA-256 `986bbaaa60f452cfeee563ae474e06d83195cf749ff515d6a129f57d1a355d49`.
+- GeoTIFF: 19,144 × 26,816, one `uint8` band, nodata 0, 1 m × 1 m, Mars 2015 equirectangular (radius 3,396,190 m; GeoTIFF WKT SHA-256 `77a22ad08d07643ce7c653c5f6cab362edd6bedb262a7b47b7bd5a12f28812d3`), bounds 77.057–77.380°E and 18.135–18.588°N.
 - The frozen 346 observed MOLA point centers yielded 329 points inside raster bounds and 259 valid unmasked FOM samples: **74.9% of observed points**, **78.7% of in-bounds points**. Seventy in-bounds points were masked; 17 were outside.
-- Sampled raw codes ranged 3–15 (median 14; mean 13.78; 13 distinct values). The codes remain uninterpreted; they are not calibrated uncertainty.
-- The cached range reader transferred 66,063,763 bytes in 112 requests under its 100 MiB cap. No DTM pixels were read; no point coordinates or raw raster pixels were retained.
+- Sampled raw codes ranged 3–15 (median 14; mean 13.2008; 13 distinct values). The codes remain uninterpreted; they are not calibrated uncertainty.
+- The cached range reader transferred 66,063,763 bytes in 67 requests under its 100 MiB cap. No DTM pixels were read; no point coordinates or raw raster pixels were retained.
 - This is confidence-layer support only. It does **not** establish 2025 DTM elevation support or replacement of the 2020 HiRISE nodata.
 
 ## Claim states
