@@ -115,12 +115,44 @@ def spherical_bbox_area_km2(bbox, radius_m=3396190.0):
     )
 
 
+def mola_local_pixel_spacing_m(latitude_deg, equatorial_spacing_m=463.0):
+    """Return local ground spacing for a simple-cylindrical MOLA grid."""
+    for value, name in (
+        (latitude_deg, "latitude_deg"),
+        (equatorial_spacing_m, "equatorial_spacing_m"),
+    ):
+        if (
+            isinstance(value, bool)
+            or not isinstance(value, (int, float))
+            or not math.isfinite(value)
+        ):
+            raise ValueError(f"{name} must be a finite number")
+    latitude = float(latitude_deg)
+    equatorial_spacing = float(equatorial_spacing_m)
+    if not -90.0 <= latitude <= 90.0:
+        raise ValueError("latitude_deg must be within [-90, 90]")
+    if equatorial_spacing <= 0.0:
+        raise ValueError("equatorial_spacing_m must be positive")
+    return {
+        "east_west_m": equatorial_spacing * math.cos(math.radians(latitude)),
+        "north_south_m": equatorial_spacing,
+    }
+
+
 def build_result():
     mola = DATASETS["mola_128ppd"]
     ctx = DATASETS["ctx_trn_2020"]
     hirise = DATASETS["hirise_msr_2025"]
     science = DATASETS["ctx_science_investigation_2021"]
     overlap = intersection_bbox(ctx["bbox"], hirise["bbox"])
+    overlap_centroid_latitude_deg = (
+        (overlap[1] + overlap[3]) / 2 if overlap is not None else None
+    )
+    local_mola_spacing = (
+        mola_local_pixel_spacing_m(overlap_centroid_latitude_deg, mola["resolution_m"])
+        if overlap_centroid_latitude_deg is not None
+        else None
+    )
     return {
         "experiment": "E542_JEZERO_MULTI_RESOLUTION_COVERAGE_AND_REFERENCE_AUDIT",
         "status": "METADATA_COVERAGE_COMPATIBLE_RAW_RASTER_VALIDATION_PENDING",
@@ -135,9 +167,39 @@ def build_result():
             "interpretation": "Bounding-box envelope intersection only; nodata holes and valid-pixel footprints are not measured.",
         },
         "scale": {
+            "mola_equatorial_resolution_m": mola["resolution_m"],
             "mola_to_ctx_linear_resolution_ratio": mola["resolution_m"] / ctx["resolution_m"],
             "ctx_to_hirise_linear_resolution_ratio": ctx["resolution_m"] / hirise["resolution_m"],
             "mola_to_hirise_linear_resolution_ratio": mola["resolution_m"] / hirise["resolution_m"],
+            "mola_local_spacing_at_ctx_hirise_overlap_centroid": (
+                {
+                    "planetocentric_latitude_deg": overlap_centroid_latitude_deg,
+                    **local_mola_spacing,
+                }
+                if local_mola_spacing is not None
+                else None
+            ),
+            "mola_local_to_ctx_resolution_ratio_at_overlap_centroid": (
+                {
+                    "east_west": local_mola_spacing["east_west_m"] / ctx["resolution_m"],
+                    "north_south": local_mola_spacing["north_south_m"] / ctx["resolution_m"],
+                }
+                if local_mola_spacing is not None
+                else None
+            ),
+            "mola_local_to_hirise_resolution_ratio_at_overlap_centroid": (
+                {
+                    "east_west": local_mola_spacing["east_west_m"] / hirise["resolution_m"],
+                    "north_south": local_mola_spacing["north_south_m"] / hirise["resolution_m"],
+                }
+                if local_mola_spacing is not None
+                else None
+            ),
+            "nominal_ratio_interpretation": (
+                "The 463 m MOLA spacing is equatorial. In the simple-cylindrical grid, "
+                "east-west ground spacing contracts by cos(latitude); report local "
+                "east-west and north-south ratios separately."
+            ),
         },
         "reference_differences": {
             "mola_iau2000_to_mars2015_radius_delta_m": ctx["radius_m"] - mola["radius_m"],
@@ -170,6 +232,7 @@ def build_result():
             "Acquire the MOLA 128ppd topography and counts tile; distinguish observed from interpolated cells over the Jezero overlap.",
             "Pin the exact CTX reference used by the 2025 HiRISE mosaic and transform all rasters into one explicit Mars body-fixed reference system.",
             "Compare registered elevation profiles and horizontal control residuals on the shared valid-pixel footprint.",
+            "Use local MOLA east-west and north-south ground spacing separately; do not treat the equatorial 463 m value as an isotropic Jezero pixel size.",
         ],
     }
 
