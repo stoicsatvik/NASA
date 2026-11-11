@@ -758,9 +758,9 @@ The highest-value next gate is to decompress only the 65.3 MB FOM_Confidence mem
 
 ## E567 — 2025 FOM_Confidence point support (2026-11-12)
 
-The exact 65,308,185-byte compressed FOM_Confidence ZIP member was decompressed to 66,059,236 bytes, opened as a 157,000 × 209,000 one-band uint8 GeoTIFF, nodata 0, 1 m resolution, ESRI:104903 Mars 2015 equirectangular. Its bounds match the published Jezero mosaic footprint. The bounded run transferred 66,063,763 bytes in 112 HTTP range requests under a 100 MiB cap; no DTM member was read.
+The exact 65,308,185-byte compressed FOM_Confidence ZIP member was decompressed to 66,059,236 bytes, opened as a 19,144 × 26,816 one-band uint8 GeoTIFF, nodata 0, 1 m resolution, Mars 2015 equirectangular. Its bounds match the published Jezero mosaic footprint. The bounded run transferred 66,063,763 bytes in 67 HTTP range requests under a 100 MiB cap; no DTM member was read.
 
-At the frozen 346 observed-MOLA point centers, 329 were inside the confidence raster and 259 had valid unmasked FOM values (74.9% of observed; 78.7% of in-bounds). Seventy in-bounds points were masked and 17 were outside. Sampled codes ranged 3–15, median 14, mean 13.78, 13 distinct codes. Codes are raw categories only; they are not calibrated uncertainty.
+At the frozen 346 observed-MOLA point centers, 329 were inside the confidence raster and 259 had valid unmasked FOM values (74.9% of observed; 78.7% of in-bounds). Seventy in-bounds points were masked and 17 were outside. Sampled codes ranged 3–15, median 14, mean 13.2008, 13 distinct codes. Codes are raw categories only; they are not calibrated uncertainty.
 
 Claim states:
 - FOM_Confidence GeoTIFF readability/georeferencing: **SUPPORTED** for the pinned member.
