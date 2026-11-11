@@ -7,7 +7,6 @@ on:
     paths:
       - experiments/e559_copernicus_aux_mask_audit.py
       - tests/test_e559_copernicus_aux_mask_audit.py
-      - research/E559_COPERNICUS_AUX_MASK_AUDIT_20261111.md
       - .github/workflows/e559-copernicus-aux-mask-audit.yml
   pull_request:
     branches:
@@ -15,7 +14,6 @@ on:
     paths:
       - experiments/e559_copernicus_aux_mask_audit.py
       - tests/test_e559_copernicus_aux_mask_audit.py
-      - research/E559_COPERNICUS_AUX_MASK_AUDIT_20261111.md
       - .github/workflows/e559-copernicus-aux-mask-audit.yml
   workflow_dispatch:
 
