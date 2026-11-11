@@ -79,7 +79,7 @@ The permutation assumes the six measured patch medians are exchangeable under no
 
 - Local exact enumeration and deterministic regression suite: **6/6 tests passed**.
 - All 720 permutations were enumerated; no Monte Carlo approximation or random seed was used.
-- Exact-head GitHub Actions is pending on this draft branch.
+- Exact-head Actions [#43027847026](https://github.com/stoicsatvik/NASA/actions/runs/43027847026) and [#43027841221](https://github.com/stoicsatvik/NASA/actions/runs/43027841221) both succeeded; all **6/6 tests** passed and the exact 720-permutation receipt reproduced.
 
 ## Next decisive action
 
