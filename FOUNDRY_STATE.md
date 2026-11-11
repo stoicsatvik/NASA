@@ -101,7 +101,7 @@ Pivot away from the planetary-analog track if any of these becomes clear:
 
 ## Next trigger
 
-**Retrieve the public Grand Falls Dune Field ScienceBase files (DEM/orthomosaic plus matched weather/imagery), hash and profile them, then align aeolian features to Mars dune data at matched support and define a defensible contrast set before E001.**
+**Pivot away from the current Grand Falls ScienceBase item after E538/E540 negative acquisition results. Select a different independently documented public Earth dataset with a verified direct data path, or re-evaluate the all-14 challenge ranking; do not repeat guessed endpoints.**
 
 E527/E528 spatial acquisition and ID joining are complete. E530 found no directly admissible shared quantitative features in the current PAAD/MGD3 pair. The next run must address independent labels/controls or falsify another feature family, not repeat ingestion or polish UI.
 
@@ -352,5 +352,29 @@ E536.1 now rejects manager preview URLs as non-direct downloads, checks HTTPS Sc
 - E538 tested the documented single-file catalog route with the exact DEM filename and a 5 MB response cap. The request was anonymous HTTPS, host/path allowlisted, and accepted only TIFF magic or a ZIP with exactly one non-empty exact-name DEM member.
 - Exact-head run [#42965502695](https://github.com/stoicsatvik/NASA/actions/runs/42965502695), commit 91c14ea0ed9c03c06c6bf7bbfa36661e5807d177: **7/7 deterministic tests passed**; the live single-file request returned **HTTP 404**. No response payload or DEM was acquired, and no TIFF metadata was inspected.
 - Result: the documented ?name= route is not usable for this item in the tested public context. This does not prove that every official ScienceBase/S3 access path is unavailable; it does rule out treating this guessed single-file route as a working fix.
-- Next: inspect only the public item metadata for an explicitly exposed anonymous cloud/download URL or select another source item with a verified direct file link. Do not use credentials, access-control bypasses, or further guessed endpoints. If no public direct URL is exposed, stop repeated acquisition attempts and retain the negative result.
+- E539/E540 completed the metadata-only URL audit and tested the exact DEM `downloadUri`; see the sections below. The metadata route returned HTML rather than TIFF. Stop further endpoint exploration for this item and pivot to another independent public source.
 - Claim boundary unchanged: Grand Falls remains a candidate Earth aeolian-process source; no raw DEM, CRS, resolution, nodata, vertical datum, calibrated pixel values, matched Mars/Earth descriptors, or E001 analogue recovery are established. No fieldwork, contact, merge, deployment, or competition submission.
+
+
+## E539 — public ScienceBase/USGS URL metadata audit (2026-11-11)
+
+- Exact-head Actions [#42967733262](https://github.com/stoicsatvik/NASA/actions/runs/42967733262): **6/6 deterministic tests passed**; public ScienceBase root item and official USGS XML metadata returned HTTP 200.
+- One root item was inspected; it contains six file entries. The sanitized audit found two file-specific `files[].downloadUri` fields at `sciencebase.usgs.gov/manager/download/{fileId}`, both without query parameters. The other URL-like entries were DOI, metadata, item, preview or catalog routes; the broad 43-candidate counter is not a count of data downloads.
+- The XML metadata SHA-256 is `09b9b4cc869f6455a9e80e2741b62723d8cdce8602487a101dbc6cee4a13c95e`. Raw metadata, query values and file URLs were not stored; no file URL was followed in E539.
+- Result: explicit download URI candidates exist in public metadata, but anonymous binary access is not established by metadata alone.
+
+## E540 — exact metadata-backed Grand Falls DEM download (2026-11-11)
+
+- Exact-head Actions [#42968010724](https://github.com/stoicsatvik/NASA/actions/runs/42968010724): **7/7 deterministic tests passed**.
+- The workflow re-fetched the public item metadata, selected exactly `GFDF_Ripples_2023_04_18_DEM.tif` at the pinned catalogue size of **619,492 bytes**, and used only that record's explicit `downloadUri`.
+- The HTTPS request returned **HTTP 200**, but the final content type was `text/html`; only **4,255 bytes** arrived, beginning `<!doctype`. The size did not match the catalogue, TIFF magic was absent, and tifffile did not inspect a raster. `raw_sample_downloaded=false`.
+- This is a valid negative acquisition result. The metadata URI is a manager download route but does not provide an anonymous raster in the tested public context. No credential, cookie, access-control bypass or alternate guessed endpoint was used.
+- Stop further ScienceBase endpoint exploration for this item. Pivot to a separate public Earth dataset or a different official 2026 challenge. The planetary-analog thesis remains a candidate, not a proven best challenge.
+
+Exact claim states remain unchanged:
+- Repo operating system: SUPPORTED.
+- Cross-body similarity: NOT YET PROVEN.
+- Known-site recovery: NOT YET MEASURED.
+- Novel analogue discovery: NOT YET PROVEN.
+- Local validation advantage: NOT YET PROVEN.
+- Challenge-selection superiority: NOT YET PROVEN.
