@@ -87,3 +87,27 @@ USGS source review identified the Grand Falls Dune Field, Navajo Nation, Arizona
 This raises the evidence potential of the planetary-analog track for a narrow **aeolian-process** experiment. It does not yet make the data E001-ready: raw files have not been downloaded or hashed, CRS/resolution/nodata/units are uninspected, and no non-analogue controls or Mars/Earth matched-support descriptors exist. The heuristic score is unchanged; Martian Map and MODIS/VIIRS remain the provisional top tier pending data ingestion and validation.
 
 Source report: `research/E535_GRAND_FALLS_AEOLIAN_DATA_SOURCE_AUDIT_20261111.md`; registry: `data/grand_falls_source_registry.csv`. Public data access is not field-access permission; the site is on Navajo Nation land and new geological fieldwork requires applicable permits. No fieldwork, sampling or contact was performed.
+
+
+## E541 leave-one-factor-out challenge-ranking falsification (2026-11-11)
+
+The frozen five-factor scorecard was rescored across **all 14 challenges**, removing one factor at a time and renormalizing the remaining weights. This is a sensitivity experiment, not a probability of winning.
+
+| Removed factor | Martian Map #11 | MODIS/VIIRS #9 | Gap (#11 − #9) | Leader |
+|---|---:|---:|---:|---|
+| None | 4.100 | 4.000 | +0.100 | #11, below meaningful threshold |
+| Data readiness | 4.133 | 3.833 | +0.300 | #11 |
+| Validation | 4.133 | 3.833 | +0.300 | #11 |
+| Portfolio reuse | 4.000 | 4.125 | −0.125 | #9, below meaningful threshold |
+| Differentiation | 4.206 | 4.176 | +0.029 | #11, effectively tied |
+| Feasibility | 4.029 | 4.000 | +0.029 | #11, effectively tied |
+
+All 14 were rescored. The top five for each ablation and the exact method are in `research/E541_CHALLENGE_SELECTION_FACTOR_ABLATION_20261111.md`.
+
+**Falsification:** the Martian Map lead reverses when the 20% portfolio-reuse factor is removed. MODIS/VIIRS leads by 0.125, still below the predeclared 0.25 meaningful-difference threshold. The two remain a provisional top tier; neither is proven superior. No other challenge enters the top two under a single-factor removal. Challenge #10 planetary analog does not enter the top five under any single-factor ablation.
+
+**Analog threshold:** with challenge #10's current reuse/differentiation/feasibility scores fixed, matching MODIS/VIIRS 4.00 requires `Data + Validation ≥ 7.8` (currently 3.5). Matching Martian Map 4.10 requires `Data + Validation ≥ 8.2`. This confirms that novel-site recovery and defensible cross-body data are the actual missing evidence, not UI polish.
+
+Claim states remain unchanged: challenge-selection superiority NOT YET PROVEN; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN.
+
+Next decisive experiment remains MOLA/CTX/HiRISE geometry/CRS registration and actual coverage on one pinned Mars area. If that fails, lower #11 and reassess #9. No challenge is locked.
