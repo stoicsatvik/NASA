@@ -1,0 +1,47 @@
+name: E540 Grand Falls direct DEM acquisition
+
+on:
+  push:
+    branches:
+      - research/e540-grand-falls-direct-dem-download-20261111
+    paths:
+      - experiments/e540_grand_falls_direct_dem_download.py
+      - experiments/test_e540_grand_falls_direct_dem_download.py
+      - .github/workflows/e540-grand-falls-direct-dem-download.yml
+      - research/E540_GRAND_FALLS_DIRECT_DEM_DOWNLOAD_20261111.md
+  pull_request:
+    branches:
+      - research/e539-public-cloud-url-metadata-audit-20261111
+      - main
+    paths:
+      - experiments/e540_grand_falls_direct_dem_download.py
+      - experiments/test_e540_grand_falls_direct_dem_download.py
+      - .github/workflows/e540-grand-falls-direct-dem-download.yml
+      - research/E540_GRAND_FALLS_DIRECT_DEM_DOWNLOAD_20261111.md
+
+permissions:
+  contents: read
+
+jobs:
+  acquire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install TIFF inspection dependencies
+        run: python -m pip install --disable-pip-version-check numpy tifffile
+      - name: Run E540 deterministic safety tests
+        run: python -m unittest experiments.test_e540_grand_falls_direct_dem_download -v
+      - name: Acquire only the exact public DEM downloadUri from metadata
+        run: python -m experiments.e540_grand_falls_direct_dem_download --out-dir .artifacts/e540
+      - name: Preserve receipt and raw DEM as a short-lived artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e540-grand-falls-dem
+          path: .artifacts/e540/
+          if-no-files-found: warn
+          retention-days: 7
