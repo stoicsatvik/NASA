@@ -1,0 +1,49 @@
+name: E559 Copernicus GLO-30 quality-mask audit
+
+on:
+  push:
+    branches:
+      - research/e559-copernicus-aux-mask-audit-20261111
+    paths:
+      - experiments/e559_copernicus_aux_mask_audit.py
+      - tests/test_e559_copernicus_aux_mask_audit.py
+      - .github/workflows/e559-copernicus-aux-mask-audit.yml
+  pull_request:
+    branches:
+      - research/e557-copernicus-glo30-lonar-sample-20261111
+    paths:
+      - experiments/e559_copernicus_aux_mask_audit.py
+      - tests/test_e559_copernicus_aux_mask_audit.py
+      - .github/workflows/e559-copernicus-aux-mask-audit.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e559-copernicus-aux-mask-audit-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  public-mask-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install bounded public COG reader and tests
+        run: python -m pip install "requests>=2.31,<3" "rasterio>=1.4,<2" "numpy>=1.26,<3" "pytest>=8,<9"
+      - name: Run deterministic mask and lineage tests
+        run: python -m pytest -q tests/test_e559_copernicus_aux_mask_audit.py
+      - name: List exact public ancillary prefixes and sample tiled masks
+        run: python -m experiments.e559_copernicus_aux_mask_audit --out .artifacts/e559/receipt.json
+      - name: Preserve compact mask/lineage receipt only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e559-copernicus-aux-mask-audit
+          path: .artifacts/e559/receipt.json
+          if-no-files-found: ignore
+          retention-days: 14
