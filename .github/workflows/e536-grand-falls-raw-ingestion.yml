@@ -1,0 +1,42 @@
+name: E536 Grand Falls bounded raw-raster ingestion
+
+on:
+  push:
+    branches:
+      - research/e536-grand-falls-raw-ingestion-20261111
+    paths:
+      - experiments/e536_grand_falls_raw_ingestion.py
+      - experiments/test_e536_grand_falls_raw_ingestion.py
+      - .github/workflows/e536-grand-falls-raw-ingestion.yml
+  pull_request:
+    branches:
+      - research/e535-grand-falls-aeolian-source-audit-20261111
+    paths:
+      - experiments/e536_grand_falls_raw_ingestion.py
+      - experiments/test_e536_grand_falls_raw_ingestion.py
+      - .github/workflows/e536-grand-falls-raw-ingestion.yml
+
+permissions:
+  contents: read
+
+jobs:
+  ingestion:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install bounded TIFF inspection dependency
+        run: python -m pip install --quiet tifffile
+      - name: Run deterministic parser tests
+        run: python -m unittest experiments.test_e536_grand_falls_raw_ingestion -v
+      - name: Probe ScienceBase and acquire one bounded raw sample
+        run: python -m experiments.e536_grand_falls_raw_ingestion
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e536-grand-falls-raw-ingestion
+          path: .artifacts/e536/
+          retention-days: 7
