@@ -21,7 +21,7 @@ SOURCE_URL = (
 )
 SOURCE_INDEX = "https://asc-pds-services.s3.us-west-2.amazonaws.com/mosaic/mars2020_trn/HiRISE/index.html"
 SOURCE_PAGE = "https://astrogeology.usgs.gov/search/map/Mars/Mars2020/JEZ_hirise_soc_006_DTM_MOLAtopography_DeltaGeoid_1m_Eqc_latTs0_lon0_blend40"
-SOURCE_DOI = "10.5066/P9QJDP48"
+SOURCE_DOI = "10.5066/P9REJ9JN"
 ALLOWED_HOST = "asc-pds-services.s3.us-west-2.amazonaws.com"
 ALLOWED_PATH = (
     "/mosaic/mars2020_trn/HiRISE/"
