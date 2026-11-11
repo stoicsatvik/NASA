@@ -12,7 +12,7 @@ on:
       - data/e550_patch_summaries.json
   pull_request:
     branches:
-      - research/e553-missingness-sensitivity-20261111
+      - research/e552-e550-missingness-sensitivity-20261111
     paths:
       - experiments/e554_hirise_nodata_neighborhood.py
       - tests/test_e554_hirise_nodata_neighborhood.py
