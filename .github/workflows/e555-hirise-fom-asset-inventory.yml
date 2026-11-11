@@ -1,0 +1,46 @@
+name: E555 product-specific HiRISE FOM asset inventory
+
+on:
+  push:
+    branches:
+      - research/e555-hirise-fom-asset-inventory-20261111
+    paths:
+      - experiments/e555_hirise_fom_asset_inventory.py
+      - tests/test_e555_hirise_fom_asset_inventory.py
+      - research/E555_HIRISE_FOM_ASSET_INVENTORY_20261111.md
+      - .github/workflows/e555-hirise-fom-asset-inventory.yml
+  pull_request:
+    branches:
+      - research/e554-hirise-nodata-neighborhood-20261111
+    paths:
+      - experiments/e555_hirise_fom_asset_inventory.py
+      - tests/test_e555_hirise_fom_asset_inventory.py
+      - research/E555_HIRISE_FOM_ASSET_INVENTORY_20261111.md
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  metadata-inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install bounded metadata reader and tests
+        run: python -m pip install "requests>=2.31,<3" "pytest>=8,<9"
+      - name: Run deterministic inventory tests
+        run: python -m pytest -q tests/test_e555_hirise_fom_asset_inventory.py
+      - name: Inventory pinned public directory and product metadata
+        run: python -m experiments.e555_hirise_fom_asset_inventory --out .artifacts/e555/receipt.json
+      - name: Preserve compact metadata receipt only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e555-hirise-fom-inventory
+          path: .artifacts/e555/receipt.json
+          if-no-files-found: ignore
+          retention-days: 14
