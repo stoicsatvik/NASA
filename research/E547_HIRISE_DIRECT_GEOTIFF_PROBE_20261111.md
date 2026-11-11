@@ -11,9 +11,9 @@ This is an alternate-source feasibility test. It is **not** a substitute for the
 ## Pinned source
 
 - Publisher: USGS Astrogeology Science Center.
-- Product: Mars 2020 Terrain Relative Navigation HiRISE DTM / orthorectified mosaic.
+- Product: Mars 2020 Terrain Relative Navigation HiRISE DTM mosaic.
 - Product DOI: https://doi.org/10.5066/P9QJDP48
-- Product page: https://astrogeology.usgs.gov/search/map/mars_2020_terrain_relative_navigation_hirise_orthorectified_image_mosaic
+- Product page: https://astrogeology.usgs.gov/search/map/Mars/Mars2020/JEZ_hirise_soc_006_DTM_MOLAtopography_DeltaGeoid_1m_Eqc_latTs0_lon0_blend40
 - Public S3 directory: https://asc-pds-services.s3.us-west-2.amazonaws.com/mosaic/mars2020_trn/HiRISE/index.html
 - Exact direct object: \`JEZ_hirise_soc_006_DTM_MOLAtopography_DeltaGeoid_1m_Eqc_latTs0_lon0_blend40.tif\`
 - The USGS directory lists the DTM GeoTIFF and XML/PDS labels as separate objects.
