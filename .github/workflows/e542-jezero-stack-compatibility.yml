@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - research/e542-jezero-stack-compatibility-20261111
+      - research/e543-jezero-mola-local-scale-20261111
     paths:
       - experiments/e542_jezero_stack_compatibility.py
       - experiments/test_e542_jezero_stack_compatibility.py
