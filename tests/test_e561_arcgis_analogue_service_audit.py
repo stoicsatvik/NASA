@@ -169,6 +169,7 @@ class E561Tests(unittest.TestCase):
         result = validate_portal_item(document)
         self.assertEqual(result["id"], SERVICE_ITEM_ID)
         self.assertEqual(result["access"], "public")
+        self.assertTrue(result["service_url_identity_matches"])
         self.assertFalse(result["raw_item_url_retained"])
         document["access"] = "private"
         with self.assertRaises(E561Error):
@@ -185,8 +186,11 @@ class E561Tests(unittest.TestCase):
             "modified": 1720636669000,
             "url": "https://services.arcgis.com/other/FeatureServer",
         }
-        with self.assertRaises(E561Error):
-            validate_portal_item(document)
+        result = validate_portal_item(document)
+        self.assertEqual(result["outcome"], "PORTAL_ITEM_METADATA_RETRIEVED_SERVICE_URL_MISMATCH")
+        self.assertFalse(result["service_url_identity_matches"])
+        self.assertEqual(result["service_url_host"], "services.arcgis.com")
+        self.assertNotIn("token-value", str(result))
 
     def test_portal_item_metadata_fallback_records_html_failure_without_aborting(self):
         valid = {
