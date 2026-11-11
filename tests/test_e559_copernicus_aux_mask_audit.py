@@ -6,6 +6,7 @@ import pytest
 from experiments.e559_copernicus_aux_mask_audit import (
     AUXFILES,
     PREVIEW,
+    cli_summary,
     E559Error,
     expected_key,
     find_layer_object,
@@ -130,3 +131,21 @@ def test_kml_summary_extracts_metadata_without_retaining_raw_xml():
     assert result["sample_features"][0]["name"] == "Scene A"
     assert result["sample_features"][0]["description_prefix"] == "Acquisition scene details"
     assert result["raw_kml_retained"] is False
+
+
+
+def test_cli_summary_uses_the_canonical_run_result_schema():
+    result = {
+        "experiment": "E559",
+        "outcome": "PUBLIC_QUALITY_MASKS_ACQUIRED_AND_SAMPLED",
+        "source": {"tile_stem": "Copernicus_DSM_COG_10_N19_00_E076_00_DEM"},
+        "handbook_exact_filename_match": {"EDM": False, "FLM": False, "WBM": False, "HEM": False, "ACM": False, "SRC": False},
+        "mask_samples": {"WBM": [{"site_id": "lonar"}], "HEM": []},
+    }
+    assert cli_summary(result) == {
+        "experiment": "E559",
+        "outcome": "PUBLIC_QUALITY_MASKS_ACQUIRED_AND_SAMPLED",
+        "tile": "Copernicus_DSM_COG_10_N19_00_E076_00_DEM",
+        "expected_mask_keys_found": {"EDM": False, "FLM": False, "WBM": False, "HEM": False, "ACM": False, "SRC": False},
+        "sampled_layers": ["HEM", "WBM"],
+    }
