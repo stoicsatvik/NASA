@@ -139,13 +139,15 @@ def test_cli_summary_uses_the_canonical_run_result_schema():
         "experiment": "E559",
         "outcome": "PUBLIC_QUALITY_MASKS_ACQUIRED_AND_SAMPLED",
         "source": {"tile_stem": "Copernicus_DSM_COG_10_N19_00_E076_00_DEM"},
-        "handbook_exact_filename_match": {"EDM": False, "FLM": False, "WBM": False, "HEM": False, "ACM": False, "SRC": False},
+        "actual_layer_keys_from_complete_listing": {"EDM": "edm.tif", "FLM": "flm.tif", "WBM": "wbm.tif", "HEM": "hem.tif", "ACM": "acm.kml", "SRC": "src.kml"},
+        "handbook_exact_filename_match": {"EDM": False, "FLM": False, "WBM": False, "HEM": False, "ACM": True, "SRC": True},
         "mask_samples": {"WBM": [{"site_id": "lonar"}], "HEM": []},
     }
     assert cli_summary(result) == {
         "experiment": "E559",
         "outcome": "PUBLIC_QUALITY_MASKS_ACQUIRED_AND_SAMPLED",
         "tile": "Copernicus_DSM_COG_10_N19_00_E076_00_DEM",
-        "expected_mask_keys_found": {"EDM": False, "FLM": False, "WBM": False, "HEM": False, "ACM": False, "SRC": False},
+        "actual_layers_found": {"EDM": True, "FLM": True, "WBM": True, "HEM": True, "ACM": True, "SRC": True},
+        "handbook_exact_filename_match": {"EDM": False, "FLM": False, "WBM": False, "HEM": False, "ACM": True, "SRC": True},
         "sampled_layers": ["HEM", "WBM"],
     }
