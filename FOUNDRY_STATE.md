@@ -3,7 +3,7 @@
 Updated: 2026-11-11
 Class: Tier A
 Time horizon: NASA Space Apps Challenge, 14–15 Nov 2026
-Working branch: `research/e535-grand-falls-aeolian-source-audit-20261111`
+Working branch: `research/e540-bounded-dem-header-probe-20261111`
 Main objective: maximize uncertainty eliminated per run and converge on a scientifically defensible Space Apps entry.
 
 ## Current thesis
@@ -101,7 +101,7 @@ Pivot away from the planetary-analog track if any of these becomes clear:
 
 ## Next trigger
 
-**Retrieve the public Grand Falls Dune Field ScienceBase files (DEM/orthomosaic plus matched weather/imagery), hash and profile them, then align aeolian features to Mars dune data at matched support and define a defensible contrast set before E001.**
+**Stop repeating URL guesses for this Grand Falls item. Find an independent, documented raw-data path (MOLA/LOLA/Diviner/Earthdata or another USGS product), then define matched-support physical descriptors and defensible controls before E001.**
 
 E527/E528 spatial acquisition and ID joining are complete. E530 found no directly admissible shared quantitative features in the current PAAD/MGD3 pair. The next run must address independent labels/controls or falsify another feature family, not repeat ingestion or polish UI.
 
@@ -354,3 +354,15 @@ E536.1 now rejects manager preview URLs as non-direct downloads, checks HTTPS Sc
 - Result: the documented ?name= route is not usable for this item in the tested public context. This does not prove that every official ScienceBase/S3 access path is unavailable; it does rule out treating this guessed single-file route as a working fix.
 - Next: inspect only the public item metadata for an explicitly exposed anonymous cloud/download URL or select another source item with a verified direct file link. Do not use credentials, access-control bypasses, or further guessed endpoints. If no public direct URL is exposed, stop repeated acquisition attempts and retain the negative result.
 - Claim boundary unchanged: Grand Falls remains a candidate Earth aeolian-process source; no raw DEM, CRS, resolution, nodata, vertical datum, calibrated pixel values, matched Mars/Earth descriptors, or E001 analogue recovery are established. No fieldwork, contact, merge, deployment, or competition submission.
+
+
+## E540 — bounded anonymous DEM header falsification (2026-11-11)
+
+- Draft PR #99, branch research/e540-bounded-dem-header-probe-20261111, exact head 009e834b14aa7010ec6c2050cabd0fcb7b72c72c, stacked on E539 / PR #98.
+- Exact-head Actions run [#42974585326](https://github.com/stoicsatvik/NASA/actions/runs/42974585326) succeeded; deterministic tests **8/8 passed**.
+- Pinned ScienceBase item metadata returned HTTP 200 and exactly one record matched GFDF_Ripples_2023_04_18_DEM.tif. The record's own anonymous downloadUri was requested with Range bytes=0-31; exactly 32 bytes were returned under HTTP 206.
+- The response was text/html; charset=UTF-8, Content-Range bytes 0-31/4255, while the metadata file size is 619,492 bytes. No TIFF magic was present. Bounded header SHA-256: da601195ac485b469d11020bd536befb96529d3a1f367ed9e97db3d7095afc6b.
+- Result: **NON_TIFF_HEADER**. The tested manager/download route returns a partial HTML representation, not DEM bytes. This falsifies this route only; it does not prove every ScienceBase/USGS route or other public datasets are inaccessible.
+- No credentials, raw bytes, raw URL/query values, full-file download, fieldwork, contact, merge, deployment or competition submission.
+- Claim states unchanged: repo operating system SUPPORTED; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN; challenge-selection superiority NOT YET PROVEN.
+- **Next:** stop guessing alternate URL shapes for this item. Pivot to a separately documented raw-data endpoint or independent MOLA/LOLA/Diviner/Earthdata source. E001 remains NOT YET MEASURED / NOT READY, not BLOCKED.
