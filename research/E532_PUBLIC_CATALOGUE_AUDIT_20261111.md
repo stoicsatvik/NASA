@@ -77,3 +77,8 @@ The earlier post-audit note said a new live-source run was still pending. That g
 - The source SHA-256 remained `09ad7d62eefd40c86acaee945fb2d1f045b199c958830ba8715e7774311afb0d`; the 16-record, all-Draft catalogue result is unchanged.
 
 The boolean exclusion is now covered by both the exact-head fixture suite and a successful live-source audit. E532 remains a candidate-positive index only and remains **NOT E001-READY**; no known-site recovery or analogue-discovery claim is promoted.
+
+
+## Follow-up reconciliation — USGS source acquisition was already complete (2026-11-11)
+
+The original E532 next-step text proposed acquiring the USGS 2020 Known Terrestrial Analog Sites point layer (DOI 10.5066/P9J72921). Repository history shows that this exact source was already tested in E326 / NASA PR #33 on 2026-10-27. The public ArcGIS layer returned four features, all volcanic, with `AnalogBody` missing/null-like in all four. It supplied no dune positives or negatives. E533 therefore does not repeat the acquisition; it audits six candidate catalogue records against their cited peer-reviewed sources instead. See `research/E533_CANDIDATE_LABEL_SOURCE_REVIEW_20261111.md`.
