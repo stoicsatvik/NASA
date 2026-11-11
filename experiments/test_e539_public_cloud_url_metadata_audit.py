@@ -1,9 +1,14 @@
 """E539 metadata URL inventory tests; no live requests."""
+import json
+import tempfile
 import unittest
+from pathlib import Path
+from unittest.mock import patch
 
 from experiments.e539_public_cloud_url_metadata_audit import (
     _url_record,
     _walk_urls,
+    main,
 )
 
 
@@ -59,6 +64,22 @@ class PublicUrlMetadataAuditTests(unittest.TestCase):
         record = _url_record("http://example.org/file.tif", "fixture.http")
         self.assertEqual(record["classification"], "non_https_url_rejected")
         self.assertFalse(record["anonymous_candidate"])
+
+    def test_cli_writes_receipt_without_network_access(self):
+        expected = {
+            "experiment": "E539",
+            "url_candidate_count": 0,
+            "raw_metadata_stored": False,
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "receipt.json"
+            with patch("sys.argv", ["e539", "--out", str(output)]):
+                with patch(
+                    "experiments.e539_public_cloud_url_metadata_audit.audit",
+                    return_value=expected,
+                ):
+                    main()
+            self.assertEqual(json.loads(output.read_text(encoding="utf-8")), expected)
 
 
 if __name__ == "__main__":
