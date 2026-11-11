@@ -37,7 +37,7 @@ jobs:
       - name: Run E534 regression tests
         run: python -m unittest experiments.test_e534_remaining_candidate_source_review -v
       - name: Fetch pinned catalogue and emit cumulative receipt
-        run: python experiments/e534_remaining_candidate_source_review.py --out .artifacts/e534/result.json
+        run: python -m experiments.e534_remaining_candidate_source_review --out .artifacts/e534/result.json
       - uses: actions/upload-artifact@v4
         with:
           name: e534-remaining-candidate-source-review
