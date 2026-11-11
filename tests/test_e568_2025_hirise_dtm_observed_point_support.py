@@ -14,6 +14,7 @@ from rasterio.transform import from_origin, rowcol
 from experiments.e568_2025_hirise_dtm_observed_point_support import (
     MOLA_RADIUS_FALLBACK_M,
     sample_raster,
+    build_support_cross_tab,
     stream_member,
 )
 
@@ -94,3 +95,34 @@ def test_raster_sampler_preserves_observed_inside_and_valid_denominators():
     assert summary["scaled_sample_min"] is not None
     assert result["metadata"]["scale"] == 0.1
     assert result["metadata"]["offset"] == 100.0
+
+
+def test_cross_tab_separates_outside_points_from_in_bounds_nodata():
+    dtm = {
+        "_inside_mask": [True, True, True, False, False],
+        "_valid_mask": [True, False, False, False, False],
+    }
+    confidence = {
+        "_inside_mask": [True, True, False, False, True],
+        "_valid_mask": [True, False, False, False, True],
+    }
+    result = build_support_cross_tab(dtm, confidence)
+
+    assert result["observed_mola_point_centers"] == 5
+    assert result["both_inside_bounds"] == 2
+    assert result["both_outside_bounds"] == 1
+    assert result["dtm_inside_confidence_outside"] == 1
+    assert result["confidence_inside_dtm_outside"] == 1
+    assert result["both_valid_within_both_bounds"] == 1
+    assert result["both_nodata_within_both_bounds"] == 1
+    assert result["confidence_valid_but_dtm_invalid_within_both_bounds"] == 0
+    assert result["dtm_valid_but_confidence_invalid_within_both_bounds"] == 0
+    assert result["validity_masks_identical_at_observed_points"] is False
+    assert result["validity_masks_identical_within_both_bounds"] is True
+
+
+def test_cross_tab_rejects_valid_samples_outside_raster_bounds():
+    dtm = {"_inside_mask": [False], "_valid_mask": [True]}
+    confidence = {"_inside_mask": [False], "_valid_mask": [False]}
+    with pytest.raises(ValueError, match="out-of-bounds point"):
+        build_support_cross_tab(dtm, confidence)
