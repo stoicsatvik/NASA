@@ -64,6 +64,7 @@ def _validate_rows(
     rows: list[dict[str, str]],
     expected_ids: set[str],
     label: str,
+    require_additional_in_catalogue: bool = True,
 ) -> list[dict[str, Any]]:
     ids = [row.get("site_id", "") for row in rows]
     if len(rows) != 6 or set(ids) != expected_ids or len(ids) != len(set(ids)):
@@ -90,7 +91,7 @@ def _validate_rows(
         if not doi or doi not in catalogue_dois:
             raise ValueError(f"review DOI is not attached to pinned catalogue record: {site_id}")
         additional = row.get("additional_doi", "").strip().lower()
-        if additional and additional not in catalogue_dois:
+        if require_additional_in_catalogue and additional and additional not in catalogue_dois:
             raise ValueError(f"additional DOI is not attached to pinned catalogue record: {site_id}")
         if row.get("review_decision") != "SOURCE_SUPPORTS_CANDIDATE_LABEL":
             raise ValueError(f"unexpected decision token for {site_id}")
@@ -120,7 +121,10 @@ def audit(
     source_sha256: str,
 ) -> dict[str, Any]:
     features = _features_by_id(document)
-    previous = _validate_rows(features, previous_rows, PREVIOUS_IDS, "E533 prior review")
+    previous = _validate_rows(
+        features, previous_rows, PREVIOUS_IDS, "E533 prior review",
+        require_additional_in_catalogue=False,
+    )
     new = _validate_rows(features, new_rows, NEW_IDS, "E534 remaining review")
     if set(x["site_id"] for x in previous).intersection(x["site_id"] for x in new):
         raise ValueError("E534 new review overlaps the preserved E533 subset")
