@@ -24,7 +24,7 @@ class E537ScienceBaseItemZipTests(unittest.TestCase):
     def test_archive_selection_is_exact_and_path_safe(self):
         buffer = io.BytesIO()
         with zipfile.ZipFile(buffer, "w") as archive:
-            archive.writestr(f"folder/{DEM_NAME}", b"II*\\x00" + b"x" * 20)
+            archive.writestr(f"folder/{DEM_NAME}", b"II*\x00" + b"x" * 20)
             archive.writestr(f"folder/{FGDC_NAME}", b"<metadata/>")
         with zipfile.ZipFile(io.BytesIO(buffer.getvalue())) as archive:
             dem, fgdc = _select_members(archive)
@@ -34,8 +34,8 @@ class E537ScienceBaseItemZipTests(unittest.TestCase):
     def test_rejects_duplicate_or_missing_dem(self):
         buffer = io.BytesIO()
         with zipfile.ZipFile(buffer, "w") as archive:
-            archive.writestr(DEM_NAME, b"II*\\x00")
-            archive.writestr("copy/" + DEM_NAME, b"II*\\x00")
+            archive.writestr(DEM_NAME, b"II*\x00")
+            archive.writestr("copy/" + DEM_NAME, b"II*\x00")
             archive.writestr(FGDC_NAME, b"<metadata/>")
         with zipfile.ZipFile(io.BytesIO(buffer.getvalue())) as archive:
             with self.assertRaisesRegex(ValueError, "exactly one"):
