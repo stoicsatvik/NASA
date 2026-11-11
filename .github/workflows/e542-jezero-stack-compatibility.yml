@@ -1,0 +1,36 @@
+name: E542 Jezero multi-resolution metadata compatibility
+
+on:
+  push:
+    branches:
+      - research/e542-jezero-stack-compatibility-20261111
+    paths:
+      - experiments/e542_jezero_stack_compatibility.py
+      - experiments/test_e542_jezero_stack_compatibility.py
+      - research/E542_JEZERO_STACK_COMPATIBILITY_20261111.md
+      - .github/workflows/e542-jezero-stack-compatibility.yml
+  pull_request:
+    branches:
+      - research/e541-challenge-selection-factor-ablation-20261111
+    paths:
+      - experiments/e542_jezero_stack_compatibility.py
+      - experiments/test_e542_jezero_stack_compatibility.py
+      - research/E542_JEZERO_STACK_COMPATIBILITY_20261111.md
+      - .github/workflows/e542-jezero-stack-compatibility.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  metadata-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run deterministic tests
+        run: python -m unittest discover -s experiments -p "test_e542_jezero_stack_compatibility.py" -v
+      - name: Validate JSON receipt
+        run: python experiments/e542_jezero_stack_compatibility.py > /tmp/e542.json && python -m json.tool /tmp/e542.json > /dev/null
