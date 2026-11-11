@@ -546,3 +546,10 @@ The observed six-patch plane has R² 0.5843 and gradient norm 0.4357 m/km. Exact
 The permutation assumes exchangeability of the six measured patch medians. Three unsupported positions are excluded and spatially informative missingness remains unresolved. Patch medians, not individual pixels, are the permutation units. Local exact tests: 6/6 passed. Exact-head Actions runs 43027847026 and 43027841221 both succeeded; all 6 tests passed and the exact 720-permutation receipt reproduced.
 
 Claim states remain: common support PARTIAL (six of nine positions); local vertical residual MEASURED for six patches only; global vertical offset reproduction NOT ESTABLISHED; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; route safety NOT CLAIMED.
+
+
+## E552 — provenance audit of E550 unsupported HiRISE windows (2026-11-11)
+
+E552 cross-checks the compact E550 nine-patch receipt (Actions #43025458917, artifact 13855824623) against the E549 receipt (Actions #43024579396, artifact 13856547599), both pinned to USGS HiRISE DOI 10.5066/P9REJ9JN. E549 records GeoTIFF GDAL_NODATA = -3.4028226550889045e+38. SHA-256 of a 113×113 little-endian float32 window filled with that value is 939e55e9e3abcb6ee16e1ef5761cb7de68a2794c13b91e173db9698310bf3179. All three E550 unsupported windows (x15_y15, x50_y85, x85_y85) have exactly this digest; all six measured windows have distinct hashes and 25/25 common cells. All nine CTX patches had 25 valid CTX cells. Thus the three missing supports are all-nodata HiRISE windows, not partially supported cells. The physical cause of the nodata (unsurveyed footprint versus masked/invalid terrain) remains NOT DETERMINED.
+
+Five deterministic tests pass locally. E551's six-patch exact permutation result is unchanged (p_R²=0.2444, p_gradient=0.1500, sign p=0.21875) and remains conditional on the six measured locations; it cannot be generalized to the nine-position grid. No raw pixels, new raster requests, imputation, fitted correction, or cross-body claim are introduced. Report: research/E552_HIRISE_NODATA_MISSINGNESS_20261111.md.
