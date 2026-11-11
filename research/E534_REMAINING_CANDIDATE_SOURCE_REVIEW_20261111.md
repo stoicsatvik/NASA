@@ -57,6 +57,14 @@ The pinned catalogue contains 16 features. Twelve have primary Mars/Moon labels:
 - experiments/test_e534_remaining_candidate_source_review.py checks source pinning, exact selection, DOI membership, no overlap with E533, no status promotion, target counts and no negative-control inference.
 - The workflow stores a machine-readable receipt. It does not copy external source photos, sensitive coordinates or the raw external catalogue.
 
+
+
+### Validation state at PR preparation
+
+- Local execution of the E534 fixture suite: **9/9 passed**.
+- The exact pinned GeoJSON revision was independently re-read through the GitHub connector. Its Git blob SHA is `156edd871599cf9ac9c083658d14d034f660e35d`; all 12 frozen record mappings, DOI/target/status checks and cumulative Mars 10 / Moon 2 counts passed.
+- This connector-backed read is not represented as the script's raw-URL Actions receipt. The dedicated workflow has not yet produced a verifiable exact-head run in the connected workflow lookup; the live raw-URL receipt remains pending.
+
 ## Next decisive work
 
 1. Build a defensible, predeclared non-analogue control universe; absence from a positive catalogue must not be treated as a negative.
