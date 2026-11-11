@@ -1,0 +1,46 @@
+name: E553 exact missingness sensitivity
+
+on:
+  push:
+    branches:
+      - research/e552-e550-missingness-sensitivity-20261111
+    paths:
+      - data/e550_patch_summaries.json
+      - experiments/e553_missingness_sensitivity.py
+      - tests/test_e553_missingness_sensitivity.py
+      - .github/workflows/e553-missingness-sensitivity.yml
+  pull_request:
+    branches:
+      - research/e551-ctx-hirise-patch-permutation-null-20261111
+    paths:
+      - data/e550_patch_summaries.json
+      - experiments/e553_missingness_sensitivity.py
+      - tests/test_e553_missingness_sensitivity.py
+      - .github/workflows/e553-missingness-sensitivity.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  missingness-sensitivity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install numerical dependency
+        run: python -m pip install "numpy>=1.26,<3"
+      - name: Run deterministic tests
+        run: python -m unittest discover -s tests -p "test_e553_missingness_sensitivity.py" -v
+      - name: Run full five-quantile exact sensitivity grid
+        run: python -m experiments.e553_missingness_sensitivity --levels 5 --out .artifacts/e552/result.json
+      - name: Preserve machine-readable result
+        uses: actions/upload-artifact@v4
+        with:
+          name: e553-missingness-sensitivity
+          path: .artifacts/e552/result.json
+          if-no-files-found: error
+          retention-days: 30

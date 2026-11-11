@@ -1,0 +1,136 @@
+{
+  "experiment": "E553 exact missingness sensitivity for E550 CTX/HiRISE nine-position grid",
+  "source": {
+    "experiment": "E550 nine-position CTX/HiRISE spatial residual campaign",
+    "github_actions_run": 43025458917,
+    "github_artifact_id": 13855824623,
+    "ctx_doi": "10.5066/P906QQT8",
+    "hirise_doi": "10.5066/P9REJ9JN",
+    "nodata_audit_pr": 112,
+    "nodata_audit_result": "All three unsupported windows exactly match the declared all-nodata digest; physical cause NOT DETERMINED."
+  },
+  "grid_positions": 9,
+  "measured_patches": 6,
+  "unsupported_patches": [
+    "x15_y15",
+    "x50_y85",
+    "x85_y85"
+  ],
+  "sensitivity_envelope": {
+    "basis": "empirical quantiles of the six observed patch medians; not physical bounds",
+    "levels": 5,
+    "quantile_probabilities": [
+      0,
+      0.25,
+      0.5,
+      0.75,
+      1
+    ],
+    "values_m": [
+      -5.013924693674653,
+      -3.0460079385934478,
+      -2.577043070471518,
+      -1.743205942955683,
+      2.4249066823599605
+    ],
+    "completion_scenarios": 125,
+    "permutations_per_scenario": 362880,
+    "total_exact_permutation_evaluations": 45360000,
+    "hypothetical_values_are_measurements": false
+  },
+  "summary": {
+    "r2_observed_range": [
+      0.00561165550245445,
+      0.761433843269503
+    ],
+    "gradient_norm_m_per_km_range": [
+      0.0329088357910971,
+      0.41367366489706203
+    ],
+    "exact_r2_p_value_range": [
+      0.018253968253968255,
+      0.9898148148148148
+    ],
+    "exact_gradient_p_value_range": [
+      0.01798941798941799,
+      0.9897486772486772
+    ],
+    "r2_significant_completion_count": 4,
+    "gradient_significant_completion_count": 4,
+    "both_statistics_significant_completion_count": 4,
+    "completion_count": 125
+  },
+  "significant_completions": [
+    {
+      "imputed_values_m": {
+        "x15_y15": -5.013924693674653,
+        "x50_y85": -3.0460079385934478,
+        "x85_y85": 2.4249066823599605
+      },
+      "observed_r2": 0.6708181049693285,
+      "observed_gradient_norm_m_per_km": 0.34753652122438067,
+      "p_r2_ge_observed": 0.0345679012345679,
+      "p_gradient_ge_observed": 0.03390652557319224
+    },
+    {
+      "imputed_values_m": {
+        "x15_y15": -5.013924693674653,
+        "x50_y85": -2.577043070471518,
+        "x85_y85": 2.4249066823599605
+      },
+      "observed_r2": 0.6974797706005885,
+      "observed_gradient_norm_m_per_km": 0.3520584262392558,
+      "p_r2_ge_observed": 0.027954144620811288,
+      "p_gradient_ge_observed": 0.027248677248677248
+    },
+    {
+      "imputed_values_m": {
+        "x15_y15": -5.013924693674653,
+        "x50_y85": -1.743205942955683,
+        "x85_y85": 2.4249066823599605
+      },
+      "observed_r2": 0.7375665933767488,
+      "observed_gradient_norm_m_per_km": 0.3606985638351075,
+      "p_r2_ge_observed": 0.018783068783068783,
+      "p_gradient_ge_observed": 0.01869488536155203
+    },
+    {
+      "imputed_values_m": {
+        "x15_y15": -5.013924693674653,
+        "x50_y85": 2.4249066823599605,
+        "x85_y85": 2.4249066823599605
+      },
+      "observed_r2": 0.761433843269503,
+      "observed_gradient_norm_m_per_km": 0.41367366489706203,
+      "p_r2_ge_observed": 0.018253968253968255,
+      "p_gradient_ge_observed": 0.01798941798941799
+    }
+  ],
+  "outcome": "MISSINGNESS_SENSITIVITY_CHANGES_CONDITIONAL_NULL_OUTCOME",
+  "claim_state": {
+    "six_patch_spatial_gradient": "NOT SUPPORTED BY E551 SIX-PATCH NULL",
+    "nine_position_spatial_gradient": "NOT IDENTIFIABLE; THREE POSITIONS UNSUPPORTED",
+    "missingness_sensitivity": "SUPPORTED AS A CONDITIONAL COMPUTATIONAL DIAGNOSTIC",
+    "cross_body_similarity": "NOT YET PROVEN",
+    "known_site_recovery": "NOT YET MEASURED",
+    "novel_analogue_discovery": "NOT YET PROVEN",
+    "route_safety": "NOT CLAIMED"
+  },
+  "limitations": [
+    "The three unsupported patch values are unknown; empirical quantiles are sensitivity scenarios, not physical bounds.",
+    "The fraction of completions with p<0.05 is not a probability because no distribution over missing values is specified.",
+    "Exact permutation p-values are conditional on each hypothetical completed nine-value vector and the exchangeability null.",
+    "No imputed value is presented as an observation or used in a scientific correction surface.",
+    "The experiment does not establish an actual spatial gradient, geophysical trend, global datum or route safety."
+  ],
+  "validation": {
+    "tested_code_head": "ac9d07aa594102899812b79cd7e0d850172a4758",
+    "pull_request_run": 43033652738,
+    "push_run": 43033646927,
+    "artifact_id": 13862081912,
+    "workflow_conclusion": "SUCCESS",
+    "deterministic_tests": 5,
+    "full_exact_grid": "125 completions × 362,880 permutations"
+  },
+  "next_gate": "Recover common valid CTX/HiRISE support at x15_y15, x50_y85 and x85_y85 using a separately verified product footprint, or preserve the partial-coverage result. Do not impute these locations in the science product."
+}
