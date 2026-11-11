@@ -3,7 +3,7 @@
 Updated: 2026-11-11
 Class: Tier A
 Time horizon: NASA Space Apps Challenge, 14–15 Nov 2026
-Working branch: `research/e546-hirise-zip-range-feasibility-20261111`
+Working branch: `research/e547-hirise-direct-geotiff-range-20261111`
 Main objective: maximize uncertainty eliminated per run and converge on a scientifically defensible Space Apps entry.
 
 ## Current thesis
@@ -480,3 +480,16 @@ Exact-head GitHub Actions run 43013238079 succeeded (11 November 2026):
 - Final exact-head run #43018937442 passed 12/12 and completed the bounded source probe. The source is range-readable, but the selected DTM and orthomosaic are ZIP-deflated. Total transfer was 68,993 bytes; no raster pixels were acquired.
 - Current result: public archive Range access SUPPORTED; random access through this ZIP member layout NOT SUPPORTED; raster values and CTX/HiRISE registration NOT YET MEASURED.
 - Next: search only for separately published controlled, range-addressable HiRISE products. Do not substitute uncontrolled RDRs and do not download the multi-gigabyte archive.
+
+
+## E547 — bounded direct controlled HiRISE GeoTIFF range probe (2026-11-11)
+
+- Isolated branch: \`research/e547-hirise-direct-geotiff-range-20261111\`, stacked on E546 / PR #106; draft PR only.
+- E546 found the 2025 MSR HiRISE DTM is ZIP-DEFLATE inside the 5.47 GB archive; no small raster window can be read through ZIP member offsets without decompressing the 676 MB DTM member.
+- Identified a distinct official 2020 Mars 2020 TRN HiRISE DTM GeoTIFF in the USGS S3 directory: \`JEZ_hirise_soc_006_DTM_MOLAtopography_DeltaGeoid_1m_Eqc_latTs0_lon0_blend40.tif\`, DOI 10.5066/P9REJ9JN. This is not the 2025 MSR mosaic (DOI 10.5066/P13CPYYU) and must not be conflated with it.
+- Added a Range-only TIFF metadata/segment probe. It validates the exact source URL, HTTP 206 and Content-Range, parses TIFF structure using a seekable bounded reader, and reads at most one compressed tile/strip no larger than 512,000 bytes.
+- Hard total transfer cap: 1,000,000 bytes. If the server ignores Range, the response body is closed without consumption. No pixel values are decoded; only compact metadata and hashes are retained.
+- Added deterministic synthetic tests for tiled TIFF parsing, oversized segment refusal, Range ignored, Content-Range mismatch, transfer cap and invalid seeks.
+- Exact-head Actions [#43022208448](https://github.com/stoicsatvik/NASA/actions/runs/43021100543) succeeded: 8/8 fixture tests passed; the 1,839,545,409-byte TIFF returned HTTP 200 with `Accept-Ranges: bytes`. TIFF is 21,400 × 21,488 float32, uncompressed, one row per strip (21,488 strips; 85,600 bytes/row), not tiled. ModelPixelScale [1,1,0], ModelTiepoint [0,0,0,4577366,1106618,0], GeoKeyDirectory present. One 85,600-byte strip was read by exact Range; total 12 requests / 258,025 bytes, below the 1 MB cap. Receipt artifact 13855557466, ZIP SHA-256 2513dc52d9abfc3bbaa1442d61382fd1c230cbda1fef7d551772d0dcdc9a4f2c.
+- Outcome: direct 2020 TIFF metadata and one strip range read SUPPORTED. COG status NOT CLAIMED; pixel values NOT decoded; 64×64 window NOT YET MEASURED; CTX/HiRISE registration NOT YET MEASURED. This is the 2020 TRN product, not the 2025 MSR mosaic.
+- Next: inspect the sidecar label for vertical units/nodata; then test a preregistered 64×64 window. The TIFF is uncompressed float32 with one row per strip, so 64 rows × 64 columns should require 64 exact 256-byte payload ranges (16,384 payload bytes) if row offset/count invariants hold. Decode only after confirming nodata semantics, then compare coordinates/CRS to E544 without assuming datum or exact CTX-reference identity. Keep 2020 and 2025 products separate.
