@@ -627,13 +627,34 @@ Next: stop repeated local pixel probes. Seek independent USGS footprint/quality-
 ## E560 - USGS catalogue acquisition result (2026-11-11)
 
 - Exact ScienceBase item JSON returned HTTP 200 (19,203 bytes) for item 5f88940b82cebb8c13d912ee; title and ID matched.
-- The item listed one file, AnalogSites_metadata.xml (9,406 bytes). The downloaded size matched; no vector file or vector URL was exposed in the downloaded FGDC XML. Initial live result: [E560 run #43067276665](https://github.com/stoicsatvik/NASA/actions/runs/43067276665).
-- The XML provisionally declares 192 entity points, fields FID/Shape/Name/AnalogType/Lat/Lon/AnalogBody, Mercator_1SP / WGS_1984 / meters, and AnalogType values Impact Crater, Dunes and Volcanic Eruption.
-- The XML explicitly says it is for identification/discovery, not for analysis, and that point locations may be wrong by up to 10 km from feature centroids. It is marked In work / update as needed; lineage is None / Unknown. Treat as a candidate discovery index only, never precise ground truth or a training label set.
-- Integrity discrepancy: item JSON MD5 def5fcdca1a6e7dd4389def926c3c1f1 versus computed XML MD5 d514547ac0dd7e68a302e03cd4c59d9f; size matches at 9,406 bytes, XML SHA-256 0b38af81da5fd638f830b066c4d6c6626b899ef0c1aad16a4cecef33821ef855. FGDC claims remain provisional until this is reconciled.
-- E560 code now pins item identity/title, refuses redirects, redacts URL query values, parses FGDC limits and records checksum status. The 13-test revision is not yet confirmed by exact-head Actions; helper checks against the actual artifact passed. Earlier failed CI runs remain recorded; the earlier 7/7 run is not evidence for the current head.
-- No vector features or coordinates were acquired. No overlap, known-site recovery, controls or E001 result.
+- The item listed one file, `AnalogSites_metadata.xml` (9,406 bytes). Downloaded size matched; no vector file or vector URL was exposed in the downloaded FGDC XML.
+- The XML provisionally declares 192 entity points and fields FID/Shape/Name/AnalogType/Lat/Lon/AnalogBody, Mercator_1SP / WGS_1984 / meters, and AnalogType values Impact Crater, Dunes and Volcanic Eruption.
+- The XML explicitly says it is for identification/discovery, not for analysis, and point locations may be wrong by up to 10 km from feature centroids. It is marked In work / update as needed; lineage is None / Unknown. Treat it only as a candidate discovery index, never precise ground truth or a training label set.
+- Integrity discrepancy: item JSON MD5 `def5fcdca1a6e7dd4389def926c3c1f1` versus computed XML MD5 `d514547ac0dd7e68a302e03cd4c59d9f`; size matches at 9,406 bytes; XML SHA-256 `0b38af81da5fd638f830b066c4d6c6626b899ef0c1aad16a4cecef33821ef855`. FGDC claims remain provisional until this is reconciled.
+- E560 exact code/test head `85063538913db181e7f21478b2ebb4c38a98356c`: [Actions #43069286871](https://github.com/stoicsatvik/NASA/actions/runs/43069286871) succeeded, **13/13 deterministic tests** and bounded live metadata acquisition. Subsequent E560 commits are documentation-only; current E560 branch head is `be3c2b5e007fb0913b4a4f12e5fd7953c8d57447`. Earlier exact code run [#43068609889](https://github.com/stoicsatvik/NASA/actions/runs/43068609889) also passed 13/13.
+- The ScienceBase item JSON exposed one ArcGIS REST FeatureServer web link on `services.arcgis.com`; its `token` query value was not retained or reused. E560 did not follow the link.
+- No vector features or coordinates were acquired by E560. No overlap, known-site recovery, controls or E001 result.
+
+## E561 - public ArcGIS analogue service audit (2026-11-11)
+
+- E561 verified the public ArcGIS service item ID and layer 0 schema. Anonymous Query is explicitly allowed. Layer 0 is a point layer with FID/Name/AnalogType/Lat/Lon/AnalogBody, object-ID field FID, WKID 3857 and max record count 2,000.
+- The exact count-only request (`where=1=1&returnCountOnly=true&f=json`) returned **4 records**, not the FGDC metadata's provisional 192. No feature rows, geometries or coordinates were requested or downloaded.
+- The service metadata reports static data and a 10 July 2024 last-edit date. It also advertises anonymous update/delete permissions; E561 used GET-only requests and performed no writes.
+- Exact-query hardening now permits only `f=json` for metadata and the exact count-only parameter map for the query endpoint. Token parameters, duplicate keys, fragments, `outFields`, geometry-return flags and arbitrary query additions are rejected.
+- Latest exact-head PR workflow [#43070943518](https://github.com/stoicsatvik/NASA/actions/runs/43070943518) and push workflow [#43070938391](https://github.com/stoicsatvik/NASA/actions/runs/43070938391) passed **7/7 deterministic tests** and repeated the live count-only query. Earlier E561 runs [#43070089505](https://github.com/stoicsatvik/NASA/actions/runs/43070089505) and [#43070045960](https://github.com/stoicsatvik/NASA/actions/runs/43070045960) also passed 7/7 and confirmed the same count. The intermediate push run [#43070930458](https://github.com/stoicsatvik/NASA/actions/runs/43070930458) was cancelled by the concurrency group after a subsequent commit; it is not a scientific failure.
+- **SUPPORTED:** public service metadata, layer schema, anonymous read access and count-only query. **NOT ESTABLISHED:** that the four service records are the 192 FGDC points, version equivalence, coordinate accuracy, analytical suitability, any labels, or E001 recovery.
+- E560's ScienceBase XML MD5 mismatch remains unresolved. The ArcGIS service count of four is a version/provenance discrepancy, not a replacement for the FGDC count. Do not request feature rows until publisher provenance reconciles the two representations.
 
 ## Updated next decisive gate
 
-Do not use the E560 metadata as a quantitative label source. Query the official ScienceBase GeoServer WFS GetCapabilities endpoint once, bounded, and look for an item/title-matched feature type. If found, use DescribeFeatureType and a count-only query before retrieving any features. If no service exists, stop this catalogue route and use an independently documented source. The TADP documentation says ScienceBase-backed data may be exposed through WMS/WFS/CSW, but this specific item has not been shown to have a published service. No follow-up to the previously contacted nonresponder.
+Reconcile the ArcGIS service item/version and the ScienceBase XML checksum discrepancy before any feature-row acquisition. If the publisher's version lineage cannot be established, retain the service only as an unverified discovery endpoint and stop short of using it as an analytical label source. No E001 recovery, coordinate overlap, control validation, or quantitative analogue result is claimed. No follow-up to previously contacted nonresponders.
+
+
+### E561 ArcGIS Portal item metadata (11 November 2026)
+
+- Public Portal item JSON confirms item ID `db564f72235f49b39c4147df36fd3308`, title Terrestrial Analog Sites for Planetary Science, type Feature Service, access public, owner account `mahunter@usgs.gov_USGS`, created 2020-11-17 18:08:27 UTC and modified 2024-07-09 18:04:14 UTC.
+- Its service URL matches the ArcGIS service host/path after case normalization; no query parameters or token are present. The 178-character description does not mention DOI 10.5066/P9J72921, the ScienceBase item ID or FGDC.
+- Layer last edit is 2024-07-10 18:37:49.500 UTC, ~24 h 33 min 35.5 s after item modified. The item identity is confirmed, but the version relationship to the 192-point FGDC release is not.
+- Count-only query still returns **4**, versus the provisional FGDC count 192. No feature rows or coordinates were acquired.
+- Final exact-head PR workflow [#43073044735](https://github.com/stoicsatvik/NASA/actions/runs/43073044735) passed **14/14 tests** and completed the live metadata/schema/count audit. Artifact [#13879985771](https://github.com/stoicsatvik/NASA/actions/runs/43073044735/artifacts/13879985771).
+- Earlier negative attempts are preserved: Portal item `f=json`/`f=pjson` initially returned `text/plain` and was rejected; accepting parseable JSON exposed a case-only path difference, now recorded explicitly. The ScienceBase XML MD5 mismatch remains unresolved.
