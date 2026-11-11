@@ -40,9 +40,30 @@ Synthetic TIFF fixtures cover:
 - transfer-budget enforcement before a network request;
 - invalid seeks outside the pinned object.
 
-## Result
+## Exact-head result
 
-Pending exact-head GitHub Actions run. No live acquisition result is claimed until the receipt confirms the HTTP status, exact Content-Range values, TIFF structure and transfer total.
+GitHub Actions [#43021100543](https://github.com/stoicsatvik/NASA/actions/runs/43021100543) succeeded on head `16c2e9ba64102ffff37dd2c968736b69ebab3f06`:
+
+- Deterministic fixtures: **8/8 passed**.
+- HTTP HEAD: **200**, `Content-Type: image/tiff`, `Accept-Ranges: bytes`.
+- Direct TIFF object size: **1,839,545,409 bytes**.
+- TIFF: one page, **21,400 × 21,488**, float32, 32 bits/sample, one sample/pixel.
+- Compression tag: **1 (uncompressed)**.
+- Layout: **not tiled**; **21,488 strips**, one row per strip, each full row 85,600 bytes.
+- Georeferencing tags present: ModelPixelScale `[1, 1, 0]`, ModelTiepoint `[0, 0, 0, 4577366, 1106618, 0]`, GeoKeyDirectory present.
+- One 85,600-byte row strip was fetched by exact HTTP Range and hashed; no pixel values were decoded.
+- **12 range requests; 258,025 total bytes transferred**, below the 1,000,000-byte cap.
+- Compact receipt artifact [13854428457](https://github.com/stoicsatvik/NASA/actions/runs/43021100543/artifacts/13854428457), ZIP SHA-256 `8ed484a78adce58569e4ed159d8a627e81bca924f6c95a7296085d3b93084156`.
+
+Outcome: **DIRECT_TIFF_SEGMENT_RANGE_READ**. The 2020 direct TIFF is range-addressable at the strip level. It is not tiled, and this experiment does not establish COG status.
+
+### Preserved interpretation boundary
+
+- Direct object existence, TIFF metadata access and one bounded strip read: **SUPPORTED**.
+- A 64×64 pixel-window read: **NOT YET MEASURED**.
+- Pixel decoding, nodata semantics, vertical units and local CTX/HiRISE registration: **NOT YET MEASURED**.
+- The 2020 product is not the 2025 MSR mosaic tested by E546.
+- No raster bytes or pixel arrays were uploaded; only the compact receipt was retained.
 
 ## Interpretation boundary
 
