@@ -486,7 +486,7 @@ Exact-head GitHub Actions run 43013238079 succeeded (11 November 2026):
 
 - Isolated branch: \`research/e547-hirise-direct-geotiff-range-20261111\`, stacked on E546 / PR #106; draft PR only.
 - E546 found the 2025 MSR HiRISE DTM is ZIP-DEFLATE inside the 5.47 GB archive; no small raster window can be read through ZIP member offsets without decompressing the 676 MB DTM member.
-- Identified a distinct official 2020 Mars 2020 TRN HiRISE DTM GeoTIFF in the USGS S3 directory: \`JEZ_hirise_soc_006_DTM_MOLAtopography_DeltaGeoid_1m_Eqc_latTs0_lon0_blend40.tif\`, DOI 10.5066/P9QJDP48. This is not the 2025 MSR mosaic (DOI 10.5066/P13CPYYU) and must not be conflated with it.
+- Identified a distinct official 2020 Mars 2020 TRN HiRISE DTM GeoTIFF in the USGS S3 directory: \`JEZ_hirise_soc_006_DTM_MOLAtopography_DeltaGeoid_1m_Eqc_latTs0_lon0_blend40.tif\`, DOI 10.5066/P9REJ9JN. This is not the 2025 MSR mosaic (DOI 10.5066/P13CPYYU) and must not be conflated with it.
 - Added a Range-only TIFF metadata/segment probe. It validates the exact source URL, HTTP 206 and Content-Range, parses TIFF structure using a seekable bounded reader, and reads at most one compressed tile/strip no larger than 512,000 bytes.
 - Hard total transfer cap: 1,000,000 bytes. If the server ignores Range, the response body is closed without consumption. No pixel values are decoded; only compact metadata and hashes are retained.
 - Added deterministic synthetic tests for tiled TIFF parsing, oversized segment refusal, Range ignored, Content-Range mismatch, transfer cap and invalid seeks.
