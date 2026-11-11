@@ -91,7 +91,7 @@ def _url_record(value: str, source: str) -> dict | None:
         "query_key_names": query_keys,
         "token_like_query_present": token_like,
         "classification": classification,
-        "anonymous_candidate": (
+        "direct_url_candidate_unverified": (
             parsed.scheme == "https"
             and not token_like
             and classification in {
@@ -225,7 +225,7 @@ def audit() -> dict:
     )
     direct = [
         item for item in candidates
-        if item["anonymous_candidate"]
+        if item["direct_url_candidate_unverified"]
         and item["classification"] != "manager_preview_not_direct"
     ]
     return {
@@ -237,11 +237,11 @@ def audit() -> dict:
         "usgs_xml_metadata": {key: value for key, value in xml.items() if key != "url_candidates"},
         "url_candidate_count": len(candidates),
         "url_candidates": candidates,
-        "anonymous_direct_candidates": direct,
+        "unverified_direct_url_candidates": direct,
         "decision": (
-            "DIRECT_URL_CANDIDATE_FOUND_IN_PUBLIC_METADATA"
+            "UNVERIFIED_DIRECT_URL_CANDIDATE_FOUND_IN_PUBLIC_METADATA"
             if direct else
-            "NO_EXPLICIT_ANONYMOUS_DIRECT_URL_FOUND_IN_PUBLIC_METADATA"
+            "NO_UNVERIFIED_DIRECT_URL_CANDIDATE_FOUND_IN_PUBLIC_METADATA"
         ),
         "raw_metadata_stored": False,
         "query_values_stored": False,
@@ -266,7 +266,7 @@ def main() -> None:
         "experiment": result["experiment"],
         "sciencebase_items_inspected": result["sciencebase_items_inspected"],
         "url_candidate_count": result["url_candidate_count"],
-        "anonymous_direct_candidate_count": len(result["anonymous_direct_candidates"]),
+        "unverified_direct_url_candidate_count": len(result["unverified_direct_url_candidates"]),
         "decision": result["decision"],
         "raw_metadata_stored": result["raw_metadata_stored"],
         "file_urls_followed": result["file_urls_followed"],

@@ -1,0 +1,53 @@
+name: E540 bounded ScienceBase anonymous range probe
+
+on:
+  push:
+    branches:
+      - research/e540-sciencebase-range-probe-20261111
+    paths:
+      - experiments/e539_public_cloud_url_metadata_audit.py
+      - experiments/test_e539_public_cloud_url_metadata_audit.py
+      - experiments/e540_sciencebase_range_probe.py
+      - experiments/test_e540_sciencebase_range_probe.py
+      - research/E539_PUBLIC_CLOUD_URL_METADATA_AUDIT_20261111.md
+      - research/E540_SCIENCEBASE_RANGE_PROBE_20261111.md
+      - .github/workflows/e540-sciencebase-range-probe.yml
+  pull_request:
+    branches:
+      - research/e539-public-cloud-url-metadata-audit-20261111
+      - main
+    paths:
+      - experiments/e539_public_cloud_url_metadata_audit.py
+      - experiments/test_e539_public_cloud_url_metadata_audit.py
+      - experiments/e540_sciencebase_range_probe.py
+      - experiments/test_e540_sciencebase_range_probe.py
+      - research/E539_PUBLIC_CLOUD_URL_METADATA_AUDIT_20261111.md
+      - research/E540_SCIENCEBASE_RANGE_PROBE_20261111.md
+      - .github/workflows/e540-sciencebase-range-probe.yml
+
+permissions:
+  contents: read
+
+jobs:
+  range-probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate E539 metadata semantics
+        run: python -m unittest experiments.test_e539_public_cloud_url_metadata_audit -v
+      - name: Validate E540 bounded range behavior
+        run: python -m unittest experiments.test_e540_sciencebase_range_probe -v
+      - name: Probe only the metadata-provided DEM downloadUri
+        run: python -m experiments.e540_sciencebase_range_probe --out .artifacts/e540/receipt.json
+      - name: Preserve sanitized range receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e540-sciencebase-range-receipt
+          path: .artifacts/e540/receipt.json
+          if-no-files-found: ignore
+          retention-days: 30

@@ -19,7 +19,7 @@ class PublicUrlMetadataAuditTests(unittest.TestCase):
             "fixture.manager",
         )
         self.assertEqual(record["classification"], "manager_preview_not_direct")
-        self.assertFalse(record["anonymous_candidate"])
+        self.assertFalse(record["direct_url_candidate_unverified"])
 
     def test_catalog_file_endpoint_is_only_a_candidate(self):
         record = _url_record(
@@ -70,8 +70,8 @@ class PublicUrlMetadataAuditTests(unittest.TestCase):
             "experiment": "E539",
             "sciencebase_items_inspected": 0,
             "url_candidate_count": 0,
-            "anonymous_direct_candidates": [],
-            "decision": "NO_EXPLICIT_ANONYMOUS_DIRECT_URL_FOUND_IN_PUBLIC_METADATA",
+            "unverified_direct_url_candidates": [],
+            "decision": "NO_UNVERIFIED_DIRECT_URL_CANDIDATE_FOUND_IN_PUBLIC_METADATA",
             "raw_metadata_stored": False,
             "file_urls_followed": False,
             "binary_files_downloaded": False,
