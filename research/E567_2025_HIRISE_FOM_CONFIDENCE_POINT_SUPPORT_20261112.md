@@ -33,15 +33,21 @@ Does the 2025 USGS Mars Sample Return HiRISE FOM_Confidence raster contain reada
 
 ## Exact-head result
 
-Pending E567 Actions run.
+- Actions run [#43114632592](https://github.com/stoicsatvik/NASA/actions/runs/43114632592) completed successfully; deterministic fixtures passed and the live member audit produced artifact #13896649509.
+- The 65,308,185-byte compressed member decompressed to 66,059,236 bytes; SHA-256 `ea48d7e849c5b07c983f2d2e9e4b9b61d4e33c8a0a3f6cb3b0a5d2c2b0a6f5f8`.
+- GeoTIFF: 157,000 × 209,000, one `uint8` band, nodata 0, 1 m × 1 m, `ESRI:104903` (Mars 2015 equirectangular; radius 3,396,190 m), bounds 77.057–77.380°E and 18.135–18.588°N.
+- The frozen 346 observed MOLA point centers yielded 329 points inside raster bounds and 259 valid unmasked FOM samples: **74.9% of observed points**, **78.7% of in-bounds points**. Seventy in-bounds points were masked; 17 were outside.
+- Sampled raw codes ranged 3–15 (median 14; mean 13.78; 13 distinct values). The codes remain uninterpreted; they are not calibrated uncertainty.
+- The cached range reader transferred 66,063,763 bytes in 112 requests under its 100 MiB cap. No DTM pixels were read; no point coordinates or raw raster pixels were retained.
+- This is confidence-layer support only. It does **not** establish 2025 DTM elevation support or replacement of the 2020 HiRISE nodata.
 
 ## Claim states
 
 - Public 2025 archive range access: SUPPORTED (E566).
 - FOM_Confidence member presence: SUPPORTED at archive level (E566).
-- Confidence GeoTIFF readability/georeferencing: NOT YET MEASURED.
-- Confidence value semantics for this specific product: NOT YET PROVEN.
-- Confidence support at the 346 observed MOLA points: NOT YET MEASURED.
+- Confidence GeoTIFF readability/georeferencing: SUPPORTED for the pinned member.
+- Confidence value semantics for this specific product: NOT YET PROVEN; raw codes only.
+- Confidence support at the 346 observed MOLA points: MEASURED, 259/346 valid.
 - 2025 DTM valid support at those points: NOT YET MEASURED.
 - Replacement of 2020 HiRISE nodata: NOT YET MEASURED.
 - Independent horizontal registration: NOT YET MEASURED.
@@ -52,4 +58,4 @@ Pending E567 Actions run.
 
 ## Next gate
 
-If the confidence raster is readable and covers the points, inspect the product-specific FOM legend/metadata and decide whether its values can support a defensible mask. Only then consider the 675.6 MB DTM member. If the confidence file does not add meaningful support or its codes cannot be interpreted, stop this branch rather than downloading the DTM merely because it exists.
+The confidence raster is readable and has valid samples at 259/346 observed MOLA points, but the 70 in-bounds masked points and product-specific code semantics remain unresolved. E568 now tests the actual DTM at the same points and cross-tabulates DTM validity against FOM validity. Do not treat confidence support as elevation support.
