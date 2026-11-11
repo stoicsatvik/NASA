@@ -24,7 +24,7 @@ ALLOWED_PATH = (
 )
 MAX_BYTES = 20_000_000
 SAMPLE_SIZE = 64
-TIFF_MAGICS = (b"II*\\x00", b"MM\\x00*", b"II+\\x00", b"MM\\x00+")
+TIFF_MAGICS = (b"II*\x00", b"MM\x00*", b"II+\x00", b"MM\x00+")
 
 
 class AcquisitionError(RuntimeError):
