@@ -33,13 +33,12 @@ Does the 2025 USGS Mars Sample Return HiRISE FOM_Confidence raster contain reada
 
 ## Exact-head result
 
-- Actions run [#43114632592](https://github.com/stoicsatvik/NASA/actions/runs/43114632592) completed successfully; deterministic fixtures passed and the live member audit produced artifact #13896649509.
-- The 65,308,185-byte compressed member decompressed to 66,059,236 bytes; SHA-256 `986bbaaa60f452cfeee563ae474e06d83195cf749ff515d6a129f57d1a355d49`.
-- GeoTIFF: 19,144 × 26,816, one `uint8` band, nodata 0, 1 m × 1 m, Mars 2015 equirectangular (radius 3,396,190 m; GeoTIFF WKT SHA-256 `77a22ad08d07643ce7c653c5f6cab362edd6bedb262a7b47b7bd5a12f28812d3`), bounds 77.057–77.380°E and 18.135–18.588°N.
-- The frozen 346 observed MOLA point centers yielded 329 points inside raster bounds and 259 valid unmasked FOM samples: **74.9% of observed points**, **78.7% of in-bounds points**. Seventy in-bounds points were masked; 17 were outside.
-- Sampled raw codes ranged 3–15 (median 14; mean 13.2008; 13 distinct values). The codes remain uninterpreted; they are not calibrated uncertainty.
-- The cached range reader transferred 66,063,763 bytes in 67 requests under its 100 MiB cap. No DTM pixels were read; no point coordinates or raw raster pixels were retained.
-- This is confidence-layer support only. It does **not** establish 2025 DTM elevation support or replacement of the 2020 HiRISE nodata.
+- Final branch head: `0af3793043f2202598fca0db68ec585744042676`; exact-head Actions [#43115750730](https://github.com/stoicsatvik/NASA/actions/runs/43115750730) **SUCCESS**, 11 tests passed, live bounded acquisition completed, artifact [#13897923542](https://github.com/stoicsatvik/NASA/actions/runs/43115750730/artifacts/13897923542).
+- The pinned 65,308,185-byte compressed member decompressed to 66,059,236 bytes; SHA-256 `986bbaaa60f452cfeee563ae474e06d83195cf749ff515d6a129f57d1a355d49`.
+- GeoTIFF: 19,144 × 26,816, one `uint8` band, nodata 0, 1 m resolution, Mars 2015 equirectangular (radius 3,396,190 m; WKT SHA-256 `77a22ad08d07643ce7c653c5f6cab362edd6bedb262a7b47b7bd5a12f28812d3`).
+- At 346 frozen observed MOLA point centers, 329 were inside and 259 had valid unmasked FOM samples: 74.9% of observed points and 78.7% of in-bounds points. Seventy in-bounds points were masked and 17 were outside. Raw codes 3–15, median 14, mean 13.2008; codes remain uninterpreted.
+- Range transfer: 66,063,763 bytes in 67 requests under the 100 MiB cap. No DTM pixels were read.
+- Two earlier runs failed only because the synthetic nodata fixture did not place nodata at the exact sampled pixel (`assert 4 == 3`). The fixture was corrected; final exact-head validation passed 11/11. The production sampler was not weakened.
 
 ## Claim states
 
