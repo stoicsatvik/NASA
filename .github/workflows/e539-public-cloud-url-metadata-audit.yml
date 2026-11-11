@@ -1,0 +1,45 @@
+name: E539 public ScienceBase URL metadata audit
+
+on:
+  push:
+    branches:
+      - research/e539-public-cloud-url-metadata-audit-20261111
+    paths:
+      - experiments/e539_public_cloud_url_metadata_audit.py
+      - experiments/test_e539_public_cloud_url_metadata_audit.py
+      - .github/workflows/e539-public-cloud-url-metadata-audit.yml
+      - research/E539_PUBLIC_CLOUD_URL_METADATA_AUDIT_20261111.md
+  pull_request:
+    branches:
+      - research/e538-sciencebase-single-file-download-20261111
+      - main
+    paths:
+      - experiments/e539_public_cloud_url_metadata_audit.py
+      - experiments/test_e539_public_cloud_url_metadata_audit.py
+      - .github/workflows/e539-public-cloud-url-metadata-audit.yml
+      - research/E539_PUBLIC_CLOUD_URL_METADATA_AUDIT_20261111.md
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run E539 deterministic metadata tests
+        run: python -m unittest experiments.test_e539_public_cloud_url_metadata_audit -v
+      - name: Inspect public item and USGS XML metadata only
+        run: python -m experiments.e539_public_cloud_url_metadata_audit --out .artifacts/e539/public-url-audit.json
+      - name: Preserve sanitized metadata audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e539-public-url-metadata-audit
+          path: .artifacts/e539/public-url-audit.json
+          if-no-files-found: ignore
+          retention-days: 30
