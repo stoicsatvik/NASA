@@ -195,7 +195,7 @@ def _geo_summary(page):
     xmax=xmin+int(page.imagewidth)*sx; ymin=ymax-int(page.imagelength)*sy
     return {"model_pixel_scale":[sx,sy],"model_tiepoint":[ti,tj,tx,ty],
         "geokeys":{str(k):v for k,v in sorted(keys.items())},"projected_crs_code":keys.get(3072),
-        "linear_units_code":keys.get(3076),"raster_type_code":raster_type,
+        "linear_units_code":keys.get(3076),"projection_transform_code":keys.get(3075),"raster_type_code":raster_type,
         "pixel_is_area":area if raster_type is not None else None,
         "raster_bounds_map_units":{"xmin":xmin,"ymin":ymin,"xmax":xmax,"ymax":ymax},
         "sample_window_center_map_units":{"x":cx,"y":cy}}
@@ -224,7 +224,7 @@ def probe(session=None):
         geo=_geo_summary(page); sample=read_float_window(reader,page,WINDOW,nodata)
         dtype=str(page.dtype); compression=int(page.compression); rows_per_strip=int(page.rowsperstrip)
     unit=next((label[k] for k in ("UNIT","UNITS","UNIT_OF_MEASURE","VERTICAL_UNITS") if k in label),None)
-    same_crs=geo["projected_crs_code"]==CTX_CRS_CODE
+    same_crs=True if geo["projected_crs_code"]==CTX_CRS_CODE else None if geo["projected_crs_code"]==32767 else False
     center=geo["sample_window_center_map_units"]; rb=geo["raster_bounds_map_units"]
     overlap={"xmin":max(CTX_BOUNDS["xmin"],rb["xmin"]),"ymin":max(CTX_BOUNDS["ymin"],rb["ymin"]),
              "xmax":min(CTX_BOUNDS["xmax"],rb["xmax"]),"ymax":min(CTX_BOUNDS["ymax"],rb["ymax"])}
@@ -245,7 +245,7 @@ def probe(session=None):
         "sample":sample,"transport":{"range_requests":len(reader.ranges),"bytes_transferred":reader.transferred,
             "transfer_cap_bytes":MAX_TIFF_TRANSFER_BYTES,"sample_row_ranges":reader.ranges[-WINDOW["height"]:]},
         "comparison_context":{"ctx_source_doi":"10.5066/P906QQT8","ctx_crs_code_from_e544":CTX_CRS_CODE,
-            "same_projected_crs_code":same_crs,"published_metadata_overlap_bounds_map_units":overlap,
+            "same_projected_crs_code":same_crs,"projected_crs_code_status":"USER_DEFINED_CODE_32767_NOT_DIRECTLY_COMPARABLE" if geo["projected_crs_code"]==32767 else "DIRECT_CODE_COMPARISON","published_metadata_overlap_bounds_map_units":overlap,
             "sample_center_inside_metadata_overlap":inside,"common_valid_pixel_support":"NOT ESTABLISHED",
             "ctx_hirise_local_registration_residual":"NOT YET MEASURED"},
         "claim_state":{"bounded_hirise_pixel_values_acquired":"SUPPORTED",
