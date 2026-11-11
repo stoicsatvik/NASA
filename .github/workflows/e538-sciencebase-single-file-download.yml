@@ -1,0 +1,44 @@
+name: E538 ScienceBase single-file DEM download probe
+
+on:
+  push:
+    branches:
+      - research/e538-sciencebase-single-file-download-20261111
+    paths:
+      - experiments/e538_sciencebase_single_file_download.py
+      - tests/test_e538_sciencebase_single_file_download.py
+      - .github/workflows/e538-sciencebase-single-file-download.yml
+  pull_request:
+    branches:
+      - research/e536-grand-falls-raw-ingestion-20261111
+    paths:
+      - experiments/e538_sciencebase_single_file_download.py
+      - tests/test_e538_sciencebase_single_file_download.py
+      - .github/workflows/e538-sciencebase-single-file-download.yml
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install bounded TIFF inspection dependency
+        run: python -m pip install tifffile
+      - name: Run deterministic E538 fixtures
+        run: python -m unittest tests.test_e538_sciencebase_single_file_download -v
+      - name: Probe the documented ScienceBase single-file endpoint
+        run: python -m experiments.e538_sciencebase_single_file_download
+      - name: Preserve response and receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e538-sciencebase-single-file-download
+          path: .artifacts/e538/
+          if-no-files-found: ignore
+          retention-days: 7
