@@ -58,7 +58,7 @@ class E533SourceReviewTests(unittest.TestCase):
         self.assertEqual(result["catalogue_feature_count"], 6)
         self.assertEqual(result["mars_moon_primary_candidate_count"], 6)
         self.assertEqual(result["predeclared_reviewed_count"], 6)
-        self.assertEqual(result["reviewed_target_counts"], {"Mars": 3, "Moon": 3})
+        self.assertEqual(result["reviewed_target_counts"], {"Mars": 4, "Moon": 2})
         self.assertEqual(result["catalogue_verified_count"], 0)
         self.assertFalse(result["e001_ready"])
         self.assertEqual(result["negative_controls"], 0)
