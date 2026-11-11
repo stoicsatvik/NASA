@@ -2,7 +2,7 @@
 
 ## Why this route is different
 
-E538 tested the documented item-wide ZIP and `?name=` single-file route. Both failed to yield a valid TIFF. E539 then inspected public ScienceBase item metadata and official USGS XML without following file URLs. It found explicit `files[].downloadUri` fields on `sciencebase.usgs.gov/manager/download/{fileId}`, distinct from the previously rejected `manager/item/.../file/...` preview URLs.
+E538 tested the documented item-wide ZIP and `?name=` single-file route. E539 then inspected public ScienceBase item metadata and official USGS XML without following file URLs. The root item explicitly exposes file-specific `files[].downloadUri` fields on `sciencebase.usgs.gov/manager/download/{fileId}`, distinct from the previously rejected `manager/item/.../file/...` preview URLs.
 
 ## Frozen acquisition gate
 
@@ -15,14 +15,23 @@ E538 tested the documented item-wide ZIP and `?name=` single-file route. Both fa
 - Inspect GeoTIFF tags, shape, dtype, compression and nodata with tifffile. Pixel values remain unit-unassigned unless source metadata proves their vertical units.
 - Keep raw data only in a seven-day Actions artifact; never commit it.
 
-## Deterministic tests
+## Exact-head result
 
-Seven tests cover exact metadata selection, preview rejection, query/userinfo rejection, duplicate/mismatched file metadata, redirect allowlist and query-value redaction. Exact-head live acquisition is pending.
+- E539.1 corrected metadata classifier: **8/8 deterministic tests passed**; the public metadata audit was rerun in the same workflow.
+- E540: **7/7 deterministic tests passed**.
+- Actions run [#42968010724](https://github.com/stoicsatvik/NASA/actions/runs/42968010724) used the exact metadata-backed DEM `downloadUri`, after re-fetching the root item metadata and selecting the unique file name/size pair.
+- The HTTPS request returned **HTTP 200**, but the final content type was `text/html`; only **4,255 bytes** arrived, beginning `<!doctype`. The response did not match the 619,492-byte catalogue size and had no TIFF magic. No raster was saved or inspected; `raw_sample_downloaded=false`.
+- This is a valid negative acquisition result. The route exposes a manager download page in the tested anonymous context, not the raster bytes.
 
 ## Claim boundary
 
-A size-matched TIFF that tifffile can open establishes raw acquisition and file-level metadata only. It does not establish physical comparability to Mars, known-analogue recovery, a valid feature representation or novel discovery.
+- Grand Falls as a USGS-described Mars-analogue candidate: SUPPORTED AS PUBLISHED.
+- Raw DEM acquisition: NOT SUPPORTED by the tested public routes.
+- CRS, resolution, nodata and vertical units: NOT YET INSPECTED.
+- Aeolian feature comparability to Mars: NOT YET PROVEN.
+- E001 known-site recovery: NOT YET MEASURED.
+- Cross-body similarity, novel analogue discovery and challenge-selection superiority: NOT YET PROVEN.
 
-## Next gate
+## Stop rule and next move
 
-If acquired, verify CRS, horizontal resolution, vertical units/datum and nodata semantics from GeoTIFF tags plus the USGS source metadata. Only then derive a physically comparable Earth descriptor and choose a defensible non-analogue control. If this exact metadata URI fails, stop this item's endpoint exploration and pivot to another independent public Earth dataset.
+Stop further ScienceBase endpoint exploration for this item. Do not try more guessed URL patterns or the orthomosaic route. Pivot to a separate independently documented public Earth dataset with a verified direct data path, or re-evaluate the all-14 official 2026 challenge ranking. No credentials, cookies, access-control bypass, site contact or fieldwork were used.
