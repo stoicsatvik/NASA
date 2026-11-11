@@ -707,5 +707,6 @@ Next highest-information work: find and verify an independent, analysis-grade Ea
 - HiRISE nodata value: -3.4028226550889045e+38 from GeoTIFF GDAL_NODATA. The 92 in-bounds-but-nodata points are not imputed.
 - HiRISE acquisition: 29 row-range requests, 959,660 bytes, 2.5 MB cap. CTX GeoTIFF: 9,662,387 bytes. MOLA topography/count ranges: 760,320 / 380,160 bytes; both exact HTTP 206 ranges matched their declared Content-Range.
 - The 190 m MOLA/Mars 2015 reference-radius difference is not interpreted as a measured displacement. No independent control-point residual or vertical comparison was run.
+- The live `tifffile` reader emitted a nonfatal GDAL_NODATA-to-float32 parsing warning; the explicit nodata resolver recovered the tag value and excluded all 92 in-bounds nodata points. Warning preserved, not suppressed.
 - Result: three-way spatial point support is PARTIAL in this bounded Jezero window. This weakens full-layer readiness for Martian Map; it does not prove the map challenge infeasible and does not validate route safety.
 
