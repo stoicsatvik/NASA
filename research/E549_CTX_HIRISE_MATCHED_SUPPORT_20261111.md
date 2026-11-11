@@ -34,4 +34,4 @@ The receipt records both source hashes, reconstructed CRS parameters, raster tra
 
 ## Validation
 
-The dedicated workflow runs deterministic geometry/area-weighting fixtures, then the bounded CTX download and HiRISE byte-range comparison. Exact-head results are appended after execution.
+The dedicated workflow runs deterministic geometry/area-weighting fixtures, then the bounded CTX download and HiRISE byte-range comparison. The first live attempt reached the exact CTX object but failed the TIFF magic check because the fixture implementation over-escaped the byte marker. That implementation failure is preserved in Actions run 43023929608; no raster bytes were interpreted in that attempt. The corrected exact-head result is appended after rerun.
