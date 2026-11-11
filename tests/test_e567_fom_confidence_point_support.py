@@ -4,7 +4,7 @@ import numpy as np
 import pyproj
 import rasterio
 from rasterio.io import MemoryFile
-from rasterio.transform import from_origin
+from rasterio.transform import from_origin, rowcol
 
 from experiments.e567_fom_confidence_point_support import (
     MOLA_RADIUS_FALLBACK_M,
@@ -31,7 +31,9 @@ def test_confidence_sampler_excludes_nodata_and_out_of_bounds_points():
         + " +no_defs +type=crs"
     )
     data = np.arange(40 * 40, dtype=np.uint16).reshape((40, 40))
-    data[20, 5] = 65535
+    transform = from_origin(77.15, 18.6, 0.01, 0.01)
+    nodata_row, nodata_col = rowcol(transform, 77.2, 18.4)
+    data[nodata_row, nodata_col] = 65535
     with MemoryFile() as memory_file:
         with memory_file.open(
             driver="GTiff",
@@ -40,7 +42,7 @@ def test_confidence_sampler_excludes_nodata_and_out_of_bounds_points():
             count=1,
             dtype="uint16",
             crs=crs,
-            transform=from_origin(77.15, 18.6, 0.01, 0.01),
+            transform=transform,
             nodata=65535,
         ) as dataset:
             dataset.write(data, 1)
