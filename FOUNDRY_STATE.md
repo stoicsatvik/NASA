@@ -281,3 +281,23 @@ Reproducible source: `experiments/e531_challenge_selection_sensitivity.py`; resu
 - Novel analogue discovery: **NOT YET PROVEN**
 - Local validation advantage: **NOT YET PROVEN**
 - Space Apps challenge-selection superiority: **NOT YET PROVEN**
+
+
+
+## E532 — independent public analogue-catalogue audit (2026-11-11)
+
+- Audited the pinned public `rachellelecussan/planetary-analogue-catalogue` GeoJSON at source commit `62e6339bdf308de3bc987388d0faa7130cf57de9`. The source README declares `data/` CC BY 4.0; no raw data or photos were copied.
+- The 16-point catalogue has primary labels Mars 10, Moon 2, Early Earth 2, Enceladus 1 and Europa 1. All 16 records are marked `Draft`; none is `Verified`.
+- Its 96 references include 33 marked peer-reviewed, 63 not marked peer-reviewed, 33 unique DOI-bearing references and one reference marked unverified. It lists 42 photos with individual licences.
+- Seven sites are flagged sensitive. Coordinate precision is approximately 10 km for 10 sites, approximately 1 km for 2, and region-only for 4.
+- Numeric descriptors are incomplete (for example extent 8/16, pH 4/16, altitude minimum 3/16, maximum 7/16). The catalogue has no explicit non-analogue control population.
+- **Result:** supported as a candidate-positive discovery index and literature-navigation aid; **rejected for current use as E001 ground truth**. No E001 ranking was run. The 12 Mars/Moon primary candidates require source-by-source review; Draft status and missing controls prevent a recovery claim.
+- Exact-head PR Actions run [#42924295331](https://github.com/stoicsatvik/NASA/actions/runs/42924295331) passed all 4 tests and fetched the pinned source; SHA-256 `09ad7d62eefd40c86acaee945fb2d1f045b199c958830ba8715e7774311afb0d`.
+- Reproducible audit: `experiments/e532_public_catalogue_audit.py`; fixture tests: `experiments/test_e532_public_catalogue_audit.py`; CI receipt artifact: `e532-public-analogue-catalogue-audit`. The script pins the source commit, enforces URL/size limits, computes SHA-256, and does not store the external dataset.
+- Claim states unchanged: cross-body similarity **NOT YET PROVEN**; known-site recovery **NOT YET MEASURED**; novel analogue discovery **NOT YET PROVEN**; challenge-selection superiority **NOT YET PROVEN**.
+- Next: acquire the separate official USGS 2020 Known Terrestrial Analog Sites point layer (DOI `10.5066/P9J72921`) as candidate positives; independently review a predeclared subset and obtain defensible non-analogue controls plus matched physical descriptors. Absence from a positive catalogue is not a negative label.
+
+
+## E532 coordinate-type validation hardening — 2026-11-11
+
+Code review found that Python's `bool` subclasses `int`, so a malformed GeoJSON point such as `[true, 20.0]` could pass the previous numeric-coordinate predicate. The E532 audit now explicitly excludes booleans and adds a regression fixture. This does not change the pinned external dataset or its candidate-only status. The original live-source receipt #42924295331 remains valid for its earlier code head; the new predicate has focused local validation, while exact-head live-source rerun remains pending.
