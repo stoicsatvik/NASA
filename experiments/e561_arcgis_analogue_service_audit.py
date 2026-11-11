@@ -100,7 +100,7 @@ def fetch_json(url: str) -> dict:
         if response.status != 200 or response.geturl() != url:
             raise E561Error("ARCGIS_RESPONSE_IDENTITY_MISMATCH")
         content_type = response.headers.get_content_type()
-        if content_type != "application/json":
+        if content_type not in {"application/json", "text/plain"}:
             raise E561Error("ARCGIS_RESPONSE_NOT_JSON:" + str(content_type))
         length = response.headers.get("Content-Length")
         if length and int(length) > MAX_RESPONSE_BYTES:
