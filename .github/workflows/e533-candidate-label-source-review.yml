@@ -1,0 +1,41 @@
+name: E533 candidate-label source audit
+on:
+  push:
+    branches:
+      - research/e533-candidate-label-source-review-20261111
+    paths:
+      - 'experiments/e533_candidate_label_source_review.py'
+      - 'experiments/test_e533_candidate_label_source_review.py'
+      - 'research/E533_CANDIDATE_LABEL_SOURCE_REVIEW_20261111.csv'
+      - '.github/workflows/e533-candidate-label-source-review.yml'
+      - 'FOUNDRY_STATE.md'
+      - 'research/E532_PUBLIC_CATALOGUE_AUDIT_20261111.md'
+  pull_request:
+    paths:
+      - 'experiments/e533_candidate_label_source_review.py'
+      - 'experiments/test_e533_candidate_label_source_review.py'
+      - 'research/E533_CANDIDATE_LABEL_SOURCE_REVIEW_20261111.csv'
+      - '.github/workflows/e533-candidate-label-source-review.yml'
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run deterministic source-audit fixtures
+        run: python -m unittest experiments.test_e533_candidate_label_source_review -v
+      - name: Fetch pinned catalogue and verify candidate/source crosswalk
+        run: python experiments/e533_candidate_label_source_review.py --out .artifacts/e533/result.json
+      - name: Preserve audit receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e533-candidate-label-source-review
+          path: .artifacts/e533/result.json
+          if-no-files-found: ignore
+          retention-days: 30
