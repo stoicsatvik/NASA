@@ -602,9 +602,11 @@ def cli_summary(result: dict) -> dict:
         "experiment": result["experiment"],
         "outcome": result["outcome"],
         "tile": result["source"]["tile_stem"],
-        "expected_mask_keys_found": {
-            key: value for key, value in result["handbook_exact_filename_match"].items()
+        "actual_layers_found": {
+            key: value is not None
+            for key, value in result["actual_layer_keys_from_complete_listing"].items()
         },
+        "handbook_exact_filename_match": result["handbook_exact_filename_match"],
         "sampled_layers": sorted(result["mask_samples"]),
     }
 
