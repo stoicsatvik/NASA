@@ -337,3 +337,10 @@ Source report: `research/E535_GRAND_FALLS_AEOLIAN_DATA_SOURCE_AUDIT_20261111.md`
 ## E536 — bounded ScienceBase raw-raster ingestion probe (2026-11-11)
 
 A new isolated workflow probes the official ScienceBase item API for the USGS 2022–2023 Grand Falls photogrammetry item (`662bccfad34ea70bd5f11f88`), follows at most two child levels, inventories attached files, and downloads only the smallest directly listed GeoTIFF/ZIP under a 50 MB cap. It hashes any downloaded archive/raster and attempts to record TIFF shape, dtype, GeoTIFF tags, nodata and unit keys plus unit-agnostic pixel statistics. It stores the receipt and sample only as a short-retention Actions artifact; no raw raster is committed. The experiment result remains **PENDING** until exact-head Actions completes. No CRS, resolution, vertical unit, or successful raw ingestion is claimed in advance.
+
+
+### NASA E536 raw-raster acquisition correction (2026-11-11)
+
+The first E536 raw-ingestion run (#42954866734) returned a 4,255-byte HTML preview page for the 619,492-byte ScienceBase DEM entry; tifffile rejected it (`TiffFileError`, header `<!do`). The initial receipt incorrectly set `raw_sample_downloaded=true` after the byte transfer. This negative result is preserved.
+
+E536.1 now rejects manager preview URLs as non-direct downloads, checks HTTPS ScienceBase catalog endpoints, content type and TIFF/ZIP magic, caps metadata JSON at 5 MiB, and uses the official item-files ZIP endpoint only when all catalogue sizes are known and total <=50,000,000 bytes. The current item-file size sum is 48,431,208 bytes. It extracts only the smallest TIFF and sets `raw_sample_downloaded=true` only if tifffile successfully inspects it. Ten fixture tests were added; the first run caught a 2,000-byte error in the test's expected catalogue-size sum, now corrected. Current exact-head workflow is pending.
