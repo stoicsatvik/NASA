@@ -5,6 +5,7 @@ from pathlib import Path
 
 ITEM_ID="5f88940b82cebb8c13d912ee"
 DOI="10.5066/P9J72921"
+EXPECTED_TITLE="Known Terrestrial Analog Sites for Planetary Science"
 METADATA_URL=f"https://www.sciencebase.gov/catalog/item/{ITEM_ID}?format=json"
 MAX_META=2_000_000
 MAX_FILE=25_000_000
@@ -26,19 +27,39 @@ def safe_file_url(url):
     p=urllib.parse.urlsplit(url)
     return p.scheme=="https" and allowed_host(p.hostname) and p.port in (None,443) and not p.username and not p.password and not p.fragment
 
+class NoRedirectHandler(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
 def bounded_get(url, cap, metadata=False):
     if metadata and not safe_metadata_url(url): raise ValueError("metadata URL failed exact allowlist")
     if not metadata and not safe_file_url(url): raise ValueError("file URL failed HTTPS host allowlist")
     req=urllib.request.Request(url,headers={"User-Agent":"NASA-E560-USGS-catalogue/1.0","Accept":"application/json" if metadata else "application/octet-stream, application/zip, application/geo+json, application/json"})
-    with urllib.request.urlopen(req,timeout=25) as r:
-        final=urllib.parse.urlsplit(r.geturl())
-        if final.scheme!="https" or not allowed_host(final.hostname) or (metadata and final.hostname not in SB) or final.port not in (None,443) or final.username or final.password or final.fragment:
-            raise ValueError("redirect left the ScienceBase/S3 HTTPS allowlist")
+    opener=urllib.request.build_opener(NoRedirectHandler)
+    with opener.open(req,timeout=25) as r:
+        final_url=r.geturl()
+        final=urllib.parse.urlsplit(final_url)
+        if final_url!=url or (metadata and not safe_metadata_url(final_url)) or (not metadata and not safe_file_url(final_url)):
+            raise ValueError("response URL changed outside the exact frozen request")
+        if metadata and r.headers.get_content_type()!="application/json":
+            raise ValueError("ScienceBase item endpoint did not return application/json")
         length=r.headers.get("Content-Length")
         if length and int(length)>cap: raise ValueError("declared response exceeds byte cap")
         data=r.read(cap+1)
         if len(data)>cap: raise ValueError("response stream exceeds byte cap")
         return {"status":r.status,"host":final.hostname,"content_type":r.headers.get_content_type(),"content_length":length,"bytes":data}
+
+def validate_item_identity(doc):
+    if not isinstance(doc,dict):
+        raise ValueError("ScienceBase item response must be a JSON object")
+    returned=doc.get("id") or doc.get("itemId") or doc.get("item_id")
+    if not returned or str(returned).lower()!=ITEM_ID:
+        raise ValueError("ScienceBase item ID is missing or does not match the frozen release")
+    if doc.get("title")!=EXPECTED_TITLE:
+        raise ValueError("ScienceBase item title does not match the frozen release")
+    return str(returned).lower()
+
 
 def metadata_files(doc):
     raw=doc.get("files")
@@ -64,7 +85,7 @@ def xml_urls(payload):
         local=str(node.tag).split("}")[-1].lower()
         if local not in {"onlink","linkage","networkr","networka","url"} or not node.text:
             continue
-        for value in re.findall(r"https?://\S+",node.text.strip()):
+        for value in re.findall(r"https?://[^\s<>\"']+",node.text.strip()):
             found.add(value.rstrip(".,);]"))
     return sorted(found)
 
@@ -121,6 +142,7 @@ def overlap(source_names,catalogues):
 
 def parse_geojson(data):
     doc=json.loads(data.decode("utf-8"))
+    if not isinstance(doc,dict) or doc.get("type")!="FeatureCollection": raise ValueError("GeoJSON type must be FeatureCollection")
     features=doc.get("features")
     if not isinstance(features,list): raise ValueError("GeoJSON FeatureCollection features missing")
     fields=set(); names=set(); geoms=set()
@@ -173,8 +195,7 @@ def run_live():
     try:
         meta=bounded_get(METADATA_URL,MAX_META,metadata=True)
         doc=json.loads(meta["bytes"].decode("utf-8"))
-        returned=doc.get("id") or doc.get("itemId") or doc.get("item_id")
-        if returned and str(returned).lower()!=ITEM_ID: raise ValueError("ScienceBase returned a different item ID")
+        returned=validate_item_identity(doc)
         files=metadata_files(doc)
         candidates=[x for x in files if Path(x.get("name") or "").suffix.lower() in {".zip",".geojson",".json",".gpkg",".shp",".kml"}]
         r["metadata"]={"status":meta["status"],"host":meta["host"],"bytes":len(meta["bytes"]),"sha256":hashlib.sha256(meta["bytes"]).hexdigest(),"title":doc.get("title"),"returned_item_id":returned,"file_count":len(files),"files":[{"name":x["name"],"size_bytes":x["size_bytes"],"checksum":x["checksum"],"url_host":urllib.parse.urlsplit(x["url"]).hostname if x["url"] else None,"url_path":urllib.parse.urlsplit(x["url"]).path if x["url"] else None,"url_sha256":hashlib.sha256(x["url"].encode()).hexdigest() if x["url"] else None} for x in files]}
@@ -202,7 +223,13 @@ def run_live():
         r["download"]={"status":data["status"],"host":data["host"],"content_type":data["content_type"],"bytes":len(payload),"sha256":hashlib.sha256(payload).hexdigest(),"catalogue_size_bytes":f.get("size_bytes"),"catalogue_size_matches":f.get("size_bytes") is not None and len(payload)==f["size_bytes"]}
         r["vector"]=parsed; r["outcome"]="VECTOR_ACQUIRED_AND_PARSED"
     except urllib.error.HTTPError as e:
-        r["outcome"]="HTTP_ERROR"; r["http_status"]=e.code; r["error"]=f"HTTP {e.code}"
+        if e.code in {301,302,303,307,308}:
+            location=e.headers.get("Location","")
+            target=urllib.parse.urlsplit(location)
+            r["outcome"]="REDIRECT_REFUSED"; r["http_status"]=e.code
+            r["redirect_target"]={"host":target.hostname,"path":target.path}
+        else:
+            r["outcome"]="HTTP_ERROR"; r["http_status"]=e.code; r["error"]=f"HTTP {e.code}"
     except urllib.error.URLError as e:
         r["outcome"]="NETWORK_ERROR"; r["error"]=f"{type(e.reason).__name__}: {e.reason}"
     except Exception as e:
