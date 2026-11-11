@@ -33,10 +33,11 @@ MOLA's IAU2000 / 3,396.0 km reference and the CTX/HiRISE Mars 2015 reference are
 ## Exact-head result
 
 - Draft PR #122, branch research/e563-mola-ctx-hirise-common-support-20261112, stacked on E562; main unchanged.
-- Exact-head GitHub Actions run [#43089442518](https://github.com/stoicsatvik/NASA/actions/runs/43089442518) succeeded. All 6 deterministic geometry/mask tests passed; bounded live acquisition completed; compact artifact [#13886639834](https://github.com/stoicsatvik/NASA/actions/runs/43089442518/artifacts/13886639834) was emitted.
+- Exact-head GitHub Actions run [#43089994108](https://github.com/stoicsatvik/NASA/actions/runs/43089994108) succeeded. All 6 deterministic geometry/mask tests passed; bounded live acquisition completed; compact artifact [#13887368321](https://github.com/stoicsatvik/NASA/actions/runs/43089994108/artifacts/13887368321) was emitted. The earlier same-head run #43089442518 independently reported the same support counts.
 - MOLA re-acquisition: 33×33 bins; **346/1,089 (31.7723%)** have count > 0. The 743 zero-count/interpolated bins are excluded from the support denominator. The two exact image ranges returned HTTP 206 and matched their pinned byte counts and Content-Range values.
 - CTX: all **346/346** observed MOLA point centers fell on valid CTX pixels. The pinned 9,662,387-byte GeoTIFF hash matched the E549 source contract.
 - HiRISE: **256/346** observed MOLA point centers fall inside the raster bounds, but only **164/346** fall on finite, non-nodata pixels. Of those, 90 were outside the raster bounds and 92 were inside the bounding box but landed on nodata.
+- The live TIFF reader emitted a nonfatal `tifffile` warning while interpreting the `GDAL_NODATA` tag as float32. E563's explicit PDS3/GeoTIFF nodata resolver still recovered `-3.4028226550889045e+38` from the tag and excluded all 92 in-bounds nodata points. The warning is preserved as a parser diagnostic, not suppressed.
 - Three-way common point support: **164/346 = 47.3988%** of observed MOLA bins. This is partial point support, not an area fraction. The 2.5 MB HiRISE cap was respected: 29 row-range requests transferred 959,660 bytes. CTX transfer was 9,662,387 bytes.
 - The PDS3-derived HiRISE CRS and CTX raster CRS are pyproj-equivalent. The mathematical transform round-trip error was 8.4×10⁻¹⁰ m; this is only a numerical inverse-transform check, **not** an independent horizontal registration residual. The source radii differ by 190 m (MOLA 3,396,000 m; Mars 2015 3,396,190 m).
 - Outcome: **THREE_WAY_POINT_SUPPORT_MEASURED**. Within this bounded window, CTX support is complete for observed MOLA points; HiRISE support is materially partial. Do not treat the metadata bounding box as common valid coverage.
@@ -47,7 +48,7 @@ MOLA's IAU2000 / 3,396.0 km reference and the CTX/HiRISE Mars 2015 reference are
 
 - Bounded MOLA observed-shot support: SUPPORTED by E545; re-acquired in E563.
 - CTX/HiRISE CRS parameter equivalence: SUPPORTED by E550; re-checked in E563.
-- Three-way MOLA/CTX/HiRISE common point support: NOT YET MEASURED until E563 completes.
+- Three-way MOLA/CTX/HiRISE common point support: **PARTIAL FOR THIS BOUNDED WINDOW** (164/346 observed MOLA point centers; 47.3988%).
 - Local horizontal registration residual: NOT YET MEASURED.
 - Cross-body similarity: NOT YET PROVEN.
 - E001 known-site recovery: NOT YET MEASURED.
@@ -56,4 +57,4 @@ MOLA's IAU2000 / 3,396.0 km reference and the CTX/HiRISE Mars 2015 reference are
 
 ## Next gate
 
-If three-way support is strong, this only clears a within-Mars spatial-support prerequisite. It does not repair the missing independent Earth positive-site and non-analogue-control labels required for E001. If support is partial or absent, preserve the result and lower Martian Map readiness rather than impute, shift or substitute unsupported pixels.
+The measured support is partial. Do not score routes or infer safety from the metadata envelope. Next, characterize the spatial clustering of the 90 out-of-bounds and 92 in-bounds-nodata observed MOLA points without retaining raw raster values, then obtain independent horizontal-control provenance if available. This still does not repair the missing independent Earth positive-site and non-analogue-control labels required for E001. Do not impute, shift or substitute unsupported pixels.
