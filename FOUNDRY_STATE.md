@@ -636,3 +636,16 @@ Next: stop repeated local pixel probes. Seek independent USGS footprint/quality-
 ## Updated next decisive gate
 
 Do not use the E560 metadata as a quantitative label source. Query the official ScienceBase GeoServer WFS GetCapabilities endpoint once, bounded, and look for an item/title-matched feature type. If found, use DescribeFeatureType and a count-only query before retrieving any features. If no service exists, stop this catalogue route and use an independently documented source. The TADP documentation says ScienceBase-backed data may be exposed through WMS/WFS/CSW, but this specific item has not been shown to have a published service. No follow-up to the previously contacted nonresponder.
+
+
+## E561 - public ArcGIS analogue service audit (2026-11-11)
+
+- E560's exact ScienceBase item response exposed a public ArcGIS FeatureServer web link on `services.arcgis.com`; its `token` query value was not retained or reused.
+- E561 exact-head PR workflow [#43070089505](https://github.com/stoicsatvik/NASA/actions/runs/43070089505) and push workflow [#43070045960](https://github.com/stoicsatvik/NASA/actions/runs/43070045960) both passed **7/7 deterministic tests** and completed the bounded live audit.
+- The service item ID and layer schema matched the frozen expectations. Anonymous Query is explicitly allowed. Layer 0 is a point layer with FID/Name/AnalogType/Lat/Lon/AnalogBody and WKID 3857.
+- A count-only request returned **4 records**, not the FGDC metadata's provisional 192. No feature rows, geometry or coordinates were downloaded.
+- E560's ScienceBase metadata XML MD5 mismatch remains unresolved. The ArcGIS service reports static data with a 10 July 2024 last-edit date; the service's metadata also advertises anonymous update/delete permissions, but this workflow made GET-only requests and performed no writes.
+- **SUPPORTED:** public service metadata, layer schema and count-only access. **NOT ESTABLISHED:** that the four service records are the 192 FGDC points, version equivalence, coordinate accuracy, analytical suitability, any labels, or E001 recovery.
+- E560 exact-head run [#43069286871](https://github.com/stoicsatvik/NASA/actions/runs/43069286871) also succeeded: 13/13 deterministic tests and bounded live metadata acquisition. Its outcome remains `METADATA_XML_CHECKSUM_MISMATCH` with secondary `METADATA_XML_NO_VECTOR_LINK`.
+
+Next: resolve the 4-versus-192 discrepancy and XML checksum/version provenance before requesting feature rows. Do not use this discovery catalogue as ground truth or a training-label source.
