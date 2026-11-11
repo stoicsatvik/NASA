@@ -1,0 +1,49 @@
+name: E544 bounded Jezero CTX raster acquisition
+
+on:
+  push:
+    branches:
+      - research/e544-ctx-raw-raster-ingestion-20261111
+    paths:
+      - experiments/e544_ctx_raster_ingestion.py
+      - tests/test_e544_ctx_raster_ingestion.py
+      - research/E544_CTX_RASTER_INGESTION_20261111.md
+      - FOUNDRY_STATE.md
+      - .github/workflows/e544-ctx-raster.yml
+  pull_request:
+    branches:
+      - research/e543-jezero-mola-local-scale-20261111
+    paths:
+      - experiments/e544_ctx_raster_ingestion.py
+      - tests/test_e544_ctx_raster_ingestion.py
+      - research/E544_CTX_RASTER_INGESTION_20261111.md
+      - FOUNDRY_STATE.md
+      - .github/workflows/e544-ctx-raster.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bounded-acquisition:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install deterministic raster test dependencies
+        run: python -m pip install "numpy>=1.26,<3" "rasterio>=1.4,<2" "pytest>=8,<9"
+      - name: Run E544 fixture tests
+        run: python -m pytest -q tests/test_e544_ctx_raster_ingestion.py
+      - name: Acquire and inspect the pinned public CTX DTM
+        run: python -m experiments.e544_ctx_raster_ingestion --out .data/e544/receipt.json
+      - name: Preserve compact receipt only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e544-ctx-raster-receipt
+          path: .data/e544/receipt.json
+          if-no-files-found: ignore
+          retention-days: 14
