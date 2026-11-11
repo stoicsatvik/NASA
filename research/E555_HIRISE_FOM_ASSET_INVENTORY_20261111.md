@@ -28,7 +28,18 @@ USGS Astrogeology's general HiRISE DTM documentation says FOM images identify pe
 
 ## Exact-head result
 
-Pending the bounded GitHub Actions run.
+Exact-head workflow [#43045846786](https://github.com/stoicsatvik/NASA/actions/runs/43045846786) succeeded.
+
+- Deterministic tests: **8/8 passed**.
+- Public directory index: **56 assets** (25 raster files, 31 metadata/other files).
+- FOM/figure-of-merit assets: **0**.
+- Filename-level provenance/quality/confidence/hillshade/mask assets: **0**.
+- Pinned PDS3 label: 2,296 bytes, 47 lines; **0 FOM references** and no confidence/provenance/quality/mask/nodata keyword hits.
+- Pinned product XML: 18,939 bytes, 305 lines; **0 FOM references**, no confidence/provenance/mask/nodata hits. The generic word `QUALITY` appears on lines 108, 157 and 260; these are keyword hits only, not evidence of a pixel-level quality layer.
+- Directory index: 14,486 bytes. Total metadata transferred: **35,721 bytes**.
+- Raster requests: **0**. Raw metadata bodies and raw pixels were not retained.
+
+**Result:** the pinned 2020 TRN HiRISE public directory, its PDS3 label and its product XML do not list or reference a FOM/provenance asset. This is a product-specific negative inventory, not proof that no separate asset exists elsewhere.
 
 ## Claim boundary
 
@@ -36,4 +47,4 @@ Absence from this directory index and its two pinned metadata files does not pro
 
 ## Next action
 
-If the pinned release exposes no FOM asset or metadata reference, use the referral from Trent Hare's automatic reply to ask one designated PDS/USGS support contact whether this specific flight mosaic has a separate footprint, confidence, FOM or processing-provenance product. Do not contact both referrals with the same question. If no product-specific provenance exists, preserve partial support and stop local nodata probing.
+If the pinned release exposes no FOM asset or metadata reference, use Trent Hare's referral to ask one designated PDS/USGS support contact whether this specific flight mosaic has a separate footprint, confidence, FOM or processing-provenance product. Do not contact both referrals with the same question. If no product-specific provenance exists, preserve partial support and stop local nodata probing.
