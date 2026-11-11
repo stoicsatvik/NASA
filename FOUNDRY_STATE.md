@@ -440,7 +440,7 @@ E542's 463 m/pixel MOLA value is an equatorial nominal spacing, not an isotropic
 - Samples a 33 × 33 window centered at the published CTX/2025-HiRISE overlap-envelope centroid (18.3995°N, 77.27025°E). Requests only complete fixed-width rows with exact HTTP Range; combined image transfer is capped at 1.2 MB and full-file responses are refused.
 - Validates PDS label dimensions, sample types, units, projection, byte offsets, HTTP 206, Content-Range and byte counts. Uses count > 0 to separate observed bins from interpolated topography.
 - Retains only hashes, source metadata and compact sample statistics; raw raster bytes and pixel arrays are not committed or uploaded.
-- Exact-head Actions result pending. No local MOLA shot-support claim is made until the receipt is inspected.
+- Exact-head run #43013238079 and post-documentation reruns #43016218070/#43016212376 succeeded; the measured result is recorded below. Bounded MOLA ingestion and local shot support are supported for this 33 × 33 window only; common-valid-pixel support with CTX/HiRISE is not established.
 - Claim states remain: cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN; route safety NOT CLAIMED.
 
 
