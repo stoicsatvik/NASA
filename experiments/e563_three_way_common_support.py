@@ -169,6 +169,176 @@ def summarize_common_support(
     }
 
 
+def _grid_cardinal_edges(observed: np.ndarray) -> tuple[int, np.ndarray]:
+    """Build 4-neighbor edges among observed MOLA bins, without retaining coordinates."""
+    coords = np.argwhere(np.asarray(observed, dtype=bool))
+    lookup = {(int(row), int(col)): index for index, (row, col) in enumerate(coords)}
+    edges: list[tuple[int, int]] = []
+    for index, (row, col) in enumerate(coords):
+        for neighbor in ((int(row) + 1, int(col)), (int(row), int(col) + 1)):
+            other = lookup.get(neighbor)
+            if other is not None:
+                edges.append((index, other))
+    return len(coords), np.asarray(edges, dtype=np.int64).reshape((-1, 2))
+
+
+def _component_sizes_4(mask: np.ndarray) -> list[int]:
+    """Return descending 4-connected component sizes for a boolean grid."""
+    values = np.asarray(mask, dtype=bool)
+    visited = np.zeros(values.shape, dtype=bool)
+    sizes: list[int] = []
+    for row, col in zip(*np.where(values)):
+        if visited[row, col]:
+            continue
+        visited[row, col] = True
+        stack = [(int(row), int(col))]
+        size = 0
+        while stack:
+            current_row, current_col = stack.pop()
+            size += 1
+            for next_row, next_col in (
+                (current_row - 1, current_col),
+                (current_row + 1, current_col),
+                (current_row, current_col - 1),
+                (current_row, current_col + 1),
+            ):
+                if (
+                    0 <= next_row < values.shape[0]
+                    and 0 <= next_col < values.shape[1]
+                    and values[next_row, next_col]
+                    and not visited[next_row, next_col]
+                ):
+                    visited[next_row, next_col] = True
+                    stack.append((next_row, next_col))
+        sizes.append(size)
+    return sorted(sizes, reverse=True)
+
+
+def _conditional_adjacency_reference(
+    membership: np.ndarray,
+    edges: np.ndarray,
+    *,
+    permutations: int,
+    rng: np.random.Generator,
+) -> dict:
+    """Compare same-class edges with a fixed-count random-label reference.
+
+    This is a descriptive reference only. It is not an inferential p-value:
+    raster footprint geometry and nodata generation are not exchangeable under
+    the uniform-label reference.
+    """
+    members = np.asarray(membership, dtype=bool)
+    observed_edges = (
+        int(np.count_nonzero(members[edges[:, 0]] & members[edges[:, 1]]))
+        if edges.size
+        else 0
+    )
+    count = int(members.sum())
+    node_count = int(members.size)
+    if count in (0, node_count) or edges.size == 0:
+        return {
+            "same_category_cardinal_adjacency_edges": observed_edges,
+            "reference_mean_adjacency_edges": None,
+            "reference_95th_percentile_adjacency_edges": None,
+            "reference_upper_tail_fraction": None,
+            "reference_permutations": 0,
+        }
+
+    null_edges = np.empty(permutations, dtype=np.int32)
+    for index in range(permutations):
+        selected = np.zeros(node_count, dtype=bool)
+        selected[rng.choice(node_count, size=count, replace=False)] = True
+        null_edges[index] = int(
+            np.count_nonzero(selected[edges[:, 0]] & selected[edges[:, 1]])
+        )
+    ordered = np.sort(null_edges)
+    q95_index = max(0, min(permutations - 1, math.ceil(0.95 * permutations) - 1))
+    exceedances = int(np.count_nonzero(null_edges >= observed_edges))
+    return {
+        "same_category_cardinal_adjacency_edges": observed_edges,
+        "reference_mean_adjacency_edges": float(null_edges.mean()),
+        "reference_95th_percentile_adjacency_edges": int(ordered[q95_index]),
+        "reference_upper_tail_fraction": float((exceedances + 1) / (permutations + 1)),
+        "reference_permutations": permutations,
+    }
+
+
+def summarize_support_spatial_clustering(
+    mola_observed: np.ndarray,
+    ctx_valid: np.ndarray,
+    hirise_inside: np.ndarray,
+    hirise_valid: np.ndarray,
+    *,
+    permutations: int = 9_999,
+    seed: int = 20_261_112,
+) -> dict:
+    """Summarize unsupported-point clustering using masks already held by E563.
+
+    Only component sizes, adjacency counts and fixed-count random-label
+    reference summaries are returned. No pixel values or point coordinates
+    are persisted.
+    """
+    arrays = [
+        np.asarray(mola_observed, dtype=bool),
+        np.asarray(ctx_valid, dtype=bool),
+        np.asarray(hirise_inside, dtype=bool),
+        np.asarray(hirise_valid, dtype=bool),
+    ]
+    if any(array.shape != arrays[0].shape for array in arrays[1:]):
+        raise ValueError("MOLA and support masks must have identical shapes")
+    observed, ctx, inside, valid = arrays
+    if not observed.any():
+        raise ValueError("no MOLA observed-shot bins in the frozen window")
+    if np.any(valid & ~inside):
+        raise ValueError("HiRISE valid pixels cannot be outside the raster bounds")
+    if permutations < 1:
+        raise ValueError("permutations must be positive")
+
+    node_count, edges = _grid_cardinal_edges(observed)
+    category_masks = {
+        "ctx_invalid": observed & ~ctx,
+        "hirise_outside_bounds": observed & ~inside,
+        "hirise_inside_nodata": observed & inside & ~valid,
+    }
+    rng = np.random.default_rng(seed)
+    categories = {}
+    for name, grid_mask in category_masks.items():
+        membership = grid_mask[observed]
+        component_sizes = _component_sizes_4(grid_mask)
+        reference = _conditional_adjacency_reference(
+            membership,
+            edges,
+            permutations=permutations,
+            rng=rng,
+        )
+        count = int(membership.sum())
+        categories[name] = {
+            "count": count,
+            "fraction_of_observed_mola_bins": count / node_count,
+            "four_connected_component_count": len(component_sizes),
+            "four_connected_component_sizes_desc": component_sizes,
+            **reference,
+        }
+
+    return {
+        "method": "4-neighbor cardinal adjacency on the fixed MOLA grid; observed bins only",
+        "observed_mola_nodes": node_count,
+        "cardinal_adjacency_edges_among_observed_bins": int(edges.shape[0]),
+        "reference_design": (
+            "uniformly reassign each category to the same number of observed MOLA bins; "
+            "the fixed observed-shot mask is preserved"
+        ),
+        "reference_interpretation": (
+            "descriptive only, not an inferential p-value; the uniform-label reference "
+            "does not model raster footprint geometry, geology or nodata generation"
+        ),
+        "permutation_seed": seed,
+        "categories": categories,
+        "raw_pixels_retained": False,
+        "point_coordinates_retained": False,
+    }
+
+
 def _sample_hirise_observed_points(
     session: requests.Session,
     lat: np.ndarray,
@@ -391,6 +561,14 @@ def run() -> dict:
                     )
                     hi_inside &= observed
 
+                spatial_clustering = summarize_support_spatial_clustering(
+                    observed,
+                    ctx_valid,
+                    hi_inside,
+                    hi_valid,
+                    permutations=9_999,
+                    seed=20_261_112,
+                )
                 common = summarize_common_support(observed, ctx_valid, hi_valid)
                 receipt.update({
                     "outcome": "THREE_WAY_POINT_SUPPORT_MEASURED",
@@ -440,6 +618,7 @@ def run() -> dict:
                         "independent_horizontal_control_residual": "NOT MEASURED",
                     },
                     "common_point_support": common,
+                    "spatial_support_clustering": spatial_clustering,
                     "geometry_support": {
                         "mola_observed_bins_inside_ctx_raster": int((observed & ctx_inside).sum()),
                         "mola_observed_bins_inside_hirise_raster": int((observed & hi_inside).sum()),
