@@ -3,7 +3,7 @@
 Updated: 2026-11-11
 Class: Tier A
 Time horizon: NASA Space Apps Challenge, 14–15 Nov 2026
-Working branch: `research/e548-hirise-pixel-window-20261111`
+Working branch: `research/e552-e550-missingness-sensitivity-20261111`
 Main objective: maximize uncertainty eliminated per run and converge on a scientifically defensible Space Apps entry.
 
 ## Current thesis
@@ -31,7 +31,7 @@ Priority order:
 1. E527 acquired the official 2007 MGD3 spatial package (547 polygons/IDs); E528 linked 535/547 unique IDs to the 2018 workbook. E530 then found no directly admissible shared quantitative physical-feature family in the current PAAD/MGD3 pair.
 2. Preserve the E530 negative result: PAAD has 45 known-analogue records but no target-body/family labels or non-analogue controls; strict Dune_Type overlap is S/SS, L is a candidate and B is ambiguous. Do not treat a codebook ID join as physical comparability.
 3. Seek independent legitimate Earth positive-site data and defensible non-analogue controls; derive only features with compatible physical meaning, support and uncertainty. Run E001 only after those inputs exist.
-4. Keep the all-14 challenge screen open. E531 found Martian Map remains the most frequent top score under tested perturbations, but its margin over MODIS/VIIRS is not robust to moderate subjective score uncertainty.
+4. Keep the all-14 challenge screen open. E541's all-14 screen places Martian Map (4.10) and MODIS/VIIRS (4.00) ahead of planetary analog (2.93) on the current rubric; ranking margins remain sensitive to subjective weights, so no challenge is locked.
 5. Martian Map is a serious alternative with MOLA/CTX/HiRISE preparation and a verified MGD3 context layer, but route-safety validation is absent. Respect the preparation-only boundary in the `martian` repo; no competition solution code before the official event window.
 6. Perform ablations and uncertainty analysis before any geospatial UX polish.
 
@@ -101,7 +101,7 @@ Pivot away from the planetary-analog track if any of these becomes clear:
 
 ## Next trigger
 
-**Stop repeating URL guesses for this Grand Falls item. Find an independent, documented raw-data path (MOLA/LOLA/Diviner/Earthdata or another USGS product), then define matched-support physical descriptors and defensible controls before E001.**
+**Do not repeat URL guesses or treat partial raster support as a spatial signal. Recover common valid support at the three all-nodata CTX/HiRISE positions only through a separately verified product footprint; otherwise preserve partial coverage. Continue independent Earth positive-site/control discovery before E001.**
 
 E527/E528 spatial acquisition and ID joining are complete. E530 found no directly admissible shared quantitative features in the current PAAD/MGD3 pair. The next run must address independent labels/controls or falsify another feature family, not repeat ingestion or polish UI.
 
@@ -546,3 +546,15 @@ The observed six-patch plane has R² 0.5843 and gradient norm 0.4357 m/km. Exact
 The permutation assumes exchangeability of the six measured patch medians. Three unsupported positions are excluded and spatially informative missingness remains unresolved. Patch medians, not individual pixels, are the permutation units. Local exact tests: 6/6 passed. Exact-head Actions runs 43027847026 and 43027841221 both succeeded; all 6 tests passed and the exact 720-permutation receipt reproduced.
 
 Claim states remain: common support PARTIAL (six of nine positions); local vertical residual MEASURED for six patches only; global vertical offset reproduction NOT ESTABLISHED; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; route safety NOT CLAIMED.
+
+
+## E553 — nine-position missingness sensitivity after E552 nodata provenance (2026-11-11)
+
+- Companion E552 draft PR #112 found that all three unsupported E550 windows (`x15_y15`, `x50_y85`, `x85_y85`) exactly match the product's declared all-nodata digest. The physical cause of nodata remains **NOT DETERMINED**; all six other windows remain valid.
+- E553 keeps the six measured medians fixed and evaluates 125 hypothetical completions using the min/Q1/median/Q3/max of the six observed values at each missing position. Each completion receives an exact 9! permutation test for plane R² and gradient norm: **45,360,000 exact permutation evaluations**.
+- Across completions, exact R² p-values range **0.0183–0.9898** and gradient p-values **0.0180–0.9897**. Four of 125 hypothetical completions yield p<0.05 for both statistics. This fraction is **not a probability** and the imputed values are not measurements.
+- **Interpretation:** E551's six-patch null remains valid for the six measured locations. The nine-position spatial-gradient claim is **NOT IDENTIFIABLE** from current support; missingness can change the conditional null result. Do not fit a correction plane or impute into the science product.
+- Exact tested code head `ac9d07aa594102899812b79cd7e0d850172a4758`; Actions PR run [43033652738](https://github.com/stoicsatvik/NASA/actions/runs/43033652738) and push run [43033646927](https://github.com/stoicsatvik/NASA/actions/runs/43033646927) both **SUCCESS**; 5 deterministic tests passed; artifact `13862081912`.
+- Report: `research/E553_MISSINGNESS_SENSITIVITY_20261111.md`; result: `research/results/E553_MISSINGNESS_SENSITIVITY_20261111.json`.
+- Claim states: six-patch gradient **NOT SUPPORTED BY E551 NULL**; nine-position gradient **NOT IDENTIFIABLE**; conditional missingness sensitivity diagnostic **SUPPORTED**; cross-body similarity **NOT YET PROVEN**; known-site recovery **NOT YET MEASURED**; novel analogue discovery **NOT YET PROVEN**; route safety **NOT CLAIMED**.
+- Next: recover valid support at the three nodata positions through a separately verified footprint or preserve the partial-coverage result. E001 still requires independently labelled Earth positive sites, hard negatives and physically comparable descriptors. No field data or route-safety validation was created.
