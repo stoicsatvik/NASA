@@ -1,0 +1,45 @@
+name: E534 remaining candidate source review
+
+on:
+  push:
+    branches:
+      - research/e534-remaining-candidate-source-review-20261111
+    paths:
+      - experiments/e534_remaining_candidate_source_review.py
+      - experiments/test_e534_remaining_candidate_source_review.py
+      - experiments/e533_candidate_label_source_review.py
+      - research/E533_CANDIDATE_LABEL_SOURCE_REVIEW_20261111.csv
+      - research/E534_REMAINING_CANDIDATE_SOURCE_REVIEW_20261111.csv
+      - .github/workflows/e534-remaining-candidate-source-review.yml
+  pull_request:
+    branches:
+      - main
+      - research/e533-candidate-label-source-review-20261111
+    paths:
+      - experiments/e534_remaining_candidate_source_review.py
+      - experiments/test_e534_remaining_candidate_source_review.py
+      - experiments/e533_candidate_label_source_review.py
+      - research/E533_CANDIDATE_LABEL_SOURCE_REVIEW_20261111.csv
+      - research/E534_REMAINING_CANDIDATE_SOURCE_REVIEW_20261111.csv
+      - .github/workflows/e534-remaining-candidate-source-review.yml
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run E534 regression tests
+        run: python -m unittest experiments.test_e534_remaining_candidate_source_review -v
+      - name: Fetch pinned catalogue and emit cumulative receipt
+        run: python -m experiments.e534_remaining_candidate_source_review --out .artifacts/e534/result.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e534-remaining-candidate-source-review
+          path: .artifacts/e534/result.json
+          retention-days: 30
