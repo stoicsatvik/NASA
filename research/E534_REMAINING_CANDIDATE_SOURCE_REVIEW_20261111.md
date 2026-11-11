@@ -29,6 +29,10 @@ E534 is the complement of E533's six-record purposeful subset. It does not rewri
 
 The review intentionally distinguishes a site used as a methodological analogue from a site with matched physical properties. A DOI attached to a catalogue record is not itself proof that every field in that record is correct.
 
+## Provenance compatibility note
+
+E533's Haughton row carries an additional corroborating DOI (10.1111/j.1945-5100.2005.tb00149.x) that is not itself listed in the pinned catalogue record. E534 preserves that prior citation as external corroboration rather than retroactively requiring every E533 supplemental DOI to be a catalogue reference. For the six new E534 rows, both the primary catalogue DOI and any additional DOI are required to appear in that site's pinned catalogue reference list. This keeps the E533 record intact while enforcing the stronger membership check on new rows.
+
 ## Cumulative result across E533 and E534
 
 The pinned catalogue contains 16 features. Twelve have primary Mars/Moon labels: 10 Mars and 2 Moon. E533 reviewed six; E534 reviews the remaining six.
