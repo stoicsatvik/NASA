@@ -1,0 +1,47 @@
+name: E536 Grand Falls ScienceBase metadata access probe
+
+on:
+  push:
+    branches:
+      - research/e536-grand-falls-sciencebase-metadata-probe-20261111
+    paths:
+      - experiments/e536_grand_falls_sciencebase_probe.py
+      - experiments/test_e536_grand_falls_sciencebase_probe.py
+      - data/grand_falls_sciencebase_item_manifest.csv
+      - research/E536_SCIENCEBASE_METADATA_ACCESS_PROBE_20261111.md
+      - .github/workflows/e536-grand-falls-sciencebase-metadata-probe.yml
+  pull_request:
+    branches:
+      - research/e535-grand-falls-aeolian-source-audit-20261111
+      - main
+    paths:
+      - experiments/e536_grand_falls_sciencebase_probe.py
+      - experiments/test_e536_grand_falls_sciencebase_probe.py
+      - data/grand_falls_sciencebase_item_manifest.csv
+      - research/E536_SCIENCEBASE_METADATA_ACCESS_PROBE_20261111.md
+      - .github/workflows/e536-grand-falls-sciencebase-metadata-probe.yml
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run metadata-probe fixture tests
+        run: python -m unittest experiments.test_e536_grand_falls_sciencebase_probe -v
+      - name: Query official ScienceBase metadata and child listings
+        run: python -m experiments.e536_grand_falls_sciencebase_probe --out .artifacts/e536/sciencebase.json
+      - name: Preserve metadata-only receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e536-grand-falls-sciencebase-metadata
+          path: .artifacts/e536/sciencebase.json
+          if-no-files-found: ignore
+          retention-days: 30
