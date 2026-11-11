@@ -63,7 +63,8 @@ The pinned catalogue contains 16 features. Twelve have primary Mars/Moon labels:
 
 - Local execution of the E534 fixture suite: **9/9 passed**.
 - The exact pinned GeoJSON revision was independently re-read through the GitHub connector. Its Git blob SHA is `156edd871599cf9ac9c083658d14d034f660e35d`; all 12 frozen record mappings, DOI/target/status checks and cumulative Mars 10 / Moon 2 counts passed.
-- This connector-backed read is not represented as the script's raw-URL Actions receipt. The dedicated workflow has not yet produced a verifiable exact-head run in the connected workflow lookup; the live raw-URL receipt remains pending.
+- Exact-head Actions run [#42939731046](https://github.com/stoicsatvik/NASA/actions/runs/42939731046) passed **9/9 tests**, fetched the pinned raw GeoJSON through the E533 source fetcher, emitted the cumulative receipt and uploaded artifact [#13820765258](https://github.com/stoicsatvik/NASA/actions/runs/42939731046/artifacts/13820765258).
+- The initial E534 workflow failed after its tests because direct script execution did not put the repository root on the import path. The workflow now invokes the runner as a module; the exact-head run above confirms the correction.
 
 ## Next decisive work
 
