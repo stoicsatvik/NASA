@@ -407,3 +407,14 @@ E542's 463 m/pixel MOLA value is an equatorial nominal spacing, not an isotropic
 - Exact-head GitHub Actions result is pending at this state update. No successful acquisition is claimed until the live workflow receipt proves TIFF parsing and valid sampled pixels.
 - If the direct URL returns HTTP 403/404/410 or non-TIFF bytes, preserve the route-specific negative result and stop guessing URL shapes. If successful, proceed to pinned HiRISE lineage and MOLA topography/counts, then common-support raster comparison.
 - Claim states unchanged pending evidence: raw CTX GeoTIFF acquisition NOT YET MEASURED; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; route safety NOT CLAIMED.
+
+
+## E544 — bounded official Jezero CTX TRN DTM acquisition (2026-11-11)
+
+- Isolated branch: `research/e544-ctx-raw-raster-ingestion-20261111`, based on E543 / PR #102; draft PR pending.
+- Pinned the official USGS Astrogeology CTX TRN DTM direct file URL (DOI 10.5066/P906QQT8), published at approximately 9.3 MB and 20 m/pixel.
+- Added a bounded HTTPS source allowlist, 20 MB cap, TIFF/BigTIFF magic validation, exact redirect-object allowlist, GeoTIFF parsing, and five deterministic 64×64 sample windows. Only transport metadata, SHA-256, raster metadata and sample summaries are retained; no raw pixels or raster file are committed or uploaded.
+- Initial exact-head Actions #43010052871 passed 10/10 fixture tests but classified the documented redirect to `asc-pds-services.s3.us-west-2.amazonaws.com` as outside the first, too-narrow allowlist. The official USGS CTX directory lists the exact TIFF object under that S3 host. This was an allowlist false negative; no raster bytes were acquired by the initial run.
+- E544 now permits only the exact source URL and exact corresponding S3 object path listed by the official USGS directory. The corrected live acquisition result is pending; no successful acquisition is claimed yet.
+- If the exact S3 object returns HTTP 403/404/410 or non-TIFF bytes, preserve that route-specific negative result and stop guessing URL shapes. If successful, proceed to pinned HiRISE lineage and MOLA topography/counts, then common-support raster comparison.
+- Claim states unchanged pending evidence: raw CTX GeoTIFF acquisition NOT YET MEASURED; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; route safety NOT CLAIMED.
