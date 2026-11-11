@@ -56,3 +56,24 @@ The guard now requires exact query maps:
 Exact-head PR workflow [#43070943518](https://github.com/stoicsatvik/NASA/actions/runs/43070943518) and push workflow [#43070938391](https://github.com/stoicsatvik/NASA/actions/runs/43070938391) both succeeded; **7/7 deterministic tests** passed and the live count-only query again returned **4**. No feature rows or coordinates were requested. The earlier push run [#43070930458](https://github.com/stoicsatvik/NASA/actions/runs/43070930458) was cancelled by the workflow concurrency group after the second commit; it is not a scientific failure.
 
 Implementation head: `97c00f1408711fb8ba8a08b0a30ef0bc5171815b`; exact test head: `66f5c01ab01a73f68aef25ed5bc8ec3d165e25fc`. Receipt artifact: [#13876899123](https://github.com/stoicsatvik/NASA/actions/runs/43070943518/artifacts/13876899123).
+
+
+## Portal item provenance result (11 November 2026)
+
+The ArcGIS Portal item REST endpoint returned JSON when its `text/plain` content type was parsed as JSON. The public item metadata validates:
+
+- Item ID `db564f72235f49b39c4147df36fd3308`, matching the service root's `serviceItemId`.
+- Title: `Terrestrial Analog Sites for Planetary Science`.
+- Type: Feature Service; access: public.
+- Owner account: `mahunter@usgs.gov_USGS`.
+- Created: 2020-11-17 18:08:27 UTC.
+- Item modified: 2024-07-09 18:04:14 UTC.
+- Layer last edit: 2024-07-10 18:37:49.500 UTC.
+- Portal item's service URL host/path matches the service endpoint after case normalization (`/arcgis/rest` versus `/ArcGIS/rest`). It contains no query parameters and no token.
+- The 178-character item description does not mention DOI `10.5066/P9J72921`, the ScienceBase item ID, or FGDC.
+
+This strengthens the identity link between the ScienceBase web link and the public ArcGIS item, but it still does **not** establish that the ArcGIS layer is the same 192-point FGDC release. The item description has no DOI/ScienceBase cross-reference; the service count remains **4**. The layer edit timestamp is about 24 h 33 min 35.5 s after the item modified timestamp, so those timestamps are not interchangeable.
+
+The initial portal-item attempts returned `text/plain` and were first rejected; the parser was then corrected to accept `text/plain` only when the body parses as JSON. A subsequent identity check exposed a path case-only difference; the final validator records that normalization explicitly rather than discarding the discrepancy. No raw item URL, query value, or metadata body is retained.
+
+Latest exact-head PR workflow [#43073044735](https://github.com/stoicsatvik/NASA/actions/runs/43073044735): **14/14 deterministic tests passed**; live portal item metadata, service schema and count-only audit completed. Receipt artifact: [#13879985771](https://github.com/stoicsatvik/NASA/actions/runs/43073044735/artifacts/13879985771).
