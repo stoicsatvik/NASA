@@ -45,6 +45,12 @@ def extract_field_definitions(text: str) -> list[dict]:
     normalized=text.replace("\r\n","\n").replace("\r","\n").replace("\f","\n")
     starts=list(re.finditer(r"(?im)^\s*Field\s+(\d+)\s*:\s*",normalized))
     definitions=[]
+    unit_tokens={
+        "m","meter","meters","metre","metres","km","km2","km^2","km²",
+        "cm","mm","m2","m^2","m²","degree","degrees","deg",
+        "km3","km^3","km³","m3","m^3","m³","cm3","cm^3","cm³",
+        "mm3","mm^3","mm³","um3","um^3","µm3","µm^3",
+    }
     for index,match in enumerate(starts):
         end=starts[index+1].start() if index+1<len(starts) else len(normalized)
         block=normalized[match.end():end].strip()
@@ -52,7 +58,11 @@ def extract_field_definitions(text: str) -> list[dict]:
         if not lines:
             continue
         first=lines[0]
-        separator=re.search(r"\s+(?:–|—|-)\s+",first)
+        # USGS uses both spaced hyphens and an en dash immediately followed
+        # by prose (for example, "CcDcAzimuth (CcDcAzimut) –ArcMap tools...").
+        # Requiring whitespace after the dash silently swallowed that entire
+        # definition into the label.
+        separator=re.search(r"\s+(?:–|—|-)\s*",first)
         if separator:
             label=first[:separator.start()].strip()
             definition_parts=[first[separator.end():].strip(),*lines[1:]]
@@ -60,7 +70,6 @@ def extract_field_definitions(text: str) -> list[dict]:
             label=first
             definition_parts=lines[1:]
         alias=re.search(r"\(([^()]+)\)\s*$",label)
-        unit_tokens={"m","meter","meters","metre","metres","km","km2","km^2","km²","cm","mm","m2","m^2","m²","degree","degrees","deg"}
         candidate=alias.group(1).strip() if alias else None
         short_name=candidate if candidate and candidate.lower() not in unit_tokens else None
         if alias and short_name:
