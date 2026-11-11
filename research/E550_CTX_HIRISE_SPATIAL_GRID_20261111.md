@@ -19,4 +19,4 @@ The nine-patch campaign is a spatial diagnostic, not global product validation. 
 
 ## Validation
 
-Deterministic tests check the fixed grid, window margins, and shift set. Exact-head live results are appended after the workflow completes.
+Deterministic tests check the fixed grid, window margins, and shift set. The first live attempt completed the nine-patch calculations but failed while assembling the receipt because the label URL was not imported. No artifact was emitted; the failure is preserved in Actions run 43024731121. The import is corrected and the exact-head campaign is rerun.
