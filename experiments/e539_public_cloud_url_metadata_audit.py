@@ -17,7 +17,7 @@ from pathlib import Path
 ITEM_ID = "662bccfad34ea70bd5f11f88"
 SCIENCEBASE = "https://www.sciencebase.gov/catalog"
 USGS_XML = "https://data.usgs.gov/datacatalog/metadata/USGS.662bccfad34ea70bd5f11f88.xml"
-SCIENCEBASE_HOSTS = {"www.sciencebase.gov", "sciencebase.gov"}
+SCIENCEBASE_HOSTS = {"www.sciencebase.gov", "sciencebase.gov", "sciencebase.usgs.gov"}
 ALLOWED_METADATA_HOSTS = SCIENCEBASE_HOSTS | {"data.usgs.gov"}
 MAX_METADATA_BYTES = 5 * 1024 * 1024
 TIMEOUT = 30
@@ -72,8 +72,12 @@ def _url_record(value: str, source: str) -> dict | None:
     host = parsed.hostname.lower()
     path = parsed.path or "/"
 
-    if host in SCIENCEBASE_HOSTS and path.startswith("/manager/item/"):
-        classification = "manager_preview_not_direct"
+    if host in SCIENCEBASE_HOSTS and path.startswith("/manager/download/"):
+        classification = "sciencebase_manager_download_candidate"
+    elif host in SCIENCEBASE_HOSTS and (
+        path == "/manager" or path.startswith("/manager/")
+    ):
+        classification = "manager_preview_or_ui_not_direct"
     elif host in SCIENCEBASE_HOSTS and path.startswith("/catalog/file/get/"):
         classification = "sciencebase_catalog_file_endpoint"
     elif token_like:
@@ -83,6 +87,23 @@ def _url_record(value: str, source: str) -> dict | None:
     else:
         classification = "non_https_url_rejected"
 
+    source_lower = source.lower()
+    file_download_field = ".files[" in source_lower and (
+        ".downloaduri" in source_lower or ".downloadurl" in source_lower
+    )
+    catalog_file_specific = (
+        classification == "sciencebase_catalog_file_endpoint" and "f" in query_keys
+    )
+    file_download_uri_candidate = (
+        parsed.scheme == "https"
+        and not token_like
+        and file_download_field
+        and (
+            classification == "sciencebase_manager_download_candidate"
+            or catalog_file_specific
+        )
+    )
+
     return {
         "source_field": source,
         "scheme": parsed.scheme,
@@ -91,14 +112,7 @@ def _url_record(value: str, source: str) -> dict | None:
         "query_key_names": query_keys,
         "token_like_query_present": token_like,
         "classification": classification,
-        "anonymous_candidate": (
-            parsed.scheme == "https"
-            and not token_like
-            and classification in {
-                "sciencebase_catalog_file_endpoint",
-                "external_https_candidate_not_verified",
-            }
-        ),
+        "file_download_uri_candidate": file_download_uri_candidate,
     }
 
 
@@ -223,10 +237,8 @@ def audit() -> dict:
         unique.values(),
         key=lambda item: (item["classification"], item["host"], item["path"], item["source_field"]),
     )
-    direct = [
-        item for item in candidates
-        if item["anonymous_candidate"]
-        and item["classification"] != "manager_preview_not_direct"
+    download_uri_candidates = [
+        item for item in candidates if item["file_download_uri_candidate"]
     ]
     return {
         "experiment": "E539",
@@ -237,11 +249,12 @@ def audit() -> dict:
         "usgs_xml_metadata": {key: value for key, value in xml.items() if key != "url_candidates"},
         "url_candidate_count": len(candidates),
         "url_candidates": candidates,
-        "anonymous_direct_candidates": direct,
+        "file_download_uri_candidates": download_uri_candidates,
+        "file_download_uri_candidate_count": len(download_uri_candidates),
         "decision": (
-            "DIRECT_URL_CANDIDATE_FOUND_IN_PUBLIC_METADATA"
-            if direct else
-            "NO_EXPLICIT_ANONYMOUS_DIRECT_URL_FOUND_IN_PUBLIC_METADATA"
+            "FILE_DOWNLOAD_URI_CANDIDATES_FOUND_IN_PUBLIC_METADATA"
+            if download_uri_candidates else
+            "NO_FILE_DOWNLOAD_URI_CANDIDATE_FOUND_IN_PUBLIC_METADATA"
         ),
         "raw_metadata_stored": False,
         "query_values_stored": False,
@@ -266,7 +279,7 @@ def main() -> None:
         "experiment": result["experiment"],
         "sciencebase_items_inspected": result["sciencebase_items_inspected"],
         "url_candidate_count": result["url_candidate_count"],
-        "anonymous_direct_candidate_count": len(result["anonymous_direct_candidates"]),
+        "file_download_uri_candidate_count": result["file_download_uri_candidate_count"],
         "decision": result["decision"],
         "raw_metadata_stored": result["raw_metadata_stored"],
         "file_urls_followed": result["file_urls_followed"],
