@@ -52,9 +52,9 @@ A missing object in the complete public prefix is a negative source-access resul
 - E557 public GLO-30 DSM tile access: SUPPORTED.
 - Public availability and bounded sampling of this tile's quality masks/lineage: SUPPORTED.
 - Water-edited lake status at the frozen Lonar coordinate: SUPPORTED.
-- Bare-earth/topographic interpretation of the E557 flat Lonar patch: REJECTED for this sample.
+- Bare-earth/topographic interpretation of the frozen E557 centre sample: REJECTED; WBM and EDM are lake, FLM is edited-except-filled, and HEM is sentinel at all 289 samples.
 - Local bare-earth elevation at that coordinate: NOT MEASURED.
-- Cross-body similarity: NOT YET PROVEN.
+- Nearby comparison point: unedited/no-water at the sampled window, but remains UNLABELLED, not a negative analogue.
 - Cross-body similarity: NOT YET PROVEN.
 - Known-site recovery: NOT YET MEASURED.
 - Novel analogue discovery: NOT YET PROVEN.
@@ -62,4 +62,7 @@ A missing object in the complete public prefix is a negative source-access resul
 
 ## Next gate
 
-If WBM/EDM identifies the flat centre patch as water-edited and FLM/HEM/SRC provide source lineage, classify the E557 centre sample as an edited-water DSM observation and sample a coordinate-uncertainty-aware annulus over unedited terrain. If the exact public prefixes contain no masks, stop guessing paths and seek another independently documented source endpoint or terrain product.
+1. Exclude the frozen Lonar centre window from terrain-morphology comparisons. It is a water-edited lake observation in the Copernicus DSM, not bare-earth evidence or a positive analogue label.
+2. Inspect the exact public ScienceBase item JSON for the USGS CC0 Known Terrestrial Analog Sites for Planetary Science release (item 5f88940b82cebb8c13d912ee, DOI 10.5066/P9J72921). Enumerate only listed file metadata; do not guess download paths or download an archive before validating the file inventory.
+3. If a public point file is listed, verify its archive hash, schema, CRS, feature IDs, coordinate precision and overlap with PAAD/the existing 16-site catalogue. Preserve it as a candidate-positive inventory, not ground truth.
+4. Use coordinate-precision-aware unedited terrain windows and independently sourced non-analogue controls before E001. No E001 recovery, cross-body similarity or local-validation claim is currently admissible.
