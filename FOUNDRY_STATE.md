@@ -3,7 +3,7 @@
 Updated: 2026-11-11
 Class: Tier A
 Time horizon: NASA Space Apps Challenge, 14–15 Nov 2026
-Working branch: `research/e557-copernicus-glo30-lonar-sample-20261111`
+Working branch: `research/e560-usgs-known-analog-catalogue-20261111`
 Main objective: maximize uncertainty eliminated per run and converge on a scientifically defensible Space Apps entry.
 
 ## Current thesis
@@ -101,10 +101,11 @@ Pivot away from the planetary-analog track if any of these becomes clear:
 
 ## Next trigger
 
-**E556 resolved NASADEM HGT tile N19E076 for both frozen Maharashtra points through CMR, but the only returned data path is Earthdata-protected. No credentials or raster bytes were used. Stop anonymous NASADEM retries. E557 now tests the anonymous Copernicus GLO-30 public COG as an auxiliary Earth DEM; keep DSM semantics and challenge-specific NASA-resource eligibility separate. Continue seeking independently labelled Earth positives and defensible controls before E001.**
+**E560 has now completed the bounded official USGS ScienceBase metadata audit (11 Nov 2026).** Exact-head Actions run #43068609889 passed 13/13 deterministic tests and acquired the pinned metadata anonymously. The item JSON returned HTTP 200 (19,203 bytes); the only file was the 9,406-byte FGDC XML. The live receipt reports a catalogue MD5 mismatch, zero vector links, and no feature payload. The XML itself says the 192 points are for discovery/reference rather than analysis and may be displaced by up to 10 km from feature centroids. Its 0.6096 m coordinate-resolution field is not positional accuracy. Do not pursue this item/WFS as an E001 analytical label source. Preserve the checksum discrepancy and do not claim 192 acquired features.
 
-E527/E528 spatial acquisition and ID joining are complete. E530 found no directly admissible shared quantitative features in the current PAAD/MGD3 pair. The next run must address independent labels/controls or falsify another feature family, not repeat ingestion or polish UI.
+The planetary-analog challenge remains **NOT YET PROVEN** as the best challenge. The all-14 screen and E541 factor ablation still put Martian Map (#11, 4.10) and MODIS/VIIRS (#9, 4.00) in a provisional top tier; the 0.10 gap is below the predeclared 0.25 threshold, and MODIS/VIIRS wins when portfolio reuse is removed. Planetary analog (#10, 2.93) remains a conditional research challenger, not the current readiness leader. No challenge is locked.
 
+Next highest-information work: test actual CRS registration and spatial coverage for the Martian Map layers on one pinned Mars area, and independently verify a no-credential public MODIS/VIIRS data path with a measurable validation target. Reassess the 14-challenge screen only when those results change a scored factor. Keep analog work focused on independent positive sites, defensible non-analogue controls and physically comparable features. No UI polish before the evidence gate.
 
 ## E514 real matched-footprint falsification (2026-11-03)
 
@@ -626,31 +627,24 @@ Next: stop repeated local pixel probes. Seek independent USGS footprint/quality-
 ## E560 - USGS catalogue acquisition result (2026-11-11)
 
 - Exact ScienceBase item JSON returned HTTP 200 (19,203 bytes) for item 5f88940b82cebb8c13d912ee; title and ID matched.
-- The item listed one file, AnalogSites_metadata.xml (9,406 bytes). The downloaded size matched; no vector file or vector URL was exposed in the downloaded FGDC XML. Initial live result: [E560 run #43067276665](https://github.com/stoicsatvik/NASA/actions/runs/43067276665).
-- The XML provisionally declares 192 entity points, fields FID/Shape/Name/AnalogType/Lat/Lon/AnalogBody, Mercator_1SP / WGS_1984 / meters, and AnalogType values Impact Crater, Dunes and Volcanic Eruption.
-- The XML explicitly says it is for identification/discovery, not for analysis, and that point locations may be wrong by up to 10 km from feature centroids. It is marked In work / update as needed; lineage is None / Unknown. Treat as a candidate discovery index only, never precise ground truth or a training label set.
-- Integrity discrepancy: item JSON MD5 def5fcdca1a6e7dd4389def926c3c1f1 versus computed XML MD5 d514547ac0dd7e68a302e03cd4c59d9f; size matches at 9,406 bytes, XML SHA-256 0b38af81da5fd638f830b066c4d6c6626b899ef0c1aad16a4cecef33821ef855. FGDC claims remain provisional until this is reconciled.
-- E560 code now pins item identity/title, refuses redirects, redacts URL query values, parses FGDC limits and records checksum status. The 13-test revision is not yet confirmed by exact-head Actions; helper checks against the actual artifact passed. Earlier failed CI runs remain recorded; the earlier 7/7 run is not evidence for the current head.
-- No vector features or coordinates were acquired. No overlap, known-site recovery, controls or E001 result.
-
-## Updated next decisive gate
-
-Do not use the E560 metadata as a quantitative label source. Query the official ScienceBase GeoServer WFS GetCapabilities endpoint once, bounded, and look for an item/title-matched feature type. If found, use DescribeFeatureType and a count-only query before retrieving any features. If no service exists, stop this catalogue route and use an independently documented source. The TADP documentation says ScienceBase-backed data may be exposed through WMS/WFS/CSW, but this specific item has not been shown to have a published service. No follow-up to the previously contacted nonresponder.
-
+- The item listed one file, `AnalogSites_metadata.xml` (9,406 bytes). Downloaded size matched; no vector file or vector URL was exposed in the downloaded FGDC XML.
+- The XML provisionally declares 192 entity points and fields FID/Shape/Name/AnalogType/Lat/Lon/AnalogBody, Mercator_1SP / WGS_1984 / meters, and AnalogType values Impact Crater, Dunes and Volcanic Eruption.
+- The XML explicitly says it is for identification/discovery, not for analysis, and point locations may be wrong by up to 10 km from feature centroids. It is marked In work / update as needed; lineage is None / Unknown. Treat it only as a candidate discovery index, never precise ground truth or a training label set.
+- Integrity discrepancy: item JSON MD5 `def5fcdca1a6e7dd4389def926c3c1f1` versus computed XML MD5 `d514547ac0dd7e68a302e03cd4c59d9f`; size matches at 9,406 bytes; XML SHA-256 `0b38af81da5fd638f830b066c4d6c6626b899ef0c1aad16a4cecef33821ef855`. FGDC claims remain provisional until this is reconciled.
+- E560 exact code/test head `85063538913db181e7f21478b2ebb4c38a98356c`: [Actions #43069286871](https://github.com/stoicsatvik/NASA/actions/runs/43069286871) succeeded, **13/13 deterministic tests** and bounded live metadata acquisition. Subsequent E560 commits are documentation-only; current E560 branch head is `be3c2b5e007fb0913b4a4f12e5fd7953c8d57447`. Earlier exact code run [#43068609889](https://github.com/stoicsatvik/NASA/actions/runs/43068609889) also passed 13/13.
+- The ScienceBase item JSON exposed one ArcGIS REST FeatureServer web link on `services.arcgis.com`; its `token` query value was not retained or reused. E560 did not follow the link.
+- No vector features or coordinates were acquired by E560. No overlap, known-site recovery, controls or E001 result.
 
 ## E561 - public ArcGIS analogue service audit (2026-11-11)
 
-- E560's exact ScienceBase item response exposed a public ArcGIS FeatureServer web link on `services.arcgis.com`; its `token` query value was not retained or reused.
-- E561 exact-head PR workflow [#43070089505](https://github.com/stoicsatvik/NASA/actions/runs/43070089505) and push workflow [#43070045960](https://github.com/stoicsatvik/NASA/actions/runs/43070045960) both passed **7/7 deterministic tests** and completed the bounded live audit.
-- The service item ID and layer schema matched the frozen expectations. Anonymous Query is explicitly allowed. Layer 0 is a point layer with FID/Name/AnalogType/Lat/Lon/AnalogBody and WKID 3857.
-- A count-only request returned **4 records**, not the FGDC metadata's provisional 192. No feature rows, geometry or coordinates were downloaded.
-- E560's ScienceBase metadata XML MD5 mismatch remains unresolved. The ArcGIS service reports static data with a 10 July 2024 last-edit date; the service's metadata also advertises anonymous update/delete permissions, but this workflow made GET-only requests and performed no writes.
-- **SUPPORTED:** public service metadata, layer schema and count-only access. **NOT ESTABLISHED:** that the four service records are the 192 FGDC points, version equivalence, coordinate accuracy, analytical suitability, any labels, or E001 recovery.
-- E560 exact-head run [#43069286871](https://github.com/stoicsatvik/NASA/actions/runs/43069286871) also succeeded: 13/13 deterministic tests and bounded live metadata acquisition. Its outcome remains `METADATA_XML_CHECKSUM_MISMATCH` with secondary `METADATA_XML_NO_VECTOR_LINK`.
+- E561 verified the public ArcGIS service item ID and layer 0 schema. Anonymous Query is explicitly allowed. Layer 0 is a point layer with FID/Name/AnalogType/Lat/Lon/AnalogBody, object-ID field FID, WKID 3857 and max record count 2,000.
+- The exact count-only request (`where=1=1&returnCountOnly=true&f=json`) returned **4 records**, not the FGDC metadata's provisional 192. No feature rows, geometries or coordinates were requested or downloaded.
+- The service metadata reports static data and a 10 July 2024 last-edit date. It also advertises anonymous update/delete permissions; E561 used GET-only requests and performed no writes.
+- Exact-query hardening now permits only `f=json` for metadata and the exact count-only parameter map for the query endpoint. Token parameters, duplicate keys, fragments, `outFields`, geometry-return flags and arbitrary query additions are rejected.
+- Latest exact-head PR workflow [#43070943518](https://github.com/stoicsatvik/NASA/actions/runs/43070943518) and push workflow [#43070938391](https://github.com/stoicsatvik/NASA/actions/runs/43070938391) passed **7/7 deterministic tests** and repeated the live count-only query. Earlier E561 runs [#43070089505](https://github.com/stoicsatvik/NASA/actions/runs/43070089505) and [#43070045960](https://github.com/stoicsatvik/NASA/actions/runs/43070045960) also passed 7/7 and confirmed the same count. The intermediate push run [#43070930458](https://github.com/stoicsatvik/NASA/actions/runs/43070930458) was cancelled by the concurrency group after a subsequent commit; it is not a scientific failure.
+- **SUPPORTED:** public service metadata, layer schema, anonymous read access and count-only query. **NOT ESTABLISHED:** that the four service records are the 192 FGDC points, version equivalence, coordinate accuracy, analytical suitability, any labels, or E001 recovery.
+- E560's ScienceBase XML MD5 mismatch remains unresolved. The ArcGIS service count of four is a version/provenance discrepancy, not a replacement for the FGDC count. Do not request feature rows until publisher provenance reconciles the two representations.
 
-Next: resolve the 4-versus-192 discrepancy and XML checksum/version provenance before requesting feature rows. Do not use this discovery catalogue as ground truth or a training-label source.
+## Updated next decisive gate
 
-
-### E561 exact-query guard hardening
-
-The E561 ArcGIS URL guard now rejects every query parameter except the exact frozen metadata/count-only maps. Token parameters, duplicate keys, fragments, feature-return parameters and arbitrary additions are rejected. Exact-head PR run [#43070943518](https://github.com/stoicsatvik/NASA/actions/runs/43070943518) and push run [#43070938391](https://github.com/stoicsatvik/NASA/actions/runs/43070938391) passed 7/7 tests and repeated the live count-only result: **4 records**, still discrepant with the provisional FGDC count of 192. No feature rows or coordinates were fetched.
+Reconcile the ArcGIS service item/version and the ScienceBase XML checksum discrepancy before any feature-row acquisition. If the publisher's version lineage cannot be established, retain the service only as an unverified discovery endpoint and stop short of using it as an analytical label source. No E001 recovery, coordinate overlap, control validation, or quantitative analogue result is claimed. No follow-up to previously contacted nonresponders.
