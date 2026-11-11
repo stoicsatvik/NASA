@@ -418,3 +418,15 @@ E542's 463 m/pixel MOLA value is an equatorial nominal spacing, not an isotropic
 - E544 now permits only the exact source URL and exact corresponding S3 object path listed by the official USGS directory. The corrected live acquisition result is pending; no successful acquisition is claimed yet.
 - If the exact S3 object returns HTTP 403/404/410 or non-TIFF bytes, preserve that route-specific negative result and stop guessing URL shapes. If successful, proceed to pinned HiRISE lineage and MOLA topography/counts, then common-support raster comparison.
 - Claim states unchanged pending evidence: raw CTX GeoTIFF acquisition NOT YET MEASURED; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; route safety NOT CLAIMED.
+
+
+### E544 exact-head result (2026-11-11)
+
+- Exact-head branch `research/e544-ctx-raw-raster-ingestion-20261111`, head `e64a9e69d86d2a1953e71a07821d4e73c75d9294`; draft PR pending.
+- GitHub Actions [#43010645516](https://github.com/stoicsatvik/NASA/actions/runs/43010645516) succeeded: **12/12 fixture tests passed**, live bounded acquisition completed, receipt artifact **13850830857** uploaded.
+- The official USGS URL redirected to the exact CTX object listed in the official PDS S3 directory. HTTP 200, image/tiff, **9,662,387 bytes**; SHA-256 `16a1aa66c3f48c1bca252795827db7b417876217aff0f5e1aff18027fab2327b`.
+- Rasterio inspected a one-band float32 GeoTIFF, **1596 × 1512**, CRS **ESRI:103885**, **20 × 20** CRS-unit affine spacing, and bounds 4573663.250853–4605583.250853 / 1079453.140188–1109693.140188. Nodata is `-3.4028226550889045e+38`.
+- Five deterministic 64×64 windows contained **20,480/20,480 valid pixels**; sampled values ranged from -2699.7209 to -2033.5281. The GeoTIFF band-unit tag is absent; the USGS product metadata separately lists vertical coordinate-system units as metres. Do not conflate those two sources.
+- Only a compact JSON receipt was uploaded; no raster or raw pixel array was committed/uploaded.
+- Raw CTX GeoTIFF acquisition and bounded sample inspection for this pinned product: **SUPPORTED**. CTX/HiRISE raster co-registration NOT YET MEASURED; MOLA local observed-count support NOT YET MEASURED; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; route safety NOT CLAIMED.
+- Next decisive gate: pin the exact 2025 HiRISE CTX-reference lineage, acquire a bounded HiRISE raster sample and MOLA topography plus observed-count tile, then compare only over verified common valid-pixel support. Do not infer route safety.
