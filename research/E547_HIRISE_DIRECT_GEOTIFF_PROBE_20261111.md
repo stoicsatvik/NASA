@@ -42,7 +42,7 @@ Synthetic TIFF fixtures cover:
 
 ## Exact-head result
 
-GitHub Actions [#43021100543](https://github.com/stoicsatvik/NASA/actions/runs/43021100543) succeeded on head `16c2e9ba64102ffff37dd2c968736b69ebab3f06`:
+GitHub Actions [#43022208448](https://github.com/stoicsatvik/NASA/actions/runs/43021100543) succeeded on head `a55616f1c193de8e34e22b3abbe8f959a67fb120`:
 
 - Deterministic fixtures: **8/8 passed**.
 - HTTP HEAD: **200**, `Content-Type: image/tiff`, `Accept-Ranges: bytes`.
@@ -53,7 +53,7 @@ GitHub Actions [#43021100543](https://github.com/stoicsatvik/NASA/actions/runs/4
 - Georeferencing tags present: ModelPixelScale `[1, 1, 0]`, ModelTiepoint `[0, 0, 0, 4577366, 1106618, 0]`, GeoKeyDirectory present.
 - One 85,600-byte row strip was fetched by exact HTTP Range and hashed; no pixel values were decoded.
 - **12 range requests; 258,025 total bytes transferred**, below the 1,000,000-byte cap.
-- Compact receipt artifact [13854428457](https://github.com/stoicsatvik/NASA/actions/runs/43021100543/artifacts/13854428457), ZIP SHA-256 `8ed484a78adce58569e4ed159d8a627e81bca924f6c95a7296085d3b93084156`.
+- Compact receipt artifact [13855557466](https://github.com/stoicsatvik/NASA/actions/runs/43021100543/artifacts/13855557466), ZIP SHA-256 `2513dc52d9abfc3bbaa1442d61382fd1c230cbda1fef7d551772d0dcdc9a4f2c`.
 
 Outcome: **DIRECT_TIFF_SEGMENT_RANGE_READ**. The 2020 direct TIFF is range-addressable at the strip level. It is not tiled, and this experiment does not establish COG status.
 
