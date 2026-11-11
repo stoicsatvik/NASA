@@ -68,8 +68,13 @@ class PublicUrlMetadataAuditTests(unittest.TestCase):
     def test_cli_writes_receipt_without_network_access(self):
         expected = {
             "experiment": "E539",
+            "sciencebase_items_inspected": 0,
             "url_candidate_count": 0,
+            "anonymous_direct_candidates": [],
+            "decision": "NO_EXPLICIT_ANONYMOUS_DIRECT_URL_FOUND_IN_PUBLIC_METADATA",
             "raw_metadata_stored": False,
+            "file_urls_followed": False,
+            "binary_files_downloaded": False,
         }
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory) / "receipt.json"
