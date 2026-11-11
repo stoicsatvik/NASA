@@ -3,7 +3,7 @@
 Updated: 2026-11-11
 Class: Tier A
 Time horizon: NASA Space Apps Challenge, 14–15 Nov 2026
-Working branch: `research/e533-candidate-label-source-review-20261111`
+Working branch: `research/e535-grand-falls-aeolian-source-audit-20261111`
 Main objective: maximize uncertainty eliminated per run and converge on a scientifically defensible Space Apps entry.
 
 ## Current thesis
@@ -101,7 +101,7 @@ Pivot away from the planetary-analog track if any of these becomes clear:
 
 ## Next trigger
 
-**Acquire an independent, source-backed Earth positive-site layer and a defensible non-analogue control population; then test whether any physically comparable descriptor survives support/uncertainty audits before attempting E001.**
+**Retrieve the public Grand Falls Dune Field ScienceBase files (DEM/orthomosaic plus matched weather/imagery), hash and profile them, then align aeolian features to Mars dune data at matched support and define a defensible contrast set before E001.**
 
 E527/E528 spatial acquisition and ID joining are complete. E530 found no directly admissible shared quantitative features in the current PAAD/MGD3 pair. The next run must address independent labels/controls or falsify another feature family, not repeat ingestion or polish UI.
 
@@ -325,3 +325,11 @@ Code review found that Python's `bool` subclasses `int`, so a malformed GeoJSON 
 - PR #93 is draft and stacked on E533 PR #92; no merge or main-branch change.
 - Claim states remain: E001 readiness **NOT READY**; known-site recovery **NOT YET MEASURED**; cross-body similarity **NOT YET PROVEN**; novel analogue discovery **NOT YET PROVEN**; challenge-selection superiority **NOT YET PROVEN**.
 - Next: construct a predeclared non-analogue control universe and matched-support descriptors with units, uncertainty, spatial support and provenance. Absence from this positive catalogue remains UNLABELLED, never negative.
+
+## E535 independent Earth aeolian dataset discovery (2026-11-11)
+
+USGS source review identified the Grand Falls Dune Field, Navajo Nation, Arizona, as a candidate positive site with independent public field-data releases from 2013–2024. The release family includes wind/sediment-flux measurements, time-lapse imagery, photogrammetry-derived DEMs and orthomosaics; USGS explicitly describes the active dune field as a Mars analogue. The 2022–2023 and 2023–2024 products provide DEM/orthomosaic and meteorological/imagery components; 2023–2024 weather is 15-minute in the windy season and hourly in calmer months, cameras are 10-minute, and passive sediment samplers are retrieved about every two weeks in the windy season.
+
+This raises the evidence potential of the planetary-analog track for a narrow **aeolian-process** experiment. It does not yet make the data E001-ready: raw files have not been downloaded or hashed, CRS/resolution/nodata/units are uninspected, and no non-analogue controls or Mars/Earth matched-support descriptors exist. The heuristic score is unchanged; Martian Map and MODIS/VIIRS remain the provisional top tier pending data ingestion and validation.
+
+Source report: `research/E535_GRAND_FALLS_AEOLIAN_DATA_SOURCE_AUDIT_20261111.md`; registry: `data/grand_falls_source_registry.csv`. Public data access is not field-access permission; the site is on Navajo Nation land and new geological fieldwork requires applicable permits. No fieldwork, sampling or contact was performed.
