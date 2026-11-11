@@ -679,4 +679,33 @@ The official FIRMS page requires Earthdata Login for daily text downloads; the a
 
 ### Next decisive gate (deadline-aware)
 
-Run one pinned-footprint MOLA/CTX/HiRISE CRS-registration and common-support experiment. Record coordinate transforms, pixel/ground resolution, nodata masks, valid overlap and registration error. Re-score Martian Map data readiness only from that measured result. Do not add UI polish or competition solution code before the data/route-safety gate.
+E563 has completed the pinned Jezero three-way MOLA/CTX/HiRISE common-point-support experiment. Do not repeat the same CRS or local support probes.
+
+- Exact-head draft PR #122 on research/e563-mola-ctx-hirise-common-support-20261112, stacked on E562; main unchanged.
+- Actions run #43089442518 passed all 6 deterministic geometry/mask tests and the bounded live acquisition. Artifact #13886639834.
+- MOLA: 346/1,089 bins (31.7723%) have observed laser-shot counts > 0; zero-count/interpolated bins are excluded.
+- CTX: 346/346 observed MOLA point centers map to valid CTX pixels.
+- HiRISE: 256/346 are inside the raster bounds; 164/346 are finite, non-nodata. Thus 90 are outside the raster bounds and 92 are inside-but-nodata.
+- Three-way common point support: 164/346 = 47.3988%. This is point-center support, not area coverage. The bounded HiRISE sample used 29 row ranges / 959,660 bytes under the 2.5 MB cap.
+- CTX and PDS3-derived HiRISE CRS parameters are pyproj-equivalent. The 190 m reference-radius difference is documented. The inverse-transform numerical round-trip is not an independent horizontal registration residual.
+- Claims: bounded MOLA observed-shot support SUPPORTED; CTX/HiRISE CRS parameter equivalence SUPPORTED; three-way point support PARTIAL FOR THIS BOUNDED WINDOW; independent horizontal registration residual NOT YET MEASURED; cross-body similarity NOT YET PROVEN; E001 known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; route safety NOT CLAIMED.
+
+Challenge-selection consequences:
+- Martian Map (#11) loses any assumption that the three-layer metadata envelope is fully common-valid coverage. The bounded observed-MOLA sample has only 47.4% three-way point support and no independent route-safety or horizontal-control validation.
+- MODIS/VIIRS (#9) still has only a static one-day VIIRS sample on a credential-free path; daily South Asia data and area API remain credential-gated.
+- Planetary analog (#10) still lacks independent analysis-grade Earth positive sites, defensible non-analogue controls and an E001 recovery result.
+- Keep the all-14 challenge screen open. #11/#9 remain provisional competitors, not proven winners; #10 is not yet the best-supported challenge. Re-score only when a scored factor changes from new evidence. No challenge is locked.
+
+Next highest-information work: find and verify an independent, analysis-grade Earth analogue plus non-analogue control source with stable geospatial geometry and scientifically meaningful labels. Document label semantics, positional uncertainty, feature availability and provenance. Run E001 only when the positive/control universe and physically comparable feature family pass that admissibility gate. If that gate cannot be met before the event, prefer a challenge whose decisive data and validation gates are already measurable rather than polishing an unvalidated analog map.
+
+## E563 — three-way MOLA / CTX / HiRISE common-point-support result (2026-11-12)
+
+- Research PR #122, branch research/e563-mola-ctx-hirise-common-support-20261112, stacked on E562.
+- Exact-head Actions run #43089442518: success; 6/6 deterministic tests and bounded live source acquisition passed. Artifact #13886639834.
+- Source hashes and acquisition receipts are retained in the PR artifact and report research/E563_THREE_WAY_COMMON_SUPPORT_20261112.md; no raw raster samples were committed.
+- Observed MOLA bins: 346/1,089. Valid CTX point centers: 346. HiRISE in-bounds point centers: 256; valid non-nodata HiRISE point centers: 164. Three-way valid point centers: 164/346 (47.3988%).
+- HiRISE nodata value: -3.4028226550889045e+38 from GeoTIFF GDAL_NODATA. The 92 in-bounds-but-nodata points are not imputed.
+- HiRISE acquisition: 29 row-range requests, 959,660 bytes, 2.5 MB cap. CTX GeoTIFF: 9,662,387 bytes. MOLA topography/count ranges: 760,320 / 380,160 bytes; both exact HTTP 206 ranges matched their declared Content-Range.
+- The 190 m MOLA/Mars 2015 reference-radius difference is not interpreted as a measured displacement. No independent control-point residual or vertical comparison was run.
+- Result: three-way spatial point support is PARTIAL in this bounded Jezero window. This weakens full-layer readiness for Martian Map; it does not prove the map challenge infeasible and does not validate route safety.
+
