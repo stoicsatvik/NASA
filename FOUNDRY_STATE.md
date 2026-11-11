@@ -782,3 +782,8 @@ E568 is the next gate: sample the actual 2025 DTM at the same 346 point centers 
 - Final E567 head `0af3793043f2202598fca0db68ec585744042676`; Actions [#43115750730](https://github.com/stoicsatvik/NASA/actions/runs/43115750730) passed 11 tests and the bounded live FOM acquisition; artifact #13897923542.
 - The two initial fixture failures (#43114343485 and #43114401229) were the same synthetic nodata-placement assertion (`assert 4 == 3`). The fixture was moved to the exact sampled pixel; the final exact head passed. No production sampling rule or scientific threshold was weakened.
 - Follow-on E568 is a separate stacked draft PR #127; its DTM result is recorded in the child-branch report and portfolio ledger, not retroactively attributed to E567.
+
+
+### E567 current-head rerun (12 November 2026)
+
+- Current branch head 630f1eabd8016734ce1ff07733ee89bb8f9add5e passed exact-head Actions [#43117959720](https://github.com/stoicsatvik/NASA/actions/runs/43117959720): 11 tests, live FOM point-support acquisition, artifact #13899432519. The measured counts remain 329 inside / 259 valid of 346 observed MOLA points. This rerun is on the documentation-reconciled head; the sampler and result are unchanged.
