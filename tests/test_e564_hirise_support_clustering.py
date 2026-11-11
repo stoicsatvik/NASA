@@ -40,7 +40,7 @@ def test_fixed_count_reference_is_deterministic_and_preserves_category_counts():
         assert category["reference_permutations"] in (0, 499)
         value = category["reference_upper_tail_fraction"]
         assert value is None or 0 <= value <= 1
-    assert "coordinates" not in str(first).lower()
+    assert "coordinates" not in str(first["categories"]).lower()
     assert first["raw_pixels_retained"] is False
     assert first["point_coordinates_retained"] is False
 
