@@ -1,0 +1,6 @@
+item_id,doi,role,usgs_catalog_url,access_status,license,raw_data_status,notes
+662bccfad34ea70bd5f11f88,10.5066/P9FRH62D,2022-2023 ripple photogrammetry,https://data.usgs.gov/datacatalog/data/USGS%3A662bccfad34ea70bd5f11f88,public,CC0 1.0,metadata probe pending,DEM and orthomosaic release; raw files not downloaded
+67bf94acd34e8876fcbfc91b,10.5066/P13HPPYM,2023-2024 integrated sediment transport release,https://data.usgs.gov/datacatalog/data/USGS%3A67bf94acd34e8876fcbfc91b,public,CC0 1.0,metadata probe pending,one parent release; do not count child components as independent sites
+67b78df2d34e1a2e835b13b7,10.5066/P13HPPYM,2024 photogrammetry component,https://data.usgs.gov/datacatalog/data/USGS%3A67b78df2d34e1a2e835b13b7,public,CC0 1.0,metadata probe pending,component shares DOI with 2023-2024 parent release
+68c05cbbd4be025f1dac0cd4,10.5066/P1TJFD9N,2009-2014 long-term meteorology,https://data.usgs.gov/datacatalog/data/USGS%3A68c05cbbd4be025f1dac0cd4,public,CC0 1.0,metadata probe pending,10-minute interval weather record; same Grand Falls site
+662ac4a0d34ea70bd5f0bc9c,10.5066/P9YQLHHB,2023 April-July meteorological component,https://data.usgs.gov/datacatalog/data/USGS%3A662ac4a0d34ea70bd5f0bc9c,public,CC0 1.0,metadata probe pending,component of the April-July 2023 integrated release
