@@ -715,3 +715,12 @@ Next highest-information work: find and verify an independent, analysis-grade Ea
 ## E564 — unsupported HiRISE point clustering diagnostic (12 November 2026)
 
 A draft follow-up branch, research/e564-hirise-support-clustering-20261112, is stacked on E563 PR #122. It reuses only E563's in-memory boolean support masks and adds four-neighbor component sizes plus a fixed-count random-label reference for CTX-invalid, HiRISE-outside and HiRISE-inside-nodata bins. The reference is descriptive, not an inferential p-value, because the uniform-label null does not model raster footprint geometry or nodata generation. No raster values or point coordinates are persisted. Exact-head live results are pending; do not claim a physical cause, registration correction, route safety or analogue recovery.
+
+
+## E564 exact-head live result — 12 November 2026
+
+- Exact head `ca9dfa437e30cc1cd83b747843c67b9bd54ba60f`; [Actions #43104061311](https://github.com/stoicsatvik/NASA/actions/runs/43104061311) succeeded, **11/11** E563/E564 tests; receipt artifact #13891699522 (ZIP SHA-256 `9a7a568353be95bc69b8e6ec627e9090d6724d23045559e9d731b63979dc90d4`).
+- Bounded Jezero 33×33 MOLA window: 346 observed-shot bins; CTX valid 346/346; HiRISE inside 256, finite/non-nodata 164; outside 90; inside-nodata 92. Three-way common point support 164/346 = 47.3988%, not an area fraction.
+- 4-connected topology: outside-bounds 6 components [59,11,8,4,4,4], 113 same-category edges; inside-nodata 8 components [44,16,10,7,7,3,3,2], 96 edges. Fixed-count reference upper-tail fractions are 0.0001 for both categories, but are descriptive only and not inferential p-values because raster footprint/geology/nodata generation are not modeled.
+- CRS definitions are equivalent; coordinate round-trip error 8.42e-10 m. Independent horizontal-control residual remains NOT MEASURED; MOLA/HiRISE reference radii differ by 190 m. 959,660 HiRISE bytes / 29 range requests; no raw pixels or point coordinates persisted. Tifffile emitted a GDAL_NODATA cast warning; the pinned nodata value was still resolved and the run succeeded.
+- Interpretation: unsupported points are spatially concentrated relative to the simple uniform-label reference on this one bounded lattice. Physical cause, registration, vertical agreement, route safety, known-site recovery and cross-body similarity remain unproven. Next gate is independent footprint/FOM provenance, not more local nodata probes.
