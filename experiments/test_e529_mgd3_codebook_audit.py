@@ -33,21 +33,30 @@ class E529Tests(unittest.TestCase):
             "Field 4: Dune Type - This field lists dune forms.\n"
             "B - barchan dune.\n"
             "Bd - barchanoid dune.\n"
+            "Field 8: CcDcAzimuth (CcDcAzimut) –ArcMap tools calculate crater-to-dune azimuth.\n"
             "Field 15: Dune Field Area (km2) - area of polygon (km2).\n"
+            "Field 17: Volume Method 1 (raster clip) (km3) - volume from raster-clipped MOLA elevations.\n"
             "Field 19: Dune_Area_km2_sinu (Area_sinu_) - area of polygon (km2).\n"
             "Field 20: Mean_Dune_Height (MDHeight) - mean height in metres (m).\n"
         )
         fields = extract_field_definitions(source)
-        self.assertEqual([item["field_number"] for item in fields], [4, 15, 19, 20])
+        self.assertEqual([item["field_number"] for item in fields], [4, 8, 15, 17, 19, 20])
         self.assertEqual(fields[0]["label"], "Dune Type")
         self.assertIn("B - barchan dune", fields[0]["definition"])
         self.assertIn("Bd - barchanoid dune", fields[0]["definition"])
-        self.assertEqual(fields[1]["label"], "Dune Field Area (km2)")
-        self.assertIsNone(fields[1]["short_name"])
-        self.assertEqual(fields[2]["short_name"], "Area_sinu_")
-        self.assertIn("km2", fields[2]["definition"])
-        self.assertEqual(fields[3]["short_name"], "MDHeight")
-        self.assertIn("(m)", fields[3]["definition"])
+        self.assertEqual(fields[1]["label"], "CcDcAzimuth")
+        self.assertEqual(fields[1]["short_name"], "CcDcAzimut")
+        self.assertIn("ArcMap tools calculate", fields[1]["definition"])
+        self.assertNotIn("Field 15:", fields[1]["definition"])
+        self.assertEqual(fields[2]["label"], "Dune Field Area (km2)")
+        self.assertIsNone(fields[2]["short_name"])
+        self.assertEqual(fields[3]["label"], "Volume Method 1 (raster clip) (km3)")
+        self.assertIsNone(fields[3]["short_name"])
+        self.assertIn("km3", fields[3]["label"])
+        self.assertEqual(fields[4]["short_name"], "Area_sinu_")
+        self.assertIn("km2", fields[4]["definition"])
+        self.assertEqual(fields[5]["short_name"], "MDHeight")
+        self.assertIn("(m)", fields[5]["definition"])
 
     def test_archive_exposes_full_field_definitions_with_source_hash(self):
         buf=io.BytesIO()
