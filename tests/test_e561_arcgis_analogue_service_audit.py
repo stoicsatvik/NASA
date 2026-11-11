@@ -175,6 +175,25 @@ class E561Tests(unittest.TestCase):
         with self.assertRaises(E561Error):
             validate_portal_item(document)
 
+    def test_portal_item_case_only_path_difference_is_recorded_not_rejected(self):
+        document = {
+            "id": SERVICE_ITEM_ID,
+            "title": "Terrestrial Analog Sites for Planetary Science",
+            "type": "Feature Service",
+            "access": "public",
+            "owner": "usgs",
+            "created": 1600000000000,
+            "modified": 1720636669000,
+            "url": "https://services.arcgis.com/v01gqwM5QqNysAAi/arcgis/rest/services/"
+                   "Terrestrial_Analog_Sites_for_Planetary_Science/FeatureServer",
+            "description": "Public data service.",
+        }
+        result = validate_portal_item(document)
+        self.assertTrue(result["service_url_identity_matches"])
+        self.assertFalse(result["service_url_path_case_sensitive_matches"])
+        self.assertTrue(result["service_url_path_case_only_difference"])
+        self.assertFalse(result["description_mentions_expected_doi"])
+
     def test_portal_item_url_must_match_exact_service_identity(self):
         document = {
             "id": SERVICE_ITEM_ID,
