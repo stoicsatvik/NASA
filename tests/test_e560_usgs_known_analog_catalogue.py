@@ -1,7 +1,7 @@
 import io, json, unittest, zipfile
 from experiments.e560_usgs_known_analog_catalogue import (
     ITEM_ID, METADATA_URL, metadata_files, normalise, overlap,
-    parse_geojson, parse_vector, safe_file_url, safe_metadata_url,
+    parse_geojson, parse_vector, safe_file_url, safe_metadata_url, xml_urls, vector_url_candidates,
 )
 
 class E560Tests(unittest.TestCase):
@@ -53,3 +53,12 @@ class E560Tests(unittest.TestCase):
         self.assertEqual(normalise("Lonar Crater, India"),"lonarcraterindia")
 
 if __name__=="__main__": unittest.main()
+
+
+    def test_metadata_xml_exposes_only_allowlisted_vector_links(self):
+        xml=b'<metadata><onlink>https://www.sciencebase.gov/catalog/file/get/123/sites.zip</onlink><onlink>https://doi.org/10.5066/P9J72921</onlink></metadata>'
+        urls=xml_urls(xml)
+        candidates=vector_url_candidates(urls)
+        self.assertEqual(len(candidates),1)
+        self.assertEqual(candidates[0]["name"],"sites.zip")
+        self.assertEqual(candidates[0]["url"],"https://www.sciencebase.gov/catalog/file/get/123/sites.zip")
