@@ -1,0 +1,51 @@
+name: E563 three-way MOLA CTX HiRISE common-support audit
+
+on:
+  push:
+    branches:
+      - research/e563-mola-ctx-hirise-common-support-20261112
+    paths:
+      - experiments/e563_three_way_common_support.py
+      - tests/test_e563_three_way_common_support.py
+      - research/E563_THREE_WAY_COMMON_SUPPORT_20261112.md
+      - .github/workflows/e563-three-way-common-support.yml
+  pull_request:
+    branches:
+      - research/e562-firms-source-access-audit-20261112
+    paths:
+      - experiments/e563_three_way_common_support.py
+      - tests/test_e563_three_way_common_support.py
+      - research/E563_THREE_WAY_COMMON_SUPPORT_20261112.md
+      - .github/workflows/e563-three-way-common-support.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e563-three-way-common-support-\${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  common-support:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install bounded geospatial dependencies
+        run: python -m pip install "numpy>=1.26,<3" "requests>=2.31,<3" "tifffile>=2024.8,<2027" "rasterio>=1.4,<2" "pyproj>=3.6,<4" "pytest>=8,<9"
+      - name: Run deterministic geometry and mask tests
+        run: python -m pytest -q tests/test_e563_three_way_common_support.py
+      - name: Acquire bounded three-way point-support receipt
+        run: python -m experiments.e563_three_way_common_support --out .artifacts/e563/receipt.json
+      - name: Preserve compact receipt only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e563-three-way-common-support-receipt
+          path: .artifacts/e563/receipt.json
+          if-no-files-found: ignore
+          retention-days: 14
