@@ -1,0 +1,45 @@
+name: E557 Copernicus GLO-30 public COG sample
+
+on:
+  push:
+    branches:
+      - research/e557-copernicus-glo30-lonar-sample-20261111
+    paths:
+      - experiments/e557_copernicus_glo30_lonar_sample.py
+      - tests/test_e557_copernicus_glo30_lonar_sample.py
+      - research/E557_COPERNICUS_GLO30_LONAR_SAMPLE_20261111.md
+      - .github/workflows/e557-copernicus-glo30-lonar-sample.yml
+  pull_request:
+    branches:
+      - research/e556-nasadem-earth-candidate-sample-20261111
+    paths:
+      - experiments/e557_copernicus_glo30_lonar_sample.py
+      - tests/test_e557_copernicus_glo30_lonar_sample.py
+      - research/E557_COPERNICUS_GLO30_LONAR_SAMPLE_20261111.md
+
+permissions:
+  contents: read
+
+jobs:
+  public-cog-sample:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install bounded COG reader and tests
+        run: python -m pip install "requests>=2.31,<3" "rasterio>=1.4,<2" "numpy>=1.26,<3" "pytest>=8,<9"
+      - name: Run deterministic tests
+        run: python -m pytest -q tests/test_e557_copernicus_glo30_lonar_sample.py
+      - name: Probe public COG and read bounded windows
+        run: python -m experiments.e557_copernicus_glo30_lonar_sample --out .artifacts/e557/receipt.json
+      - name: Preserve compact sample receipt only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e557-copernicus-glo30-lonar-sample
+          path: .artifacts/e557/receipt.json
+          if-no-files-found: ignore
+          retention-days: 14
