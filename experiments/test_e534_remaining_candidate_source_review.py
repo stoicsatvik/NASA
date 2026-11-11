@@ -59,6 +59,9 @@ def feature(site_id, target, dois, status="Draft"):
 
 def fixtures():
     previous_rows = [row(site, target, doi) for site, target, doi in PREVIOUS]
+    # E533 records one corroborating DOI for Haughton that is not a catalogue DOI.
+    # It remains valid external evidence and must not be mistaken for catalogue membership.
+    previous_rows[-1]["additional_doi"] = "10.1111/j.1945-5100.2005.tb00149.x"
     new_rows = [row(site, target, doi, additional) for site, target, doi, additional in NEW]
     features = []
     for site, target, doi in PREVIOUS:
@@ -110,6 +113,14 @@ class E534RemainingSourceReviewTests(unittest.TestCase):
         new_rows[0]["additional_doi"] = "10.9999/not-in-catalogue"
         with self.assertRaises(ValueError):
             audit(document, previous_rows, new_rows, "abc")
+
+    def test_preserves_previous_e533_external_supplemental_doi(self):
+        document, previous_rows, new_rows = fixtures()
+        result = audit(document, previous_rows, new_rows, "abc")
+        self.assertEqual(
+            result["previous_reviewed_sites"][-1]["additional_doi"],
+            "10.1111/j.1945-5100.2005.tb00149.x",
+        )
 
     def test_requires_exact_frozen_new_six_and_no_duplicates(self):
         document, previous_rows, new_rows = fixtures()
