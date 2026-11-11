@@ -27,3 +27,18 @@ The public service metadata and layer directory are independently indexed by Arc
 A successful count-only query establishes service availability, schema and a record count only. It does **not** establish that the 192 FGDC-declared points were downloaded, that the metadata checksum discrepancy is resolved, or that the catalogue is suitable for analysis. E560's FGDC statement says the point locations are discovery/reference approximations with possible errors up to 10 km and explicitly says they are not for analysis. The catalogue remains a discovery index, not ground truth or a training-label source.
 
 Raw service JSON and feature rows are not retained. Only a compact receipt is uploaded as a short-lived workflow artifact.
+
+
+## Exact-head live result (11 November 2026)
+
+- Exact implementation/test head: `e99866cccbffb83b0118f81256f5bed13d1446a1`.
+- PR workflow [#43070089505](https://github.com/stoicsatvik/NASA/actions/runs/43070089505) and push workflow [#43070045960](https://github.com/stoicsatvik/NASA/actions/runs/43070045960) both succeeded; **7/7 deterministic tests** passed in each run.
+- The exact public service item ID and layer 0 identity matched. The service advertises Query capability and explicitly allows anonymous querying. Layer 0 is `TerrestrialAnalogs`, a point Feature Layer, with fields FID, Name, AnalogType, Lat, Lon and AnalogBody; object-ID field FID; spatial reference 3857; max record count 2,000.
+- The count-only request (`where=1=1&returnCountOnly=true&f=json`) returned **4 records**. No feature rows, geometries or coordinates were requested or downloaded.
+- The count does **not** match the FGDC metadata's provisional declaration of 192 points. This is a material version/provenance discrepancy, not a reason to silently replace 192 with 4. E560's XML MD5 mismatch also remains unresolved.
+- Service metadata reports static data and a last edit date of 10 July 2024. Its editor-tracking metadata advertises anonymous update/delete permissions; this experiment performed only GET requests and did not test or invoke any write operation.
+- Outcome: public service schema and count-only access are SUPPORTED; catalogue feature contents, point identities, coordinate accuracy, version equivalence to the FGDC XML, quantitative suitability, and E001 known-site recovery remain NOT ESTABLISHED.
+
+## Next gate
+
+Do not download feature rows yet. First resolve the 4-versus-192 discrepancy using source/version provenance: compare the ArcGIS service item ID, last-edit metadata, ScienceBase file record and DOI release history. The FGDC file checksum mismatch prevents treating the XML as a trusted version manifest. If the publisher's version lineage cannot be reconciled, retain the ArcGIS service only as an unverified discovery endpoint and stop short of using it as an analytical label source.
