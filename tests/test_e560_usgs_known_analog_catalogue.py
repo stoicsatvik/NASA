@@ -2,7 +2,7 @@ import io, json, unittest, zipfile
 from experiments.e560_usgs_known_analog_catalogue import (
     ITEM_ID, EXPECTED_TITLE, METADATA_URL, NoRedirectHandler, checksum_status,
     metadata_files, normalise, overlap, parse_fgdc_metadata, parse_geojson,
-    parse_vector, safe_file_url, safe_metadata_url, validate_item_identity,
+    parse_vector, safe_file_url, safe_metadata_url, validate_item_identity, summarize_web_links,
     xml_urls, vector_url_candidates,
 )
 
@@ -96,6 +96,13 @@ class E560Tests(unittest.TestCase):
     def test_geojson_requires_feature_collection(self):
         with self.assertRaises(ValueError):
             parse_geojson(b'{"type":"Feature","features":[]}')
+
+    def test_item_web_links_redact_query_values(self):
+        links = summarize_web_links([{"title": "service", "type": "WFS", "uri": "https://www.sciencebase.gov/geoserver/ows?service=WFS&token=SECRET"}])
+        self.assertEqual(links[0]["host"], "www.sciencebase.gov")
+        self.assertEqual(links[0]["path"], "/geoserver/ows")
+        self.assertEqual(links[0]["query_parameter_names"], ["service", "token"])
+        self.assertNotIn("SECRET", str(links))
 
     def test_metadata_xml_exposes_only_allowlisted_vector_links(self):
         xml=b'<metadata><onlink>https://www.sciencebase.gov/catalog/file/get/123/sites.zip</onlink><onlink>https://doi.org/10.5066/P9J72921</onlink></metadata>'
