@@ -5,6 +5,7 @@ from e542_jezero_stack_compatibility import (
     build_result,
     contains_bbox,
     intersection_bbox,
+    mola_local_pixel_spacing_m,
     spherical_bbox_area_km2,
     validate_bbox,
 )
@@ -52,6 +53,58 @@ class TestE542JezeroStack(unittest.TestCase):
         self.assertAlmostEqual(mola / ctx, 23.15)
         self.assertEqual(ctx / hirise, 20.0)
         self.assertEqual(mola / hirise, 463.0)
+
+    def test_mola_local_spacing_is_anisotropic_at_overlap_centroid(self):
+        overlap = intersection_bbox(
+            DATASETS["ctx_trn_2020"]["bbox"],
+            DATASETS["hirise_msr_2025"]["bbox"],
+        )
+        latitude = (overlap[1] + overlap[3]) / 2
+        spacing = mola_local_pixel_spacing_m(
+            latitude, DATASETS["mola_128ppd"]["resolution_m"]
+        )
+        self.assertAlmostEqual(latitude, 18.3995, places=6)
+        self.assertAlmostEqual(spacing["east_west_m"], 439.3308687348, places=8)
+        self.assertAlmostEqual(spacing["north_south_m"], 463.0, places=12)
+
+        scale = build_result()["scale"]
+        self.assertAlmostEqual(
+            scale["mola_local_to_ctx_resolution_ratio_at_overlap_centroid"]["east_west"],
+            21.9665434367,
+            places=8,
+        )
+        self.assertAlmostEqual(
+            scale["mola_local_to_ctx_resolution_ratio_at_overlap_centroid"]["north_south"],
+            23.15,
+            places=12,
+        )
+        self.assertAlmostEqual(
+            scale["mola_local_to_hirise_resolution_ratio_at_overlap_centroid"]["east_west"],
+            439.3308687348,
+            places=8,
+        )
+        self.assertAlmostEqual(
+            scale["mola_local_to_hirise_resolution_ratio_at_overlap_centroid"]["north_south"],
+            463.0,
+            places=12,
+        )
+
+    def test_mola_local_spacing_is_equatorial_and_latitude_symmetric(self):
+        equator = mola_local_pixel_spacing_m(0.0)
+        north = mola_local_pixel_spacing_m(18.3995)
+        south = mola_local_pixel_spacing_m(-18.3995)
+        self.assertAlmostEqual(equator["east_west_m"], 463.0, places=12)
+        self.assertAlmostEqual(equator["north_south_m"], 463.0, places=12)
+        self.assertAlmostEqual(north["east_west_m"], south["east_west_m"], places=12)
+        self.assertAlmostEqual(north["north_south_m"], south["north_south_m"], places=12)
+
+    def test_mola_local_spacing_rejects_invalid_latitudes_and_spacing(self):
+        for latitude in (True, 90.01, float("nan")):
+            with self.assertRaises(ValueError):
+                mola_local_pixel_spacing_m(latitude)
+        for spacing in (True, 0.0, -1.0, float("inf")):
+            with self.assertRaises(ValueError):
+                mola_local_pixel_spacing_m(18.3995, spacing)
 
     def test_science_investigation_extension_is_not_default_reference(self):
         notes = " ".join(DATASETS["ctx_science_investigation_2021"]["notes"]).lower()
