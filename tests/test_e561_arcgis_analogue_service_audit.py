@@ -3,6 +3,7 @@ import unittest
 from experiments.e561_arcgis_analogue_service_audit import (
     E561Error,
     LAYER_NAME,
+    LAYER_URL,
     SERVICE_ITEM_ID,
     count_query_url,
     endpoint_is_allowed,
@@ -31,6 +32,11 @@ class E561Tests(unittest.TestCase):
             "https://user:pass@services.arcgis.com/v01gqwM5QqNysAAi/ArcGIS/rest/services/"
             "Terrestrial_Analog_Sites_for_Planetary_Science/FeatureServer?f=json"
         ))
+        self.assertFalse(endpoint_is_allowed(LAYER_URL + "?f=json&token=not-used"))
+        self.assertFalse(endpoint_is_allowed(LAYER_URL + "?f=json&outFields=*"))
+        self.assertFalse(endpoint_is_allowed(count_query_url() + "&token=not-used"))
+        self.assertFalse(endpoint_is_allowed(LAYER_URL + "?f=json&f=json"))
+        self.assertFalse(endpoint_is_allowed(LAYER_URL + "?f=json#fragment"))
 
     def test_count_query_is_strictly_count_only(self):
         from urllib.parse import parse_qs, urlsplit
