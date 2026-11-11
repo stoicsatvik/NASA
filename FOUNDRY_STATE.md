@@ -594,3 +594,18 @@ Next: stop repeated local pixel probes. Seek independent USGS footprint/quality-
 - Two 17×17 windows were measured. Lonar literature lead: 289 valid samples, all exactly 479.500 m (SD/relief/slope 0). Nearby comparison point: median 570.597 m, mean 569.788 m, SD 4.520 m, relief 14.064 m, central slope 4.760°. Both windows cover ~465×492 m. The flat Lonar patch is not interpreted without WBM/FLM lineage; it may be water or a point away from the crater rim. Coordinates are approximate; this is not a site-wide sample.
 - **SUPPORTED:** anonymous GLO-30 tile access and descriptive DSM windows. **NOT ESTABLISHED:** bare-earth comparability, site labels, cross-body similarity, known-site recovery, novel discovery or local validation advantage.
 - Next: obtain WBM/FLM/source-lineage masks if public, sample a coordinate-uncertainty-aware rim/annulus, and audit independent positive-candidate catalogues. Keep DSM distinct from MOLA/CTX/HiRISE; no E001 claim.
+
+
+## E558 external candidate-catalogue audit (2026-11-11)
+
+- Source 1: Rachelle Le Cussan, `rachellelecussan/planetary-analogue-catalogue`, commit `62e6339bdf308de3bc987388d0faa7130cf57de9`, `data/sites.geojson` blob `156edd871599cf9ac9c083658d14d034f660e35d`, generated 2026-10-12, data CC BY 4.0. Metadata-only source audit; no source files were modified.
+- 16 candidate sites, 96 references, 33 peer-reviewed references, 1 marked unverified. All 16 records are Draft; none is second-person Verified. Target distribution: Mars 10, Early Earth 2, Moon 2, Enceladus 1, Europa 1. Coordinate precision: 10 approximately 10 km, 2 approximately 1 km, 4 region-only. Seven sites omit analogue limitations. No India/Maharashtra site and no non-analogue controls.
+- This is a candidate-positive catalogue, not ground truth. Its coordinate precision makes sub-kilometre raster sampling around most points unjustified. Record-level analogue claims require original-reference review.
+- Source 2 located, not yet acquired: USGS *Known Terrestrial Analog Sites for Planetary Science*, DOI `10.5066/P9J72921`, 2020 point layer, public CC0 1.0. Feature count, schema, archive checksum and overlap with PAAD / the 16-site catalogue remain UNKNOWN until the actual vector data is downloaded and parsed. It is another candidate-positive source, not a negative/control set.
+- Durable audit: `research/E558_PUBLIC_ANALOGUE_CATALOGUE_AUDIT_20261111.md`. No controls, labels, raw measurements or validation results were fabricated.
+
+## NASA event-window decision state
+
+- The 14-challenge screen remains a heuristic readiness ranking, not a judging-probability estimate and not a locked challenge decision.
+- NASA's official site confirms the 2026 event is **14–15 November 2026**. Recheck all official challenge resource lists and submission/judging guidance as they become available before locking a challenge; an independent data-atlas currently points to **13 November** for the resource/guide release, which is a monitoring cue, not an authoritative NASA rule.
+- The planetary-analog challenge remains **NOT YET PROVEN** to be the best challenge. The current research track has useful data-access evidence but no E001 known-site recovery and no cross-body similarity result.
