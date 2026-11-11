@@ -1,0 +1,52 @@
+name: E560 USGS known-analogue catalogue acquisition
+on:
+  push:
+    branches:
+      - research/e560-usgs-known-analog-catalogue-20261111
+    paths:
+      - experiments/e560_usgs_known_analog_catalogue.py
+      - tests/test_e560_usgs_known_analog_catalogue.py
+      - .github/workflows/e560-usgs-known-analog-catalogue.yml
+      - research/E558_PUBLIC_ANALOGUE_CATALOGUE_AUDIT_20261111.md
+      - research/E533_CANDIDATE_LABEL_SOURCE_REVIEW_20261111.csv
+      - research/E534_REMAINING_CANDIDATE_SOURCE_REVIEW_20261111.csv
+      - data/nasa_analog_explorer_pairs.csv
+  pull_request:
+    branches:
+      - research/e559-copernicus-aux-mask-audit-20261111
+    paths:
+      - experiments/e560_usgs_known_analog_catalogue.py
+      - tests/test_e560_usgs_known_analog_catalogue.py
+      - .github/workflows/e560-usgs-known-analog-catalogue.yml
+      - research/E558_PUBLIC_ANALOGUE_CATALOGUE_AUDIT_20261111.md
+      - research/E533_CANDIDATE_LABEL_SOURCE_REVIEW_20261111.csv
+      - research/E534_REMAINING_CANDIDATE_SOURCE_REVIEW_20261111.csv
+      - data/nasa_analog_explorer_pairs.csv
+permissions:
+  contents: read
+concurrency:
+  group: e560-usgs-known-analog-catalogue-\${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  acquire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install bounded shapefile parser
+        run: python -m pip install pyshp
+      - name: Run deterministic E560 tests
+        run: python -m unittest tests.test_e560_usgs_known_analog_catalogue -v
+      - name: Query official ScienceBase metadata and acquire one bounded vector file
+        run: python -m experiments.e560_usgs_known_analog_catalogue
+      - name: Preserve source bytes and receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e560-usgs-known-analog-catalogue
+          path: .artifacts/e560/
+          if-no-files-found: ignore
+          retention-days: 7
