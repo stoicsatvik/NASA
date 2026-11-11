@@ -13,9 +13,17 @@ Does the public ScienceBase item or its official USGS XML metadata explicitly ex
 - Classify manager-preview routes, official catalog file routes, signed/tokenized URLs and other HTTPS candidates separately.
 - Do not follow any file URL, download any binary, or infer anonymous access from a metadata field.
 
-## Validation
+## Validation history and correction
 
-Six deterministic tests cover manager-preview rejection, catalog-file candidate classification, signed URL rejection, query-value redaction, recursive URL-field discovery and HTTP rejection. Exact-head live metadata audit is pending.
+The first two exact-head live attempts, [#42967652009](https://github.com/stoicsatvik/NASA/actions/runs/42967652009) and [#42967666860](https://github.com/stoicsatvik/NASA/actions/runs/42967666860), each passed the six original deterministic helper tests but failed when invoking the CLI with:
+
+```
+NameError: name 'argparse' is not defined
+```
+
+The tests imported helper functions but never exercised `main()`, so the missing CLI import escaped the first test layer. The current branch adds the missing `argparse` import and a network-free CLI regression that patches `audit()`, invokes `main()`, and verifies the JSON receipt is written.
+
+The earlier failures remain preserved. A new exact-head live metadata audit is pending; no URL-discovery result is claimed until it completes.
 
 ## Claim boundary
 
@@ -23,4 +31,4 @@ A URL found in metadata is only a candidate until anonymous access is independen
 
 ## Stop rule
 
-If the public metadata contains no explicit direct anonymous candidate, preserve that result and stop trying alternate ScienceBase endpoint patterns for this item. Continue the NASA stream with independent Earth/Mars sources and the all-14 challenge comparison instead.
+If the public metadata contains no explicit direct anonymous candidate, preserve that result and stop trying alternate ScienceBase endpoint patterns for this item. Continue the NASA stream with independent Earth/Mars sources and the all-14 challenge comparison.
