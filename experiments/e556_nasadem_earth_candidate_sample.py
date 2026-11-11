@@ -31,10 +31,10 @@ SITES = (
         "role": "literature_lead_not_validated_positive",
     },
     {
-        "site_id": "nearby_deccan_comparison",
+        "site_id": "nearby_local_comparison_point",
         "latitude": 19.8000,
         "longitude": 76.3000,
-        "role": "local_comparison_not_negative_label",
+        "role": "nearby_comparison_not_negative_label",
     },
 )
 
@@ -91,7 +91,10 @@ def parse_cmr_tile(payload: dict, expected_tile: str) -> dict:
             continue
         umm = item.get("umm") or {}
         granule_ur = str(umm.get("GranuleUR", ""))
-        producer_id = str(umm.get("DataGranule", {}).get("Identifiers", [{}])[0].get("Identifier", ""))
+        identifiers = (umm.get("DataGranule") or {}).get("Identifiers") or []
+        if isinstance(identifiers, dict):
+            identifiers = [identifiers]
+        producer_id = str(identifiers[0].get("Identifier", "")) if identifiers and isinstance(identifiers[0], dict) else ""
         candidates = _related_data_urls(umm)
         identity = f"{granule_ur} {producer_id} " + " ".join(candidates)
         if expected_tile.lower() in identity.lower():
@@ -324,13 +327,16 @@ def run() -> dict:
                 continue
             candidates = item["granule"]["data_urls"]
             safe = []
+            failures = []
             for candidate in candidates:
                 try:
                     safe.append(validate_data_url(candidate, tile))
-                except E556Error:
-                    continue
+                except E556Error as error:
+                    failures.append(error.outcome)
             if safe:
                 urls[tile] = safe[0]
+            elif "EARTHDATA_AUTH_REQUIRED" in failures:
+                raise E556Error("EARTHDATA_AUTH_REQUIRED", "CMR exposes only a protected NASADEM HGT path; no credentials will be used")
         if not urls:
             raise E556Error(
                 "NO_ALLOWLISTED_PUBLIC_DATA_URL",
