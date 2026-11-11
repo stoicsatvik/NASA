@@ -1,8 +1,7 @@
 """E537: bounded download of the official ScienceBase item ZIP and DEM inspection.
 
 The URL pattern follows DOI-USGS/sciencebasepy's public get_item_files_zip
-implementation: GET /catalog/file/get/{item_id}. Raw files remain workflow
-artifacts; none are committed to the repository.
+implementation. Raw files remain workflow artifacts; none are committed.
 """
 from __future__ import annotations
 
@@ -85,8 +84,12 @@ def parse_fgdc(xml_bytes: bytes) -> dict:
 
 
 def inspect_dem(dem_bytes: bytes, fgdc_bytes: bytes) -> dict:
-    if not (dem_bytes.startswith(b"II*\x00") or dem_bytes.startswith(b"MM\x00*")
-            or dem_bytes.startswith(b"II+\x00") or dem_bytes.startswith(b"MM\x00+")):
+    if not (
+        dem_bytes.startswith(b"II*\x00")
+        or dem_bytes.startswith(b"MM\x00*")
+        or dem_bytes.startswith(b"II+\x00")
+        or dem_bytes.startswith(b"MM\x00+")
+    ):
         raise ValueError("selected DEM is not a TIFF/BigTIFF payload")
     with MemoryFile(dem_bytes) as mem:
         with mem.open() as ds:
@@ -173,18 +176,18 @@ def download_and_inspect(output_dir: Path) -> dict:
             with open(tmp_name, "rb") as handle:
                 if handle.read(4) != b"PK\x03\x04":
                     raise ValueError("ScienceBase item ZIP endpoint returned non-ZIP content")
+            item_zip_path = output_dir / "item.zip"
+            item_zip_path.write_bytes(Path(tmp_name).read_bytes())
             with zipfile.ZipFile(tmp_name) as archive:
+                receipt["download"]["archive_members"] = [
+                    {"name": info.filename, "bytes": info.file_size}
+                    for info in archive.infolist()
+                ]
                 dem_info, fgdc_info = _select_members(archive)
                 dem_bytes = archive.read(dem_info)
                 fgdc_bytes = archive.read(fgdc_info)
-            if dem_info.file_size != len(dem_bytes):
-                raise ValueError("DEM member size mismatch")
-            dem_path = output_dir / "sample.tif"
-            dem_path.write_bytes(dem_bytes)
             (output_dir / "source_metadata.xml").write_bytes(fgdc_bytes)
-            profile = inspect_dem(dem_bytes, fgdc_bytes)
             receipt["download"].update({
-                "success": True,
                 "bytes": total,
                 "zip_sha256": hashlib.sha256(Path(tmp_name).read_bytes()).hexdigest(),
                 "selected_dem_member_bytes": len(dem_bytes),
@@ -193,6 +196,15 @@ def download_and_inspect(output_dir: Path) -> dict:
                 "selected_fgdc_member_sha256": hashlib.sha256(fgdc_bytes).hexdigest(),
                 "catalogue_size_matches": len(dem_bytes) == CATALOGUE_DEM_BYTES,
             })
+            receipt["source"]["fgdc_fields"] = parse_fgdc(fgdc_bytes)
+            if len(dem_bytes) != CATALOGUE_DEM_BYTES:
+                raise ValueError(
+                    f"DEM ZIP member size {len(dem_bytes)} != catalogue size {CATALOGUE_DEM_BYTES}"
+                )
+            dem_path = output_dir / "sample.tif"
+            dem_path.write_bytes(dem_bytes)
+            profile = inspect_dem(dem_bytes, fgdc_bytes)
+            receipt["download"]["success"] = True
             receipt["raster_inspection"] = profile
             receipt["claim_state"] = {
                 "raw_earth_raster_ingestion": "SUPPORTED" if profile["crs"] else "PARTIAL",
@@ -210,7 +222,7 @@ def download_and_inspect(output_dir: Path) -> dict:
         if response is not None:
             response.close()
     (output_dir / "receipt.json").write_text(
-        json.dumps(receipt, indent=2, sort_keys=True) + "\\n",
+        json.dumps(receipt, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
     return receipt
