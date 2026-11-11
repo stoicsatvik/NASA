@@ -97,11 +97,11 @@ def _is_direct_file_url(url: str) -> bool:
 
 
 def _has_tiff_magic(prefix: bytes) -> bool:
-    return prefix[:4] in (b"II*\\x00", b"MM\\x00*", b"II+\\x00", b"MM\\x00+")
+    return prefix[:4] in (b"II*\x00", b"MM\x00*", b"II+\x00", b"MM\x00+")
 
 
 def _has_zip_magic(prefix: bytes) -> bool:
-    return prefix.startswith((b"PK\\x03\\x04", b"PK\\x05\\x06", b"PK\\x07\\x08"))
+    return prefix.startswith((b"PK\x03\x04", b"PK\x05\x06", b"PK\x07\x08"))
 
 
 def _payload_matches(filename: str, prefix: bytes) -> bool:
