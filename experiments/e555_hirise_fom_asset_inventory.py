@@ -29,15 +29,15 @@ MAX_XML_BYTES = 512_000
 USER_AGENT = "Unified-Parallel-Foundry-E555/1.0"
 
 FOM_PATTERNS = (
-    re.compile(r"\\bFOM\\b", re.IGNORECASE),
-    re.compile(r"FIGURE[\\s_-]+OF[\\s_-]+MERIT", re.IGNORECASE),
+    re.compile(r"(?<![A-Z0-9])FOM(?![A-Z0-9])", re.IGNORECASE),
+    re.compile(r"FIGURE[\s_-]+OF[\s_-]+MERIT", re.IGNORECASE),
 )
 METADATA_PATTERNS = {
-    "confidence": re.compile(r"\\bCONFIDENCE\\b", re.IGNORECASE),
-    "provenance": re.compile(r"\\bPROVENANCE\\b", re.IGNORECASE),
-    "quality": re.compile(r"\\bQUALITY\\b", re.IGNORECASE),
-    "mask": re.compile(r"\\bMASK\\b", re.IGNORECASE),
-    "nodata": re.compile(r"\\b(?:NO_DATA|NODATA|MISSING_CONSTANT)\\b", re.IGNORECASE),
+    "confidence": re.compile(r"\bCONFIDENCE\b", re.IGNORECASE),
+    "provenance": re.compile(r"\bPROVENANCE\b", re.IGNORECASE),
+    "quality": re.compile(r"\bQUALITY\b", re.IGNORECASE),
+    "mask": re.compile(r"\bMASK\b", re.IGNORECASE),
+    "nodata": re.compile(r"\b(?:NO_DATA|NODATA|MISSING_CONSTANT)\b", re.IGNORECASE),
 }
 
 
