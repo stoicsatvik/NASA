@@ -5,18 +5,24 @@ on:
     branches:
       - research/e540-grand-falls-direct-dem-download-20261111
     paths:
+      - experiments/e539_public_cloud_url_metadata_audit.py
+      - experiments/test_e539_public_cloud_url_metadata_audit.py
       - experiments/e540_grand_falls_direct_dem_download.py
       - experiments/test_e540_grand_falls_direct_dem_download.py
       - .github/workflows/e540-grand-falls-direct-dem-download.yml
+      - research/E539_PUBLIC_CLOUD_URL_METADATA_AUDIT_20261111.md
       - research/E540_GRAND_FALLS_DIRECT_DEM_DOWNLOAD_20261111.md
   pull_request:
     branches:
       - research/e539-public-cloud-url-metadata-audit-20261111
       - main
     paths:
+      - experiments/e539_public_cloud_url_metadata_audit.py
+      - experiments/test_e539_public_cloud_url_metadata_audit.py
       - experiments/e540_grand_falls_direct_dem_download.py
       - experiments/test_e540_grand_falls_direct_dem_download.py
       - .github/workflows/e540-grand-falls-direct-dem-download.yml
+      - research/E539_PUBLIC_CLOUD_URL_METADATA_AUDIT_20261111.md
       - research/E540_GRAND_FALLS_DIRECT_DEM_DOWNLOAD_20261111.md
 
 permissions:
@@ -31,6 +37,17 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      - name: Run E539 deterministic metadata tests
+        run: python -m unittest experiments.test_e539_public_cloud_url_metadata_audit -v
+      - name: Inspect public item and USGS XML metadata only
+        run: python -m experiments.e539_public_cloud_url_metadata_audit --out .artifacts/e539/public-url-audit.json
+      - name: Preserve sanitized metadata audit
+        uses: actions/upload-artifact@v4
+        with:
+          name: e539-public-url-metadata-audit
+          path: .artifacts/e539/public-url-audit.json
+          if-no-files-found: error
+          retention-days: 30
       - name: Install TIFF inspection dependencies
         run: python -m pip install --disable-pip-version-check numpy tifffile
       - name: Run E540 deterministic safety tests
