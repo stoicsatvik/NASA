@@ -1,0 +1,45 @@
+name: E556 NASADEM Earth candidate/control sample
+
+on:
+  push:
+    branches:
+      - research/e556-nasadem-earth-candidate-sample-20261111
+    paths:
+      - experiments/e556_nasadem_earth_candidate_sample.py
+      - tests/test_e556_nasadem_earth_candidate_sample.py
+      - research/E556_NASADEM_EARTH_CANDIDATE_SAMPLE_20261111.md
+      - .github/workflows/e556-nasadem-earth-candidate-sample.yml
+  pull_request:
+    branches:
+      - research/e554-hirise-nodata-neighborhood-20261111
+    paths:
+      - experiments/e556_nasadem_earth_candidate_sample.py
+      - tests/test_e556_nasadem_earth_candidate_sample.py
+      - research/E556_NASADEM_EARTH_CANDIDATE_SAMPLE_20261111.md
+
+permissions:
+  contents: read
+
+jobs:
+  bounded-nasadem-sample:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install bounded metadata/data reader and tests
+        run: python -m pip install "requests>=2.31,<3" "pytest>=8,<9"
+      - name: Run deterministic tests
+        run: python -m pytest -q tests/test_e556_nasadem_earth_candidate_sample.py
+      - name: Query NASA CMR and acquire two bounded HGT patches
+        run: python -m experiments.e556_nasadem_earth_candidate_sample --out .artifacts/e556/receipt.json
+      - name: Preserve compact sample receipt only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e556-nasadem-earth-candidate-sample
+          path: .artifacts/e556/receipt.json
+          if-no-files-found: ignore
+          retention-days: 14
