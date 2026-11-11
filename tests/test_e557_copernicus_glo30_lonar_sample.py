@@ -55,7 +55,7 @@ def test_summary_reports_descriptive_metrics_and_masked_count():
     assert result["masked_or_nonfinite_samples"] == 1
     assert result["elevation_min_m"] == pytest.approx(101.0)
     assert result["elevation_max_m"] == pytest.approx(148.0)
-    assert result["local_relief_m"] == pytest.approx(46.0)
+    assert result["local_relief_m"] == pytest.approx(47.0)
     assert result["central_slope_deg"] is not None
     assert result["raw_window_retained"] is False
 
