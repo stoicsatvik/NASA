@@ -249,6 +249,26 @@ def write_receipt(receipt):
     (OUT/"receipt.json").write_text(json.dumps(receipt,indent=2,sort_keys=True)+"\n",encoding="utf-8")
     return receipt
 
+def summarize_web_links(values):
+    out=[]
+    if not isinstance(values,list):
+        return out
+    for item in values:
+        if not isinstance(item,dict):
+            continue
+        raw=item.get("uri") or item.get("url") or item.get("link")
+        parsed=urllib.parse.urlsplit(raw) if isinstance(raw,str) else None
+        out.append({
+            "title":item.get("title"),
+            "type":item.get("type"),
+            "host":parsed.hostname if parsed else None,
+            "path":parsed.path if parsed else None,
+            "query_parameter_names":sorted({key for key,_ in urllib.parse.parse_qsl(parsed.query,keep_blank_values=True)}) if parsed else [],
+            "url_sha256":hashlib.sha256(raw.encode()).hexdigest() if isinstance(raw,str) else None,
+        })
+    return out
+
+
 def run_live():
     r={"experiment":"E560","source":{"item_id":ITEM_ID,"doi":DOI,"metadata_url":METADATA_URL},"outcome":"NOT_STARTED","claim_boundary":"Candidate-positive catalogue only; not ground truth or negative controls."}
     try:
@@ -257,7 +277,17 @@ def run_live():
         returned=validate_item_identity(doc)
         files=metadata_files(doc)
         candidates=[x for x in files if Path(x.get("name") or "").suffix.lower() in {".zip",".geojson",".json",".gpkg",".shp",".kml"}]
-        r["metadata"]={"status":meta["status"],"host":meta["host"],"bytes":len(meta["bytes"]),"sha256":hashlib.sha256(meta["bytes"]).hexdigest(),"title":doc.get("title"),"returned_item_id":returned,"file_count":len(files),"files":[{"name":x["name"],"size_bytes":x["size_bytes"],"checksum":x["checksum"],"url_host":urllib.parse.urlsplit(x["url"]).hostname if x["url"] else None,"url_path":urllib.parse.urlsplit(x["url"]).path if x["url"] else None,"url_sha256":hashlib.sha256(x["url"].encode()).hexdigest() if x["url"] else None} for x in files]}
+        r["metadata"]={
+            "status":meta["status"],"host":meta["host"],"bytes":len(meta["bytes"]),
+            "sha256":hashlib.sha256(meta["bytes"]).hexdigest(),"title":doc.get("title"),
+            "returned_item_id":returned,"top_level_keys":sorted(doc.keys()),
+            "system_type":doc.get("systemType"),"access_level":doc.get("accessLevel"),
+            "has_children":doc.get("hasChildren"),"parent_id":doc.get("parentId"),
+            "web_link_count":len(doc.get("webLinks",[])) if isinstance(doc.get("webLinks"),list) else None,
+            "web_links":summarize_web_links(doc.get("webLinks")),
+            "file_count":len(files),
+            "files":[{"name":x["name"],"size_bytes":x["size_bytes"],"checksum":x["checksum"],"url_host":urllib.parse.urlsplit(x["url"]).hostname if x["url"] else None,"url_path":urllib.parse.urlsplit(x["url"]).path if x["url"] else None,"url_sha256":hashlib.sha256(x["url"].encode()).hexdigest() if x["url"] else None} for x in files]
+        }
         if not candidates:
             xmls=[x for x in files if (x.get("name") or "").lower().endswith(".xml") and x.get("url")]
             if len(xmls)==1:
