@@ -31,7 +31,19 @@ Interpretation:
 
 ## Exact-head result
 
-Pending GitHub Actions exact-head execution.
+Current code head `d347746f80ee7e01649b58383eedeb6fe7c04704`.
+
+- Exact-head workflow [#43044286332](https://github.com/stoicsatvik/NASA/actions/runs/43044286332) succeeded.
+- Deterministic tests: **6/6 passed**.
+- All three frozen 128×128 neighborhoods were measured.
+- Each neighborhood contained **16,384 finite nodata pixels, zero non-finite pixels, and zero usable pixels**; the central 64×64 diagnostic window also had zero usable pixels.
+- All three sampled byte windows had the same SHA-256 `985c185499065102b54acaa4215e54bfa15bb35b3bd172b268638b9b8aec069c`, consistent with the constant declared nodata value rather than a measured surface.
+- Total transfer: **368,991 bytes across 394 exact range requests**, below the 1 MB cap.
+- The PDS3 label SHA-256 is `99b972f7ea13f9e05e9d3f265435a0566b53dbde4088781673edeb0b6d24cade`.
+
+**Result:** all three positions remain unsupported across at least the sampled 128 m × 128 m neighborhoods. This is stronger evidence for local product-support gaps than the original 113×113 windows, but it still does not identify the physical cause. It does not establish that the locations were outside stereo coverage, nor that they were intentionally masked.
+
+Receipt artifact: [#13865239568](https://github.com/stoicsatvik/NASA/actions/runs/43044286332/artifacts/13865239568) (1,904-byte ZIP; raw pixels not retained).
 
 ## Claim boundary
 
@@ -41,4 +53,4 @@ Cross-body similarity remains NOT YET PROVEN; known-site recovery remains NOT YE
 
 ## Next action
 
-If valid support reaches the frozen centers, inspect the exact boundary and determine whether a separately preregistered common-support sample is defensible. If all three neighborhoods remain all-nodata, stop repeating local pixel probes and seek independent USGS footprint/quality-mask provenance or preserve partial coverage.
+Stop repeating local pixel probes around these three coordinates. Seek independent product-footprint or pixel-provenance evidence. The USGS Astrogeology HiRISE DTM documentation identifies a Figure-of-Merit (FOM) image as the definitive per-pixel provenance layer for standard PDS HiRISE DTMs, but the pinned 2020 TRN product's public directory must be checked separately; do not assume the generic FOM asset exists for this flight mosaic. If no product-specific provenance asset is exposed, ask the designated PDS/USGS support contact or preserve the three positions as unsupported.
