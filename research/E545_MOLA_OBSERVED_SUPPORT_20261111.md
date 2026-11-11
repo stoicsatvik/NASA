@@ -44,13 +44,14 @@ Exact-head GitHub Actions run 43013238079 succeeded (11 November 2026):
 - Cross-body similarity remains NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN; route safety NOT CLAIMED.
 
 
-## Claim states
+## Claim states (reconciled to exact-head result)
 
-- PDS MOLA source/label interpretation: SUPPORTED by the pinned public labels.
-- Bounded MOLA topography/count ingestion: NOT YET MEASURED.
-- Jezero-window observed-shot support: NOT YET MEASURED.
-- Cross-body similarity: NOT YET PROVEN.
-- Known-site recovery: NOT YET MEASURED.
-- Novel analogue discovery: NOT YET PROVEN.
-- Local validation advantage: NOT YET PROVEN.
-- Route safety: NOT CLAIMED.
+- PDS MOLA source/label interpretation: **SUPPORTED** by the pinned public labels.
+- Bounded MOLA topography/count ingestion: **SUPPORTED** for the pinned 33 × 33 window; both exact HTTP 206 ranges passed byte-count and Content-Range validation.
+- Jezero-window observed-shot support: **SUPPORTED for this bounded window only**; 346/1,089 bins (31.7723%) have count > 0. This is not a global coverage estimate.
+- Common-valid-pixel support with CTX/HiRISE: **NOT YET ESTABLISHED**; the complete MOLA window extends beyond the metadata-envelope intersection and no raster registration/reference transformation is performed.
+- Cross-body similarity: **NOT YET PROVEN**.
+- Known-site recovery: **NOT YET MEASURED**.
+- Novel analogue discovery: **NOT YET PROVEN**.
+- Local validation advantage: **NOT YET PROVEN**.
+- Route safety: **NOT CLAIMED**.
