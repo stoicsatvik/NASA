@@ -118,7 +118,7 @@ def parse_fgdc_metadata(payload):
                 analog_types=sorted({x.text.strip() for x in attr.findall(".//edomv") if x.text and x.text.strip()})
     count=value(".//spdoinfo/ptvctinf/sdtsterm/ptvctcnt")
     accuracy=value(".//dataqual/posacc/horizpa/horizpar")
-    match=re.search(r"up to\\s+(\\d+(?:\\.\\d+)?)\\s*km",accuracy or "",re.IGNORECASE)
+    match=re.search(r"up to\s+(\d+(?:\.\d+)?)\s*km",accuracy or "",re.IGNORECASE)
     absres=value(".//spref/horizsys/planar/planci/coordrep/absres")
     ordres=value(".//spref/horizsys/planar/planci/coordrep/ordres")
     return {
