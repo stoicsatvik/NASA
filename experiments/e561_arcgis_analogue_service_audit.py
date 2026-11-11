@@ -213,15 +213,18 @@ def validate_portal_item(document: dict) -> dict:
     item_query_names = sorted({key for key, _ in item_url_pairs})
     normalized_path = service_url.path.rstrip("/")
     expected_path = expected_service.path.rstrip("/")
+    path_case_sensitive_matches = normalized_path in {expected_path, expected_path + "/0"}
     url_identity_matches = (
         service_url.scheme == "https"
         and service_url.hostname == expected_service.hostname
         and service_port in (None, 443)
-        and normalized_path in {expected_path, expected_path + "/0"}
+        and normalized_path.casefold() in {expected_path.casefold(), (expected_path + "/0").casefold()}
         and not service_url.username
         and not service_url.password
         and not service_url.fragment
     )
+    description = str(document.get("description") or "")
+    description_folded = description.casefold()
     created = document.get("created")
     modified = document.get("modified")
     if any(isinstance(value, bool) or not isinstance(value, int) or value <= 0 for value in (created, modified)):
@@ -243,7 +246,14 @@ def validate_portal_item(document: dict) -> dict:
         "service_url_path": service_url.path,
         "expected_service_url_path": expected_path,
         "service_url_identity_matches": url_identity_matches,
+        "service_url_path_case_sensitive_matches": path_case_sensitive_matches,
+        "service_url_path_case_only_difference": url_identity_matches and not path_case_sensitive_matches,
         "service_url_query_parameter_names": item_query_names,
+        "description_length_chars": len(description),
+        "description_sha256": __import__("hashlib").sha256(description.encode("utf-8")).hexdigest(),
+        "description_mentions_expected_doi": "10.5066/p9j72921" in description_folded,
+        "description_mentions_sciencebase_item_id": "5f88940b82cebb8c13d912ee" in description_folded,
+        "description_mentions_fgdc": "fgdc" in description_folded,
         "service_url_has_token_parameter": "token" in item_query_names,
         "raw_item_url_retained": False,
         "raw_item_metadata_retained": False,
