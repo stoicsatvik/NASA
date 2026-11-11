@@ -1,6 +1,6 @@
 """E560: bounded public acquisition of the USGS known-analogue point layer."""
 from __future__ import annotations
-import csv, hashlib, io, json, re, urllib.error, urllib.parse, urllib.request, zipfile
+import csv, hashlib, io, json, re, urllib.error, urllib.parse, urllib.request, zipfile, xml.etree.ElementTree as ET
 from pathlib import Path
 
 ITEM_ID="5f88940b82cebb8c13d912ee"
@@ -54,6 +54,35 @@ def metadata_files(doc):
         except (TypeError,ValueError): size=None
         out.append({"name":str(name) if name else None,"url":str(url) if url else None,"size_bytes":size,"checksum":f.get("checksum") or f.get("md5") or f.get("sha256")})
     return out
+
+
+
+def xml_urls(payload):
+    root=ET.fromstring(payload)
+    found=set()
+    for node in root.iter():
+        local=str(node.tag).split("}")[-1].lower()
+        if local not in {"onlink","linkage","networkr","networka","url"} or not node.text:
+            continue
+        for value in re.findall(r"https?://[^\\s<>\"']+",node.text.strip()):
+            found.add(value.rstrip(".,);]"))
+    return sorted(found)
+
+def vector_url_candidates(urls):
+    allowed={".zip",".geojson",".json",".gpkg",".shp",".kml"}
+    result=[]
+    for url in urls:
+        if not safe_file_url(url):
+            continue
+        parsed=urllib.parse.urlsplit(url)
+        filename=Path(parsed.path).name
+        for values in urllib.parse.parse_qs(parsed.query).values():
+            for value in values:
+                if Path(value).suffix.lower() in allowed:
+                    filename=Path(value).name
+        if Path(filename).suffix.lower() in allowed:
+            result.append({"name":filename,"url":url,"size_bytes":None,"checksum":None})
+    return result
 
 def normalise(s):
     return re.sub(r"[^a-z0-9]+","",s.casefold())
@@ -148,8 +177,20 @@ def run_live():
         if returned and str(returned).lower()!=ITEM_ID: raise ValueError("ScienceBase returned a different item ID")
         files=metadata_files(doc)
         candidates=[x for x in files if Path(x.get("name") or "").suffix.lower() in {".zip",".geojson",".json",".gpkg",".shp",".kml"}]
-        r["metadata"]={"status":meta["status"],"host":meta["host"],"bytes":len(meta["bytes"]),"sha256":hashlib.sha256(meta["bytes"]).hexdigest(),"title":doc.get("title"),"returned_item_id":returned,"file_count":len(files),"files":[{"name":x["name"],"size_bytes":x["size_bytes"],"checksum":x["checksum"],"url_host":urllib.parse.urlsplit(x["url"]).hostname if x["url"] else None} for x in files]}
-        if not candidates: r["outcome"]="METADATA_ONLY_NO_VECTOR_FILE"; return write_receipt(r)
+        r["metadata"]={"status":meta["status"],"host":meta["host"],"bytes":len(meta["bytes"]),"sha256":hashlib.sha256(meta["bytes"]).hexdigest(),"title":doc.get("title"),"returned_item_id":returned,"file_count":len(files),"files":[{"name":x["name"],"size_bytes":x["size_bytes"],"checksum":x["checksum"],"url_host":urllib.parse.urlsplit(x["url"]).hostname if x["url"] else None,"url_path":urllib.parse.urlsplit(x["url"]).path if x["url"] else None,"url_sha256":hashlib.sha256(x["url"].encode()).hexdigest() if x["url"] else None} for x in files]}
+        if not candidates:
+            xmls=[x for x in files if (x.get("name") or "").lower().endswith(".xml") and x.get("url")]
+            if len(xmls)==1:
+                xml_response=bounded_get(xmls[0]["url"],500_000,metadata=False)
+                xml_payload=xml_response["bytes"]
+                OUT.mkdir(parents=True,exist_ok=True)
+                (OUT/"metadata.xml").write_bytes(xml_payload)
+                links=xml_urls(xml_payload)
+                candidates=vector_url_candidates(links)
+                r["metadata_xml"]={"name":xmls[0]["name"],"status":xml_response["status"],"host":xml_response["host"],"bytes":len(xml_payload),"sha256":hashlib.sha256(xml_payload).hexdigest(),"links":[{"host":urllib.parse.urlsplit(x).hostname,"path":urllib.parse.urlsplit(x).path,"url_sha256":hashlib.sha256(x.encode()).hexdigest()} for x in links],"vector_link_count":len(candidates)}
+            if not candidates:
+                r["outcome"]="METADATA_XML_NO_VECTOR_LINK" if xmls else "METADATA_ONLY_NO_VECTOR_FILE"
+                return write_receipt(r)
         if len(candidates)!=1: r["outcome"]="AMBIGUOUS_VECTOR_FILES"; return write_receipt(r)
         f=candidates[0]
         if not f.get("url"): r["outcome"]="VECTOR_FILE_URL_NOT_EXPOSED"; return write_receipt(r)
