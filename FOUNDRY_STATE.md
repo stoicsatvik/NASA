@@ -649,3 +649,8 @@ Do not use the E560 metadata as a quantitative label source. Query the official 
 - E560 exact-head run [#43069286871](https://github.com/stoicsatvik/NASA/actions/runs/43069286871) also succeeded: 13/13 deterministic tests and bounded live metadata acquisition. Its outcome remains `METADATA_XML_CHECKSUM_MISMATCH` with secondary `METADATA_XML_NO_VECTOR_LINK`.
 
 Next: resolve the 4-versus-192 discrepancy and XML checksum/version provenance before requesting feature rows. Do not use this discovery catalogue as ground truth or a training-label source.
+
+
+### E561 exact-query guard hardening
+
+The E561 ArcGIS URL guard now rejects every query parameter except the exact frozen metadata/count-only maps. Token parameters, duplicate keys, fragments, feature-return parameters and arbitrary additions are rejected. Exact-head PR run [#43070943518](https://github.com/stoicsatvik/NASA/actions/runs/43070943518) and push run [#43070938391](https://github.com/stoicsatvik/NASA/actions/runs/43070938391) passed 7/7 tests and repeated the live count-only result: **4 records**, still discrepant with the provisional FGDC count of 192. No feature rows or coordinates were fetched.
