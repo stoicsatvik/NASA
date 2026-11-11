@@ -596,6 +596,19 @@ def run() -> dict:
         ),
     }
 
+def cli_summary(result: dict) -> dict:
+    """Return a compact CLI receipt using the canonical run() result schema."""
+    return {
+        "experiment": result["experiment"],
+        "outcome": result["outcome"],
+        "tile": result["source"]["tile_stem"],
+        "expected_mask_keys_found": {
+            key: value for key, value in result["handbook_exact_filename_match"].items()
+        },
+        "sampled_layers": sorted(result["mask_samples"]),
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--out", type=Path, required=True)
@@ -603,15 +616,7 @@ def main() -> int:
     result = run()
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(result, indent=2, sort_keys=True, allow_nan=False) + "\n", encoding="utf-8")
-    print(json.dumps({
-        "experiment": result["experiment"],
-        "outcome": result["outcome"],
-        "tile": result["source"]["tile_stem"],
-        "expected_mask_keys_found": {
-            key: value for key, value in result["exact_expected_key_presence"].items()
-        },
-        "sampled_layers": sorted(result["mask_samples"]),
-    }, sort_keys=True))
+    print(json.dumps(cli_summary(result), sort_keys=True))
     return 0
 
 
