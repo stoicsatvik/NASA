@@ -320,6 +320,40 @@ def summarize_support_spatial_clustering(
             **reference,
         }
 
+    # A second null conditions on the actual HiRISE in-bounds footprint.
+    # The all-observed reference above mixes deterministic outside-raster geometry
+    # with nodata. Here only observed MOLA nodes inside the raster are eligible.
+    inside_nodes = inside[observed]
+    inside_positions = np.flatnonzero(inside_nodes)
+    inside_index = np.full(node_count, -1, dtype=np.int64)
+    inside_index[inside_positions] = np.arange(len(inside_positions), dtype=np.int64)
+    inside_edge_mask = (
+        (inside_index[edges[:, 0]] >= 0) & (inside_index[edges[:, 1]] >= 0)
+        if edges.size
+        else np.zeros(0, dtype=bool)
+    )
+    inside_edges = inside_index[edges[inside_edge_mask]] if edges.size else np.empty((0, 2), dtype=np.int64)
+    nodata_inside_membership = category_masks["hirise_inside_nodata"][observed][inside_nodes]
+    footprint_reference = _conditional_adjacency_reference(
+        nodata_inside_membership,
+        inside_edges,
+        permutations=permutations,
+        rng=np.random.default_rng(seed + 1),
+    )
+    footprint_reference.update(
+        {
+            "eligible_in_bounds_observed_bins": int(inside_nodes.sum()),
+            "in_bounds_cardinal_adjacency_edges": int(inside_edges.shape[0]),
+            "reference_scope": "observed MOLA bins inside the fixed HiRISE raster footprint only",
+            "reference_interpretation": (
+                "conditional fixed-footprint random-label reference; descriptive only, "
+                "not an inferential p-value because within-footprint spatial dependence "
+                "and nodata generation are not exchangeable"
+            ),
+        }
+    )
+    categories["hirise_inside_nodata"]["footprint_conditioned_reference"] = footprint_reference
+
     return {
         "method": "4-neighbor cardinal adjacency on the fixed MOLA grid; observed bins only",
         "observed_mola_nodes": node_count,
@@ -329,8 +363,10 @@ def summarize_support_spatial_clustering(
             "the fixed observed-shot mask is preserved"
         ),
         "reference_interpretation": (
-            "descriptive only, not an inferential p-value; the uniform-label reference "
-            "does not model raster footprint geometry, geology or nodata generation"
+            "the all-observed uniform-label references are descriptive only and do not "
+            "model raster footprint geometry; the separate inside-nodata reference "
+            "conditions on the fixed HiRISE footprint but remains non-inferential because "
+            "within-footprint spatial dependence and nodata generation are not exchangeable"
         ),
         "permutation_seed": seed,
         "categories": categories,
