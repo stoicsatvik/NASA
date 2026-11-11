@@ -33,7 +33,7 @@ Does the 2025 USGS Mars Sample Return HiRISE FOM_Confidence raster contain reada
 
 ## Exact-head result
 
-- Final branch head: `0af3793043f2202598fca0db68ec585744042676`; exact-head Actions [#43115750730](https://github.com/stoicsatvik/NASA/actions/runs/43115750730) **SUCCESS**, 11 tests passed, live bounded acquisition completed, artifact [#13897923542](https://github.com/stoicsatvik/NASA/actions/runs/43115750730/artifacts/13897923542).
+- Final branch head: `630f1eabd8016734ce1ff07733ee89bb8f9add5e`; exact-head Actions [#43117959720](https://github.com/stoicsatvik/NASA/actions/runs/43117959720) **SUCCESS**, 11 tests passed, live bounded acquisition completed, artifact [#13899432519](https://github.com/stoicsatvik/NASA/actions/runs/43117959720/artifacts/13899432519). The earlier code head `0af3793` also passed run #43115750730; the current head adds documentation-only validation reconciliation.
 - The pinned 65,308,185-byte compressed member decompressed to 66,059,236 bytes; SHA-256 `986bbaaa60f452cfeee563ae474e06d83195cf749ff515d6a129f57d1a355d49`.
 - GeoTIFF: 19,144 × 26,816, one `uint8` band, nodata 0, 1 m resolution, Mars 2015 equirectangular (radius 3,396,190 m; WKT SHA-256 `77a22ad08d07643ce7c653c5f6cab362edd6bedb262a7b47b7bd5a12f28812d3`).
 - At 346 frozen observed MOLA point centers, 329 were inside and 259 had valid unmasked FOM samples: 74.9% of observed points and 78.7% of in-bounds points. Seventy in-bounds points were masked and 17 were outside. Raw codes 3–15, median 14, mean 13.2008; codes remain uninterpreted.
