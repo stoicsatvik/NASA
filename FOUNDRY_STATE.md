@@ -3,7 +3,7 @@
 Updated: 2026-11-11
 Class: Tier A
 Time horizon: NASA Space Apps Challenge, 14–15 Nov 2026
-Working branch: `research/e554-hirise-nodata-neighborhood-20261111`
+Working branch: `research/e555-hirise-fom-asset-inventory-20261111`
 Main objective: maximize uncertainty eliminated per run and converge on a scientifically defensible Space Apps entry.
 
 ## Current thesis
@@ -563,3 +563,8 @@ Claim states remain: common support PARTIAL (six of nine positions); local verti
 ## E554 exact-head update (2026-11-11)
 
 The E554 bounded neighborhood workflow [#43044286332](https://github.com/stoicsatvik/NASA/actions/runs/43044286332) passed 6/6 tests. All three E550 unsupported positions had 16,384/16,384 finite nodata pixels, zero non-finite pixels, zero usable pixels, and zero usable pixels in the central 64×64. The three sampled windows share the same constant-nodata byte digest. Transfer was 368,991 bytes across 394 exact ranges. This establishes local 128 m support gaps, not their cause. The next gate is product-specific FOM/footprint provenance; no imputation, correction plane, or route-safety claim.
+
+
+## E555 — product-specific FOM/provenance inventory (2026-11-11)
+
+E554's exact-head run #43044286332 passed 6/6 tests and found all three unsupported E550 positions remained 16,384/16,384 nodata across 128×128 neighborhoods. The new E555 branch performs a metadata-only inventory of the exact 2020 TRN HiRISE public directory, PDS3 label and product XML to test whether this release exposes a FOM/quality/provenance asset. Generic USGS HiRISE DTM documentation describes FOM as definitive pixel-level provenance, but product-specific availability is not assumed. E555 makes zero raster requests and retains only asset names, metadata hashes and keyword line numbers. Next: if no FOM is exposed, ask one referred PDS/USGS support contact whether a separate flight-product coverage/provenance layer exists; do not repeat local nodata probes.
