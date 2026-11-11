@@ -309,7 +309,7 @@ def run() -> dict:
             "experiment": "E557 Copernicus GLO-30 public COG sample at Maharashtra analogue literature lead",
             "outcome": "PUBLIC_COG_RANGE_ACCESS_AND_WINDOW_SAMPLE_SUPPORTED",
             "source": {
-                "product": "Copernicus DEM GLO-30 Public (2021 release)",
+                "product": "Copernicus DEM GLO-30 Public COG (legacy AWS bucket; exact release version not exposed by tile metadata)",
                 "publisher": "European Union / ESA Copernicus",
                 "bucket": "copernicus-dem-30m",
                 "region": "eu-central-1",
@@ -318,7 +318,7 @@ def run() -> dict:
                 "license": "Copernicus Licence; attribution required",
                 "nominal_resolution": "1 arc-second, approximately 30 m",
                 "surface_semantics": "Digital Surface Model (DSM), not a bare-earth DTM",
-                "acquisition": "TanDEM-X mission observations from 2011–2015; static 2021 public release",
+                "acquisition": "Primary TanDEM-X observations from 2011–2015; exact release/version and tile-level infill are not exposed by this COG receipt.",
                 "public_access": "anonymous AWS Open Data bucket; no account or API key",
             },
             "access": {
