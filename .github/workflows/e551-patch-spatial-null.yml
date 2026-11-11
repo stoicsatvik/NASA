@@ -1,0 +1,37 @@
+name: E551 exact patch-level spatial null
+
+on:
+  push:
+    branches:
+      - research/e551-ctx-hirise-patch-permutation-null-20261111
+    paths:
+      - data/e550_patch_summaries.json
+      - experiments/e551_patch_spatial_null.py
+      - tests/test_e551_patch_spatial_null.py
+      - .github/workflows/e551-patch-spatial-null.yml
+  pull_request:
+    branches:
+      - research/e550-ctx-hirise-spatial-residual-grid-20261111
+    paths:
+      - data/e550_patch_summaries.json
+      - experiments/e551_patch_spatial_null.py
+      - tests/test_e551_patch_spatial_null.py
+      - .github/workflows/e551-patch-spatial-null.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  exact-null:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run deterministic regression tests
+        run: python -m unittest discover -s tests -p "test_e551_patch_spatial_null.py" -v
+      - name: Reproduce exact permutation receipt
+        run: python -m experiments.e551_patch_spatial_null
