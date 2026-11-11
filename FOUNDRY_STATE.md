@@ -314,3 +314,14 @@ Code review found that Python's `bool` subclasses `int`, so a malformed GeoJSON 
 - Reproducible crosswalk: `research/E533_CANDIDATE_LABEL_SOURCE_REVIEW_20261111.csv`; pinned-source verifier: `experiments/e533_candidate_label_source_review.py`; fixtures: `experiments/test_e533_candidate_label_source_review.py`; receipt artifact: `e533-candidate-label-source-review`.
 - Candidate-label support for these six narrow claims: **SUPPORTED**. Catalogue-wide E001 ground truth: **NOT READY**. Cross-body similarity: **NOT YET PROVEN**. Known-site recovery: **NOT YET MEASURED**. Novel analogue discovery: **NOT YET PROVEN**. Challenge-selection superiority: **NOT YET PROVEN**.
 - Next: audit the remaining six Mars/Moon candidate records with the same source-to-feature criteria; then acquire defensible controls and matched-support physical descriptors. Absence from a positive catalogue remains UNLABELLED, never negative.
+
+## E534 — complete source review of the remaining Mars/Moon candidates (2026-11-11)
+
+- Preserved E533's six-record subset and audited the remaining six primary Mars/Moon candidates against the same pinned E532 GeoJSON revision: Dallol, McMurdo Dry Valleys, Arkaroola/Mount Painter, Lanzarote lava tubes, Bockfjord/Svalbard and Boulby Mine.
+- Primary sources support each record's **narrow candidate-label claim**, with scope limits retained: hydrothermal Fe geochemistry; dry-valley microclimate/geomorphology; hyperspectral method transfer; lava-tube mineralogy/microbial biomarkers; Martian-meteorite carbonate-globule mineralogy; and deep-subsurface instrument/habitability research.
+- E534 validates the exact six prior E533 IDs and six new IDs, DOI membership for the new catalogue references, target-body consistency, and preservation of Draft status. It preserves E533's Haughton supplemental DOI as external corroboration rather than falsely requiring it to appear in the catalogue reference list.
+- Cumulative source review is now 12/12 Mars/Moon primary candidates: Mars 10, Moon 2. All 12 remain Draft; catalogue Verified count is 0. No negative controls were created and no site was promoted.
+- Exact-head Actions run [#42939838865](https://github.com/stoicsatvik/NASA/actions/runs/42939838865) passed 9/9 tests, fetched the pinned source and emitted artifact [#13819608032](https://github.com/stoicsatvik/NASA/actions/runs/42939838865/artifacts/13819608032).
+- PR #93 is draft and stacked on E533 PR #92; no merge or main-branch change.
+- Claim states remain: E001 readiness **NOT READY**; known-site recovery **NOT YET MEASURED**; cross-body similarity **NOT YET PROVEN**; novel analogue discovery **NOT YET PROVEN**; challenge-selection superiority **NOT YET PROVEN**.
+- Next: construct a predeclared non-analogue control universe and matched-support descriptors with units, uncertainty, spatial support and provenance. Absence from this positive catalogue remains UNLABELLED, never negative.
