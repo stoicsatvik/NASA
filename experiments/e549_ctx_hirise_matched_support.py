@@ -295,7 +295,7 @@ def main():
         "ctx_hirise_crs_equal":result.get("projection_audit",{}).get("pyproj_crs_equivalent"),
         "common_cells":result.get("patch",{}).get("common_valid_area_cells_at_zero_shift"),
         "median_residual_m":result.get("zero_shift_residual_ctx_minus_hirise_m",{}).get("median"),
-        "hirise_bytes":result.get("transport",{}).get("bytes_transferred")},sort_keys=True))
+        "hirise_bytes":result.get("transport",{}).get("hirise_bytes_transferred")},sort_keys=True))
     return 0 if result["outcome"] in ("MATCHED_SUPPORT_COMPARISON","PARTIAL_SUPPORT_COMPARISON") else 1
 
 if __name__=="__main__": raise SystemExit(main())
