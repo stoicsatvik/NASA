@@ -31,7 +31,7 @@ Does the exact public Copernicus GLO-30 tile used by E557 expose its documented 
 
 ## Result
 
-PENDING exact-head live Actions. The experiment will distinguish:
+The exact-head live run completed; detailed measurements follow. The experiment distinguished:
 1. masks present and sampled;
 2. masks present but not safely sampleable;
 3. complete public-prefix listing with no expected masks/lineage objects;
@@ -39,11 +39,22 @@ PENDING exact-head live Actions. The experiment will distinguish:
 
 A missing object in the complete public prefix is a negative source-access result, not evidence that the product itself lacks the layer.
 
+## Exact-head result (11 November 2026)
+
+- Code/test head `905e6d91e3876b66146c64ea3de9bbf994857ed6`; dedicated Actions [#43064153053](https://github.com/stoicsatvik/NASA/actions/runs/43064153053) succeeded with **11/11 tests** and the bounded live audit. Duplicate push run [#43064147215](https://github.com/stoicsatvik/NASA/actions/runs/43064147215) also succeeded.
+- Both exact public prefixes were fully enumerated: AUXFILES 5 objects / 1,753 XML bytes; PREVIEW 8 objects / 2,610 XML bytes. All six actual layers/lineage objects were found. Public COG raster basenames differ from the handbook's simplified DGED names for EDM/FLM/HEM/WBM; listing-driven selection succeeded. ACM/SRC names matched.
+- At the frozen Lonar literature-lead coordinate (19.9750 N, 76.5090 E), all 289 WBM samples are `lake`, all 289 EDM samples are `lake`, all 289 FLM samples are `edited_except_filled`, and all 289 HEM samples are sentinel `-32767` (zero valid values). The E557 flat 479.500 m patch is water-edited lake surface, not usable bare-earth/topographic morphology evidence. Exclude it from terrain descriptors; it is not a positive analogue label.
+- At the nearby comparison point (19.8000 N, 76.3000 E), all 289 WBM samples are `no_water`, all EDM samples `not_edited`, all FLM samples `not_edited_not_filled`; HEM has 289 valid samples, median 0.4560666 m, range 0.2976013–1.2218320 m. This remains an unlabelled nearby comparison, not a negative analogue.
+- ACM KML contains one tile placemark, 16,172 ICESat points and tile-level LE68 1.415 m / LE90 1.665 m statistics; these are not Lonar-specific validation. SRC KML contains 37 source-scene placemarks. Raw mask pixels and full KML were not retained.
+
 ## Claim ceiling
 
 - E557 public GLO-30 DSM tile access: SUPPORTED.
-- Public availability of ancillary quality masks in this AWS bucket: NOT YET MEASURED until exact-prefix listing completes.
-- Lonar water/fill/edit status: NOT YET MEASURED until actual mask pixels are read.
+- Public availability and bounded sampling of this tile's quality masks/lineage: SUPPORTED.
+- Water-edited lake status at the frozen Lonar coordinate: SUPPORTED.
+- Bare-earth/topographic interpretation of the E557 flat Lonar patch: REJECTED for this sample.
+- Local bare-earth elevation at that coordinate: NOT MEASURED.
+- Cross-body similarity: NOT YET PROVEN.
 - Cross-body similarity: NOT YET PROVEN.
 - Known-site recovery: NOT YET MEASURED.
 - Novel analogue discovery: NOT YET PROVEN.
