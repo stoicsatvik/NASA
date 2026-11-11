@@ -5,6 +5,7 @@ raw metadata, or records query values that could contain signed credentials.
 """
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 import urllib.error
