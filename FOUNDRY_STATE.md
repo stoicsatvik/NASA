@@ -535,3 +535,14 @@ Next decisive experiment: E550 spatially replicate this comparison at a preregis
 - Claim state: CRS parameter equivalence SUPPORTED; metadata envelope versus common support distinction MEASURED; sampled-grid common support PARTIAL; local residual distribution MEASURED; global offset reproduction NOT ESTABLISHED; local horizontal registration residual NOT YET MEASURED; cross-body similarity NOT YET PROVEN; E001 known-site recovery NOT YET MEASURED.
 
 Next: inspect CTX component-DTM seam/quality provenance and seek independent HRSC/MOLA reference data for the six supported patches. Do not fit a correction. Then run E001 known-analogue recovery with transparent random, Euclidean and physically weighted baselines.
+
+
+## E551 — exact patch-level spatial permutation null for E550 (2026-11-11)
+
+E551 reanalyses the E550 receipt artifact (Actions run 43025458917; artifact 13855824623; receipt SHA-256 bb13f638136d038ec10d683b26fdc48d684fce38957360bc60f121b6d3401123). Nine preregistered positions were attempted, but only six had common valid support (25/25 CTX cells at 100% HiRISE area coverage); x15_y15, x50_y85 and x85_y85 had zero common valid cells. The six patch medians are preserved in data/e550_patch_summaries.json; no raw raster is retained.
+
+The observed six-patch plane has R² 0.5843 and gradient norm 0.4357 m/km. Exact enumeration of all 720 assignments gives p(R² >= observed)=0.2444 and p(gradient norm >= observed)=0.1500. Five of six medians are negative, but the exact two-sided sign-test p=0.21875. Leave-one-patch-out R² ranges 0.1069–0.9145. **Negative result:** a spatially coherent residual gradient is NOT SUPPORTED by this six-patch null test. The six local vertical residuals remain measured; the plane is not a correction surface or geophysical model.
+
+The permutation assumes exchangeability of the six measured patch medians. Three unsupported positions are excluded and spatially informative missingness remains unresolved. Patch medians, not individual pixels, are the permutation units. Local exact tests: 6/6 passed; exact-head Actions pending.
+
+Claim states remain: common support PARTIAL (six of nine positions); local vertical residual MEASURED for six patches only; global vertical offset reproduction NOT ESTABLISHED; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; route safety NOT CLAIMED.
