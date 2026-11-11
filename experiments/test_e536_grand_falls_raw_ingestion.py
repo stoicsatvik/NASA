@@ -91,6 +91,19 @@ class E536ScienceBaseProbeTests(unittest.TestCase):
             self.assertEqual(result["reason"], "contained_file_has_no_tiff_magic")
             self.assertFalse(destination.exists())
 
+    def test_archive_reports_zero_byte_cloud_tiff_placeholders(self):
+        with tempfile.TemporaryDirectory() as directory:
+            archive_path = Path(directory) / "item.zip"
+            destination = Path(directory) / "sample.tif"
+            with zipfile.ZipFile(archive_path, "w") as archive:
+                archive.writestr("dem.tif", b"")
+                archive.writestr("ortho.tif", b"")
+            result = _extract_first_tiff(archive_path, destination)
+            self.assertFalse(result["extracted"])
+            self.assertEqual(result["reason"], "no_nonempty_tiff_members")
+            self.assertEqual([item["size_bytes"] for item in result["members"]], [0, 0])
+            self.assertFalse(destination.exists())
+
 
 if __name__ == "__main__":
     unittest.main()
