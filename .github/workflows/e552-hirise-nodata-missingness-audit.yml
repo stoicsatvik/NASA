@@ -1,0 +1,49 @@
+name: E552 HiRISE nodata missingness provenance audit
+
+on:
+  push:
+    branches:
+      - research/e552-hirise-nodata-missingness-audit-20261111
+    paths:
+      - data/e550_patch_support_provenance.json
+      - experiments/e552_hirise_nodata_missingness_audit.py
+      - tests/test_e552_hirise_nodata_missingness_audit.py
+      - research/E552_HIRISE_NODATA_MISSINGNESS_20261111.md
+      - .github/workflows/e552-hirise-nodata-missingness-audit.yml
+      - FOUNDRY_STATE.md
+  pull_request:
+    branches:
+      - research/e551-ctx-hirise-patch-permutation-null-20261111
+    paths:
+      - data/e550_patch_support_provenance.json
+      - experiments/e552_hirise_nodata_missingness_audit.py
+      - tests/test_e552_hirise_nodata_missingness_audit.py
+      - research/E552_HIRISE_NODATA_MISSINGNESS_20261111.md
+      - .github/workflows/e552-hirise-nodata-missingness-audit.yml
+      - FOUNDRY_STATE.md
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  nodata-provenance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run deterministic receipt and digest tests
+        run: python -m unittest discover -s tests -p "test_e552_hirise_nodata_missingness_audit.py" -v
+      - name: Reproduce compact nodata provenance receipt
+        run: python -m experiments.e552_hirise_nodata_missingness_audit --out .artifacts/e552/receipt.json
+      - name: Preserve compact receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e552-hirise-nodata-missingness-receipt
+          path: .artifacts/e552/receipt.json
+          if-no-files-found: ignore
+          retention-days: 14
