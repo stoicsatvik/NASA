@@ -210,6 +210,8 @@ def read_tiff_header(session: requests.Session, url: str, expected_size: int) ->
             raise E559Error("OBJECT_RANGE_REDIRECT_REFUSED", "Object range redirected; redirects are not followed")
         if response.status_code == 200:
             raise E559Error("OBJECT_RANGE_IGNORED", "Object server ignored Range; response body was not consumed")
+        if response.url != url:
+            raise E559Error("OBJECT_RANGE_URL_CHANGED", "Object range response URL changed")
         if response.status_code != 206:
             raise E559Error(f"OBJECT_RANGE_HTTP_{response.status_code}", "Object header range did not return HTTP 206")
         start, end, total = response.headers.get("Content-Range", "").replace("bytes ", "").split("/", 1)[0].split("-") + [expected_size]
@@ -356,17 +358,22 @@ def read_small_kml(session: requests.Session, url: str, expected_size: int) -> d
         headers={"User-Agent": USER_AGENT, "Accept-Encoding": "identity"},
         timeout=(15, 45),
         allow_redirects=False,
+        stream=True,
     )
-    if response.status_code in (301, 302, 303, 307, 308):
-        raise E559Error("KML_REDIRECT_REFUSED", "KML object redirected; redirects are not followed")
-    if response.status_code != 200 or response.url != url:
-        raise E559Error(f"KML_HTTP_{response.status_code}", "KML object did not return exact HTTP 200")
-    if len(response.content) != expected_size or len(response.content) > MAX_KML_BYTES:
-        raise E559Error("KML_BODY_SIZE_MISMATCH", "KML response length differs from the S3 listing")
-    result = summarize_kml(response.content)
-    result["size_bytes"] = len(response.content)
-    result["sha256"] = hashlib.sha256(response.content).hexdigest()
-    return result
+    try:
+        if response.status_code in (301, 302, 303, 307, 308):
+            raise E559Error("KML_REDIRECT_REFUSED", "KML object redirected; redirects are not followed")
+        if response.status_code != 200 or response.url != url:
+            raise E559Error(f"KML_HTTP_{response.status_code}", "KML object did not return exact HTTP 200")
+        body = response.raw.read(MAX_KML_BYTES + 1, decode_content=True)
+        if len(body) != expected_size or len(body) > MAX_KML_BYTES:
+            raise E559Error("KML_BODY_SIZE_MISMATCH", "KML response length differs from the S3 listing or 1 MB budget")
+        result = summarize_kml(body)
+        result["size_bytes"] = len(body)
+        result["sha256"] = hashlib.sha256(body).hexdigest()
+        return result
+    finally:
+        response.close()
 
 
 def run() -> dict:
