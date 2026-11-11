@@ -1,7 +1,9 @@
 import io, json, unittest, zipfile
 from experiments.e560_usgs_known_analog_catalogue import (
-    ITEM_ID, METADATA_URL, metadata_files, normalise, overlap,
-    parse_geojson, parse_vector, safe_file_url, safe_metadata_url, xml_urls, vector_url_candidates,
+    ITEM_ID, EXPECTED_TITLE, METADATA_URL, NoRedirectHandler, checksum_status,
+    metadata_files, normalise, overlap, parse_fgdc_metadata, parse_geojson,
+    parse_vector, safe_file_url, safe_metadata_url, validate_item_identity,
+    xml_urls, vector_url_candidates,
 )
 
 class E560Tests(unittest.TestCase):
@@ -51,6 +53,49 @@ class E560Tests(unittest.TestCase):
         self.assertEqual(result["PAAD"]["normalized_full_string"],[("Atacama Desert","atacama-desert")])
         self.assertIn("not coordinate",result["PAAD"]["meaning"])
         self.assertEqual(normalise("Lonar Crater, India"),"lonarcraterindia")
+
+    def test_item_identity_is_exact(self):
+        self.assertEqual(validate_item_identity({"id": ITEM_ID, "title": EXPECTED_TITLE}), ITEM_ID)
+        with self.assertRaises(ValueError):
+            validate_item_identity({"id": "different", "title": EXPECTED_TITLE})
+        with self.assertRaises(ValueError):
+            validate_item_identity({"id": ITEM_ID, "title": "Wrong title"})
+
+    def test_redirect_handler_refuses_redirects(self):
+        handler = NoRedirectHandler()
+        self.assertIsNone(handler.redirect_request(None, None, 302, "Found", {}, "https://www.sciencebase.gov/other"))
+
+    def test_checksum_status_preserves_mismatch(self):
+        import hashlib
+        payload = b"metadata"
+        good = checksum_status({"type": "MD5", "value": hashlib.md5(payload).hexdigest()}, payload)
+        bad = checksum_status({"type": "MD5", "value": "0" * 32}, payload)
+        self.assertTrue(good["matches"])
+        self.assertFalse(bad["matches"])
+        self.assertEqual(bad["status"], "MISMATCH")
+
+    def test_fgdc_metadata_summary_preserves_use_and_accuracy_limits(self):
+        xml = b"""<metadata>
+          <idinfo><citation><citeinfo><origin>USGS</origin><pubdate>20201218</pubdate><title>Known Terrestrial Analog Sites for Planetary Science</title></citeinfo></citation>
+          <descript><purpose>For identification of research areas, not for analysis</purpose></descript>
+          <status><progress>In work</progress><update>As needed</update></status><accconst>Public domain.</accconst></idinfo>
+          <dataqual><complete>Limited to verified NASA-funded sites.</complete><posacc><horizpa><horizpar>May have errors up to 10km from centroid.</horizpar></horizpa></posacc>
+          <lineage><procstep><procdesc>None</procdesc><procdate>Unknown</procdate></procstep></lineage></dataqual>
+          <spdoinfo><ptvctinf><sdtsterm><sdtstype>Entity point</sdtstype><ptvctcnt>192</ptvctcnt></sdtsterm></ptvctinf></spdoinfo>
+          <spref><horizsys><planar><mapproj><mapprojn>Mercator_1SP</mapprojn></mapproj><planci><coordrep><absres>0.6096</absres><ordres>0.6096</ordres></coordrep><plandu>meters</plandu></planci></planar><geodetic><horizdn>WGS_1984</horizdn></geodetic></horizsys></spref>
+          <eainfo><detailed><attr><attrlabl>Name</attrlabl></attr><attr><attrlabl>AnalogType</attrlabl><attrdomv><edomv>Impact Crater</edomv></attrdomv><attrdomv><edomv>Dunes</edomv></attrdomv></attr></detailed></eainfo>
+        </metadata>"""
+        summary = parse_fgdc_metadata(xml)
+        self.assertEqual(summary["declared_feature_count"], 192)
+        self.assertEqual(summary["maximum_accuracy_error_km"], 10.0)
+        self.assertFalse(summary["analysis_use_allowed"])
+        self.assertEqual(summary["projection"], "Mercator_1SP")
+        self.assertEqual(summary["analog_type_values"], ["Dunes", "Impact Crater"])
+        self.assertNotIn("email", str(summary).lower())
+
+    def test_geojson_requires_feature_collection(self):
+        with self.assertRaises(ValueError):
+            parse_geojson(b'{"type":"Feature","features":[]}')
 
     def test_metadata_xml_exposes_only_allowlisted_vector_links(self):
         xml=b'<metadata><onlink>https://www.sciencebase.gov/catalog/file/get/123/sites.zip</onlink><onlink>https://doi.org/10.5066/P9J72921</onlink></metadata>'
