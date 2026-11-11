@@ -221,6 +221,59 @@ def _top_counts(values: list[float]) -> list[dict]:
     return [{"value": value, "count": count} for value, count in counter.most_common(12)]
 
 
+def build_support_cross_tab(dtm_result: dict, confidence_result: dict) -> dict:
+    """Compare validity only after separating shared in-bounds points from outside points."""
+    dtm_inside = np.asarray(dtm_result["_inside_mask"], dtype=bool)
+    confidence_inside = np.asarray(confidence_result["_inside_mask"], dtype=bool)
+    dtm_valid = np.asarray(dtm_result["_valid_mask"], dtype=bool)
+    confidence_valid = np.asarray(confidence_result["_valid_mask"], dtype=bool)
+    lengths = {len(dtm_inside), len(confidence_inside), len(dtm_valid), len(confidence_valid)}
+    if len(lengths) != 1:
+        raise ValueError("DTM and confidence point masks must have equal lengths")
+    if np.any(dtm_valid & ~dtm_inside):
+        raise ValueError("DTM validity mask marks an out-of-bounds point as valid")
+    if np.any(confidence_valid & ~confidence_inside):
+        raise ValueError("confidence validity mask marks an out-of-bounds point as valid")
+
+    both_inside = dtm_inside & confidence_inside
+    both_outside = ~dtm_inside & ~confidence_inside
+    dtm_inside_confidence_outside = dtm_inside & ~confidence_inside
+    confidence_inside_dtm_outside = confidence_inside & ~dtm_inside
+    both_valid = dtm_valid & confidence_valid
+    both_invalid = ~dtm_valid & ~confidence_valid
+    dtm_only = dtm_valid & ~confidence_valid
+    confidence_only = confidence_valid & ~dtm_valid
+
+    both_valid_inside = both_inside & dtm_valid & confidence_valid
+    both_nodata_inside = both_inside & ~dtm_valid & ~confidence_valid
+    dtm_only_inside = both_inside & dtm_valid & ~confidence_valid
+    confidence_only_inside = both_inside & confidence_valid & ~dtm_valid
+
+    return {
+        "observed_mola_point_centers": int(len(dtm_valid)),
+        "dtm_inside_bounds": int(dtm_inside.sum()),
+        "confidence_inside_bounds": int(confidence_inside.sum()),
+        "both_inside_bounds": int(both_inside.sum()),
+        "both_outside_bounds": int(both_outside.sum()),
+        "dtm_inside_confidence_outside": int(dtm_inside_confidence_outside.sum()),
+        "confidence_inside_dtm_outside": int(confidence_inside_dtm_outside.sum()),
+        "dtm_valid": int(dtm_valid.sum()),
+        "confidence_valid": int(confidence_valid.sum()),
+        "both_valid": int(both_valid.sum()),
+        "confidence_valid_but_dtm_invalid": int(confidence_only.sum()),
+        "dtm_valid_but_confidence_invalid": int(dtm_only.sum()),
+        "both_invalid": int(both_invalid.sum()),
+        "both_valid_within_both_bounds": int(both_valid_inside.sum()),
+        "both_nodata_within_both_bounds": int(both_nodata_inside.sum()),
+        "confidence_valid_but_dtm_invalid_within_both_bounds": int(confidence_only_inside.sum()),
+        "dtm_valid_but_confidence_invalid_within_both_bounds": int(dtm_only_inside.sum()),
+        "validity_masks_identical_at_observed_points": bool(np.array_equal(dtm_valid, confidence_valid)),
+        "validity_masks_identical_within_both_bounds": bool(
+            not dtm_only_inside.any() and not confidence_only_inside.any()
+        ),
+    }
+
+
 def run() -> dict:
     receipt = {
         "experiment": "E568_2025_HIRISE_DTM_AND_FOM_OBSERVED_MOLA_POINT_SUPPORT",
@@ -317,24 +370,10 @@ def run() -> dict:
             dtm_result = sample_raster(dtm, lat, lon, observed)
             confidence_result = sample_raster(confidence, lat, lon, observed)
 
-        dtm_valid = np.asarray(dtm_result["_valid_mask"], dtype=bool)
-        fom_valid = np.asarray(confidence_result["_valid_mask"], dtype=bool)
-        both_valid = dtm_valid & fom_valid
-        confidence_only = fom_valid & ~dtm_valid
-        dtm_only = dtm_valid & ~fom_valid
-        neither = ~dtm_valid & ~fom_valid
         fom_values = confidence_result["_raw_values"]
-        cross_tab = {
-            "observed_mola_point_centers": int(observed.sum()),
-            "dtm_valid": int(dtm_valid.sum()),
-            "confidence_valid": int(fom_valid.sum()),
-            "both_valid": int(both_valid.sum()),
-            "confidence_valid_but_dtm_invalid": int(confidence_only.sum()),
-            "dtm_valid_but_confidence_invalid": int(dtm_only.sum()),
-            "both_invalid": int(neither.sum()),
-            "fom_raw_code_counts": _top_counts(fom_values),
-            "fom_codes_are_interpreted": False,
-        }
+        cross_tab = build_support_cross_tab(dtm_result, confidence_result)
+        cross_tab["fom_raw_code_counts"] = _top_counts(fom_values)
+        cross_tab["fom_codes_are_interpreted"] = False
         receipt["mola_source"] = {
             "counts_label": count_label_receipt,
             "counts_range": count_range,
