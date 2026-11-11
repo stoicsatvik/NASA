@@ -467,6 +467,16 @@ Exact-head GitHub Actions run 43013238079 succeeded (11 November 2026):
 - Tests whether exact HTTP Range access can inspect the ZIP tail, ZIP64 metadata, central directory, one DTM member's local header and four-byte TIFF signature without downloading or extracting the archive.
 - Hard transfer budget: 8.52 MB; the workflow refuses a server that ignores Range and never follows redirects.
 - Deterministic fixture suite covers URL allowlisting, exact 206/Content-Range validation, ignored Range, redirects, ZIP EOCD, multi-disk rejection, central-directory parsing, path traversal and local-header agreement.
-- Exact-head live result is pending. No archive accessibility, DTM member layout, TIFF parsing, pixel values or co-registration is claimed until the receipt is inspected.
+- Exact-head Actions [#43018937442](https://github.com/stoicsatvik/NASA/actions/runs/43018937442) succeeded: 12/12 fixtures passed. The 5,468,062,403-byte ZIP64 archive supports exact HTTP Range; 17 entries and a 3,215-byte central directory were parsed. Exactly one DTM TIFF was found, but it is ZIP method 8 (DEFLATE), 675,625,590 compressed / 711,891,990 uncompressed bytes. The orthomosaic is also deflated (4,631,266,296 / 4,674,976,833 bytes). Only 68,993 bytes were transferred; no raster values were read. Receipt artifact 13854770384, SHA-256 82eb60c3c2871d076bace47fde5db08fe31022623d3de700335d504d513a6efe.
+- Outcome: archive range access SUPPORTED; DTM random access through this ZIP layout NOT SUPPORTED. Do not download the 5.3 GB archive or the 676 MB DTM member.
 - Next gate depends on the measured member compression method: stored TIFF may permit bounded internal IFD/tile reads; ZIP-deflated TIFF does not permit ordinary random access without full-member decompression and must not trigger a multi-gigabyte download.
 - Claim states remain: cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; challenge-selection superiority NOT YET PROVEN; route safety NOT CLAIMED.
+
+
+### E546 exact-head failure and result reconciliation
+
+- First live run #43018471829 passed 11/11 fixtures but hit a ZIP64 receipt-accounting bug after central-directory parsing; no receipt was produced. The runner fix was committed.
+- Intermediate run #43018803181 caught a double-escaped ZIP64 signature fixture (1 failure, 11 passes); the fixture was corrected.
+- Final exact-head run #43018937442 passed 12/12 and completed the bounded source probe. The source is range-readable, but the selected DTM and orthomosaic are ZIP-deflated. Total transfer was 68,993 bytes; no raster pixels were acquired.
+- Current result: public archive Range access SUPPORTED; random access through this ZIP member layout NOT SUPPORTED; raster values and CTX/HiRISE registration NOT YET MEASURED.
+- Next: search only for separately published controlled, range-addressable HiRISE products. Do not substitute uncontrolled RDRs and do not download the multi-gigabyte archive.
