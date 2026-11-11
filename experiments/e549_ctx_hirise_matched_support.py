@@ -192,13 +192,6 @@ def run():
         if size<=0 or head.headers.get("Accept-Ranges","").lower()!="bytes":
             raise ExperimentError("HIRISE_RANGE_UNAVAILABLE","HiRISE object size/range support unavailable")
     finally: head.close()
-    hi_x0=geo["raster_bounds_map_units"]["xmin"]; hi_y0=geo["raster_bounds_map_units"]["ymax"]; hi_sx,hi_sy=geo["model_pixel_scale"]
-    hi_window={
-        "col_off":math.floor((block_xmin-hi_x0)/hi_sx)-6,
-        "row_off":math.floor((hi_y0-block_ymax)/hi_sy)-6,
-        "width":math.ceil((block_xmax-hi_x0)/hi_sx)+6-math.floor((block_xmin-hi_x0)/hi_sx)+6,
-        "height":math.ceil((hi_y0-block_ymin)/hi_sy)+6-math.floor((hi_y0-block_ymax)/hi_sy)+6,
-    }
     reader=RangeReader(session,TIFF_URL,size,max_bytes=MAX_HIRISE_BYTES)
     with tifffile.TiffFile(reader) as tif:
         page=tif.pages[0]
@@ -208,6 +201,13 @@ def run():
         if geo["projected_crs_code"]!=32767 or geo["projection_transform_code"]!=17:
             raise ExperimentError("HIRISE_GEOKEY_CONTRACT_MISMATCH","Expected user-defined equirectangular GeoKeys")
         nodata,nd_source=_resolve_nodata(page,label)
+        hi_x0=geo["raster_bounds_map_units"]["xmin"]; hi_y0=geo["raster_bounds_map_units"]["ymax"]; hi_sx,hi_sy=geo["model_pixel_scale"]
+        hi_window={
+            "col_off":math.floor((block_xmin-hi_x0)/hi_sx)-6,
+            "row_off":math.floor((hi_y0-block_ymax)/hi_sy)-6,
+            "width":math.ceil((block_xmax-hi_x0)/hi_sx)+6-math.floor((block_xmin-hi_x0)/hi_sx)+6,
+            "height":math.ceil((hi_y0-block_ymin)/hi_sy)+6-math.floor((hi_y0-block_ymax)/hi_sy)+6,
+        }
         hi_values,hi_hash=_read_hirise_array(reader,page,hi_window)
     # Each CTX 20 m cell is compared with the area-weighted mean of its overlapping 1 m HiRISE pixels.
     def cell_bounds(r,c):
