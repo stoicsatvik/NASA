@@ -12,6 +12,7 @@ on:
       - research/E534_REMAINING_CANDIDATE_SOURCE_REVIEW_20261111.csv
       - data/nasa_analog_explorer_pairs.csv
   pull_request:
+    types: [opened, synchronize, reopened]
     branches:
       - research/e559-copernicus-aux-mask-audit-20261111
     paths:
@@ -25,7 +26,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: e560-usgs-known-analog-catalogue-\${{ github.ref }}
+  group: e560-usgs-known-analog-catalogue-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   acquire:
