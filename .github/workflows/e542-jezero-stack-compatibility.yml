@@ -9,6 +9,7 @@ on:
       - experiments/e542_jezero_stack_compatibility.py
       - experiments/test_e542_jezero_stack_compatibility.py
       - research/E542_JEZERO_STACK_COMPATIBILITY_20261111.md
+      - FOUNDRY_STATE.md
       - .github/workflows/e542-jezero-stack-compatibility.yml
   pull_request:
     branches:
