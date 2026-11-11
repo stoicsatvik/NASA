@@ -754,3 +754,39 @@ Claim update:
 - Route safety: **NOT CLAIMED**.
 
 The highest-value next gate is to decompress only the 65.3 MB FOM_Confidence member, inspect its GeoTIFF metadata/semantics, and sample the frozen 346 observed-MOLA point centers. Decompress the 675.6 MB DTM member only if that confidence audit shows useful coverage. This is a data-readiness result for Martian Map #11, not evidence that #11 is superior to every official challenge.
+
+
+## E567 — 2025 FOM_Confidence point support (2026-11-12)
+
+The exact 65,308,185-byte compressed FOM_Confidence ZIP member was decompressed to 66,059,236 bytes, opened as a 19,144 × 26,816 one-band uint8 GeoTIFF, nodata 0, 1 m resolution, Mars 2015 equirectangular. Its bounds match the published Jezero mosaic footprint. The bounded run transferred 66,063,763 bytes in 67 HTTP range requests under a 100 MiB cap; no DTM member was read.
+
+At the frozen 346 observed-MOLA point centers, 329 were inside the confidence raster and 259 had valid unmasked FOM values (74.9% of observed; 78.7% of in-bounds). Seventy in-bounds points were masked and 17 were outside. Sampled codes ranged 3–15, median 14, mean 13.2008, 13 distinct codes. Codes are raw categories only; they are not calibrated uncertainty.
+
+Claim states:
+- FOM_Confidence GeoTIFF readability/georeferencing: **SUPPORTED** for the pinned member.
+- Confidence support at the frozen MOLA points: **MEASURED, 259/346**.
+- Product-specific numeric FOM code semantics: **NOT YET PROVEN**.
+- 2025 DTM elevation support at those points: **NOT YET MEASURED**.
+- Replacement of 2020 HiRISE nodata: **NOT YET MEASURED**.
+- Independent horizontal registration: **NOT YET MEASURED**; the mosaic is aligned to CTX.
+- Cross-body similarity: **NOT YET PROVEN**.
+- E001 known-site recovery: **NOT YET MEASURED**.
+- Novel analogue discovery: **NOT YET PROVEN**.
+- Route safety: **NOT CLAIMED**.
+
+E568 is the next gate: sample the actual 2025 DTM at the same 346 point centers and cross-tab its valid mask against FOM_Confidence. Confidence support alone is not elevation support.
+
+
+## E567 exact-head validation refresh (12 November 2026)
+
+- Final E567 head `0af3793043f2202598fca0db68ec585744042676`; Actions [#43115750730](https://github.com/stoicsatvik/NASA/actions/runs/43115750730) passed 11 tests and the bounded live FOM acquisition; artifact #13897923542.
+- The two initial fixture failures (#43114343485 and #43114401229) were the same synthetic nodata-placement assertion (`assert 4 == 3`). The fixture was moved to the exact sampled pixel; the final exact head passed. No production sampling rule or scientific threshold was weakened.
+- Follow-on E568 is a separate stacked draft PR #127; its DTM result is recorded in the child-branch report and portfolio ledger, not retroactively attributed to E567.
+
+
+### E567 current-head rerun (12 November 2026)
+
+- Current branch head 630f1eabd8016734ce1ff07733ee89bb8f9add5e passed exact-head Actions [#43117959720](https://github.com/stoicsatvik/NASA/actions/runs/43117959720): 11 tests, live FOM point-support acquisition, artifact #13899432519. The measured counts remain 329 inside / 259 valid of 346 observed MOLA points. This rerun is on the documentation-reconciled head; the sampler and result are unchanged.
+
+
+Subsequent commits after measured code head 630f1eabd8016734ce1ff07733ee89bb8f9add5e are documentation-only; that code head was rerun successfully by #43117959720. No sampler code changed after that exact-head acquisition.

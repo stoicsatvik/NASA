@@ -132,5 +132,38 @@ def test_archive_without_confidence_is_a_preserved_negative_result():
     assert result["confidence_member_count"] == 0
 
 
+
+
+def test_cached_range_reads_reuse_a_bounded_block():
+    payload = b"0123456789"
+    session = FakeSession(payload)
+    remote = HTTPRangeFile(
+        session,
+        "https://example.test/archive.zip",
+        max_total_bytes=10,
+        cache_block_bytes=4,
+    )
+    remote.seek(2)
+    assert remote.read(2) == b"23"
+    assert remote.read(2) == b"45"
+    assert session.requested_ranges == ["bytes=2-5"]
+    assert remote.transferred == 4
+
+
+def test_cached_range_reader_enforces_cumulative_transfer_cap():
+    payload = b"0123456789"
+    session = FakeSession(payload)
+    remote = HTTPRangeFile(
+        session,
+        "https://example.test/archive.zip",
+        max_total_bytes=3,
+        cache_block_bytes=4,
+    )
+    remote.seek(2)
+    with pytest.raises(RangeReadError) as error:
+        remote.read(1)
+    assert error.value.outcome == "RANGE_TRANSFER_CAP_EXCEEDED"
+
+
 def test_inspection_uses_the_pinned_official_archive_by_default():
     assert ARCHIVE_URL.startswith("https://asc-pds-services.s3.us-west-2.amazonaws.com/")
