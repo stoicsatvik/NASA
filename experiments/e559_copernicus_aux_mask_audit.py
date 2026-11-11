@@ -29,6 +29,7 @@ HEADER_RANGE_BYTES = 16_384
 MAX_KML_BYTES = 1_000_000
 WINDOW = 17
 MAX_BLOCK_UNCOMPRESSED_BYTES = 8_000_000
+MAX_FULL_MASK_BYTES = 1_000_000
 AUXFILES = "AUXFILES"
 PREVIEW = "PREVIEW"
 
@@ -72,6 +73,30 @@ def expected_key(prefix: str, layer: str) -> str:
         raise ValueError(f"unsupported layer: {layer}")
     folder = AUXFILES if layer in {"EDM", "FLM", "WBM", "HEM", "ACM"} else PREVIEW
     return f"{prefix}{folder}/{EXPECTED_FILENAME_PREFIX}{LAYER_SUFFIXES[layer]}"
+
+
+
+def find_layer_object(objects: list[dict], prefix: str, layer: str) -> dict | None:
+    """Select one object by documented layer suffix from the exact listed prefix.
+
+    The public COG bucket uses a different basename from the simplified DGED
+    handbook example. This function never constructs a candidate object path:
+    it selects only a unique key returned by the frozen S3 listing.
+    """
+    if layer not in LAYER_SUFFIXES:
+        raise ValueError(f"unsupported layer: {layer}")
+    suffix = LAYER_SUFFIXES[layer]
+    matches = [
+        item for item in objects
+        if item.get("key", "").startswith(prefix) and item.get("key", "").endswith(suffix)
+    ]
+    if len(matches) > 1:
+        raise E559Error(
+            "AMBIGUOUS_LAYER_OBJECT",
+            "More than one listed object matches the documented layer suffix",
+            {"layer": layer, "prefix": prefix, "keys": [item["key"] for item in matches]},
+        )
+    return matches[0] if matches else None
 
 
 def validate_key(key: str, prefix: str) -> str:
@@ -281,7 +306,7 @@ def summarize_mask_window(values, layer: str, nodata) -> dict:
     return result
 
 
-def sample_mask(dataset, layer: str, site: dict) -> dict:
+def sample_mask(dataset, layer: str, site: dict, object_size: int) -> dict:
     x, y = _sample_xy(dataset, float(site["latitude"]), float(site["longitude"]))
     row, col = dataset.index(x, y)
     half = WINDOW // 2
@@ -289,20 +314,30 @@ def sample_mask(dataset, layer: str, site: dict) -> dict:
     row1, col1 = row + half + 1, col + half + 1
     if row0 < 0 or col0 < 0 or row1 > dataset.height or col1 > dataset.width:
         raise E559Error("MASK_WINDOW_OUTSIDE_TILE", "Frozen mask sample window crosses raster boundary")
-    if not dataset.is_tiled:
-        raise E559Error("MASK_NOT_TILED", "Mask is not tiled; a bounded raster window cannot be guaranteed")
-    block_h, block_w = dataset.block_shapes[0]
-    row_blocks = len(set(range(row0 // block_h, (row1 - 1) // block_h + 1)))
-    col_blocks = len(set(range(col0 // block_w, (col1 - 1) // block_w + 1)))
-    block_bytes = block_h * block_w * np.dtype(dataset.dtypes[0]).itemsize
-    blocks = row_blocks * col_blocks
-    estimated = blocks * block_bytes
-    if estimated > MAX_BLOCK_UNCOMPRESSED_BYTES:
-        raise E559Error(
-            "MASK_BLOCK_BUDGET_EXCEEDED",
-            "Required mask blocks exceed the 8 MB uncompressed read budget",
-            {"blocks": blocks, "block_uncompressed_bytes": block_bytes, "estimated_bytes": estimated},
-        )
+    if dataset.is_tiled:
+        block_h, block_w = dataset.block_shapes[0]
+        row_blocks = len(set(range(row0 // block_h, (row1 - 1) // block_h + 1)))
+        col_blocks = len(set(range(col0 // block_w, (col1 - 1) // block_w + 1)))
+        block_bytes = block_h * block_w * np.dtype(dataset.dtypes[0]).itemsize
+        blocks = row_blocks * col_blocks
+        estimated = blocks * block_bytes
+        read_mode = "windowed_tiled_blocks"
+        if estimated > MAX_BLOCK_UNCOMPRESSED_BYTES:
+            raise E559Error(
+                "MASK_BLOCK_BUDGET_EXCEEDED",
+                "Required mask blocks exceed the 8 MB uncompressed read budget",
+                {"blocks": blocks, "block_uncompressed_bytes": block_bytes, "estimated_bytes": estimated},
+            )
+    else:
+        if object_size > MAX_FULL_MASK_BYTES:
+            raise E559Error(
+                "MASK_NOT_TILED",
+                "Non-tiled mask exceeds the 1 MB bounded full-file read budget",
+                {"object_size_bytes": object_size, "budget_bytes": MAX_FULL_MASK_BYTES},
+            )
+        block_h = block_w = blocks = 0
+        estimated = int(object_size)
+        read_mode = "bounded_full_small_mask"
     values = dataset.read(1, window=Window(col0, row0, WINDOW, WINDOW), masked=True)
     result = summarize_mask_window(values, layer, dataset.nodata)
     result.update({
@@ -312,12 +347,12 @@ def sample_mask(dataset, layer: str, site: dict) -> dict:
         "longitude": float(site["longitude"]),
         "pixel_row": int(row),
         "pixel_column": int(col),
+        "read_mode": read_mode,
         "blocks_touched": blocks,
         "block_shape": [int(block_h), int(block_w)],
-        "estimated_uncompressed_block_bytes": int(estimated),
+        "estimated_uncompressed_read_bytes": int(estimated),
     })
     return result
-
 
 def summarize_kml(body: bytes) -> dict:
     try:
@@ -329,11 +364,20 @@ def summarize_kml(body: bytes) -> dict:
     all_fields = set()
     for placemark in placemarks:
         name = ""
+        description = ""
+        timestamp = None
+        time_span = {}
         fields = {}
         for node in placemark.iter():
             local = node.tag.rsplit("}", 1)[-1]
             if local == "name" and not name:
                 name = (node.text or "").strip()
+            elif local == "description" and not description:
+                description = (node.text or "").strip()
+            elif local == "when":
+                timestamp = (node.text or "").strip() or timestamp
+            elif local in {"begin", "end"}:
+                time_span[local] = (node.text or "").strip()
             if local in {"Data", "SimpleData"}:
                 field_name = node.attrib.get("name")
                 value_node = next((child for child in node if child.tag.rsplit("}", 1)[-1] == "value"), None)
@@ -341,14 +385,19 @@ def summarize_kml(body: bytes) -> dict:
                 if field_name:
                     fields[field_name] = value
                     all_fields.add(field_name)
-        features.append({"name": name, "fields": fields})
+        features.append({
+            "name": name,
+            "description_prefix": description[:500],
+            "timestamp": timestamp,
+            "time_span": time_span,
+            "fields": fields,
+        })
     return {
         "placemark_count": len(placemarks),
         "field_names": sorted(all_fields),
         "sample_features": features[:10],
         "raw_kml_retained": False,
     }
-
 
 def read_small_kml(session: requests.Session, url: str, expected_size: int) -> dict:
     if expected_size > MAX_KML_BYTES:
@@ -396,16 +445,30 @@ def run() -> dict:
                 "full_prefix_enumerated": False,
             }
     expected = {layer: expected_key(f"{tile_folder}/", layer) for layer in LAYER_SUFFIXES}
-    objects_by_key = {item["key"]: item for item in all_objects}
-    exact_presence = {layer: key in objects_by_key for layer, key in expected.items()}
+    layer_folders = {
+        "EDM": AUXFILES, "FLM": AUXFILES, "WBM": AUXFILES, "HEM": AUXFILES,
+        "ACM": AUXFILES, "SRC": PREVIEW,
+    }
+    actual_entries = {}
+    for layer, folder in layer_folders.items():
+        prefix = f"{tile_folder}/{folder}/"
+        actual_entries[layer] = find_layer_object(all_objects, prefix, layer)
+    actual_keys = {
+        layer: (entry["key"] if entry else None) for layer, entry in actual_entries.items()
+    }
+    handbook_name_match = {
+        layer: bool(actual_entries[layer] and actual_entries[layer]["key"] == expected[layer])
+        for layer in LAYER_SUFFIXES
+    }
     samples = {}
     object_receipts = {}
     for layer in ("EDM", "FLM", "WBM", "HEM"):
-        key = expected[layer]
-        if key not in objects_by_key:
+        entry = actual_entries[layer]
+        if entry is None:
             continue
-        entry = objects_by_key[key]
-        url = object_url(key, f"{tile_folder}/{AUXFILES}/")
+        key = entry["key"]
+        prefix = f"{tile_folder}/{AUXFILES}/"
+        url = object_url(key, prefix)
         head = head_object(session, url, int(entry["size_bytes"]))
         header = read_tiff_header(session, url, int(entry["size_bytes"]))
         object_receipts[layer] = {"key": key, "head": head, "header_range": header}
@@ -418,18 +481,8 @@ def run() -> dict:
             GDAL_HTTP_MAX_RETRY="0",
         ):
             with rasterio.open(f"/vsicurl/{url}") as dataset:
-                if not dataset.is_tiled:
-                    object_receipts[layer]["raster_metadata"] = {
-                        "is_tiled": False,
-                        "width": int(dataset.width),
-                        "height": int(dataset.height),
-                        "crs": str(dataset.crs),
-                        "dtype": dataset.dtypes[0],
-                    }
-                    object_receipts[layer]["sample_outcome"] = "MASK_NOT_TILED"
-                    continue
                 object_receipts[layer]["raster_metadata"] = {
-                    "is_tiled": True,
+                    "is_tiled": bool(dataset.is_tiled),
                     "width": int(dataset.width),
                     "height": int(dataset.height),
                     "crs": str(dataset.crs),
@@ -439,24 +492,32 @@ def run() -> dict:
                     "nodata": dataset.nodata,
                     "block_shapes": [[int(a), int(b)] for a, b in dataset.block_shapes],
                 }
-                samples[layer] = [sample_mask(dataset, layer, site) for site in SITES]
+                try:
+                    samples[layer] = [
+                        sample_mask(dataset, layer, site, int(entry["size_bytes"]))
+                        for site in SITES
+                    ]
+                    object_receipts[layer]["sample_outcome"] = "SAMPLED"
+                except E559Error as error:
+                    object_receipts[layer]["sample_outcome"] = error.outcome
+                    object_receipts[layer]["sample_message"] = str(error)
     kml_receipts = {}
     for layer in ("ACM", "SRC"):
-        key = expected[layer]
-        if key not in objects_by_key:
+        entry = actual_entries[layer]
+        if entry is None:
             continue
-        entry = objects_by_key[key]
-        folder = AUXFILES if layer == "ACM" else PREVIEW
-        url = object_url(key, f"{tile_folder}/{folder}/")
+        folder = layer_folders[layer]
+        url = object_url(entry["key"], f"{tile_folder}/{folder}/")
         head = head_object(session, url, int(entry["size_bytes"]))
         kml_receipts[layer] = {
-            "key": key,
+            "key": entry["key"],
             "head": head,
             "summary": read_small_kml(session, url, int(entry["size_bytes"])),
         }
-    found_masks = any(exact_presence[layer] for layer in ("EDM", "FLM", "WBM", "HEM"))
-    found_lineage = any(exact_presence[layer] for layer in ("ACM", "SRC"))
-    if found_masks and samples:
+    found_masks = any(actual_entries[layer] for layer in ("EDM", "FLM", "WBM", "HEM"))
+    found_lineage = any(actual_entries[layer] for layer in ("ACM", "SRC"))
+    sampled_mask_count = len(samples)
+    if found_masks and sampled_mask_count:
         outcome = "PUBLIC_QUALITY_MASKS_ACQUIRED_AND_SAMPLED"
     elif found_masks:
         outcome = "PUBLIC_QUALITY_MASK_OBJECTS_FOUND_METADATA_ONLY"
@@ -491,8 +552,9 @@ def run() -> dict:
             "pagination_followed": False,
         },
         "prefix_listings": prefix_results,
-        "expected_keys_from_handbook": expected,
-        "exact_expected_key_presence": exact_presence,
+        "handbook_expected_keys": expected,
+        "actual_layer_keys_from_complete_listing": actual_keys,
+        "handbook_exact_filename_match": handbook_name_match,
         "object_receipts": object_receipts,
         "mask_samples": samples,
         "lineage_kml": kml_receipts,
@@ -510,8 +572,7 @@ def run() -> dict:
         },
         "claim_boundary": {
             "public_DSM_tile": "SUPPORTED by E557",
-            "public_quality_mask_availability": (
-                "SUPPORTED" if found_masks else
+            "public_quality_mask_availability": "SUPPORTED" if found_masks else (
                 "NOT FOUND IN COMPLETE PREFIX LISTING" if all(prefix_results.get(folder, {}).get("full_prefix_enumerated") for folder in (AUXFILES, PREVIEW))
                 else "NOT YET MEASURED"
             ),
@@ -522,20 +583,18 @@ def run() -> dict:
             "local_validation_advantage": "NOT YET PROVEN",
         },
         "limitations": [
-            "The DGED product handbook's folder/file structure is being checked against the actual legacy public COG bucket; product documentation does not guarantee that every ancillary object is exposed in that bucket.",
-            "Only the exact N19/E076 tile's AUXFILES and PREVIEW prefixes are listed; no alternative filenames or paths are guessed.",
-            "Only small 17×17 windows are read from tiled masks; non-tiled masks are not sampled.",
+            "The public COG bucket's actual basenames include the COG tile stem and DEM suffix; the simplified DGED handbook basename differs. Access is selected only from exact keys returned by the frozen prefix listing.",
+            "Only the exact N19/E076 tile's AUXFILES and PREVIEW prefixes are listed; no alternative paths are guessed.",
+            "Only small 17×17 windows are read from tiled masks; non-tiled masks are read only when the complete file is at most 1 MB.",
             "The two locations remain a literature lead and a nearby comparison point, not positive/negative analogue labels.",
             "Copernicus GLO-30 is a DSM, not a bare-earth DTM; water editing, fill sources, and local quality must remain explicit.",
             "The product handbook reports global accuracy statistics; they do not establish local Lonar accuracy.",
             "No raw DEM, mask pixels, or complete KML files are retained.",
         ],
         "next_gate": (
-            "If WBM/EDM confirms the flat Lonar centre is water-edited and FLM/HEM/SRC expose the source lineage, reclassify the E557 centre sample as an edited-water DSM observation and run the coordinate-uncertainty-aware annulus on unedited terrain. "
-            "If masks are absent from the exact public prefixes, stop guessing AWS paths and seek an independently documented product endpoint or another public terrain source."
+            "Use the WBM/EDM samples to determine whether the flat Lonar centre is water-edited; use FLM/HEM/SRC to inspect fill source and local uncertainty. If the centre is edited water, reclassify E557's centre sample and sample a coordinate-uncertainty-aware annulus over unedited terrain."
         ),
     }
-
 
 def main() -> int:
     parser = argparse.ArgumentParser()
