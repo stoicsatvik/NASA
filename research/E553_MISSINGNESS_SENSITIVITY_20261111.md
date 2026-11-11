@@ -67,3 +67,14 @@ Do not fit a correction plane, impute the three locations into the science produ
 - Exact nulls: 9! permutations per completion, 125 completions.
 
 No field data, new sensor measurements, route-safety validation, destructive sampling, or restricted-area access was performed.
+
+
+## Exact-head validation
+
+- Tested implementation/workflow head: `ac9d07aa594102899812b79cd7e0d850172a4758`.
+- Dedicated pull-request Actions run [#43033652738](https://github.com/stoicsatvik/NASA/actions/runs/43033652738): **SUCCESS**; all five deterministic tests, the full 125 × 9! exact sensitivity grid and artifact upload passed.
+- Dedicated push Actions run [#43033646927](https://github.com/stoicsatvik/NASA/actions/runs/43033646927): **SUCCESS**.
+- Machine-readable durable receipt: `research/results/E553_MISSINGNESS_SENSITIVITY_20261111.json`; original Actions artifact **13862081912**.
+- Companion nodata provenance audit: draft PR [#112](https://github.com/stoicsatvik/NASA/pull/112). It identifies all three unsupported windows as all-nodata; physical cause remains NOT DETERMINED.
+
+The later receipt/report/state commits do not change the tested experiment code. Main remains unchanged.
