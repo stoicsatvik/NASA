@@ -396,3 +396,37 @@ E536.1 now rejects manager preview URLs as non-direct downloads, checks HTTPS Sc
 ## E543 — Jezero local MOLA scale anisotropy (2026-11-11)
 
 E542's 463 m/pixel MOLA value is an equatorial nominal spacing, not an isotropic local ground spacing. For the simple-cylindrical MOLA grid, east-west ground spacing scales by cos(planetocentric latitude), while north-south spacing remains 463 m. At the CTX/HiRISE overlap-envelope centroid (18.3995°N), the nominal local MOLA spacing is 439.3309 m east-west and 463.0000 m north-south. This changes the local MOLA:CTX ratio to 21.9665:1 east-west / 23.15:1 north-south and MOLA:HiRISE to 439.33:1 / 463:1. These remain metadata/projection-derived nominal ratios, not measured effective raster resolution. Exact-head Actions run #42998924344 passed 14/14 deterministic tests and JSON receipt validation. No raster bytes, pixel values, local MOLA shot counts, or co-registration residuals were acquired. Next: inspect actual GeoTIFF grid transforms and local counts before selecting resampling or alignment parameters.
+
+
+## E544 — bounded official Jezero CTX TRN DTM acquisition (2026-11-11)
+
+- Isolated branch: `research/e544-ctx-raw-raster-ingestion-20261111`, based on E543 / PR #102; draft PR pending.
+- Pinned the official USGS Astrogeology CTX TRN DTM direct file URL (DOI 10.5066/P906QQT8), published at approximately 9.3 MB and 20 m/pixel.
+- Added a bounded HTTPS allowlist, 20 MB cap, TIFF/BigTIFF magic validation, redirect-host validation, GeoTIFF parsing, and five deterministic 64×64 sample windows. Only transport metadata, SHA-256, raster metadata and sample summaries are retained; no raw pixels or raster file are committed or uploaded.
+- Fixture tests cover exact source URL policy, TIFF signatures, HTML-preview rejection, transport receipts, nodata masking and bounded GeoTIFF sampling.
+- Exact-head GitHub Actions result is pending at this state update. No successful acquisition is claimed until the live workflow receipt proves TIFF parsing and valid sampled pixels.
+- If the direct URL returns HTTP 403/404/410 or non-TIFF bytes, preserve the route-specific negative result and stop guessing URL shapes. If successful, proceed to pinned HiRISE lineage and MOLA topography/counts, then common-support raster comparison.
+- Claim states unchanged pending evidence: raw CTX GeoTIFF acquisition NOT YET MEASURED; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; route safety NOT CLAIMED.
+
+
+## E544 — bounded official Jezero CTX TRN DTM acquisition (2026-11-11)
+
+- Isolated branch: `research/e544-ctx-raw-raster-ingestion-20261111`, based on E543 / PR #102; draft PR pending.
+- Pinned the official USGS Astrogeology CTX TRN DTM direct file URL (DOI 10.5066/P906QQT8), published at approximately 9.3 MB and 20 m/pixel.
+- Added a bounded HTTPS source allowlist, 20 MB cap, TIFF/BigTIFF magic validation, exact redirect-object allowlist, GeoTIFF parsing, and five deterministic 64×64 sample windows. Only transport metadata, SHA-256, raster metadata and sample summaries are retained; no raw pixels or raster file are committed or uploaded.
+- Initial exact-head Actions #43010052871 passed 10/10 fixture tests but classified the documented redirect to `asc-pds-services.s3.us-west-2.amazonaws.com` as outside the first, too-narrow allowlist. The official USGS CTX directory lists the exact TIFF object under that S3 host. This was an allowlist false negative; no raster bytes were acquired by the initial run.
+- E544 now permits only the exact source URL and exact corresponding S3 object path listed by the official USGS directory. The corrected live acquisition result is pending; no successful acquisition is claimed yet.
+- If the exact S3 object returns HTTP 403/404/410 or non-TIFF bytes, preserve that route-specific negative result and stop guessing URL shapes. If successful, proceed to pinned HiRISE lineage and MOLA topography/counts, then common-support raster comparison.
+- Claim states unchanged pending evidence: raw CTX GeoTIFF acquisition NOT YET MEASURED; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; route safety NOT CLAIMED.
+
+
+### E544 exact-head result (2026-11-11)
+
+- Exact-head branch `research/e544-ctx-raw-raster-ingestion-20261111`, head `e64a9e69d86d2a1953e71a07821d4e73c75d9294`; draft PR pending.
+- GitHub Actions [#43010645516](https://github.com/stoicsatvik/NASA/actions/runs/43010645516) succeeded: **12/12 fixture tests passed**, live bounded acquisition completed, receipt artifact **13850830857** uploaded.
+- The official USGS URL redirected to the exact CTX object listed in the official PDS S3 directory. HTTP 200, image/tiff, **9,662,387 bytes**; SHA-256 `16a1aa66c3f48c1bca252795827db7b417876217aff0f5e1aff18027fab2327b`.
+- Rasterio inspected a one-band float32 GeoTIFF, **1596 × 1512**, CRS **ESRI:103885**, **20 × 20** CRS-unit affine spacing, and bounds 4573663.250853–4605583.250853 / 1079453.140188–1109693.140188. Nodata is `-3.4028226550889045e+38`.
+- Five deterministic 64×64 windows contained **20,480/20,480 valid pixels**; sampled values ranged from -2699.7209 to -2033.5281. The GeoTIFF band-unit tag is absent; the USGS product metadata separately lists vertical coordinate-system units as metres. Do not conflate those two sources.
+- Only a compact JSON receipt was uploaded; no raster or raw pixel array was committed/uploaded.
+- Raw CTX GeoTIFF acquisition and bounded sample inspection for this pinned product: **SUPPORTED**. CTX/HiRISE raster co-registration NOT YET MEASURED; MOLA local observed-count support NOT YET MEASURED; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; route safety NOT CLAIMED.
+- Next decisive gate: pin the exact 2025 HiRISE CTX-reference lineage, acquire a bounded HiRISE raster sample and MOLA topography plus observed-count tile, then compare only over verified common valid-pixel support. Do not infer route safety.
