@@ -1,0 +1,23 @@
+{
+  "source": {
+    "experiment": "E550 nine-position CTX/HiRISE spatial residual campaign",
+    "github_actions_run": 43025458917,
+    "github_artifact_id": 13855824623,
+    "artifact_zip_sha256": "a1cd14c272ed122f82edaac5f72e788d799ad7311bd488f8beffd989f487ccb1",
+    "receipt_json_sha256": "bb13f638136d038ec10d683b26fdc48d684fce38957360bc60f121b6d3401123",
+    "ctx_doi": "10.5066/P906QQT8",
+    "hirise_doi": "10.5066/P9REJ9JN",
+    "residual_definition": "CTX elevation minus area-weighted HiRISE elevation, metres"
+  },
+  "patches": [
+    {"patch_id":"x15_y15","fraction_x":0.15,"fraction_y":0.15,"center_x":4580576.0,"center_y":1088353.2,"ctx_valid_cells":25,"common_valid_cells":0,"median_residual_m":null},
+    {"patch_id":"x50_y15","fraction_x":0.50,"fraction_y":0.15,"center_x":4588066.0,"center_y":1088353.2,"ctx_valid_cells":25,"common_valid_cells":25,"coverage_min":1.0,"median_residual_m":-1.5152992918465316},
+    {"patch_id":"x85_y15","fraction_x":0.85,"fraction_y":0.15,"center_x":4595556.0,"center_y":1088353.2,"ctx_valid_cells":25,"common_valid_cells":25,"coverage_min":1.0,"median_residual_m":-3.152290503237964},
+    {"patch_id":"x15_y50","fraction_x":0.15,"fraction_y":0.50,"center_x":4580576.0,"center_y":1095874.0,"ctx_valid_cells":25,"common_valid_cells":25,"coverage_min":1.0,"median_residual_m":-5.013924693674653},
+    {"patch_id":"x50_y50","fraction_x":0.50,"fraction_y":0.50,"center_x":4588066.0,"center_y":1095874.0,"ctx_valid_cells":25,"common_valid_cells":25,"coverage_min":1.0,"median_residual_m":-2.727160244659899},
+    {"patch_id":"x85_y50","fraction_x":0.85,"fraction_y":0.50,"center_x":4595556.0,"center_y":1095874.0,"ctx_valid_cells":25,"common_valid_cells":25,"coverage_min":1.0,"median_residual_m":2.4249066823599605},
+    {"patch_id":"x15_y85","fraction_x":0.15,"fraction_y":0.85,"center_x":4580576.0,"center_y":1103394.8,"ctx_valid_cells":25,"common_valid_cells":25,"coverage_min":1.0,"median_residual_m":-2.4269258962831373},
+    {"patch_id":"x50_y85","fraction_x":0.50,"fraction_y":0.85,"center_x":4588066.0,"center_y":1103394.8,"ctx_valid_cells":25,"common_valid_cells":0,"median_residual_m":null},
+    {"patch_id":"x85_y85","fraction_x":0.85,"fraction_y":0.85,"center_x":4595556.0,"center_y":1103394.8,"ctx_valid_cells":25,"common_valid_cells":0,"median_residual_m":null}
+  ]
+}
