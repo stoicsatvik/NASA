@@ -46,3 +46,10 @@ The source URL is pinned to one exact HTTPS host and path. No credentials, alter
 ## Next gate after a successful receipt
 
 Pin the exact 2025 HiRISE CTX-reference lineage; acquire a bounded HiRISE sample and the MOLA topography plus observed-count tile; reconcile body-fixed reference, projection, units, nodata and support; then compare elevation profiles only over verified common valid-pixel support. Do not treat metadata-envelope overlap as raster overlap.
+
+
+## E544.1 — allowlist correction (11 November 2026)
+
+The first exact-head workflow (#43010052871) passed all **10/10 fixture tests** and reached the published URL. It returned a redirect to `asc-pds-services.s3.us-west-2.amazonaws.com`, which the initial single-host allowlist rejected. The receipt therefore recorded `REDIRECT_OUTSIDE_ALLOWLIST`; **no raster bytes were acquired**. This was a false negative caused by an over-restrictive redirect policy, not evidence that the public dataset is unavailable.
+
+The official USGS Astrogeology CTX directory independently lists the exact same TIFF filename under that S3 host. E544 now permits only the exact pinned source URL and the exact corresponding S3 object path from that official directory. It does not permit arbitrary S3 paths or hosts. The corrected live acquisition and GeoTIFF parse are pending.
