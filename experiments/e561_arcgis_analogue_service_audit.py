@@ -35,17 +35,31 @@ class NoRedirectHandler(urllib.request.HTTPRedirectHandler):
 
 def endpoint_is_allowed(url: str) -> bool:
     parsed = urllib.parse.urlsplit(url)
-    return (
-        parsed.scheme == "https"
-        and parsed.hostname == "services.arcgis.com"
-        and parsed.port in (None, 443)
-        and parsed.path in {urllib.parse.urlsplit(SERVICE_URL).path,
-                            urllib.parse.urlsplit(LAYER_URL).path,
-                            urllib.parse.urlsplit(QUERY_URL).path}
-        and not parsed.username
-        and not parsed.password
-        and not parsed.fragment
-    )
+    allowed_paths = {
+        urllib.parse.urlsplit(SERVICE_URL).path,
+        urllib.parse.urlsplit(LAYER_URL).path,
+        urllib.parse.urlsplit(QUERY_URL).path,
+    }
+    if (
+        parsed.scheme != "https"
+        or parsed.hostname != "services.arcgis.com"
+        or parsed.port not in (None, 443)
+        or parsed.path not in allowed_paths
+        or parsed.username
+        or parsed.password
+        or parsed.fragment
+    ):
+        return False
+    try:
+        pairs = urllib.parse.parse_qsl(parsed.query, keep_blank_values=True, strict_parsing=True)
+    except ValueError:
+        return False
+    params = dict(pairs)
+    if len(params) != len(pairs):
+        return False
+    if parsed.path == urllib.parse.urlsplit(QUERY_URL).path:
+        return params == {"where": "1=1", "returnCountOnly": "true", "f": "json"}
+    return params == {"f": "json"}
 
 
 def count_query_url() -> str:
