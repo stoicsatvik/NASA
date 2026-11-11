@@ -609,3 +609,20 @@ Next: stop repeated local pixel probes. Seek independent USGS footprint/quality-
 - The 14-challenge screen remains a heuristic readiness ranking, not a judging-probability estimate and not a locked challenge decision.
 - NASA's official site confirms the 2026 event is **14–15 November 2026**. Recheck all official challenge resource lists and submission/judging guidance as they become available before locking a challenge; an independent data-atlas currently points to **13 November** for the resource/guide release, which is a monitoring cue, not an authoritative NASA rule.
 - The planetary-analog challenge remains **NOT YET PROVEN** to be the best challenge. The current research track has useful data-access evidence but no E001 known-site recovery and no cross-body similarity result.
+
+
+
+## E559 exact-head live result (2026-11-11)
+
+- Exact code/test head: `905e6d91e3876b66146c64ea3de9bbf994857ed6`.
+- Dedicated exact-head workflow [#43064153053](https://github.com/stoicsatvik/NASA/actions/runs/43064153053): SUCCESS; **11/11 deterministic tests** and bounded live source audit completed. Duplicate push-triggered run [#43064147215](https://github.com/stoicsatvik/NASA/actions/runs/43064147215) also succeeded.
+- Both exact public prefixes were fully enumerated without pagination: AUXFILES 5 objects / 1,753 XML bytes; PREVIEW 8 objects / 2,610 XML bytes. All six actual layers/lineage objects were found from the listing. Raster COG filenames differ from the handbook's simplified DGED basename for EDM/FLM/HEM/WBM; listing-driven selection succeeded. ACM and SRC names matched the handbook convention.
+- Two bounded 17×17 windows were sampled for EDM, FLM, WBM and HEM. At the frozen Lonar literature-lead coordinate (19.9750 N, 76.5090 E): **289/289 WBM pixels = lake; 289/289 EDM pixels = lake; 289/289 FLM pixels = edited except filled; HEM = 0/289 valid pixels (all -32767 sentinel)**. The previously observed flat 479.500 m E557 DSM patch is therefore a water-edited lake observation, not usable bare-earth/topographic morphology evidence. Exclude this point from terrain-descriptor comparisons; do not reinterpret it as a positive analogue label.
+- At the nearby comparison coordinate (19.8000 N, 76.3000 E): 289/289 WBM pixels = no water; 289/289 EDM = not edited; 289/289 FLM = not edited/not filled; HEM has 289 valid values, median 0.4560666 m, range 0.2976013–1.2218320 m. This point remains an unlabelled nearby comparison, **not a negative analogue**.
+- ACM KML: one geocell placemark, 16,172 ICESat points, tile-level absolute vertical accuracy LE68 1.415 m and LE90 1.665 m. These are tile-level statistics, not Lonar-specific validation. SRC KML: 37 scene placemarks with source-scene IDs and acquisition metadata. Raw raster windows and complete KML were not retained.
+- **SUPPORTED:** public quality-mask and source-lineage acquisition for this exact Copernicus tile; water-edited status at the frozen Lonar coordinate. **NOT ESTABLISHED:** local bare-earth elevation, any analogue label, cross-body similarity, known-site recovery, novel discovery, or local validation advantage.
+- E559's CLI summary initially referenced a nonexistent key and then mislabeled filename equality as layer presence. Both integration defects were corrected; the exact-head 11-test run now reports actual layer presence separately from handbook filename equality. Earlier failed run #43062858434 is preserved as a failure; no data result was claimed from that failed process.
+
+## Updated next decisive gate
+
+Do not sample the flat Lonar centre as terrain. Acquire and parse the independent USGS CC0 *Known Terrestrial Analog Sites for Planetary Science* point layer (DOI `10.5066/P9J72921`), verify archive hash/schema/CRS/feature IDs and candidate-site overlap with PAAD and the 16-site catalogue, and preserve it as a candidate-positive inventory rather than ground truth. Then choose coordinate-precision-appropriate unedited terrain windows and independently sourced controls before E001. No E001 recovery or cross-body similarity claim is yet admissible.
