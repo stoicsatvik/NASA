@@ -78,14 +78,14 @@ def test_final_url_accepts_only_the_documented_exact_usgs_pds_s3_object():
         validate_final_url("https://example.com/data.tif")
 
 
-@pytest.mark.parametrize("magic", [b"II*\\x00", b"MM\\x00*", b"II+\\x00", b"MM\\x00+"])
+@pytest.mark.parametrize("magic", [b"II*\x00", b"MM\x00*", b"II+\x00", b"MM\x00+"])
 def test_tiff_magic_accepts_classic_and_bigtiff(magic):
     assert is_tiff(magic + b"payload")
 
 
 def test_tiff_magic_rejects_html_and_zip():
     assert not is_tiff(b"<!DOCTYPE html>")
-    assert not is_tiff(b"PK\\x03\\x04")
+    assert not is_tiff(b"PK\x03\\x04")
 
 
 def test_fetch_records_transport_without_exposing_payload():
