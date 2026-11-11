@@ -1,15 +1,17 @@
 import numpy as np
 import pytest
-import rasterio
 from rasterio.io import MemoryFile
 from rasterio.transform import from_origin
 
 from experiments.e544_ctx_raster_ingestion import (
     AcquisitionError,
     SOURCE_URL,
+    S3_HOST,
+    S3_PATH,
     fetch_raster_bytes,
     inspect_raster,
     is_tiff,
+    validate_final_url,
     validate_source_url,
 )
 
@@ -67,7 +69,16 @@ def test_source_url_is_pinned_to_exact_public_usgs_product():
         validate_source_url(SOURCE_URL + "?download=1")
 
 
-@pytest.mark.parametrize("magic", [b"II*\x00", b"MM\x00*", b"II+\x00", b"MM\x00+"])
+def test_final_url_accepts_only_the_documented_exact_usgs_pds_s3_object():
+    final_url = f"https://{S3_HOST}{S3_PATH}"
+    validate_final_url(final_url)
+    with pytest.raises(ValueError):
+        validate_final_url(f"https://{S3_HOST}/mosaic/mars2020_trn/CTX/other.tif")
+    with pytest.raises(ValueError):
+        validate_final_url("https://example.com/data.tif")
+
+
+@pytest.mark.parametrize("magic", [b"II*\\x00", b"MM\\x00*", b"II+\\x00", b"MM\\x00+"])
 def test_tiff_magic_accepts_classic_and_bigtiff(magic):
     assert is_tiff(magic + b"payload")
 
@@ -90,6 +101,19 @@ def test_fetch_records_transport_without_exposing_payload():
     assert receipt["http_status"] == 200
     assert receipt["bytes"] == len(payload)
     assert receipt["content_type"] == "image/tiff"
+
+
+def test_fetch_accepts_the_exact_documented_s3_redirect():
+    payload = synthetic_geotiff()
+    final_url = f"https://{S3_HOST}{S3_PATH}"
+
+    def opener(request, timeout):
+        return FakeResponse(payload, url=final_url)
+
+    data, receipt = fetch_raster_bytes(opener=opener)
+    assert data == payload
+    assert receipt["final_host"] == S3_HOST
+    assert receipt["final_path"] == S3_PATH
 
 
 def test_fetch_classifies_html_preview_as_negative_not_as_raster():
