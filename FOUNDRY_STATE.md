@@ -3,7 +3,7 @@
 Updated: 2026-11-11
 Class: Tier A
 Time horizon: NASA Space Apps Challenge, 14–15 Nov 2026
-Working branch: `research/e554-hirise-nodata-neighborhood-20261111`
+Working branch: `research/e556-nasadem-earth-candidate-sample-20261111`
 Main objective: maximize uncertainty eliminated per run and converge on a scientifically defensible Space Apps entry.
 
 ## Current thesis
@@ -101,7 +101,7 @@ Pivot away from the planetary-analog track if any of these becomes clear:
 
 ## Next trigger
 
-**E554 finds all three missing positions remain all-nodata across 128×128 (128 m) neighborhoods. Stop further local pixel probes. Next: obtain independent USGS footprint/quality-mask provenance; if it cannot establish valid common support, preserve partial coverage. Continue independent Earth positive-site/control discovery before E001.**
+**E556 resolved NASADEM HGT tile N19E076 for both frozen Maharashtra points through CMR, but the only returned data path is Earthdata-protected. No credentials or raster bytes were used. Stop anonymous NASADEM retries. E557 now tests the anonymous Copernicus GLO-30 public COG as an auxiliary Earth DEM; keep DSM semantics and challenge-specific NASA-resource eligibility separate. Continue seeking independently labelled Earth positives and defensible controls before E001.**
 
 E527/E528 spatial acquisition and ID joining are complete. E530 found no directly admissible shared quantitative features in the current PAAD/MGD3 pair. The next run must address independent labels/controls or falsify another feature family, not repeat ingestion or polish UI.
 
@@ -572,3 +572,14 @@ Draft PR #114, branch `research/e554-hirise-nodata-neighborhood-20261111`. Exact
 Claim: local 128 m nodata neighborhoods MEASURED; common support at the three positions NOT RECOVERED; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; route safety NOT CLAIMED.
 
 Next: stop repeated local pixel probes. Seek independent USGS footprint/quality-mask provenance or preserve partial coverage; return effort to independent Earth positive-site/control discovery before E001.
+
+
+## E556 NASADEM HGT access gate (2026-11-11)
+
+- Draft PR #116 on `research/e556-nasadem-earth-candidate-sample-20261111`, stacked on E554; main unchanged.
+- Exact implementation head `24e7238f329df6f9189cee939c20258043489009`; [Actions #43049875930](https://github.com/stoicsatvik/NASA/actions/runs/43049875930) SUCCESS, 8/8 deterministic tests; aggregate artifact #13868747953, ZIP SHA-256 `ffe193339d56983d88ad0f8cfac13fcc67c29a1333cfec2275aca7f24b5c3d5a`.
+- NASA CMR returned `NASADEM_HGT_n19e076` / tile `N19E076` for both Lonar (19.9750 N, 76.5090 E) and nearby comparison (19.8000 N, 76.3000 E).
+- Both CMR responses were 3,206 bytes with distinct preserved SHA-256 values in `research/E556_NASADEM_EARTH_CANDIDATE_SAMPLE_20261111.md`.
+- The only returned data path is `/lp-prod-protected/NASADEM_HGT.001/NASADEM_HGT_n19e076/NASADEM_HGT_n19e076.zip`. Outcome **EARTHDATA_AUTH_REQUIRED**. No credentials, redirects, range requests or raster bytes.
+- **SUPPORTED:** CMR tile metadata resolution. **BLOCKED:** anonymous NASADEM pixel access through this path. No elevation sample was measured.
+- E557 tests an anonymous Copernicus GLO-30 public COG as auxiliary data; do not treat it as a mandatory NASA challenge resource or merge DSM values naively with planetary elevation.
