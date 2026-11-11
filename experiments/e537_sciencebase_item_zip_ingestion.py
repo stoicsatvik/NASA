@@ -85,8 +85,8 @@ def parse_fgdc(xml_bytes: bytes) -> dict:
 
 
 def inspect_dem(dem_bytes: bytes, fgdc_bytes: bytes) -> dict:
-    if not (dem_bytes.startswith(b"II*\\x00") or dem_bytes.startswith(b"MM\\x00*")
-            or dem_bytes.startswith(b"II+\\x00") or dem_bytes.startswith(b"MM\\x00+")):
+    if not (dem_bytes.startswith(b"II*\x00") or dem_bytes.startswith(b"MM\x00*")
+            or dem_bytes.startswith(b"II+\x00") or dem_bytes.startswith(b"MM\x00+")):
         raise ValueError("selected DEM is not a TIFF/BigTIFF payload")
     with MemoryFile(dem_bytes) as mem:
         with mem.open() as ds:
@@ -171,7 +171,7 @@ def download_and_inspect(output_dir: Path) -> dict:
             if total < 4:
                 raise ValueError("download is too small to be a ZIP archive")
             with open(tmp_name, "rb") as handle:
-                if handle.read(4) != b"PK\\x03\\x04":
+                if handle.read(4) != b"PK\x03\x04":
                     raise ValueError("ScienceBase item ZIP endpoint returned non-ZIP content")
             with zipfile.ZipFile(tmp_name) as archive:
                 dem_info, fgdc_info = _select_members(archive)
