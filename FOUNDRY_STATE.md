@@ -3,7 +3,7 @@
 Updated: 2026-11-11
 Class: Tier A
 Time horizon: NASA Space Apps Challenge, 14–15 Nov 2026
-Working branch: `research/e531-challenge-selection-sensitivity-20261111`
+Working branch: `research/e533-candidate-label-source-review-20261111`
 Main objective: maximize uncertainty eliminated per run and converge on a scientifically defensible Space Apps entry.
 
 ## Current thesis
@@ -301,3 +301,16 @@ Reproducible source: `experiments/e531_challenge_selection_sensitivity.py`; resu
 ## E532 coordinate-type validation hardening — 2026-11-11
 
 Code review found that Python's `bool` subclasses `int`, so a malformed GeoJSON point such as `[true, 20.0]` could pass the previous numeric-coordinate predicate. The E532 audit now explicitly excludes booleans and adds a regression fixture. This does not change the pinned external dataset or its candidate-only status. The original live-source receipt #42924295331 remains valid for its earlier code head; the new predicate has focused local validation, while exact-head live-source rerun remains pending.
+
+
+## E533 — source audit of six Mars/Moon candidate labels (2026-11-11)
+
+- New isolated branch `research/e533-candidate-label-source-review-20261111`, stacked on E532 PR #91; no main changes.
+- Reconciled the stale E532 next action: USGS 2020 Known Terrestrial Analog Sites (DOI `10.5066/P9J72921`) was already acquired by E326 in PR #33 on 2026-10-27. It yielded four public features, all volcanic, with `AnalogBody` missing/null-like in all four. It is not a dune or Moon/Mars control cohort; do not re-ingest.
+- Predeclared a purposeful six-record subset from the pinned 16-site catalogue: Atacama Yungay, Río Tinto, Holuhraun, Lava Beds, Mauna Kea and Haughton. Four are Mars-primary and two Moon-primary.
+- Reviewed the cited primary sources and a directly relevant additional source where recorded. All six support the **narrow candidate-label claim** for their stated feature scope. The support types differ: hyperarid soil/habitability; acidic geochemistry; fissure-fed lava morphology; lunar lava-tube prospecting; lunar instrument/ISRU field testing; and impact/Mars remote-sensing research.
+- All six source-catalogue records remain `Draft`. The other six Mars/Moon primary candidates remain unaudited. This is a purposeful evidence-availability subset, not a random sample or independent expert verification.
+- No coordinates were geocoded, no sensitive locations were exposed, no non-analogue controls were created, and no E001 ranking or leave-one-site-out recovery was run.
+- Reproducible crosswalk: `research/E533_CANDIDATE_LABEL_SOURCE_REVIEW_20261111.csv`; pinned-source verifier: `experiments/e533_candidate_label_source_review.py`; fixtures: `experiments/test_e533_candidate_label_source_review.py`; receipt artifact: `e533-candidate-label-source-review`.
+- Candidate-label support for these six narrow claims: **SUPPORTED**. Catalogue-wide E001 ground truth: **NOT READY**. Cross-body similarity: **NOT YET PROVEN**. Known-site recovery: **NOT YET MEASURED**. Novel analogue discovery: **NOT YET PROVEN**. Challenge-selection superiority: **NOT YET PROVEN**.
+- Next: audit the remaining six Mars/Moon candidate records with the same source-to-feature criteria; then acquire defensible controls and matched-support physical descriptors. Absence from a positive catalogue remains UNLABELLED, never negative.
