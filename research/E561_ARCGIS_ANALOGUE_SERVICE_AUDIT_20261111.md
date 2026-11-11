@@ -42,3 +42,17 @@ Raw service JSON and feature rows are not retained. Only a compact receipt is up
 ## Next gate
 
 Do not download feature rows yet. First resolve the 4-versus-192 discrepancy using source/version provenance: compare the ArcGIS service item ID, last-edit metadata, ScienceBase file record and DOI release history. The FGDC file checksum mismatch prevents treating the XML as a trusted version manifest. If the publisher's version lineage cannot be reconciled, retain the ArcGIS service only as an unverified discovery endpoint and stop short of using it as an analytical label source.
+
+
+## Exact-query allowlist hardening (11 November 2026)
+
+A review of the E561 request guard found that it pinned the ArcGIS host and path but would still accept arbitrary query parameters if a future caller passed them to `fetch_json`. That was broader than the documented frozen request contract.
+
+The guard now requires exact query maps:
+- Service and layer metadata: only `f=json`.
+- Count endpoint: only `where=1=1`, `returnCountOnly=true`, and `f=json`.
+- Duplicate parameters, fragments, tokens, `outFields`, geometry-return flags and any other query additions are rejected.
+
+Exact-head PR workflow [#43070943518](https://github.com/stoicsatvik/NASA/actions/runs/43070943518) and push workflow [#43070938391](https://github.com/stoicsatvik/NASA/actions/runs/43070938391) both succeeded; **7/7 deterministic tests** passed and the live count-only query again returned **4**. No feature rows or coordinates were requested. The earlier push run [#43070930458](https://github.com/stoicsatvik/NASA/actions/runs/43070930458) was cancelled by the workflow concurrency group after the second commit; it is not a scientific failure.
+
+Implementation head: `97c00f1408711fb8ba8a08b0a30ef0bc5171815b`; exact test head: `66f5c01ab01a73f68aef25ed5bc8ec3d165e25fc`. Receipt artifact: [#13876899123](https://github.com/stoicsatvik/NASA/actions/runs/43070943518/artifacts/13876899123).
