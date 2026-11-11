@@ -648,3 +648,13 @@ Next: stop repeated local pixel probes. Seek independent USGS footprint/quality-
 ## Updated next decisive gate
 
 Reconcile the ArcGIS service item/version and the ScienceBase XML checksum discrepancy before any feature-row acquisition. If the publisher's version lineage cannot be established, retain the service only as an unverified discovery endpoint and stop short of using it as an analytical label source. No E001 recovery, coordinate overlap, control validation, or quantitative analogue result is claimed. No follow-up to previously contacted nonresponders.
+
+
+### E561 ArcGIS Portal item metadata (11 November 2026)
+
+- Public Portal item JSON confirms item ID `db564f72235f49b39c4147df36fd3308`, title Terrestrial Analog Sites for Planetary Science, type Feature Service, access public, owner account `mahunter@usgs.gov_USGS`, created 2020-11-17 18:08:27 UTC and modified 2024-07-09 18:04:14 UTC.
+- Its service URL matches the ArcGIS service host/path after case normalization; no query parameters or token are present. The 178-character description does not mention DOI 10.5066/P9J72921, the ScienceBase item ID or FGDC.
+- Layer last edit is 2024-07-10 18:37:49.500 UTC, ~24 h 33 min 35.5 s after item modified. The item identity is confirmed, but the version relationship to the 192-point FGDC release is not.
+- Count-only query still returns **4**, versus the provisional FGDC count 192. No feature rows or coordinates were acquired.
+- Final exact-head PR workflow [#43073044735](https://github.com/stoicsatvik/NASA/actions/runs/43073044735) passed **14/14 tests** and completed the live metadata/schema/count audit. Artifact [#13879985771](https://github.com/stoicsatvik/NASA/actions/runs/43073044735/artifacts/13879985771).
+- Earlier negative attempts are preserved: Portal item `f=json`/`f=pjson` initially returned `text/plain` and was rejected; accepting parseable JSON exposed a case-only path difference, now recorded explicitly. The ScienceBase XML MD5 mismatch remains unresolved.
