@@ -3,7 +3,7 @@
 Updated: 2026-11-11
 Class: Tier A
 Time horizon: NASA Space Apps Challenge, 14–15 Nov 2026
-Working branch: `research/e540-bounded-dem-header-probe-20261111`
+Working branch: `research/e542-jezero-stack-compatibility-20261111`
 Main objective: maximize uncertainty eliminated per run and converge on a scientifically defensible Space Apps entry.
 
 ## Current thesis
@@ -117,8 +117,7 @@ E527/E528 spatial acquisition and ID joining are complete. E530 found no directl
   Relative to E513 raw 5x5 pixel ranking, **3/5 nearest unverified Earth
   candidates changed**.
 - **4/5 nearest candidates retained under all 500 spatial permutations**
-  of each frozen MOLA target, indicating that this descriptor ranking often
-  lacks discriminating spatial morphology. Five frozen targets are not
+  of each frozen MOLA target, indicating that this descriptor ranking often  lacks discriminating spatial morphology. Five frozen targets are not
   independent analogue labels.
 - Source-backed receipt and complete negative results:
   `research/E514_EQUAL_FOOTPRINT_REAL_RESULT_20261103.md`.
@@ -237,7 +236,6 @@ The earlier E525/E528 preflight statements are superseded by the exact-head acqu
 Source artifacts: PAAD workflow #42902970540 / artifact 13804420438; MGD3 E527-E529 workflow #42904750899 / artifact 13804087352. Source archive SHA-256 values and exact URLs are preserved in the E530 report and JSON.
 
 ## E530 — PAAD / MGD3 cross-body feature admissibility (2026-11-11)
-
 E530 used the actual PAAD, 2007 MGD3 and 2018 MGD3 artifact tables. The reproducible script and result are in experiments/e530_crossbody_feature_admissibility.py and research/E530_CROSSBODY_FEATURE_ADMISSIBILITY_20261111.md.
 
 - PAAD has 45 unique analog-site records, but no per-site target-body/family labels and no non-analogue controls. Missingness: composition 16/45, approximate area 12/45, sand source 3/45, elevation 1/45.
@@ -357,7 +355,6 @@ E536.1 now rejects manager preview URLs as non-direct downloads, checks HTTPS Sc
 
 
 ## E540 — bounded anonymous DEM header falsification (2026-11-11)
-
 - Draft PR #99, branch research/e540-bounded-dem-header-probe-20261111, exact head 009e834b14aa7010ec6c2050cabd0fcb7b72c72c, stacked on E539 / PR #98.
 - Exact-head Actions run [#42974585326](https://github.com/stoicsatvik/NASA/actions/runs/42974585326) succeeded; deterministic tests **8/8 passed**.
 - Pinned ScienceBase item metadata returned HTTP 200 and exactly one record matched GFDF_Ripples_2023_04_18_DEM.tif. The record's own anonymous downloadUri was requested with Range bytes=0-31; exactly 32 bytes were returned under HTTP 206.
@@ -380,3 +377,17 @@ E536.1 now rejects manager preview URLs as non-direct downloads, checks HTTPS Sc
 - Result: #11 and #9 remain a provisional tie. The #11 lead is partly a portfolio-reuse tie-break, not evidence of scientific/judging superiority. #10 is NOT YET PROVEN as the best challenge; E001 remains NOT YET MEASURED.
 - No new dataset was ingested, no E001 experiment/fieldwork was run, no credentials were created, and no UI polish/competition submission/merge/deployment occurred.
 - Next: test MOLA/CTX/HiRISE geometry, CRS registration and actual coverage on one pinned Mars area. If insufficient, lower #11 and reassess #9.
+
+## E542 — Jezero MOLA / CTX / HiRISE coverage and reference audit (2026-11-11)
+
+- Draft PR is stacked on E541 / PR #100; main remains unchanged.
+- Official PDS MOLA label confirms the 128ppd MEGT44N000HB tile covers 0–44°N / 0–90°E at 0.463 km/pixel at the equator. It uses simple cylindrical projection, planetocentric latitude, positive-east longitude, IAU2000 and a 3396.0 km sphere. Empty bins are interpolated; the label reports about 55% of equatorial bins contain a shot and gaps can reach 12 km. This is not a Jezero-local count measurement.
+- USGS 2020 TRN CTX DTM metadata gives 20 m/pixel and bbox 77.1605–77.699°E / 18.211–18.7212°N, Mars 2015 metadata, 3396.19 km sphere, planetocentric latitude, positive-east longitude and MOLA control.
+- USGS 2025 MSR TRN HiRISE metadata gives 1 m/pixel and bbox 77.057–77.380°E / 18.135–18.588°N, the same published Mars 2015 sphere/projection conventions, MOLA control, and CTX-reference alignment below 6 m at p93 and 10.2 m at p99; 8/10 stereo pairs were completed.
+- Deterministic envelope audit: MOLA tile contains both product envelopes; CTX/HiRISE metadata envelopes overlap over 77.1605–77.380°E / 18.211–18.588°N, a spherical bounding-box area of 275.88 km². This is not valid-pixel area or raster registration.
+- Nominal linear resolution ratios: MOLA:CTX 23.15:1; CTX:HiRISE 20:1; MOLA:HiRISE 463:1.
+- MOLA IAU2000 / 3396.0 km metadata differs from Mars 2015 / 3396.19 km CTX/HiRISE metadata by 190 m in reference sphere radius. This is not a measured elevation bias or a vertical correction. Explicit transformation and local MOLA observed-count masking remain mandatory.
+- The 2021 Science Investigation CTX extension is not interchangeable with the TRN reference: its additional orbits were MOLA-localized and the published Jezero comparison reports significant pixel offsets from HRSC. Keep it quarantined until independently registered.
+- Local deterministic harness: 11/11 tests passed. No raw raster bytes, pixel values or local MOLA counts were acquired; no DEM residual or raster registration was measured.
+- Claim: Jezero multi-resolution published-metadata coverage compatibility SUPPORTED. Raw raster co-registration NOT YET MEASURED. Cross-body similarity NOT YET PROVEN. Known-site recovery NOT YET MEASURED. Novel analogue discovery NOT YET PROVEN. Challenge-selection superiority NOT YET PROVEN.
+- Next: acquire bounded official CTX TRN and HiRISE raster subsets plus MOLA topography/counts; inspect labels, nodata, units, CRS and valid footprints; pin the exact 2025 CTX reference; transform to one Mars body-fixed reference and compare elevation profiles/control residuals. Do not infer route safety.
