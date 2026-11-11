@@ -754,3 +754,24 @@ Claim update:
 - Route safety: **NOT CLAIMED**.
 
 The highest-value next gate is to decompress only the 65.3 MB FOM_Confidence member, inspect its GeoTIFF metadata/semantics, and sample the frozen 346 observed-MOLA point centers. Decompress the 675.6 MB DTM member only if that confidence audit shows useful coverage. This is a data-readiness result for Martian Map #11, not evidence that #11 is superior to every official challenge.
+
+
+## E567 — 2025 FOM_Confidence point support (2026-11-12)
+
+The exact 65,308,185-byte compressed FOM_Confidence ZIP member was decompressed to 66,059,236 bytes, opened as a 157,000 × 209,000 one-band uint8 GeoTIFF, nodata 0, 1 m resolution, ESRI:104903 Mars 2015 equirectangular. Its bounds match the published Jezero mosaic footprint. The bounded run transferred 66,063,763 bytes in 112 HTTP range requests under a 100 MiB cap; no DTM member was read.
+
+At the frozen 346 observed-MOLA point centers, 329 were inside the confidence raster and 259 had valid unmasked FOM values (74.9% of observed; 78.7% of in-bounds). Seventy in-bounds points were masked and 17 were outside. Sampled codes ranged 3–15, median 14, mean 13.78, 13 distinct codes. Codes are raw categories only; they are not calibrated uncertainty.
+
+Claim states:
+- FOM_Confidence GeoTIFF readability/georeferencing: **SUPPORTED** for the pinned member.
+- Confidence support at the frozen MOLA points: **MEASURED, 259/346**.
+- Product-specific numeric FOM code semantics: **NOT YET PROVEN**.
+- 2025 DTM elevation support at those points: **NOT YET MEASURED**.
+- Replacement of 2020 HiRISE nodata: **NOT YET MEASURED**.
+- Independent horizontal registration: **NOT YET MEASURED**; the mosaic is aligned to CTX.
+- Cross-body similarity: **NOT YET PROVEN**.
+- E001 known-site recovery: **NOT YET MEASURED**.
+- Novel analogue discovery: **NOT YET PROVEN**.
+- Route safety: **NOT CLAIMED**.
+
+E568 is the next gate: sample the actual 2025 DTM at the same 346 point centers and cross-tab its valid mask against FOM_Confidence. Confidence support alone is not elevation support.
