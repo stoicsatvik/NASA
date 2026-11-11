@@ -321,6 +321,7 @@ def run() -> dict:
         for site in SITES:
             site_metadata.append(query_site(session, site))
         urls = {}
+        protected_paths = []
         for item in site_metadata:
             tile = item["tile"]
             if tile in urls:
@@ -329,6 +330,19 @@ def run() -> dict:
             safe = []
             failures = []
             for candidate in candidates:
+                parsed = urlsplit(candidate)
+                if (
+                    parsed.scheme == "https"
+                    and parsed.hostname == DATA_HOST
+                    and parsed.path.startswith("/lp-prod-protected/")
+                    and tile.lower() in parsed.path.lower()
+                ):
+                    protected_paths.append({
+                        "tile": tile,
+                        "host": parsed.hostname,
+                        "path": parsed.path,
+                        "query_present": bool(parsed.query),
+                    })
                 try:
                     safe.append(validate_data_url(candidate, tile))
                 except E556Error as error:
@@ -336,7 +350,23 @@ def run() -> dict:
             if safe:
                 urls[tile] = safe[0]
             elif "EARTHDATA_AUTH_REQUIRED" in failures:
-                raise E556Error("EARTHDATA_AUTH_REQUIRED", "CMR exposes only a protected NASADEM HGT path; no credentials will be used")
+                raise E556Error(
+                    "EARTHDATA_AUTH_REQUIRED",
+                    "CMR exposes only a protected NASADEM HGT path; no credentials will be used",
+                    {
+                        "cmr_sites": [
+                            {
+                                "site_id": record["site_id"],
+                                "tile": record["tile"],
+                                "granule_ur": record["granule"]["granule_ur"],
+                                "cmr_response_bytes": record["granule"]["cmr_response_bytes"],
+                                "cmr_response_sha256": record["granule"]["cmr_response_sha256"],
+                            }
+                            for record in site_metadata
+                        ],
+                        "protected_paths": protected_paths,
+                    },
+                )
         if not urls:
             raise E556Error(
                 "NO_ALLOWLISTED_PUBLIC_DATA_URL",
@@ -364,7 +394,7 @@ def run() -> dict:
                 "tile_grid": "1 degree × 1 degree; 3601 × 3601 signed 16-bit HGT samples",
                 "elevation_units": "metres",
                 "vertical_reference": "EGM96 geoid, subject to product guide verification",
-                "source_sensor_period": "SRTM mission, 11–22 February 2000",
+                "source_sensor_period": "SRTM mission, 11–21 February 2000",
                 "provenance_note": "NASADEM is a reprocessed/merged elevation product using SRTM telemetry and auxiliary control/elevation sources; it is not a raw single-instrument measurement.",
                 "public_data_host": DATA_HOST,
                 "public_data_path": urlsplit(url).path,
