@@ -40,7 +40,28 @@ The 2025 product is distributed as a multi-gigabyte ZIP. A full download is unne
 
 ## Result
 
-Pending exact-head GitHub Actions execution. No successful archive access, member selection, TIFF parse, raster value or co-registration is claimed until a compact receipt is inspected.
+Exact-head GitHub Actions run [#43018937442](https://github.com/stoicsatvik/NASA/actions/runs/43018937442) succeeded on commit `deb4c02f26146466aab06e78e0a2cfc0942763ab`: **12/12 deterministic tests passed** and the bounded live probe completed.
+
+- HEAD: HTTP 200; `Accept-Ranges: bytes`; archive size **5,468,062,403 bytes**; ZIP64; 17 members.
+- Exact central directory: 3,215 bytes. One DTM TIFF candidate was identified.
+- DTM member: ZIP method **8 (DEFLATE)**; compressed **675,625,590 bytes**, uncompressed **711,891,990 bytes**.
+- The DTM local header was verified and only four bytes at the compressed member offset were read. They are not TIFF magic because the member is deflated.
+- Orthomosaic member is also DEFLATE: 4,631,266,296 compressed bytes / 4,674,976,833 uncompressed bytes.
+- Total transfer: **68,993 bytes**, below the 8.52 MB cap. Receipt artifact: [13854770384](https://github.com/stoicsatvik/NASA/actions/runs/43018937442/artifacts/13854770384), SHA-256 `82eb60c3c2871d076bace47fde5db08fe31022623d3de700335d504d513a6efe`.
+- Outcome: **ZIP_DEFLATED_MEMBER_NOT_RANDOM_ACCESSIBLE**. The archive supports bounded Range access, but its DTM and orthomosaic members do not permit ordinary random access to internal TIFF tiles through ZIP member offsets. No raster pixel or value was acquired.
+
+### Preserved implementation/test failures
+
+- First run [#43018471829](https://github.com/stoicsatvik/NASA/actions/runs/43018471829): 11/11 fixtures passed; live probe reached ZIP64 central-directory parsing, then failed on nested ZIP64 receipt accounting before producing a receipt. This was a runner bug, not a source-access failure.
+- Intermediate run [#43018803181](https://github.com/stoicsatvik/NASA/actions/runs/43018803181): one ZIP64 fixture failed because the test encoded the signature as escaped text rather than binary bytes. The fixture was corrected; the final exact-head run passed 12/12.
+
+### Updated interpretation
+
+- Public archive provenance and bounded HTTP Range access: **SUPPORTED**.
+- DTM/orthomosaic random access through this ZIP layout: **NOT SUPPORTED** without downloading/decompressing the corresponding large member.
+- Full 5.3 GB archive download: **REJECTED** as the next experiment; no download was attempted.
+- Raster values and CTX/HiRISE registration: **NOT YET MEASURED**.
+- Cross-body similarity: **NOT YET PROVEN**; known-site recovery **NOT YET MEASURED**; novel analogue discovery **NOT YET PROVEN**; challenge-selection superiority **NOT YET PROVEN**.
 
 ## Interpretation boundary
 
@@ -57,8 +78,8 @@ The 2025 LPSC paper identifies the reference as the Mars 2020 CTX DEM and report
 ## Claim states
 
 - Public HiRISE product provenance and published metadata: SUPPORTED.
-- Bounded archive range access: NOT YET MEASURED.
-- DTM member random access: NOT YET MEASURED.
+- Bounded archive range access: SUPPORTED.
+- DTM member random access through this ZIP layout: NOT SUPPORTED (DEFLATE).
 - HiRISE raster values inspected: NOT YET MEASURED.
 - CTX/HiRISE local registration: NOT YET MEASURED.
 - MOLA/CTX/HiRISE common-valid-pixel support: NOT YET ESTABLISHED.
@@ -69,7 +90,7 @@ The 2025 LPSC paper identifies the reference as the Mars 2020 CTX DEM and report
 
 ## Next gate
 
-- If the selected DTM member is ZIP-stored and begins with a TIFF signature, use bounded ranges to inspect TIFF IFDs, GeoTIFF CRS/transform/nodata and one internal tile only; then test a frozen local registration against the CTX TRN product.
-- If the member is ZIP-deflated, do not download the 5.3 GB archive. Search only documented, legitimate per-scene or cloud-optimized products with controlled geometry; uncontrolled HiRISE RDRs are not substitutes for this controlled mosaic.
-- If Range is ignored or the archive is inaccessible, preserve the route-specific negative result and pivot to another independently documented data source.
+- The DTM and orthomosaic members are ZIP-deflated. Do not download the 5.3 GB archive or the 676 MB compressed DTM member merely to obtain a small window.
+- Search for a separately published, directly addressable controlled HiRISE GeoTIFF/COG covering the CTX overlap. The USGS uncontrolled HiRISE RDR collection is explicitly not co-registered with controlled products and is not an admissible substitute.
+- If no controlled range-addressable product exists, preserve the source limitation and pivot to another independently documented planetary/Earth dataset.
 - Keep Martian Map #11 and MODIS/VIIRS #9 as a provisional tie; planetary analog #10 remains conditional on real positive/negative site evidence and E001.
