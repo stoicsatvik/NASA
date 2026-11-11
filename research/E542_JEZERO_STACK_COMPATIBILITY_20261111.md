@@ -68,3 +68,23 @@ This result improves the data-readiness evidence for Challenge #11 but does not 
 ## Next decisive experiment
 
 Acquire the 9.3 MB official CTX TRN DTM and a bounded HiRISE raster subset; acquire the MOLA 128ppd topography and counts tile; inspect actual file magic, labels, nodata, units, CRS and valid-pixel footprints; pin the exact 2025 CTX reference; transform to one explicit Mars body-fixed reference; then compare elevation profiles and horizontal control residuals over the shared valid-pixel support. Do not advance to route-risk or astronaut-safety claims.
+
+
+## E543 — local MOLA ground-sample anisotropy correction (2026-11-11)
+
+A review of E542 found that its single MOLA:CTX and MOLA:HiRISE ratios used the PDS label's 463 m/pixel at the equator as though it were an isotropic local ground spacing. For a simple-cylindrical grid, north-south spacing remains the equatorial meridional spacing while east-west ground spacing scales by cos(latitude).
+
+The CTX/HiRISE metadata-envelope overlap centroid is at planetocentric latitude **18.3995°**. Applying the projection geometry gives:
+
+- MOLA east-west ground spacing: **439.3309 m**.
+- MOLA north-south ground spacing: **463.0000 m**.
+- Local MOLA:CTX ratio: **21.9665:1 east-west**, **23.15:1 north-south**.
+- Local MOLA:HiRISE ratio: **439.33:1 east-west**, **463:1 north-south**.
+
+The earlier 23.15:1 and 463:1 values remain valid as equatorial / north-south nominal ratios; they are not local isotropic ratios. The code now reports both nominal and overlap-centroid local values. This is a projection-geometry correction, not a measurement of the raster's effective resolution, valid-pixel support, resampling kernel, or registration quality.
+
+### E543 validation
+
+- Added deterministic tests for the local cosine correction, north/south latitude symmetry, equatorial identity, and rejection of Boolean/nonfinite/out-of-range inputs.
+- The metadata-only claim ceiling is unchanged: no raster bytes, pixel values, MOLA count cells, or co-registration residuals were acquired.
+- Exact-head Actions validation is recorded in the E543 PR after the branch run completes.
