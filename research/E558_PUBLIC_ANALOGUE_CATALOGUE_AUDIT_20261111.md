@@ -65,3 +65,37 @@ USGS, *Known Terrestrial Analog Sites for Planetary Science*, DOI [10.5066/P9J72
 ## Next discriminating action
 
 Acquire the USGS point layer from its ScienceBase data release, verify the archive checksum and schema, then compare names/coordinates/analogue types against PAAD and this catalogue without treating missing catalogue entries as negatives. Only after candidate provenance is reconciled should the pipeline construct uncertainty-aware DEM windows and matched background/control samples.
+
+
+## Access-route audit (2026-11-11)
+
+### USGS point-layer release
+
+The official USGS landing page identifies the release as a point layer, authored by Marc A. Hunter, and marked CC0 1.0. The Data.gov record classifies access as public, but its `Digital Data` distribution points only to the DOI landing page; the second distribution is the original metadata XML. It does not expose a direct vector-file URL in the harvested distribution record.
+
+- USGS landing page: https://www.usgs.gov/data/known-terrestrial-analog-sites-planetary-science
+- Data.gov record: https://catalog.data.gov/dataset/known-terrestrial-analog-sites-for-planetary-science
+- ScienceBase item ID resolved from the DOI redirect: `5f88940b82cebb8c13d912ee`
+- ScienceBase API documentation: https://www.usgs.gov/sciencebase-instructions-and-documentation/api-and-web-services
+- Contact in the catalog record: Marc A. Hunter (`mahunter@usgs.gov`).
+
+A metadata-only web retrieval attempt in this research session did not return the ScienceBase item JSON (the browser fetch was unavailable) and the Data.gov metadata XML endpoint returned HTTP 403 to the retrieval client. These are client-side retrieval outcomes, **not** proof that the public data release is inaccessible to ordinary clients. No file was downloaded. Feature count, geometry schema, CRS, checksum, file size and overlap remain UNKNOWN.
+
+Marc A. Hunter was already contacted on 2026-11-10 about a separate PAAD codebook question and has not replied. No second message was sent about this release; this would be a follow-up to a nonresponder.
+
+### Copernicus mask-band lead
+
+The Google Earth Engine catalogue for `COPERNICUS/DEM/GLO30_2024_1` documents five bands: DEM, EDM, FLM, HEM and WBM. It defines FLM as the filling/lineage mask and WBM values as no-water, ocean, lake or river. The same catalogue describes the source as DGED and the elevation surface as a DSM in the EGM2008 vertical datum.
+
+- Catalogue: https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_DEM_GLO30_2024_1
+- Copernicus Data Space collection/access description: https://dataspace.copernicus.eu/explore-data/data-collections/copernicus-contributing-missions/collections-description/COP-DEM
+- AWS Open Data registry for the anonymous GLO-30 Public COG bucket: https://registry.opendata.aws/copernicus-dem/
+
+This is a **discovery lead, not a mask acquisition**. The Earth Engine 2024_1 collection must not be conflated with E557's pinned 2021 GLO-30 Public AWS COG. No WBM/FLM pixel values were requested or retrieved, and no anonymous direct WBM/FLM object URL was verified. If an Earth Engine route is pursued, it must use a separately authorized account/project; no credentials were used in this audit.
+
+### Revised next gate
+
+1. Retrieve the USGS ScienceBase item JSON through a verified public client route; enumerate file names, sizes and content types before downloading anything.
+2. If a vector file exists, download only that release asset, verify its byte length and SHA-256, parse the geometry/schema/CRS, and preserve its source attributes.
+3. Compare the USGS layer with PAAD and the 16-site catalogue using provenance-aware name/coordinate matching. Absence from any catalogue is not a negative label.
+4. Keep E557's anonymous 2021 DSM sample separate from any future mask layer unless exact product version, tile identity, grid, transform and datum are verified.
