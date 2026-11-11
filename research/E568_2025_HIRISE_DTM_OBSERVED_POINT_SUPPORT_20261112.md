@@ -26,7 +26,7 @@ Does the 2025 USGS Mars Sample Return HiRISE DTM contain valid elevation samples
 
 ## Prior baseline
 
-E563 measured 164/346 valid points in the 2020 HiRISE DTM, with 256/346 inside its raster bounds and 92 in-bounds nodata points. E567 measured 259/346 valid samples in the 2025 FOM_Confidence raster, with 329/346 inside its bounds. Those are different products and masks; neither result proves 2025 DTM support.
+E563 measured 164/346 valid points in the 2020 HiRISE DTM, with 256/346 inside its raster bounds and 92 in-bounds nodata points. E567 measured 259/346 valid samples in the 2025 FOM_Confidence raster, with 329/346 inside its bounds. E568 now measures the actual 2025 DTM at the same 346 observed point centers. The aggregate 2025 DTM support count is 259/346, 95 points above the 2020 aggregate (27.46 percentage points), but E563 did not retain its per-point validity mask, so this is not a paired point-by-point mask comparison.
 
 ## Interpretation boundaries
 
@@ -39,17 +39,26 @@ E563 measured 164/346 valid points in the 2020 HiRISE DTM, with 256/346 inside i
 
 ## Exact-head result
 
-Pending E568 Actions run.
+- Final code/test head: 41915fa71cbdd77bcf124d9763dec24fae3511f6; exact-head Actions [#43117751701](https://github.com/stoicsatvik/NASA/actions/runs/43117751701) SUCCESS. The combined E566/E567/E568 deterministic suite passed 16 tests; bounded live acquisition completed. Receipt artifact [#13898873321](https://github.com/stoicsatvik/NASA/actions/runs/43117751701/artifacts/13898873321).
+- Archive transport: 742,395,283 bytes in 712 range requests under the 850 MiB cap. The 5.47 GB archive was not downloaded as a whole; the 4.6 GB orthoimage was not read; temporary DTM/FOM rasters were deleted. Only a 3,062-byte aggregate receipt was uploaded.
+- Both GeoTIFFs are 19,144 × 26,816, one band, 1 m resolution, with identical CRS, transform, bounds and resolution. DTM is float32 with nodata −32767, scale 1 and offset 0; FOM is uint8 with nodata 0. Neither band declares a unit in the GeoTIFF metadata.
+- At 346 frozen observed MOLA point centers, 329 were inside both raster bounds, 17 were outside both, 259 were valid in both, and 70 were in-bounds nodata in both. There were zero points inside only one raster and zero validity-mask disagreements within the shared footprint. The explicit cross-tab now separates outside-footprint points from in-footprint nodata.
+- DTM sample summary (scale/offset applied as recorded): min −2428.0457, median −2012.3060, mean −2038.0110, max −1651.6827. GeoTIFF band units are null; no vertical datum equivalence or elevation accuracy is claimed.
+- The 2025 DTM has 259/346 valid point centers (74.86%), versus E563's 164/346 aggregate for the 2020 DTM (47.40%): +95 supported centers / +27.46 percentage points. This is an aggregate comparison, not a paired mask-overlap statistic, because E563 did not retain its per-point mask.
+- FOM codes remain uninterpreted raw categories. Identical DTM/FOM validity masks show support-mask agreement at these points, not calibrated confidence or independent accuracy evidence.
 
 ## Claim states
 
 - Public archive range access: SUPPORTED (E566).
 - 2025 DTM and FOM member presence: SUPPORTED at archive level (E566).
-- 2025 DTM GeoTIFF readability: NOT YET MEASURED.
-- 2025 DTM valid support at 346 observed MOLA points: NOT YET MEASURED.
-- DTM/FOM mask alignment: NOT YET MEASURED.
-- Support relative to the 2020 HiRISE baseline of 164/346: NOT YET MEASURED.
+- 2025 DTM GeoTIFF readability: SUPPORTED for this pinned member.
+- 2025 DTM valid support at the 346 observed MOLA points: MEASURED, 259/346 for this bounded window.
+- FOM support at the same points: MEASURED, 259/346 (E567/E568).
+- DTM/FOM validity-mask agreement: MEASURED at the 346 point centers; 259 both valid, 70 both in-bounds nodata, 17 outside both, zero discordant points.
+- Aggregate support relative to the 2020 HiRISE baseline: MEASURED, +95 valid centers; not paired point-by-point.
 - Independent horizontal registration: NOT YET MEASURED.
+- Vertical datum equivalence / absolute elevation accuracy: NOT YET MEASURED.
+- FOM numeric-code semantics for this exact product: NOT YET PROVEN.
 - Cross-body similarity: NOT YET PROVEN.
 - E001 known-site recovery: NOT YET MEASURED.
 - Novel analogue discovery: NOT YET PROVEN.
