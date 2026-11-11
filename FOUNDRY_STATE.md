@@ -104,3 +104,9 @@ Pivot away from the planetary-analog track if any of these becomes clear:
 **Dataset access + known-analogue recovery.**
 
 The next substantive run should reduce one of these uncertainties, not add another planning document.
+
+## 2026-10-23: MOLA interpolation evidence gate
+
+Official maintained MEGDR labels establish that the 720×1440 MEGT median-topography raster **interpolates cells without MOLA observations** and that only ~55% of equatorial bins contain shots; the paired MEGC counts raster is needed to distinguish measured from interpolated cells. See `research/MOLA_MEGDR_COUNTS_INTERPOLATION_GATE_20261023.md`.
+
+**No raw MEGT/MEGC bytes were ingested**. Dataset access remains unverified and E001 remains NOT YET MEASURED. Next preparation gate is checksum + counts-mask QC on official data, not geospatial UI. Full 2026 challenge statements are expected 28 Oct; actual competition solution development is reserved for 14–15 Nov under official guidance. Planetary challenge ranking remains NOT YET PROVEN.
