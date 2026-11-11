@@ -2,7 +2,7 @@ name: E537 ScienceBase item ZIP ingestion
 
 on:
   push:
-    branches: [research/e537-sciencebase-item-zip-ingestion-20261111]
+    branches: [research/e537-sciencebase-item-zip-ingestion-20261111, research/e537-zip-negative-classification-20261111]
   pull_request:
     branches: [main, research/e536-grand-falls-raw-ingestion-20261111]
     paths:
