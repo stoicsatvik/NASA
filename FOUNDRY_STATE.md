@@ -3,7 +3,7 @@
 Updated: 2026-11-11
 Class: Tier A
 Time horizon: NASA Space Apps Challenge, 14–15 Nov 2026
-Working branch: `research/e557-copernicus-glo30-lonar-sample-20261111`
+Working branch: `research/e560-usgs-known-analog-catalogue-20261111`
 Main objective: maximize uncertainty eliminated per run and converge on a scientifically defensible Space Apps entry.
 
 ## Current thesis
@@ -101,10 +101,11 @@ Pivot away from the planetary-analog track if any of these becomes clear:
 
 ## Next trigger
 
-**E556 resolved NASADEM HGT tile N19E076 for both frozen Maharashtra points through CMR, but the only returned data path is Earthdata-protected. No credentials or raster bytes were used. Stop anonymous NASADEM retries. E557 now tests the anonymous Copernicus GLO-30 public COG as an auxiliary Earth DEM; keep DSM semantics and challenge-specific NASA-resource eligibility separate. Continue seeking independently labelled Earth positives and defensible controls before E001.**
+**E560 has now completed the bounded official USGS ScienceBase metadata audit (11 Nov 2026).** Exact-head Actions run #43068609889 passed 13/13 deterministic tests and acquired the pinned metadata anonymously. The item JSON returned HTTP 200 (19,203 bytes); the only file was the 9,406-byte FGDC XML. The live receipt reports a catalogue MD5 mismatch, zero vector links, and no feature payload. The XML itself says the 192 points are for discovery/reference rather than analysis and may be displaced by up to 10 km from feature centroids. Its 0.6096 m coordinate-resolution field is not positional accuracy. Do not pursue this item/WFS as an E001 analytical label source. Preserve the checksum discrepancy and do not claim 192 acquired features.
 
-E527/E528 spatial acquisition and ID joining are complete. E530 found no directly admissible shared quantitative features in the current PAAD/MGD3 pair. The next run must address independent labels/controls or falsify another feature family, not repeat ingestion or polish UI.
+The planetary-analog challenge remains **NOT YET PROVEN** as the best challenge. The all-14 screen and E541 factor ablation still put Martian Map (#11, 4.10) and MODIS/VIIRS (#9, 4.00) in a provisional top tier; the 0.10 gap is below the predeclared 0.25 threshold, and MODIS/VIIRS wins when portfolio reuse is removed. Planetary analog (#10, 2.93) remains a conditional research challenger, not the current readiness leader. No challenge is locked.
 
+Next highest-information work: test actual CRS registration and spatial coverage for the Martian Map layers on one pinned Mars area, and independently verify a no-credential public MODIS/VIIRS data path with a measurable validation target. Reassess the 14-challenge screen only when those results change a scored factor. Keep analog work focused on independent positive sites, defensible non-analogue controls and physically comparable features. No UI polish before the evidence gate.
 
 ## E514 real matched-footprint falsification (2026-11-03)
 
