@@ -366,3 +366,17 @@ E536.1 now rejects manager preview URLs as non-direct downloads, checks HTTPS Sc
 - No credentials, raw bytes, raw URL/query values, full-file download, fieldwork, contact, merge, deployment or competition submission.
 - Claim states unchanged: repo operating system SUPPORTED; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN; challenge-selection superiority NOT YET PROVEN.
 - **Next:** stop guessing alternate URL shapes for this item. Pivot to a separately documented raw-data endpoint or independent MOLA/LOLA/Diviner/Earthdata source. E001 remains NOT YET MEASURED / NOT READY, not BLOCKED.
+
+
+## E541 — challenge-selection leave-one-factor-out falsification (2026-11-11)
+
+- Draft PR #100, branch `research/e541-challenge-selection-factor-ablation-20261111`, stacked on E540 / PR #99.
+- Re-scored all 14 challenge candidates after removing each of the five score factors in turn and renormalizing the remaining weights.
+- Martian Map #11 leads the frozen scorecard 4.10 vs MODIS/VIIRS #9 at 4.00, but the 0.10 gap is below the 0.25 meaningful-difference threshold.
+- Removing portfolio reuse flips the leader: MODIS/VIIRS 4.125 vs Martian Map 4.000 (gap 0.125, still not meaningful). Removing the other four factors leaves Martian Map ahead by 0.029–0.300; the 0.300 gaps occur only when data-readiness or validation, two core criteria, is removed.
+- No other challenge enters the top two under a single-factor ablation. Planetary analog #10 remains outside the top five under all five ablations.
+- For #10 to match MODIS/VIIRS 4.00 with reuse/differentiation/feasibility held fixed, its data-readiness + validation scores must sum to at least 7.8 (currently 3.5); to match Martian Map 4.10 they must sum to at least 8.2. This is a concrete evidence gate, not a target to inflate heuristically.
+- Official scope cross-check: Martian Map asks for an integrated layered view of a Mars location/route from multiple NASA missions; it does not require a route-safety claim. MODIS/VIIRS asks for a harmonized burning-activity calendar. Planetary analog asks for new Earth analog identification/characterization. Links and method are in `research/E541_CHALLENGE_SELECTION_FACTOR_ABLATION_20261111.md`.
+- Result: #11 and #9 remain a provisional tie. The #11 lead is partly a portfolio-reuse tie-break, not evidence of scientific/judging superiority. #10 is NOT YET PROVEN as the best challenge; E001 remains NOT YET MEASURED.
+- No new dataset was ingested, no E001 experiment/fieldwork was run, no credentials were created, and no UI polish/competition submission/merge/deployment occurred.
+- Next: test MOLA/CTX/HiRISE geometry, CRS registration and actual coverage on one pinned Mars area. If insufficient, lower #11 and reassess #9.
