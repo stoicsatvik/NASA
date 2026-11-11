@@ -278,14 +278,21 @@ def _extract_first_tiff(archive_path: Path, destination: Path) -> dict | None:
             ]
             if not candidates:
                 return None
-            selected = min(candidates, key=lambda info: info.file_size)
+            inventory = [
+                {"member": info.filename, "size_bytes": info.file_size, "compressed_bytes": info.compress_size}
+                for info in candidates
+            ]
+            nonempty = [info for info in candidates if info.file_size > 0]
+            if not nonempty:
+                return {"extracted": False, "reason": "no_nonempty_tiff_members", "members": inventory}
+            selected = min(nonempty, key=lambda info: info.file_size)
             if selected.file_size > MAX_DOWNLOAD_BYTES:
-                return {"extracted": False, "reason": "contained_tiff_exceeds_50mb_cap", "size_bytes": selected.file_size}
+                return {"extracted": False, "reason": "contained_tiff_exceeds_50mb_cap", "size_bytes": selected.file_size, "members": inventory}
             total = 0
             with archive.open(selected) as source:
                 prefix = source.read(8)
                 if not _has_tiff_magic(prefix):
-                    return {"extracted": False, "reason": "contained_file_has_no_tiff_magic", "member": selected.filename, "prefix_hex": prefix.hex()}
+                    return {"extracted": False, "reason": "contained_file_has_no_tiff_magic", "member": selected.filename, "prefix_hex": prefix.hex(), "members": inventory}
                 total = len(prefix)
                 with destination.open("wb") as target:
                     target.write(prefix)
@@ -297,7 +304,7 @@ def _extract_first_tiff(archive_path: Path, destination: Path) -> dict | None:
                         if total > MAX_DOWNLOAD_BYTES:
                             target.close()
                             destination.unlink(missing_ok=True)
-                            return {"extracted": False, "reason": "extracted_tiff_exceeds_50mb_cap"}
+                            return {"extracted": False, "reason": "extracted_tiff_exceeds_50mb_cap", "members": inventory}
                         target.write(chunk)
             return {
                 "extracted": True,
@@ -305,6 +312,7 @@ def _extract_first_tiff(archive_path: Path, destination: Path) -> dict | None:
                 "bytes": destination.stat().st_size,
                 "sha256": _sha256(destination),
                 "path": str(destination),
+                "members": inventory,
             }
     except zipfile.BadZipFile:
         return {"extracted": False, "reason": "downloaded_zip_is_invalid"}
