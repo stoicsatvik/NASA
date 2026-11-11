@@ -754,3 +754,15 @@ Claim update:
 - Route safety: **NOT CLAIMED**.
 
 The highest-value next gate is to decompress only the 65.3 MB FOM_Confidence member, inspect its GeoTIFF metadata/semantics, and sample the frozen 346 observed-MOLA point centers. Decompress the 675.6 MB DTM member only if that confidence audit shows useful coverage. This is a data-readiness result for Martian Map #11, not evidence that #11 is superior to every official challenge.
+
+
+## E568 exact-head result (12 November 2026)
+
+- Branch `research/e568-2025-hirise-dtm-observed-point-support-20261112`, head `0d692a630d30ed7cf2bb4b2e19b1a1f56804149c`. Dedicated Actions run [#43115633885](https://github.com/stoicsatvik/NASA/actions/runs/43115633885) succeeded; the bounded raster/archive audit completed. Receipt artifact [#13899160705](https://github.com/stoicsatvik/NASA/actions/runs/43115633885/artifacts/13899160705).
+- DTM: 259/346 observed MOLA point centers valid (74.86%); 329/346 inside raster bounds (95.09%); 259/329 in-bounds points valid (78.72%).
+- FOM_Confidence: exactly the same validity mask at these points: 259 both-valid, 87 both-invalid, zero confidence-only or DTM-only points. This is a mask-alignment observation for this window, not a calibrated confidence result.
+- Raw FOM codes among valid samples: 14=112, 13=52, 15=49, 12=23, 11=5, 3=4, 8=3, 4=2, 5=2, 7=2, 10=2, 6=2, plus one remaining category count; numeric meanings remain uninterpreted.
+- Archive access used 712 HTTP ranges and transferred 742,395,283 bytes under the 850 MiB cap. The 5.47 GB archive and orthoimage were not downloaded; only the selected DTM and FOM members were decompressed to temporary files, then deleted. No per-point values or coordinates were retained.
+- Compared with E563's 2020 aggregate 164/346 valid points, the 2025 product has 95 more valid point centers (+27.46 percentage points). This is an aggregate cross-run comparison, **not a paired per-point improvement test**: E563 did not retain its point mask. Do not claim a causal or statistically independent improvement.
+- Claim states: 2025 DTM GeoTIFF readability SUPPORTED for this pinned member; DTM support MEASURED for this bounded window; DTM/FOM mask alignment MEASURED for this bounded window; independent horizontal registration NOT YET MEASURED; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN; route safety NOT CLAIMED.
+- Next: if the 2020-vs-2025 coverage difference is used in the challenge score, first run a paired 346-point mask cross-tab and CRS/registration sensitivity; otherwise keep it as bounded data-readiness evidence and return to E001 known-site recovery. No UI polish gate has been met.
