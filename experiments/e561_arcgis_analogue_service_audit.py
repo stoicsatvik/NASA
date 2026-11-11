@@ -205,26 +205,33 @@ def validate_portal_item(document: dict) -> dict:
         raise E561Error("ARCGIS_PORTAL_ITEM_TITLE_MISMATCH")
     service_url = urllib.parse.urlsplit(str(document.get("url", "")))
     expected_service = urllib.parse.urlsplit(SERVICE_URL)
-    if (
-        service_url.scheme != "https"
-        or service_url.hostname != expected_service.hostname
-        or service_url.port not in (None, 443)
-        or service_url.path != expected_service.path
-        or service_url.username
-        or service_url.password
-        or service_url.fragment
-    ):
-        raise E561Error("ARCGIS_PORTAL_ITEM_SERVICE_URL_MISMATCH")
     try:
+        service_port = service_url.port
         item_url_pairs = urllib.parse.parse_qsl(service_url.query, keep_blank_values=True, strict_parsing=True)
     except ValueError as error:
-        raise E561Error("ARCGIS_PORTAL_ITEM_SERVICE_URL_QUERY_INVALID") from error
+        raise E561Error("ARCGIS_PORTAL_ITEM_SERVICE_URL_INVALID") from error
     item_query_names = sorted({key for key, _ in item_url_pairs})
+    normalized_path = service_url.path.rstrip("/")
+    expected_path = expected_service.path.rstrip("/")
+    url_identity_matches = (
+        service_url.scheme == "https"
+        and service_url.hostname == expected_service.hostname
+        and service_port in (None, 443)
+        and normalized_path in {expected_path, expected_path + "/0"}
+        and not service_url.username
+        and not service_url.password
+        and not service_url.fragment
+    )
     created = document.get("created")
     modified = document.get("modified")
     if any(isinstance(value, bool) or not isinstance(value, int) or value <= 0 for value in (created, modified)):
         raise E561Error("ARCGIS_PORTAL_ITEM_TIMESTAMPS_INVALID")
     return {
+        "outcome": (
+            "PORTAL_ITEM_METADATA_CONFIRMED"
+            if url_identity_matches
+            else "PORTAL_ITEM_METADATA_RETRIEVED_SERVICE_URL_MISMATCH"
+        ),
         "id": SERVICE_ITEM_ID,
         "title": title,
         "type": "Feature Service",
@@ -232,7 +239,10 @@ def validate_portal_item(document: dict) -> dict:
         "owner": owner,
         "created_unix_ms": created,
         "modified_unix_ms": modified,
-        "service_url_identity": expected_service.hostname + expected_service.path,
+        "service_url_host": service_url.hostname,
+        "service_url_path": service_url.path,
+        "expected_service_url_path": expected_path,
+        "service_url_identity_matches": url_identity_matches,
         "service_url_query_parameter_names": item_query_names,
         "service_url_has_token_parameter": "token" in item_query_names,
         "raw_item_url_retained": False,
@@ -247,9 +257,9 @@ def fetch_portal_item_metadata(fetcher=fetch_json) -> dict:
             document = fetcher(PORTAL_ITEM_URL + "?f=" + response_format)
             item = validate_portal_item(document)
             return {
-                "outcome": "PORTAL_ITEM_METADATA_CONFIRMED",
+                "outcome": item["outcome"],
                 "item": item,
-                "attempts": attempts + [{"format": response_format, "outcome": "JSON_AND_IDENTITY_VALID"}],
+                "attempts": attempts + [{"format": response_format, "outcome": "JSON_RETRIEVED"}],
             }
         except E561Error as error:
             attempts.append({"format": response_format, "outcome": error.outcome})
