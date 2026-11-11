@@ -89,6 +89,65 @@ def xml_urls(payload):
             found.add(value.rstrip(".,);]"))
     return sorted(found)
 
+def checksum_status(expected, payload):
+    if not isinstance(expected,dict):
+        return {"status":"NOT_PROVIDED","matches":None}
+    kind=str(expected.get("type") or "").upper()
+    value=str(expected.get("value") or "").lower()
+    if kind=="MD5":
+        actual=hashlib.md5(payload).hexdigest()
+    elif kind in {"SHA256","SHA-256"}:
+        actual=hashlib.sha256(payload).hexdigest()
+    else:
+        return {"type":kind or None,"expected":value or None,"matches":None,"status":"UNSUPPORTED_CHECKSUM"}
+    return {"type":kind,"expected":value,"actual":actual,"matches":actual==value,"status":"MATCH" if actual==value else "MISMATCH"}
+
+
+def parse_fgdc_metadata(payload):
+    root=ET.fromstring(payload)
+    def value(path):
+        node=root.find(path)
+        return node.text.strip() if node is not None and node.text else None
+    fields=[]
+    analog_types=[]
+    for attr in root.findall(".//eainfo/detailed/attr"):
+        label=attr.findtext("attrlabl")
+        if label:
+            fields.append(label.strip())
+            if label.strip()=="AnalogType":
+                analog_types=sorted({x.text.strip() for x in attr.findall(".//edomv") if x.text and x.text.strip()})
+    count=value(".//spdoinfo/ptvctinf/sdtsterm/ptvctcnt")
+    accuracy=value(".//dataqual/posacc/horizpa/horizpar")
+    match=re.search(r"up to\\s+(\\d+(?:\\.\\d+)?)\\s*km",accuracy or "",re.IGNORECASE)
+    absres=value(".//spref/horizsys/planar/planci/coordrep/absres")
+    ordres=value(".//spref/horizsys/planar/planci/coordrep/ordres")
+    return {
+        "title":value(".//idinfo/citation/citeinfo/title"),
+        "author":value(".//idinfo/citation/citeinfo/origin"),
+        "publication_date":value(".//idinfo/citation/citeinfo/pubdate"),
+        "metadata_date":value(".//metainfo/metd"),
+        "purpose":value(".//idinfo/descript/purpose"),
+        "analysis_use_allowed":not ("not for analysis" in (value(".//idinfo/descript/purpose") or "").casefold()),
+        "progress":value(".//idinfo/status/progress"),
+        "update_frequency":value(".//idinfo/status/update"),
+        "declared_geometry":value(".//spdoinfo/ptvctinf/sdtsterm/sdtstype"),
+        "declared_feature_count":int(count) if count and count.isdigit() else None,
+        "horizontal_accuracy_statement":accuracy,
+        "maximum_accuracy_error_km":float(match.group(1)) if match else None,
+        "completeness_statement":value(".//dataqual/complete"),
+        "lineage_process_description":value(".//dataqual/lineage/procstep/procdesc"),
+        "lineage_process_date":value(".//dataqual/lineage/procstep/procdate"),
+        "projection":value(".//spref/horizsys/planar/mapproj/mapprojn"),
+        "horizontal_datum":value(".//spref/horizsys/geodetic/horizdn"),
+        "coordinate_units":value(".//spref/horizsys/planar/planci/plandu"),
+        "coordinate_resolution_m":float(absres) if absres and ordres and absres==ordres else None,
+        "attribute_fields":fields,
+        "analog_type_values":analog_types,
+        "access_constraints":value(".//idinfo/accconst"),
+        "use_constraints":value(".//idinfo/useconst"),
+    }
+
+
 def vector_url_candidates(urls):
     allowed={".zip",".geojson",".json",".gpkg",".shp",".kml"}
     result=[]
@@ -208,7 +267,22 @@ def run_live():
                 (OUT/"metadata.xml").write_bytes(xml_payload)
                 links=xml_urls(xml_payload)
                 candidates=vector_url_candidates(links)
-                r["metadata_xml"]={"name":xmls[0]["name"],"status":xml_response["status"],"host":xml_response["host"],"bytes":len(xml_payload),"sha256":hashlib.sha256(xml_payload).hexdigest(),"links":[{"host":urllib.parse.urlsplit(x).hostname,"path":urllib.parse.urlsplit(x).path,"url_sha256":hashlib.sha256(x.encode()).hexdigest()} for x in links],"vector_link_count":len(candidates)}
+                expected_size=xmls[0].get("size_bytes")
+                checksum=checksum_status(xmls[0].get("checksum"),xml_payload)
+                r["metadata_xml"]={
+                    "name":xmls[0]["name"],"status":xml_response["status"],"host":xml_response["host"],
+                    "bytes":len(xml_payload),"sha256":hashlib.sha256(xml_payload).hexdigest(),
+                    "catalogue_size_bytes":expected_size,
+                    "catalogue_size_matches":expected_size is not None and len(xml_payload)==expected_size,
+                    "catalogue_checksum":checksum,
+                    "links":[{"host":urllib.parse.urlsplit(x).hostname,"path":urllib.parse.urlsplit(x).path,"url_sha256":hashlib.sha256(x.encode()).hexdigest()} for x in links],
+                    "vector_link_count":len(candidates),
+                    "fgdc_summary":parse_fgdc_metadata(xml_payload),
+                }
+                if checksum.get("matches") is False:
+                    r["outcome"]="METADATA_XML_CHECKSUM_MISMATCH"
+                    r["secondary_outcome"]="METADATA_XML_NO_VECTOR_LINK" if not candidates else "VECTOR_LINKS_NOT_FOLLOWED"
+                    return write_receipt(r)
             if not candidates:
                 r["outcome"]="METADATA_XML_NO_VECTOR_LINK" if xmls else "METADATA_ONLY_NO_VECTOR_FILE"
                 return write_receipt(r)
