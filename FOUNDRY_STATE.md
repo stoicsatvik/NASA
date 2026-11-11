@@ -3,7 +3,7 @@
 Updated: 2026-11-12
 Class: Tier A
 Time horizon: NASA Space Apps Challenge, 14–15 Nov 2026
-Working branch: `research/e562-firms-source-access-audit-20261112`
+Working branch: `research/e568-2025-hirise-dtm-observed-point-support-20261112`
 Main objective: maximize uncertainty eliminated per run and converge on a scientifically defensible Space Apps entry.
 
 ## Current thesis
