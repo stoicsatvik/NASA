@@ -27,7 +27,9 @@ OUT = Path(".artifacts/e561")
 
 
 class E561Error(RuntimeError):
-    pass
+    def __init__(self, outcome: str):
+        super().__init__(outcome)
+        self.outcome = outcome
 
 
 class NoRedirectHandler(urllib.request.HTTPRedirectHandler):
@@ -43,9 +45,13 @@ def endpoint_is_allowed(url: str) -> bool:
         urllib.parse.urlsplit(QUERY_URL).path,
     }
     portal_path = urllib.parse.urlsplit(PORTAL_ITEM_URL).path
+    try:
+        port = parsed.port
+    except ValueError:
+        return False
     if (
         parsed.scheme != "https"
-        or parsed.port not in (None, 443)
+        or port not in (None, 443)
         or parsed.username
         or parsed.password
         or parsed.fragment
@@ -63,7 +69,7 @@ def endpoint_is_allowed(url: str) -> bool:
             return params == {"where": "1=1", "returnCountOnly": "true", "f": "json"}
         return params == {"f": "json"}
     if parsed.hostname == "www.arcgis.com" and parsed.path == portal_path:
-        return params == {"f": "json"}
+        return params in ({"f": "json"}, {"f": "pjson"})
     return False
 
 
@@ -93,8 +99,9 @@ def fetch_json(url: str) -> dict:
     with response:
         if response.status != 200 or response.geturl() != url:
             raise E561Error("ARCGIS_RESPONSE_IDENTITY_MISMATCH")
-        if response.headers.get_content_type() != "application/json":
-            raise E561Error("ARCGIS_RESPONSE_NOT_JSON")
+        content_type = response.headers.get_content_type()
+        if content_type != "application/json":
+            raise E561Error("ARCGIS_RESPONSE_NOT_JSON:" + str(content_type))
         length = response.headers.get("Content-Length")
         if length and int(length) > MAX_RESPONSE_BYTES:
             raise E561Error("ARCGIS_RESPONSE_DECLARED_SIZE_EXCEEDED")
@@ -233,6 +240,27 @@ def validate_portal_item(document: dict) -> dict:
     }
 
 
+def fetch_portal_item_metadata(fetcher=fetch_json) -> dict:
+    attempts = []
+    for response_format in ("json", "pjson"):
+        try:
+            document = fetcher(PORTAL_ITEM_URL + "?f=" + response_format)
+            item = validate_portal_item(document)
+            return {
+                "outcome": "PORTAL_ITEM_METADATA_CONFIRMED",
+                "item": item,
+                "attempts": attempts + [{"format": response_format, "outcome": "JSON_AND_IDENTITY_VALID"}],
+            }
+        except E561Error as error:
+            attempts.append({"format": response_format, "outcome": error.outcome})
+    return {
+        "outcome": "PORTAL_ITEM_METADATA_UNAVAILABLE",
+        "attempts": attempts,
+        "raw_item_url_retained": False,
+        "raw_item_metadata_retained": False,
+    }
+
+
 def validate_count(document: dict) -> int:
     count = document.get("count")
     if isinstance(count, bool) or not isinstance(count, int) or count < 0:
@@ -244,7 +272,7 @@ def validate_count(document: dict) -> int:
 
 
 def run_live() -> dict:
-    portal_item = validate_portal_item(fetch_json(PORTAL_ITEM_URL + "?f=json"))
+    portal_item = fetch_portal_item_metadata()
     service_doc = fetch_json(SERVICE_URL + "?f=json")
     service = validate_service(service_doc)
     layer_doc = fetch_json(LAYER_URL + "?f=json")
