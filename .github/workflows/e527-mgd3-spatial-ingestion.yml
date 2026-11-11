@@ -1,0 +1,58 @@
+name: E527 official USGS MGD3 spatial ingestion
+
+on:
+  push:
+    branches:
+      - research/e527-mgd3-spatial-ingestion-20261111
+    paths:
+      - 'experiments/e527_mgd3_spatial_ingestion.py'
+      - 'experiments/test_e527_mgd3_spatial_ingestion.py'
+      - 'experiments/e528_mgd3_2018_id_join.py'
+      - 'experiments/test_e528_mgd3_2018_id_join.py'
+      - 'experiments/e529_mgd3_codebook_audit.py'
+      - 'experiments/test_e529_mgd3_codebook_audit.py'
+      - '.github/workflows/e527-mgd3-spatial-ingestion.yml'
+  pull_request:
+    paths:
+      - 'experiments/e527_mgd3_spatial_ingestion.py'
+      - 'experiments/test_e527_mgd3_spatial_ingestion.py'
+      - 'experiments/e528_mgd3_2018_id_join.py'
+      - 'experiments/test_e528_mgd3_2018_id_join.py'
+      - 'experiments/e529_mgd3_codebook_audit.py'
+      - 'experiments/test_e529_mgd3_codebook_audit.py'
+      - '.github/workflows/e527-mgd3-spatial-ingestion.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  acquire-and-inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned shapefile parser
+        run: python -m pip install pyshp==2.3.1 openpyxl==3.1.5
+      - name: Run deterministic parser and provenance tests
+        run: python -m unittest experiments.test_e527_mgd3_spatial_ingestion experiments.test_e528_mgd3_2018_id_join experiments.test_e529_mgd3_codebook_audit -v
+      - name: Acquire official USGS MGD3 spatial and table archives
+        run: python experiments/e527_mgd3_spatial_ingestion.py --out .artifacts/e527
+      - name: Join the official 2018 MGD3 workbooks to verified 2007 Dune_ID values
+        run: python experiments/e528_mgd3_2018_id_join.py --spatial-csv .artifacts/e527/mgd3_2007_dune_fields.csv --out .artifacts/e528
+      - name: Extract full official 2007 MGD3 field definitions and codebooks
+        run: python experiments/e529_mgd3_codebook_audit.py --output .artifacts/e529/mgd3_2007_codebook_audit.json
+      - name: Preserve source receipts and normalized tables
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e527-e529-mgd3-spatial-2018-join-and-codebook
+          path: |
+            .artifacts/e527/**
+            .artifacts/e528/**
+            .artifacts/e529/**
+          if-no-files-found: ignore
+          retention-days: 30

@@ -3,7 +3,7 @@
 Updated: 2026-11-11
 Class: Tier A
 Time horizon: NASA Space Apps Challenge, 14–15 Nov 2026
-Working branch: `research/e524-paad-mgd3-feature-admissibility-20261111`
+Working branch: `research/e527-mgd3-spatial-ingestion-20261111`
 Main objective: maximize uncertainty eliminated per run and converge on a scientifically defensible Space Apps entry.
 
 ## Current thesis
@@ -194,3 +194,61 @@ Challenge-selection superiority remains NOT YET PROVEN. Do not lock the planetar
 ## Updated next decisive experiment
 
 Retrieve the official 2007 MGD3 spatial package through USGS download/ScienceBase/OGC endpoints; verify source hash, CRS, geometry and 37-column schema; join spatial features to the 2018 workbook by Dune ID; report matched/unmatched IDs; then construct the first physically comparable Earth/Mars feature matrix and run E001 leave-one-site-out against random, histogram-only and physically weighted baselines. Preserve nulls and unlabeled controls.
+
+## E528 integration preflight — actual MGD3 Dune ID field (2026-11-11)
+
+A source-to-source integration review of the E527→E528 path found a deterministic header-binding defect before any scientific join was claimed.
+
+- E527's ID-field recognizer explicitly admits the long USGS field name `Dune  Field Lon+Lat ID` (and its regression fixture already exercises that name).
+- E527 writes the original DBF field name into `mgd3_2007_dune_fields.csv`.
+- E528 previously accepted only normalized headers exactly equal to `Dune_ID` / `DuneID`; its tests used only the canonical alias. Therefore the actual E527 output schema could be rejected by E528 before the 2018 workbook join.
+- E528 now uses a fail-closed field resolver aligned with E527's recognized aliases: exact canonical IDs first, otherwise one unique Dune + delimited ID field. Missing or ambiguous candidates are rejected.
+- Regression tests now cover the long USGS field plus a nearby non-ID azimuth field, ambiguous Dune-ID candidates, canonical Dune_ID, and missing headers.
+- Focused local integration harness: **3/3 tests passed** for actual long-field admission, ambiguity rejection, and canonical/missing-header controls.
+- Commits on the isolated E527 branch: source `c9a33d46f84dfcf5db7b90aa96ffffa267ef464a`; tests/head `7fc6a9d76d74d0094ee7ac07e18ba04fe8ad845f`.
+- GitHub exact-head Actions status is **not yet verified**. The E527 workflow is push/workflow_dispatch-triggered; the available commit-run reader only exposes PR-triggered runs, and no check/status was returned for the new head.
+- The official 2007 archive has **not yet been ingested in this run**, the E528 2018 workbook join has **not yet been executed**, and E529 codebook interpretation remains pending. This is an integration-contract correction, not evidence of matched IDs or physical feature comparability.
+
+Claim states unchanged: cross-body similarity **NOT YET PROVEN**; known-site recovery **NOT YET MEASURED**; novel analogue discovery **NOT YET PROVEN**; challenge-selection superiority **NOT YET PROVEN**.
+
+Next: obtain the exact-head E527-E529 workflow receipt, inspect archive hash/CRS/schema and matched/unmatched Dune IDs, then audit codebook definitions before any physical descriptor crosswalk.
+
+
+## 2026 challenge-selection falsification screen (2026-11-11)
+
+The full 14-challenge screen is recorded in `research/CHALLENGE_SELECTION_SCREEN_20261111.md`. First-pass weighted readiness screen (data 25%, measurable validation 25%, portfolio reuse 20%, differentiation 15%, 48-hour feasibility 15%) does **not** support planetary analog as the current default. Martian Map ranks first at 4.10/5, MODIS/VIIRS at 4.00, CLPS at 3.85, Earth System Trend Detective at 3.80; planetary analog scores 2.93 because known-site recovery and cross-body descriptors are still unmeasured. These are heuristic readiness scores, not judging predictions.
+
+The best current execution candidate is therefore **Challenge 11: Interplanetary Survival Guide: Martian Map**, provisionally. Existing `stoicsatvik/martian` is preparation-only (not a solution) and records MOLA/CTX/HiRISE source families; the NASA MGD3 spatial ingestion can potentially supply a dune layer. Challenge 10 remains alive only behind the E527 archive/schema/CRS gate and a real E001 leave-one-site-out recovery result. MODIS/VIIRS and CLPS remain live alternatives.
+
+Do not lock or submit. Re-score after official MGD3 ingestion and a reproducible Mars-layer registration test. Keep observed terrain/environment layers separate from crew fatigue, oxygen assumptions and mission rules; RAD/REMS are local rover observations, not global safety forecasts. Challenge-selection superiority remains **NOT YET PROVEN**.
+
+
+## E527/E528 actual MGD3 acquisition and join (2026-11-11)
+
+Exact-head Actions run [#42922184681](https://github.com/stoicsatvik/NASA/actions/runs/42922184681) on the E527 branch passed **22 parser/provenance tests** and completed the live archive acquisition, 2018 workbook join and prior E529 keyword audit.
+
+- Official 2007 Shapefiles.zip: 60,597,152 bytes; SHA-256 `a43e8f842aa0e9b1edb920a2624a430ebf7fb6a059fc9c6f1ae37cc179635f34`.
+- Core layer: **547 POLYGON geometries, 547 nonempty unique Dune_IDs, zero duplicates**. CRS is Mars sinusoidal on the 3,396,190 m MOLA sphere; native coordinates are metres. The polygon bounding box is recorded in the receipt.
+- Official 2007 Tables.zip: SHA-256 `9f2e7fe86f813cafcabf34587648e2d6d31a6207046a6d32fb2a98953c8cadb1`. The same-release Softcopy table joined **547/547** unique IDs to the spatial layer using the long field name `Dune  Field Lon+Lat ID`.
+- Official 2018 workbook: 2,982,330 bytes; SHA-256 `92771c23cfa4a64dfcc38f5ad29de00adfa41b9f321d3665beb2112eefe3485e`, matching E318 exactly. E528 normalized **1,853** ID-bearing rows across eight worksheets and linked **535 unique Equatorial Dune_IDs** to the 2007 spatial inventory. Four worksheets contain matches. Each Equatorial Global Summary sheet has 58/58 IDs matched; the Stability Index has 535/786 unique IDs matched; the THEMIS ATI/TES modeling sheet has 40/53 rows matched. South Polar sheets have no matches because they lie outside the 2007 layer's equatorial coverage; they are not treated as negative sites.
+- The 2007 Dune_ID encoding decodes to longitude and aerocentric latitude at 0.1-degree precision. Those values are identifier-derived and are not independent coordinates or a positional-accuracy measurement.
+- The previous E529 audit verified 12 documentation entries and 20 metadata entries, preserving archive hashes. Its bounded keyword excerpts were insufficient for a full codebook crosswalk.
+
+## E529 full field-definition extraction (2026-11-11)
+
+The E529 parser now extracts complete numbered field definitions from `ReadMe_GIS.txt` and `ReadMe_Softcopy.txt`, preserves source-document SHA-256 values, decodes Windows-1252 en-dash separators, and distinguishes unit parentheses from field aliases. All seven E529 unit tests passed in an isolated local harness (including three new parser-focused fixtures); this is not a full repository CI run. The current extractor has **not yet been rerun against the live USGS archives**; the 22-test exact-head workflow above predates this change. See `research/E529_MGD3_FIELD_DEFINITION_EXTRACTION_20261111.md`.
+
+E530 remains a decisive negative admissibility result: strict Dune_Type matches are S/SS; L remains a candidate; B is ambiguous because PAAD combines barchan/barchanoid while MGD3 separates B/Bd. Naively admitting B inflates coverage 1.81× on PAAD and 1.93× on MGD3. No directly shared quantitative physical-feature family is admitted. E001 remains NOT READY; no analogue recovery or cross-body similarity is claimed.
+
+## Current frontier after E531 (2026-11-11)
+
+- E531 keeps Martian Map and MODIS/VIIRS in a provisional top tier. Martian Map is the most frequent top choice in the tested perturbation families (83.97%, 65.40%, 54.34%), but its 5th-percentile score margin over MODIS/VIIRS is negative even at ±0.25. These are heuristic scorecard perturbations, not judging probabilities. Do not lock the challenge.
+- The 2007 MGD3 dune layer is now available as source-backed Mars context. It does **not** validate a route-safety model or a cross-body analogue model.
+- Highest-value next actions: (1) run the updated E529 full-field extractor on the official archives and inspect the exact Dune_Type, area, average-elevation and mean-height definitions; (2) only then update E530's conservative crosswalk if a source-backed equivalence exists; (3) test CRS/extent/coverage registration of MGD3 against the existing MOLA/CTX/HiRISE layers in `stoicsatvik/martian`. Keep observed terrain layers separate from crew fatigue, oxygen assumptions and mission rules.
+
+Claim states remain: cross-body similarity **NOT YET PROVEN**; known-site recovery **NOT YET MEASURED**; novel analogue discovery **NOT YET PROVEN**; route safety **NOT VALIDATED**; challenge-selection superiority **NOT YET PROVEN**.
+
+
+## E529 CI syntax correction — 2026-11-11
+
+The latest E527/E528/E529 workflow failure [#42923772054](https://github.com/stoicsatvik/NASA/actions/runs/42923772054) was a Python syntax error in E529 ZIP path normalization, before any live acquisition step. Corrected the escaped backslash in commit [ed7db2b](https://github.com/stoicsatvik/NASA/commit/ed7db2b7163fc5474a3a598d6dc89b3127bacaad). The exact current E529 module/test files passed **7/7** unit tests in an isolated Python harness and imported successfully. This does not substitute for exact-head Actions or live archive extraction; the corrected commit has no returned combined status. Prior E527/E528 live acquisition evidence from run #42922184681 remains valid for its earlier code head (547/547 spatial IDs, 547/547 same-release table join, 535 unique Equatorial 2018 IDs). Re-run the full workflow on the corrected head before accepting the new E529 field-definition extraction as live-source validated. No taxonomy or E001 claim changes.
