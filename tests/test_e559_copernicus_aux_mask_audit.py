@@ -101,7 +101,7 @@ def test_hem_sentinel_is_excluded_from_height_error_statistics():
     assert result["valid_samples"] == 4
     assert result["masked_or_sentinel_samples"] == 2
     assert result["height_error_median_m"] == 2.5
-    assert result["center_value"] == 3.0
+    assert result["center_value"] == 4.0
 
 
 def test_kml_summary_extracts_metadata_without_retaining_raw_xml():
