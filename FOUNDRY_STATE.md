@@ -430,3 +430,31 @@ E542's 463 m/pixel MOLA value is an equatorial nominal spacing, not an isotropic
 - Only a compact JSON receipt was uploaded; no raster or raw pixel array was committed/uploaded.
 - Raw CTX GeoTIFF acquisition and bounded sample inspection for this pinned product: **SUPPORTED**. CTX/HiRISE raster co-registration NOT YET MEASURED; MOLA local observed-count support NOT YET MEASURED; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; route safety NOT CLAIMED.
 - Next decisive gate: pin the exact 2025 HiRISE CTX-reference lineage, acquire a bounded HiRISE raster sample and MOLA topography plus observed-count tile, then compare only over verified common valid-pixel support. Do not infer route safety.
+
+
+## E545 — bounded Jezero MOLA observed-count support (2026-11-11)
+
+- Isolated branch: research/e545-mola-observed-support-20261111, based on E544.
+- Tests the missing local-support premise directly instead of substituting the global equatorial 55% observed-bin statement.
+- Pins the PDS Geosciences Node 128 ppd MOLA topography tile MEGT44N000HB and companion count tile MEGC44N000HB, including their PDS3 labels.
+- Samples a 33 × 33 window centered at the published CTX/2025-HiRISE overlap-envelope centroid (18.3995°N, 77.27025°E). Requests only complete fixed-width rows with exact HTTP Range; combined image transfer is capped at 1.2 MB and full-file responses are refused.
+- Validates PDS label dimensions, sample types, units, projection, byte offsets, HTTP 206, Content-Range and byte counts. Uses count > 0 to separate observed bins from interpolated topography.
+- Retains only hashes, source metadata and compact sample statistics; raw raster bytes and pixel arrays are not committed or uploaded.
+- Exact-head run #43013238079 and post-documentation reruns #43016218070/#43016212376 succeeded; the measured result is recorded below. Bounded MOLA ingestion and local shot support are supported for this 33 × 33 window only; common-valid-pixel support with CTX/HiRISE is not established.
+- Claim states remain: cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN; route safety NOT CLAIMED.
+
+
+### E545 exact-head result (2026-11-11)
+
+Exact-head GitHub Actions run 43013238079 succeeded (11 November 2026):
+
+- Deterministic E545 fixtures: 13/13 passed.
+- Both PDS labels returned HTTP 200 and passed the frozen dimensions/type/projection contract.
+- Topography range: HTTP 206, 760,320 bytes, Content-Range bytes 75110400-75870719/129761280, SHA-256 26bc6c5c3b5445690558a2d2b7af89d8be4d0ef4071eb0f6640c807143db7cd7.
+- Counts range: HTTP 206, 380,160 bytes, Content-Range bytes 37555200-37935359/64880640, SHA-256 216841a8e5ad73ea0051e7227bd64086708ae617e451de450904b4f4f0b82b8b.
+- The 33 × 33 window contains 346/1,089 bins with count > 0 (31.7723% observed; 743 bins have zero recorded shots and interpolated topography). Positive counts range 1–7, median 2, sum 650.
+- Observed-bin topography: min -2,530 m, median -2,080 m, mean -2,115.806 m, max -1,696 m, population SD 228.663 m. These are PDS MOLA areoid-relative values, not yet transformed to the CTX/HiRISE reference.
+- Receipt artifact 13851307843; ZIP SHA-256 0c52efbc41515eab4c8f6f25da9b699d74b38edd1395414f51d97cb16f1d23ba. No raw pixels or raster bytes were retained.
+- Outcome: MOLA_OBSERVED_SUPPORT_MEASURED. Bounded MOLA ingestion and local observed-shot support for this window: SUPPORTED. The 31.8% result is a measured local coverage fraction, not a global coverage estimate or a co-registration result.
+- The MOLA window is centered inside the CTX/HiRISE metadata-envelope intersection; its full footprint extends beyond that intersection. It is not a verified common-valid-pixel window.
+- Cross-body similarity remains NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN; route safety NOT CLAIMED.
