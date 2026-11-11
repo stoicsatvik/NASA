@@ -3,7 +3,7 @@
 Updated: 2026-11-11
 Class: Tier A
 Time horizon: NASA Space Apps Challenge, 14–15 Nov 2026
-Working branch: `research/e547-hirise-direct-geotiff-range-20261111`
+Working branch: `research/e548-hirise-pixel-window-20261111`
 Main objective: maximize uncertainty eliminated per run and converge on a scientifically defensible Space Apps entry.
 
 ## Current thesis
@@ -493,3 +493,17 @@ Exact-head GitHub Actions run 43013238079 succeeded (11 November 2026):
 - Exact-head Actions [#43022208448](https://github.com/stoicsatvik/NASA/actions/runs/43021100543) succeeded: 8/8 fixture tests passed; the 1,839,545,409-byte TIFF returned HTTP 200 with `Accept-Ranges: bytes`. TIFF is 21,400 × 21,488 float32, uncompressed, one row per strip (21,488 strips; 85,600 bytes/row), not tiled. ModelPixelScale [1,1,0], ModelTiepoint [0,0,0,4577366,1106618,0], GeoKeyDirectory present. One 85,600-byte strip was read by exact Range; total 12 requests / 258,025 bytes, below the 1 MB cap. Receipt artifact 13855557466, ZIP SHA-256 2513dc52d9abfc3bbaa1442d61382fd1c230cbda1fef7d551772d0dcdc9a4f2c.
 - Outcome: direct 2020 TIFF metadata and one strip range read SUPPORTED. COG status NOT CLAIMED; pixel values NOT decoded; 64×64 window NOT YET MEASURED; CTX/HiRISE registration NOT YET MEASURED. This is the 2020 TRN product, not the 2025 MSR mosaic.
 - Next: inspect the sidecar label for vertical units/nodata; then test a preregistered 64×64 window. The TIFF is uncompressed float32 with one row per strip, so 64 rows × 64 columns should require 64 exact 256-byte payload ranges (16,384 payload bytes) if row offset/count invariants hold. Decode only after confirming nodata semantics, then compare coordinates/CRS to E544 without assuming datum or exact CTX-reference identity. Keep 2020 and 2025 products separate.
+
+
+## E548 — bounded controlled HiRISE pixel-window acquisition (2026-11-11)
+
+- Draft PR #108, stacked on E547 / PR #107; main unchanged.
+- Exact-head Actions #43023187910 passed 9/9 deterministic tests and completed the live bounded acquisition.
+- The 2020 TRN HiRISE PDS3 label (2,296 bytes; SHA-256 99b972f7ea13f9e05e9d3f265435a0566b53dbde4088781673edeb0b6d24cade) identifies IEEE_REAL / 32-bit samples, equirectangular projection, centre latitude/longitude 0°, A-axis radius 3,396.19 km and 59,274.6975 pixels/degree. It does not expose a standalone UNIT or MISSING_CONSTANT field.
+- GeoTIFF GDAL_NODATA supplies -3.4028226550889045e+38; no nodata values occurred in the preregistered 64×64 window.
+- Actual bounded pixel sample: 4,096/4,096 finite and usable; min −2,439.2717, median −2,436.7209, mean −2,436.6555, SD 1.2090, max −2,433.9929. Sample SHA-256 f9cb7459bc3c6030c29c84070913cf4ff20d0650a3e4c4d438bcf255c2c2ae65.
+- 74 exact Range requests / 188,767 bytes transferred, below the 1 MB cap; receipt artifact 13854994460.
+- GeoTIFF ProjectedCSTypeGeoKey is 32767 (user-defined), so direct code equality with E544's ESRI:103885 is not meaningful. Both official USGS product pages independently specify equirectangular projection, 3,396,190 m spherical radii, planetocentric latitude, positive-east longitude and metre vertical units. Exact parameter-level equivalence still requires reconstruction from the label/GeoKeys.
+- E548 supports bounded 2020 HiRISE pixel acquisition only. Common valid-pixel support, local CTX/HiRISE residual, cross-body similarity, E001 known-site recovery, novel analogue discovery and local validation advantage remain NOT ESTABLISHED / NOT YET MEASURED / NOT YET PROVEN as applicable. No raw pixels were retained or uploaded.
+
+Next: reconstruct the user-defined HiRISE projection, verify parameter equivalence with the E544 CTX CRS, and run an area-matched CTX-versus-HiRISE elevation comparison with nodata masks and preregistered ±6 m shift sensitivity. Preserve the published ~0.4 m median offset as external context, not as a result of this local sample.
