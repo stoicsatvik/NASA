@@ -3,7 +3,7 @@
 Updated: 2026-11-11
 Class: Tier A
 Time horizon: NASA Space Apps Challenge, 14–15 Nov 2026
-Working branch: `research/e554-hirise-nodata-neighborhood-20261111`
+Working branch: `research/e557-copernicus-glo30-lonar-sample-20261111`
 Main objective: maximize uncertainty eliminated per run and converge on a scientifically defensible Space Apps entry.
 
 ## Current thesis
@@ -101,7 +101,7 @@ Pivot away from the planetary-analog track if any of these becomes clear:
 
 ## Next trigger
 
-**E554 finds all three missing positions remain all-nodata across 128×128 (128 m) neighborhoods. Stop further local pixel probes. Next: obtain independent USGS footprint/quality-mask provenance; if it cannot establish valid common support, preserve partial coverage. Continue independent Earth positive-site/control discovery before E001.**
+**E556 resolved NASADEM HGT tile N19E076 for both frozen Maharashtra points through CMR, but the only returned data path is Earthdata-protected. No credentials or raster bytes were used. Stop anonymous NASADEM retries. E557 now tests the anonymous Copernicus GLO-30 public COG as an auxiliary Earth DEM; keep DSM semantics and challenge-specific NASA-resource eligibility separate. Continue seeking independently labelled Earth positives and defensible controls before E001.**
 
 E527/E528 spatial acquisition and ID joining are complete. E530 found no directly admissible shared quantitative features in the current PAAD/MGD3 pair. The next run must address independent labels/controls or falsify another feature family, not repeat ingestion or polish UI.
 
@@ -572,3 +572,25 @@ Draft PR #114, branch `research/e554-hirise-nodata-neighborhood-20261111`. Exact
 Claim: local 128 m nodata neighborhoods MEASURED; common support at the three positions NOT RECOVERED; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; route safety NOT CLAIMED.
 
 Next: stop repeated local pixel probes. Seek independent USGS footprint/quality-mask provenance or preserve partial coverage; return effort to independent Earth positive-site/control discovery before E001.
+
+
+## E556 NASADEM HGT access gate (2026-11-11)
+
+- Draft PR #116 on `research/e556-nasadem-earth-candidate-sample-20261111`, stacked on E554; main unchanged.
+- Exact implementation head `24e7238f329df6f9189cee939c20258043489009`; [Actions #43049875930](https://github.com/stoicsatvik/NASA/actions/runs/43049875930) SUCCESS, 8/8 deterministic tests; aggregate artifact #13868747953, ZIP SHA-256 `ffe193339d56983d88ad0f8cfac13fcc67c29a1333cfec2275aca7f24b5c3d5a`.
+- NASA CMR returned `NASADEM_HGT_n19e076` / tile `N19E076` for both Lonar (19.9750 N, 76.5090 E) and nearby comparison (19.8000 N, 76.3000 E).
+- Both CMR responses were 3,206 bytes with distinct preserved SHA-256 values in `research/E556_NASADEM_EARTH_CANDIDATE_SAMPLE_20261111.md`.
+- The only returned data path is `/lp-prod-protected/NASADEM_HGT.001/NASADEM_HGT_n19e076/NASADEM_HGT_n19e076.zip`. Outcome **EARTHDATA_AUTH_REQUIRED**. No credentials, redirects, range requests or raster bytes.
+- **SUPPORTED:** CMR tile metadata resolution. **BLOCKED:** anonymous NASADEM pixel access through this path. No elevation sample was measured.
+- E557 tests an anonymous Copernicus GLO-30 public COG as auxiliary data; do not treat it as a mandatory NASA challenge resource or merge DSM values naively with planetary elevation.
+
+
+## E557 Copernicus GLO-30 sample gate (2026-11-11)
+
+- Draft PR #117, branch `research/e557-copernicus-glo30-lonar-sample-20261111`, stacked on E556; main unchanged.
+- Exact code/test head `0679ef0ab45903738fdf80e086b078e61533c077`; [Actions #43050765819](https://github.com/stoicsatvik/NASA/actions/runs/43050765819) SUCCESS, 7/7 deterministic tests; artifact #13868973608, ZIP SHA-256 `55830d1d3457d0692f61492fb7caede6777797f5bd930bb7590fe1772a053ca7`.
+- Public Copernicus GLO-30 COG tile `N19_00_E076_00` HEAD 200, object size 39,295,710 bytes, range support confirmed; exact 16,384-byte header range returned HTTP 206 and TIFF signature. No full tile or raw window was committed.
+- Raster metadata: 3600×3600 float32, EPSG:4326, 1 arc-second, 1024×1024 DEFLATE COG blocks, 2/4/8 overviews, `AREA_OR_POINT=Point`, no GeoTIFF unit tag. Official handbook specifies metres and EGM2008 vertical datum; GLO-30 is a DSM including vegetation/buildings.
+- Two 17×17 windows were measured. Lonar literature lead: 289 valid samples, all exactly 479.500 m (SD/relief/slope 0). Nearby comparison point: median 570.597 m, mean 569.788 m, SD 4.520 m, relief 14.064 m, central slope 4.760°. Both windows cover ~465×492 m. The flat Lonar patch is not interpreted without WBM/FLM lineage; it may be water or a point away from the crater rim. Coordinates are approximate; this is not a site-wide sample.
+- **SUPPORTED:** anonymous GLO-30 tile access and descriptive DSM windows. **NOT ESTABLISHED:** bare-earth comparability, site labels, cross-body similarity, known-site recovery, novel discovery or local validation advantage.
+- Next: obtain WBM/FLM/source-lineage masks if public, sample a coordinate-uncertainty-aware rim/annulus, and audit independent positive-candidate catalogues. Keep DSM distinct from MOLA/CTX/HiRISE; no E001 claim.
