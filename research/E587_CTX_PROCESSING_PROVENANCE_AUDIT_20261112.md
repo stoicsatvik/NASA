@@ -22,13 +22,18 @@ The runner performs one pinned anonymous STAC search, inspects selected metadata
 
 ## Result
 
-Pending exact-head workflow. The result must distinguish:
-- an item-specific command sequence recovered from public metadata;
-- a provenance file exposed but without the relevant commands;
-- no item-specific provenance exposed in the pinned STAC item;
-- acquisition/parser failure.
+Exact-head workflow [#43235910834](https://github.com/stoicsatvik/NASA/actions/runs/43235910834) passed all 8 deterministic parser tests and the bounded live acquisition. The first attempt [#43235616356](https://github.com/stoicsatvik/NASA/actions/runs/43235616356) passed the same 8 tests but failed before source access because the directly executed script could not import the sibling `experiments` module; the repository root was added to `sys.path`, and the exact-head workflow then succeeded.
 
-No command order or sign convention is inferred from a missing asset.
+The live STAC POST returned HTTP 200 with 10,691 bytes and exactly the pinned item. It exposed seven assets (`dtm`, `image`, `intersection_error`, `mola_csv`, `orthoimage`, `qa_metrics`, `thumbnail`) and only `self`, `parent`, `collection`, `root` link relations. The selected processing/provenance property-key scan found no provenance keys. No provenance link or command-bearing asset was exposed. The result is therefore **NO_ITEM_SPECIFIC_PROVENANCE_EXPOSED_IN_PINNED_STAC_ITEM**.
+
+This is a bounded negative result about the pinned STAC item, not proof that a separate USGS provenance record does not exist elsewhere. The exact `pc_align` input order, inverse-transform application and `geodiff --reverse` flag remain NOT ESTABLISHED. The official ASP documentation establishes tool semantics only: `pc_align` first input is the fixed reference and second is the movable source; `geodiff` defaults to DEM1−DEM2 and DEM+CSV comparisons use the DEM grid regardless of argument order, with `--reverse` flipping sign.
+
+- Exact-head commit: `18b440fbc69abfd53de082d12b4e008d64e86168`.
+- Workflow: [#43235910834](https://github.com/stoicsatvik/NASA/actions/runs/43235910834), 8/8 tests passed, live probe succeeded.
+- Aggregate artifact: [#13951818805](https://github.com/stoicsatvik/NASA/actions/runs/43235910834/artifacts/13951818805), ZIP SHA-256 `a69f4ebea3f3aa58a1b84adfae1f2bc6e6b64790a4394d4d5f6ce93a536e8470`.
+- Durable aggregate receipt: `research/results/E587_CTX_PROCESSING_PROVENANCE_AUDIT_20261112.json`.
+
+No raw STAC JSON, raw provenance text, local paths, coordinates, signed query values or credentials were retained. The MOLA points remain control inputs, not held-out validation. Next: locate a distinct public provenance endpoint or a genuinely independent altimetry/DTM control source; do not repeat the same post-control QA cohort.
 
 ## Interpretation boundary
 

@@ -3,7 +3,7 @@
 Updated: 2026-11-12
 Class: Tier A
 Time horizon: NASA Space Apps Challenge, 14–15 Nov 2026
-Working branch: `research/e586-ctx-footprint-geometry-audit-20261112`
+Working branch: `research/e587-ctx-processing-provenance-audit-20261112`
 Main objective: maximize uncertainty eliminated per run and converge on a scientifically defensible Space Apps entry.
 
 ## Current thesis
@@ -1057,6 +1057,9 @@ Next gate: resolve item-specific `geodiff` order/control provenance; then inspec
 - Isolated branch `research/e587-ctx-processing-provenance-audit-20261112`, stacked on E586 / PR #148. Main remains untouched.
 - The new bounded runner checks the exact pinned STAC item for provenance/processing properties, links and assets, and fetches at most two allowlisted text provenance assets (2 MB cap each). It stores only metadata summaries, command roles/flags and hashes; no raw paths, command lines, coordinates, signed query values, credentials or source text.
 - Official ASP documentation now constrains interpretation: `pc_align` uses first input as fixed reference and second as movable source, with the denser reference first; `geodiff` defaults to DEM1−DEM2, while a DEM+CSV comparison uses the DEM grid regardless of input order and `--reverse` flips sign. The USGS CTX page says CTX products are aligned to MOLA shot tracks and QA metrics are post-ground-control CTX–MOLA differences.
-- These public docs do not identify the pinned item's exact commands. The exact-head workflow will determine whether the STAC item exposes item-specific provenance; no input order or sign is inferred from absence.
-- Independent validation remains unavailable from the MOLA control points because they are used in alignment. All required scientific claim states remain unchanged.
-- Exact-head validation: PENDING.
+- Exact-head workflow [#43235910834](https://github.com/stoicsatvik/NASA/actions/runs/43235910834) passed 8/8 deterministic parser tests and the bounded anonymous STAC acquisition. The first attempt [#43235616356](https://github.com/stoicsatvik/NASA/actions/runs/43235616356) also passed 8/8 tests but failed before source access because direct script execution did not include the repository root on `sys.path`; the import was fixed and the exact-head run repeated successfully. Both attempts are preserved.
+- Exact-head STAC POST: HTTP 200, 10,691 bytes, exact pinned item returned. Asset keys: `dtm`, `image`, `intersection_error`, `mola_csv`, `orthoimage`, `qa_metrics`, `thumbnail`. Link relations: `self`, `parent`, `collection`, `root`. No processing/provenance property keys, provenance links, provenance assets or command-bearing metadata were exposed by this pinned STAC item.
+- Result: `NO_ITEM_SPECIFIC_PROVENANCE_EXPOSED_IN_PINNED_STAC_ITEM`. This is a bounded negative result about the STAC item, not proof that no separate USGS provenance record exists elsewhere. The audit therefore does not recover the item's exact `pc_align` input order, inverse-transform application or `geodiff --reverse` flag.
+- Aggregate artifact [#13951818805](https://github.com/stoicsatvik/NASA/actions/runs/43235910834/artifacts/13951818805), ZIP SHA-256 `a69f4ebea3f3aa58a1b84adfae1f2bc6e6b64790a4394d4d5f6ce93a536e8470`; durable receipt: `research/results/E587_CTX_PROCESSING_PROVENANCE_AUDIT_20261112.json`.
+- Interpretation: ASP tool semantics are SUPPORTED by official documentation; item-specific sign/order remain NOT ESTABLISHED. MOLA control points remain training/control inputs, not independent validation. The nine E583/E586 products remain correlated post-control QA evidence, not held-out accuracy samples.
+- Next decisive move: seek a distinct public provenance endpoint or a genuinely independent altimetry/DTM control source. Do not keep sampling the same post-control QA cohort or treat it as validation. All core scientific claim states remain unchanged.
