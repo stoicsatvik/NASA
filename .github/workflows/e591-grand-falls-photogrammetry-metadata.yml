@@ -1,0 +1,52 @@
+name: E591 Grand Falls photogrammetry metadata inventory
+
+on:
+  pull_request:
+    branches:
+      - research/e590-grand-falls-2023-2024-access-20261112
+    paths:
+      - experiments/e591_grand_falls_photogrammetry_metadata.py
+      - experiments/test_e591_grand_falls_photogrammetry_metadata.py
+      - research/E591_GRAND_FALLS_PHOTOGRAMMETRY_METADATA_20261112.md
+      - .github/workflows/e591-grand-falls-photogrammetry-metadata.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e591-grand-falls-photogrammetry-metadata
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run deterministic E591 tests
+        run: python -m unittest experiments.test_e591_grand_falls_photogrammetry_metadata -v
+
+  live_probe:
+    if: github.event_name == 'pull_request'
+    needs: tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run one bounded metadata request
+        if: hashFiles('research/results/E591_GRAND_FALLS_PHOTOGRAMMETRY_METADATA_20261112.json') == ''
+        run: python -m experiments.e591_grand_falls_photogrammetry_metadata --out .artifacts/e591/grand-falls-photogrammetry-metadata.json
+      - name: Preserve sanitized metadata receipt only
+        if: always() && hashFiles('research/results/E591_GRAND_FALLS_PHOTOGRAMMETRY_METADATA_20261112.json') == ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: e591-grand-falls-photogrammetry-metadata
+          path: .artifacts/e591/grand-falls-photogrammetry-metadata.json
+          if-no-files-found: ignore
+          retention-days: 7
