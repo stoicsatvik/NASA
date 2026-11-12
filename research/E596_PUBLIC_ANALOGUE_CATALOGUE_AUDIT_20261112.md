@@ -45,6 +45,10 @@ The source README explicitly says new entries start Draft and become Verified on
 
 NASA's official Analog Explorer gallery lists 11 Earth/planet pairs, including Kilauea/Moon, Atacama/Mars, Iceland/Mars and Iceland/Moon. The USGS official terrestrial-analogs page identifies Meteor Crater, Cinder Lake, SP Mountain, Sunset Crater, Grand Falls, San Francisco Volcanic Field, Lava River Cave, Verde Valley and Grand Canyon, with stated use cases. These are useful independent candidate sources, but their page text does not expose a ready coordinate-bearing site-feature matrix. The USGS TADP/ScienceBase route remains a possible structured source; the prior metadata probe timed out.
 
+## Reproducibility
+
+Workflow [run 43265462598](https://github.com/stoicsatvik/NASA/actions/runs/43265462598) passed 4/4 deterministic tests, downloaded the exact pinned GeoJSON snapshot and verified the Git blob SHA before generating the aggregate-only receipt. The receipt is coordinate-free; raw geometry is not retained.
+
 ## E001 decision
 
 **E001 remains NOT YET MEASURED.** The catalogue cannot be used as ground truth in its current state: all records are Draft, and several site geometries are too coarse for a point sample without primary-source extent resolution. A 16-site list is not a labelled benchmark. The two-point Lonar/NASADEM sample remains descriptive only; neither Lonar nor its nearby comparison point is a validated positive/negative label.
