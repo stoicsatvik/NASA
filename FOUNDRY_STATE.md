@@ -3,7 +3,7 @@
 Updated: 2026-11-12
 Class: Tier A
 Time horizon: NASA Space Apps Challenge, 14–15 Nov 2026
-Working branch: `research/e577-grand-falls-2017-2019-access-20261112`
+Working branch: `research/e582-ctx-slope-error-envelope-20261112`
 Main objective: maximize uncertainty eliminated per run and converge on a scientifically defensible Space Apps entry.
 
 ## Current thesis
@@ -980,3 +980,14 @@ Claim states remain unchanged: repo operating system SUPPORTED; cross-body simil
 - Vertical unit is absent from STAC `raster:bands[].unit` and GeoTIFF band units. Official USGS CTX documentation says heights are relative to the Mars areoid and describes the `dem_geoid` processing stage; ASP `point2dem` documentation says DEM heights are in metres. This supports a source-backed metre inference, not a direct file metadata declaration.
 - Slope was deliberately not computed in E581 because the unit metadata was absent. Next: make the documented unit inference explicit, calculate multi-baseline slopes with uncertainty caveats, and inspect the item's QA metrics asset. USGS warns that effective resolution is coarser than 20 m posting and typical vertical precision is around 3–5 m.
 - Claim states: public item/COG acquisition SUPPORTED; raster/STAC shape-transform agreement SUPPORTED FOR THIS ITEM; pixel-window sampling SUPPORTED; TIFF/STAC vertical-unit field NOT REPORTED; documented metre inference CANDIDATE; slope and QA analysis NOT YET MEASURED; E001/cross-body/novel analogue/local validation/challenge superiority unchanged.
+
+
+## E582 — CTX slope-descriptor vertical-error sensitivity (12 November 2026)
+
+- Isolated branch `research/e582-ctx-slope-error-envelope-20261112`, draft PR stacked on E581 / PR #141; main untouched.
+- Source: official USGS CTX DTM documentation. It states 20 m post spacing, typical 3–5 m vertical precision, coarser effective resolution, MOLA control with sparse shot support, and per-item QA residual summaries. It explicitly notes that 3 m error can create about 9° apparent slope over 20 m but less than 1° over 200 m.
+- Recomputed the one-height perturbation envelope `atan(delta_z / baseline)`: 3 m/20 m = 8.530766°; 3 m/200 m = 0.859372°; 5 m/20 m = 14.036243°; 5 m/200 m = 1.432096°. Local standard-library assertions passed. This is a sensitivity calculation, not a raster slope measurement or confidence interval.
+- Decision: reject 20 m slope as the primary robust descriptor for this CTX product under the documented error envelope; retain 200 m as a candidate only. MOLA QA residuals are a quality screen, not independent fine-scale ground truth.
+- Exact claim states unchanged: public item/COG and E581 pixel-window acquisition SUPPORTED; direct TIFF/STAC vertical unit NOT REPORTED; metre interpretation only a collection-level processing-documentation inference; 200 m slope and QA residual analysis NOT YET MEASURED; E001, cross-body similarity, novel discovery, local validation advantage and challenge-selection superiority NOT YET PROVEN/NOT YET MEASURED.
+- Next: E583 bounded acquisition of `qa_metrics` and MOLA-control CSV, followed by 200 m/400 m slope summaries with valid-pair counts, nodata and detrending sensitivity. No route-safety claim.
+- Full report: `research/E582_CTX_SLOPE_ERROR_ENVELOPE_20261112.md`.
