@@ -1,4 +1,4 @@
-# E582 — CTX slope-descriptor vertical-error sensitivity
+# E582-S companion — CTX slope-descriptor vertical-error sensitivity
 
 Date: 12 November 2026  
 Branch: `research/e582-ctx-slope-error-envelope-20261112`  
@@ -57,7 +57,7 @@ The four values above were recomputed locally with Python's standard-library `ma
 
 ## Next decisive experiment
 
-E583 should acquire the pinned item's public `qa_metrics` asset and MOLA-control CSV with bounded, redacted receipts; inspect their schema and residuals; then calculate 200 m and 400 m slope summaries only after the vertical-unit provenance is explicit. Report valid-pair counts, nodata masks, detrending sensitivity and the separate effects of local noise and long-baseline tilt. Do not claim route safety from this single DTM.
+The parallel E582 QA/MOLA audit is now complete on PR #143. It acquired both assets but found a +27.3687 m mean and +26.7783 m median CTX–MOLA difference (SD 10.934 m), which is a quality warning under the official USGS guidance. E583 should first screen several additional Jezero CTX items by their QA metrics. Only if an item has defensible residuals should a later experiment calculate 200 m/400 m slope summaries with explicit vertical-unit provenance, valid-pair counts, nodata masks and detrending sensitivity. Do not claim route safety from this single DTM.
 
 ## Claim states
 
