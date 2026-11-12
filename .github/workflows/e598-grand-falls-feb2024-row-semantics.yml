@@ -1,0 +1,55 @@
+name: E598 Grand Falls February 2024 row semantics
+
+on:
+  push:
+    branches:
+      - research/e598-grand-falls-feb2024-row-semantics-20261112
+    paths:
+      - FOUNDRY_STATE.md
+      - experiments/e590_grand_falls_2023_2024_probe.py
+      - experiments/e595_grand_falls_sensor_dictionary.py
+      - experiments/e597_grand_falls_row_group_semantics.py
+      - experiments/e598_grand_falls_feb2024_row_semantics.py
+      - experiments/test_e598_grand_falls_feb2024_row_semantics.py
+      - .github/workflows/e598-grand-falls-feb2024-row-semantics.yml
+  pull_request:
+    branches:
+      - research/e597-grand-falls-row-group-semantics-20261112
+    paths:
+      - FOUNDRY_STATE.md
+      - experiments/e598_grand_falls_feb2024_row_semantics.py
+      - experiments/test_e598_grand_falls_feb2024_row_semantics.py
+      - research/E598_GRAND_FALLS_FEB2024_ROW_SEMANTICS_20261112.md
+      - .github/workflows/e598-grand-falls-feb2024-row-semantics.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e598-grand-falls-feb2024-row-semantics
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run deterministic selection and row-summary tests
+        run: python -m unittest experiments.test_e598_grand_falls_feb2024_row_semantics -v
+      - name: Acquire exact small CSV and write aggregate-only receipt
+        run: python -m experiments.e598_grand_falls_feb2024_row_semantics --out .artifacts/e598/receipt.json
+      - name: Validate aggregate receipt
+        run: python -m json.tool .artifacts/e598/receipt.json > /dev/null
+      - name: Upload aggregate-only result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e598-grand-falls-feb2024-row-semantics
+          path: .artifacts/e598/receipt.json
+          if-no-files-found: ignore
+          retention-days: 7
