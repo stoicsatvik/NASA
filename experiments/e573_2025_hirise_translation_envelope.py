@@ -135,7 +135,8 @@ def sample_2025_at_offset(
 
     if np.any(valid & ~inside):
         raise AssertionError("valid mask contains an out-of-bounds point")
-    return inside, valid
+    # Match e569's boolean-indexed 1-D point order exactly (C-order over observed bins).
+    return inside[observed], valid[observed]
 
 
 def summarize_tabs(tabs: dict[str, dict]) -> dict:
