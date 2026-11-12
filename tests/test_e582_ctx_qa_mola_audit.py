@@ -45,9 +45,21 @@ class E582Tests(unittest.TestCase):
                 "collection": COLLECTION,
                 "properties": {"datetime": "2023-04-18T12:00:00Z"},
                 "assets": {
-                    "qa_metrics": {"href": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/qa.txt"},
+                    "qa_metrics": {
+                        "href": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/qa.txt?signature=asset-secret",
+                        "type": "text/plain",
+                        "roles": ["metadata"],
+                    },
                     "mola_csv": {"href": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/control.csv"},
                 },
+                "links": [
+                    {
+                        "rel": "provenance",
+                        "href": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/provenance.txt?token=link-secret",
+                        "type": "text/plain",
+                        "title": "Processing provenance",
+                    },
+                ],
             }],
         }
         summary, assets = parse_item(document)
@@ -55,6 +67,11 @@ class E582Tests(unittest.TestCase):
         self.assertEqual(summary["asset_keys"], ["mola_csv", "qa_metrics"])
         self.assertIn("qa_metrics", assets)
         self.assertIn("mola_csv", assets)
+        self.assertEqual(summary["item_links"][0]["rel"], "provenance")
+        self.assertNotIn("link-secret", json.dumps(summary))
+        self.assertNotIn("asset-secret", json.dumps(summary))
+        self.assertEqual(summary["asset_summaries"][1]["key"], "qa_metrics")
+        self.assertEqual(summary["asset_summaries"][1]["type"], "text/plain")
         with self.assertRaises(ProbeError):
             parse_item({
                 "type": "FeatureCollection",
