@@ -1133,3 +1133,14 @@ Next gate: resolve item-specific `geodiff` order/control provenance; then inspec
 Claim states unchanged: repo operating system SUPPORTED; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN; challenge-selection superiority NOT YET PROVEN.
 
 Next highest-information action: retrieve only the 12,658-byte XML metadata file, parse its source-described raster types, CRS, vertical datum, grid spacing, nodata, acquisition dates and processing lineage if present. Do not download the 1.56 GB archive set without a specific validation question and a bounded sample path.
+
+
+## E593 — Grand Falls photogrammetry XML metadata (12 November 2026)
+
+- Draft PR #157, stacked on E591 / PR #155; final exact head 503d83e2a355362b894d1e88830a84413e182f7a. Workflow [#43259099282](https://github.com/stoicsatvik/NASA/actions/runs/43259099282): **14/14 tests passed**, bounded live XML acquisition succeeded. Artifact [#13962867109](https://github.com/stoicsatvik/NASA/actions/runs/43259099282/artifacts/13962867109).
+- E591 item metadata hash matched exactly. One exact 12,658-byte FGDC XML record was fetched; XML SHA-256 0811ca45fadb55c44c438c28a7dd1f6a52b47b09b5abd9f2440cb95ceddd1517. No archive or raster bytes were requested.
+- The XML explicitly says the dataset has no geospatial data, only non-projected point coordinates; no topology tests were performed. No horizontal CRS, vertical datum, grid resolution or nodata fields were found.
+- The source describes Nikon D750/35 mm imagery, ~60% overlap, Metashape high-accuracy alignment, filtered reconstruction/projection outliers, ultra-high dense cloud, 2.5D height-field mesh, scale-bar-based relative geometry, DEM edge extrapolation and orthomosaics forced to match DEM pixel dimensions.
+- The accuracy statement is qualitative and supplies no independent numeric checkpoint RMSE, scale-bar uncertainty or vertical accuracy. The completeness statement places the observations at one dune-field location from 2024-02-20 to 2024-07-25.
+- Decision: local relative 2.5D morphology is source-described; absolute geospatial placement is not supported by this XML. Direct MOLA/CTX registration or geospatial overlay is inadmissible. All seven archives (~1.56 GB) remain unopened.
+- Next gate: only seek separate scale-bar calibration, non-projected control-point distances and independent checkpoint residuals. If absent, stop at local relative morphology; do not invent a CRS.
