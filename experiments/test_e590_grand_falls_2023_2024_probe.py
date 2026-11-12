@@ -19,6 +19,8 @@ class E590Tests(unittest.TestCase):
         from urllib.parse import parse_qs, urlsplit
         query = parse_qs(urlsplit(e590.ITEM_URL).query)
         self.assertIn(e590.ITEM_ID, e590.ITEM_URL)
+        self.assertEqual(e590.ITEM_ID, "67bf94acd34e8876fcbfc91b")
+        self.assertEqual(e590.DOI_REDIRECT_ITEM_ID, "677ee6bed34e760b392c4aa3")
         self.assertEqual(query["format"], ["json"])
         self.assertEqual(query["fields"], [e590.ITEM_FIELDS])
         self.assertEqual(e590.DOI, "10.5066/P13HPPYM")
