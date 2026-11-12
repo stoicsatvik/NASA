@@ -788,3 +788,16 @@ The highest-value next gate is to decompress only the 65.3 MB FOM_Confidence mem
 - The 2020 TIFF reader emitted a non-fatal tifffile warning while parsing the GDAL_NODATA tag; the experiment's own nodata resolver read the tag and completed. Treat the warning as a parser warning, not as proof of a data error. A separate explicit nodata-sentinel encoding audit remains a possible hardening step.
 - Claim boundary: paired point support is MEASURED for this frozen 346-point window; area coverage, vertical datum equivalence, elevation accuracy, independent horizontal registration, route safety, cross-body similarity, known-site recovery and novel analogue discovery remain NOT YET PROVEN/MEASURED or NOT CLAIMED.
 
+
+
+## E571 — LOLA 45-degree seam-control result (2026-11-12)
+
+- Draft PR #130, branch `research/e571-lola-seam-control-20261112`, code head `59f8fe849e93a9b5b3948bbf90e3963bc5d60ee2`, stacked on E570 / PR #129.
+- Exact-head Actions [#43135464449](https://github.com/stoicsatvik/NASA/actions/runs/43135464449) succeeded: **6/6 deterministic tests** and bounded live PDS acquisition; receipt artifact #13907615759.
+- The pinned LOLA GDR label returned HTTP 200 (5,139 bytes). Three 11×11 HTTP Range windows transferred 691,332 range bytes; total transfer was 696,471 / 1,000,000 bytes. Each window had 121/121 finite samples and zero missing values. No full raster or raw pixel values were retained.
+- Reacquired 45°S seam relief: 1,662.636876 m, within 0.003124 m of E570's rounded 1,662.64 m.
+- Same-longitude controls at 44.5°S and 45.5°S: relief 164.632440 m / 757.747948 m; MAD 31.714439 m / 43.487906 m; median slope 0.560620° / 1.864560°; p90 slope 0.986113° / 7.642094°.
+- The seam window exceeds both controls on all four descriptors; relative to the control mean, ratios are 3.605× relief, 11.626× MAD, 4.237× median slope and 2.994× p90 slope.
+- Limitation: controls differ substantially (593.116 m relief difference; 6.656° p90-slope difference) and each overlaps the seam window by 3/11 rows. This is a **candidate seam confound**, not proof of causation; natural terrain variation remains viable.
+- Claim states: repo operating system SUPPORTED; bounded LOLA ingestion SUPPORTED for this pinned product; local seam/control comparison SUPPORTED for this one location; seam artifact attribution NOT YET PROVEN; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN; challenge-selection superiority NOT YET PROVEN.
+- Do not repeat another single-longitude seam variant. Next priority is to challenge the current leading alternatives in the 14-challenge screen (Martian Map and MODIS/VIIRS) with their own data/acceptance gates; a multi-longitude seam campaign is justified only if it can change feature admissibility. No UI polish before evidence.
