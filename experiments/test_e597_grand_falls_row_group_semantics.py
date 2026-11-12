@@ -54,7 +54,7 @@ class E597RowGroupTests(unittest.TestCase):
         result = summarize_rows(headers, rows)
         self.assertEqual(result["within_timestamp_group"]["family_rows_with_all_three_channels_present"]["wind_speed_mph"], 5)
         self.assertEqual(result["within_timestamp_group"]["row_nonnull_channel_count_distribution"]["11"], 1)
-        self.assertEqual(result["row_nonnull_channel_count_distribution"]["12"], 5)
+        self.assertEqual(result["within_timestamp_group"]["row_nonnull_channel_count_distribution"]["12"], 5)
 
     def test_duplicate_record_numbers_are_measured_not_rewritten(self):
         headers, rows = make_fixture()
