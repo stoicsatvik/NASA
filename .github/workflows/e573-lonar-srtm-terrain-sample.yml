@@ -1,0 +1,49 @@
+name: E573 bounded Lonar SRTM terrain sample
+
+on:
+  push:
+    branches:
+      - research/e573-lonar-srtm-terrain-sample-20261112
+    paths:
+      - experiments/e573_lonar_srtm_terrain_sample.py
+      - tests/test_e573_lonar_srtm_terrain_sample.py
+      - .github/workflows/e573-lonar-srtm-terrain-sample.yml
+  pull_request:
+    branches:
+      - research/e572-independent-analogue-catalogue-audit-20261112
+    paths:
+      - experiments/e573_lonar_srtm_terrain_sample.py
+      - tests/test_e573_lonar_srtm_terrain_sample.py
+      - .github/workflows/e573-lonar-srtm-terrain-sample.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e573-lonar-srtm-terrain-sample-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  terrain-sample:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install bounded raster analysis dependencies
+        run: python -m pip install "numpy>=1.26,<3" "rasterio>=1.4,<2" "requests>=2.31,<3" "pytest>=8,<9"
+      - name: Run deterministic terrain descriptor tests
+        run: python -m pytest -q tests/test_e573_lonar_srtm_terrain_sample.py
+      - name: Acquire one pinned SRTM tile and emit aggregate descriptors
+        run: python -m experiments.e573_lonar_srtm_terrain_sample --out .artifacts/e573/receipt.json
+      - name: Preserve aggregate receipt only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e573-lonar-srtm-terrain-sample
+          path: .artifacts/e573/receipt.json
+          if-no-files-found: ignore
+          retention-days: 14
