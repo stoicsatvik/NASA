@@ -7,6 +7,9 @@ from experiments.e587_ctx_provenance_command_audit import (
     parse_command_line,
     parse_commands,
     select_exact_features,
+    build_s3_list_url,
+    parse_s3_listing_xml,
+    audit_s3_prefixes,
 )
 
 COLLECTION = "mro_ctx_controlled_usgs_dtms"
@@ -159,6 +162,68 @@ class E587Tests(unittest.TestCase):
         result = analyze_features(rows, receipt(ids), fetcher=fake_fetcher)
         self.assertEqual(result["decision"], "ITEM_SET_MISMATCH")
         self.assertEqual(calls, [])
+
+
+    def test_s3_prefix_is_derived_from_exact_dtm_asset_path(self):
+        url = build_s3_list_url(
+            "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/ctx/item-1/item-1_dtm.tif"
+        )
+        from urllib.parse import parse_qs, urlsplit
+        parsed = urlsplit(url)
+        query = parse_qs(parsed.query)
+        self.assertEqual(parsed.netloc, "astrogeo-ard.s3-us-west-2.amazonaws.com")
+        self.assertEqual(query["prefix"], ["mars/mro/ctx/item-1/"])
+        self.assertEqual(query["max-keys"], ["100"])
+        self.assertEqual(parsed.path, "/")
+
+    def test_s3_listing_parser_detects_unadvertised_provenance_sidecar(self):
+        xml = b'''<?xml version="1.0" encoding="UTF-8"?>
+        <ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
+          <IsTruncated>false</IsTruncated>
+          <Contents><Key>mars/item-1/item-1_dtm.tif</Key><Size>100</Size><ETag>"abc"</ETag><LastModified>2026-11-01T00:00:00.000Z</LastModified></Contents>
+          <Contents><Key>mars/item-1/provenance_commands.txt</Key><Size>250</Size><ETag>"def"</ETag><LastModified>2026-11-01T00:00:00.000Z</LastModified></Contents>
+          <Contents><Key>mars/item-1/item-1_mola_shots.csv</Key><Size>500</Size><ETag>"ghi"</ETag><LastModified>2026-11-01T00:00:00.000Z</LastModified></Contents>
+        </ListBucketResult>'''
+        result = parse_s3_listing_xml(xml)
+        self.assertEqual(result["decision"], "LISTED")
+        self.assertFalse(result["is_truncated"])
+        self.assertEqual(len(result["objects"]), 3)
+        self.assertTrue(result["objects"][1]["is_provenance_candidate"])
+        self.assertTrue(result["objects"][2]["is_control_candidate"])
+        self.assertNotIn("mars/item-1", str(result))
+        self.assertFalse(result["objects"][0]["full_key_stored"])
+
+    def test_s3_listing_parser_preserves_truncation(self):
+        xml = b'''<ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><IsTruncated>true</IsTruncated></ListBucketResult>'''
+        result = parse_s3_listing_xml(xml)
+        self.assertTrue(result["is_truncated"])
+
+    def test_s3_prefix_access_denied_is_preserved_without_retrying_other_items(self):
+        ids = [f"item-{index}" for index in range(9)]
+        rows = features(ids, include_provenance_asset=False, provenance_link=False)
+        for row in rows:
+            row["assets"]["dtm"] = {
+                "href": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/item/item_dtm.tif",
+                "type": "image/tiff",
+            }
+        calls = []
+
+        def fake_fetcher(url, *, max_bytes):
+            calls.append(url)
+            return {
+                "status": 403,
+                "headers": {"Content-Type": "application/xml"},
+                "payload": b"<Error><Code>AccessDenied</Code></Error>",
+                "bytes_read": 45,
+                "declared_bytes": 45,
+                "final_url": url,
+                "too_large": False,
+            }
+
+        result = audit_s3_prefixes(rows, fetcher=fake_fetcher)
+        self.assertEqual(result["decision"], "S3_LISTING_ACCESS_DENIED")
+        self.assertEqual(result["item_prefixes_listed"], 0)
+        self.assertEqual(len(calls), 1)
 
 
 if __name__ == "__main__":
