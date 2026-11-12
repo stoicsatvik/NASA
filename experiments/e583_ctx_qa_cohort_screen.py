@@ -10,17 +10,32 @@ import hashlib
 import json
 from pathlib import Path
 
-from experiments.e582_ctx_qa_mola_audit import (
-    API_URL,
-    COLLECTION,
-    MAX_SEARCH_BYTES,
-    MAX_QA_BYTES,
-    ProbeError,
-    fetch_bounded,
-    parse_qa_metrics,
-    safe_url_summary,
-    validate_public_url,
-)
+try:
+    from experiments.e582_ctx_qa_mola_audit import (
+        API_URL,
+        COLLECTION,
+        MAX_SEARCH_BYTES,
+        MAX_QA_BYTES,
+        ProbeError,
+        fetch_bounded,
+        parse_qa_metrics,
+        safe_url_summary,
+        validate_public_url,
+    )
+except ModuleNotFoundError as error:
+    if error.name != "experiments":
+        raise
+    from e582_ctx_qa_mola_audit import (
+        API_URL,
+        COLLECTION,
+        MAX_SEARCH_BYTES,
+        MAX_QA_BYTES,
+        ProbeError,
+        fetch_bounded,
+        parse_qa_metrics,
+        safe_url_summary,
+        validate_public_url,
+    )
 
 JEZERO_BBOX = [76.69, 17.41, 78.69, 19.41]
 SEARCH_LIMIT = 9
