@@ -1063,3 +1063,34 @@ Next gate: resolve item-specific `geodiff` order/control provenance; then inspec
 - Aggregate artifact [#13951818805](https://github.com/stoicsatvik/NASA/actions/runs/43235910834/artifacts/13951818805), ZIP SHA-256 `a69f4ebea3f3aa58a1b84adfae1f2bc6e6b64790a4394d4d5f6ce93a536e8470`; durable receipt: `research/results/E587_CTX_PROCESSING_PROVENANCE_AUDIT_20261112.json`.
 - Interpretation: ASP tool semantics are SUPPORTED by official documentation; item-specific sign/order remain NOT ESTABLISHED. MOLA control points remain training/control inputs, not independent validation. The nine E583/E586 products remain correlated post-control QA evidence, not held-out accuracy samples.
 - Next decisive move: seek a distinct public provenance endpoint or a genuinely independent altimetry/DTM control source. Do not keep sampling the same post-control QA cohort or treat it as validation. All core scientific claim states remain unchanged.
+
+
+## E588 — production CTX STAC item provenance audit (12 November 2026)
+
+- Isolated branch research/e588-ctx-production-api-provenance-audit-20261112, stacked on E587 / PR #149. Main remains untouched.
+- The USGS CTX documentation explicitly lists processing commands as available provenance information, while E587 found no provenance fields/assets in the pinned item returned by the documentation-site STAC search endpoint. E588 tests the distinct official production API linked from the collection metadata.
+- Frozen target: one exact GET for collection mro_ctx_controlled_usgs_dtms / item P18_007925_1987_XN_18N282W__P19_008650_1987_XI_18N282W. At most two allowlisted text provenance assets, 2 MB cap, 20 s timeout, same-host/allowlisted redirects only.
+- No credentials, raw STAC JSON, raw provenance text, local filesystem paths, coordinates or signed query values are retained. Safe URL summaries preserve public S3 object paths. E587's exact-nine-item S3-prefix inventory includes this same P18 product directory: its DTM path matches the production API path exactly; the listing found 8 objects, one MOLA/control object, zero provenance candidates and no truncation. No separate E589 repeat against this directory is needed; the result remains bounded to the exact folder and first 100 keys.
+- Exact-head workflow #43238810519 passed 7/7 deterministic tests and the production API GET. HTTP 200, 10,067 bytes. The official production item exposes the same seven assets and four link relations as E587, with no provenance property/link/asset/command metadata. The MOLA CSV asset title explicitly says it was used for initial pc-align. This reinforces that MOLA points are control inputs, not independent validation. The result is bounded to both STAC item representations; it does not prove the separate data-browser provenance record is absent.
+- The MOLA asset is titled 'MOLA Spot Observations Used for initial pc-align'; the collection description says the products are absolutely controlled to MOLA using pc_align. Exact pc_align input order, inverse-transform application and geodiff --reverse state remain NOT YET ESTABLISHED until recovered from processing commands.
+
+
+### E588 independent USGS product-level control cross-check (12 November 2026)
+
+- USGS CTX Analysis Ready Data documentation confirms nominal 20 m CTX DTM post spacing, MOLA alignment and associated orthoimage generation with Ames Stereo Pipeline `point2dem`.
+- USGS warns that offsets may remain between separately controlled CTX DTMs because MOLA is lower resolution. The NASA/USGS public release description documents global bundle adjustment with ISIS `jigsaw` and iterative `pc_align` alignment to MOLA across 26 groupings.
+- CTX I/F is top-of-atmosphere reflectance affected by dust, illumination and topography, not direct surface albedo.
+- This supports product-level CTX-to-MOLA control, not exact E583 item-specific `geodiff` operands, `pc_align` order, grouping assignment or transform lineage. E587 already listed all nine exact product folders without truncation and found zero provenance-named objects; a separate P18-only repeat is redundant.
+- Nominal 20 m post spacing is not MOLA spatial support. No robust 20 m slope/roughness/traversability or route-safety claim follows from grid spacing.
+- Claim states unchanged: product-level MOLA control SUPPORTED; item-specific lineage NOT YET ESTABLISHED; independent accuracy/route safety NOT YET MEASURED/PROVEN; E001 NOT YET MEASURED; cross-body similarity, novel discovery, local validation advantage and challenge-selection superiority NOT YET PROVEN.
+- Source report section appended to `research/E588_CTX_PRODUCTION_API_PROVENANCE_AUDIT_20261112.md`. Sources: https://stac.astrogeology.usgs.gov/docs/data/mars/ctx/ ; https://registry.opendata.aws/nasa-usgs-controlled-mro-ctx-dtms/ ; https://astrogeology.usgs.gov/docs/concepts/missions/mro/ctx-data/ .
+- Documentation-only review; no data download, code test or benchmark. E587's exact-head 14/14 run and complete 9-prefix inventory remain the relevant validation.
+
+### E589 bounded QA-metadata extraction (12 November 2026; PR #152 closed)
+
+- A later bounded run against the already inventoried P18 product prefix fetched only the 13,095-byte JSON metadata mirror and the 398-byte qa_metrics.txt; no raster or MOLA CSV was downloaded. The S3 listing itself is redundant with E587's exact nine-product inventory; PR #152 remains closed.
+- The JSON is an ordinary STAC item mirror (same seven assets and 18 ordinary properties), not processing provenance. It contains one textual pc_align mention with zero operands, no structured command record and zero executable commands.
+- The QA file mentions geodiff but gives no DEM operand order, CTX-MOLA/MOLA-CTX label or --reverse flag. Post-control CTX-MOLA diagnostic values: max 117.316 m; min -79.9007 m; mean 27.3687 m; standard deviation 10.934 m; median 26.7783 m.
+- These values are not independent accuracy or held-out validation. The MOLA points remain control inputs. Item-specific pc_align order, inverse-transform application and geodiff sign remain NOT YET ESTABLISHED.
+- Workflow #43242642721 passed 12/12 tests; artifact #13956436025, ZIP SHA-256 a7b3a9331886816f34697e30db7733dfb597165ac006ba6ee3a5631e5e335040. Metadata JSON SHA-256 05146f1b8636737d653bc6e2cfecfe7a5d43ff602c2e08e5d97b35da0321622d; QA text SHA-256 c577c0a83ccc58375b4a7790b6edd9eeee0d84de41f602c56ba00c424a8bcd5e.
+- This addendum integrates the bounded metadata result into the active E588 draft PR #151; it does not reopen or merge the closed E589 PR #152.
