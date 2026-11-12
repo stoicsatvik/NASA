@@ -942,3 +942,18 @@ Claim states remain unchanged: repo operating system SUPPORTED; cross-body simil
 - This is a transport/access failure, not evidence that the USGS release contains no records and not a scientific null. Do not retry this item using guessed URL variants.
 - E001 known-site recovery remains NOT YET MEASURED; cross-body similarity, novel analogue discovery, local validation advantage and planetary-analog challenge superiority remain NOT YET PROVEN.
 - Next: pivot to a different independent public Earth-side source or a literature-backed catalogue with usable coordinates and defensible physical descriptors. No claim promotion.
+
+
+## E579 challenge-readiness falsification — 12 November 2026
+
+- New isolated branch research/e579-martian-map-stac-readiness-20261112, stacked on E578 PR #138; main remains untouched.
+- The official 2026 challenge index lists 14 challenges. The current all-14 scorecard remains Martian Map 4.10, MODIS/VIIRS 4.00 and planetary analog 2.93; the 0.10 gap is below the 0.25 meaningful-difference threshold. E531 sensitivity favours Martian Map under tested perturbations, but challenge-selection superiority remains NOT YET PROVEN.
+- A live GET of the official USGS Astrogeology STAC collection metadata for mro_ctx_controlled_usgs_dtms succeeded. It reports Mars, NASA/USGS provenance, CC0-1.0, a 2023-04-18 to 2025-07-04 temporal interval, Mars 2015 ocentric equirectangular WKT2 and GSD range 20.0002065–35.9625866 m. It says the CTX products are controlled to MOLA, while warning that some products have jitter and large nodata regions.
+- The STAC items endpoint was not retrievable through this run's browser path. No item, raster, pixel, footprint or terrain measurement was acquired. This is collection metadata access only, not a data-ingestion success.
+- Official CTX documentation reports 20 m posting and typical 3–5 m vertical precision but warns about jitter, nodata, long-baseline tilt and effective resolution. Controlled HiRISE DTM products are CC0/MOLA-controlled and are not guaranteed to co-register with uncontrolled RDR imagery.
+- The official FIRMS page says Earthdata Login is required for daily text-file downloads and MAP_KEY for API/WMS/WFS. No account or key was created and no credentialless historical MODIS/VIIRS path was verified.
+- Planetary analog remains the weakest current data-readiness path: E577/E578 ScienceBase requests acquired no records; E572 is only a candidate site index; E001 remains NOT YET MEASURED.
+- Readiness ordering under current evidence: Martian Map > MODIS/VIIRS > planetary analog. This is not a final challenge selection. No challenge is locked.
+- Full report: research/E579_MARTIAN_MAP_STAC_READINESS_20261112.md.
+- Exact claim states unchanged: repo operating system SUPPORTED; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN; challenge-selection superiority NOT YET PROVEN.
+- No tests were run because this is a documentation/source-metadata audit and the Actions quota is exhausted. No UI, raster processing, field data, public deployment or competition submission.
