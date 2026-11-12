@@ -78,4 +78,15 @@ Sources accessed 12 November 2026:
 - NASA/USGS CTX DTM open-data registry: https://registry.opendata.aws/nasa-usgs-controlled-mro-ctx-dtms/
 - USGS CTX mission/data documentation: https://astrogeology.usgs.gov/docs/concepts/missions/mro/ctx-data/
 
-Documentation-only cross-check. No raster, QA asset, MOLA CSV, raw STAC item, or control point was downloaded. No code tests or benchmark were run.
+Documentation-only cross-check. At the time of this E588 source review no raster, QA asset, MOLA CSV, raw STAC item or control point was downloaded and no code tests or benchmark were run. A later bounded E589 follow-on fetched only the STAC JSON metadata mirror and the 398-byte QA text; see the addendum below.
+
+## E589 bounded QA-metadata addendum — 12 November 2026
+
+The same P18 item prefix had already been listed in the exact nine-product E587 inventory, so the E589 S3 listing itself was redundant and PR #152 remains closed. The already-completed E589 run nevertheless fetched two small metadata files without downloading raster or MOLA control data:
+
+- The 13,095-byte JSON file is a STAC item mirror with the same seven assets and 18 ordinary properties. Its single pc_align mention has zero operands; there are no structured command records or executable commands.
+- The 398-byte qa_metrics.txt parses to max 117.316 m, min -79.9007 m, mean 27.3687 m, standard deviation 10.934 m and median 26.7783 m. It mentions geodiff but does not expose operand order, a CTX-MOLA/MOLA-CTX label or --reverse.
+- These are post-control CTX–MOLA diagnostics, not independent accuracy. The MOLA points were used for initial pc_align and are not held-out validation.
+- E589 exact-head workflow #43242642721 passed 12/12 tests; artifact #13956436025. The S3 listing returned eight objects without truncation. No full object keys, raw JSON, raw QA text, local paths, credentials or signed query values were stored.
+
+Result: **STAC_JSON_MIRROR_AND_POST_CONTROL_QA_ONLY**. Exact pc_align order, inverse-transform use and geodiff sign remain NOT YET ESTABLISHED. E001 known-site recovery remains NOT YET MEASURED; no planetary-analogue or challenge-ranking claim changes.
