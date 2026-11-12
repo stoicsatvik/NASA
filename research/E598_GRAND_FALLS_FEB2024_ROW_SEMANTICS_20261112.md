@@ -46,3 +46,11 @@ This is a same-site, cross-release data-integrity experiment. It is not independ
 ## Next gate
 
 If the row-group pattern recurs, retain the mechanism as unresolved and stop treating repeated rows as independent sensors. If it does not recur, identify which row semantics differ before pooling releases. In either case, do not deduplicate or calculate wind/particle correlations until source semantics and calibration are resolved.
+
+
+## Preserved first exact-head failure and response-contract correction
+
+- Workflow #43270910285 ran all 6/6 deterministic tests successfully.
+- The bounded source request reached the exact-size response, but the first implementation rejected its media type because it was not text/csv. The run did not produce a receipt and is preserved as a failed acquisition attempt, not a data null.
+- The revised parser records the exact response media type, byte count and payload hash. A nonstandard media type is admitted only if the complete pinned-size payload decodes as CSV and its unique header contains the full 14-field E595 dictionary schema. HTML, malformed text, duplicate headers and missing fields remain rejected.
+- This correction does not weaken the exact catalogue identity, size, HTTPS host/redirect, or 5 MB read-ceiling checks.
