@@ -5,16 +5,21 @@ import argparse
 import hashlib
 import json
 import urllib.parse
+import urllib.error
+import urllib.request
 from pathlib import Path, PurePosixPath
 from urllib.parse import urlsplit
 
 from experiments.e577_grand_falls_2017_2019_access_probe import (
     ALLOWED_HOSTS,
-    MAX_HEADER_BYTES,
     MAX_METADATA_BYTES,
+    TIMEOUT_SECONDS,
+    USER_AGENT,
+    SafeRedirectHandler,
     fetch_bounded,
     inspect_payload,
     parse_content_range,
+    validate_public_url,
 )
 
 PARENT_ITEM_ID = "677ee6bed34e760b392c4aa3"
@@ -154,6 +159,46 @@ def _children_summary(document: dict) -> list[dict]:
     return result
 
 
+def fetch_prefix_bounded(url: str, *, limit: int) -> dict:
+    """Read no more than limit bytes; never follow redirects outside the allowlist."""
+    validate_public_url(url)
+    request = urllib.request.Request(
+        url,
+        headers={"User-Agent": USER_AGENT, "Accept": "text/csv,text/plain,*/*"},
+    )
+    opener = urllib.request.build_opener(SafeRedirectHandler())
+    try:
+        with opener.open(request, timeout=TIMEOUT_SECONDS) as response:
+            payload = response.read(limit)
+            final_url = response.geturl()
+            validate_public_url(final_url)
+            return {"status": response.status, "headers": response.headers, "payload": payload, "final_url": final_url}
+    except urllib.error.HTTPError as error:
+        final_url = error.geturl()
+        validate_public_url(final_url)
+        return {"status": error.code, "headers": error.headers, "payload": b"", "final_url": final_url}
+
+
+def classify_sample_response(status: int, headers: dict, payload: bytes, expected_size: int, limit: int) -> str | None:
+    content_type = str(headers.get("Content-Type") or "").lower()
+    if "text/html" in content_type or len(payload) != min(limit, expected_size):
+        return None
+    if status == 206:
+        content_range = parse_content_range(headers.get("Content-Range"))
+        expected_end = min(limit - 1, expected_size - 1)
+        if content_range and content_range[0] == 0 and content_range[1] == expected_end and content_range[2] == expected_size:
+            return "http_range"
+        return None
+    if status == 200:
+        try:
+            content_length = int(headers.get("Content-Length"))
+        except (TypeError, ValueError):
+            return None
+        if content_length == expected_size:
+            return "bounded_stream_prefix"
+    return None
+
+
 def _complete_csv_prefix(payload: bytes) -> bytes:
     end = payload.rfind(b"\n")
     return payload[:end + 1] if end >= 0 else b""
@@ -180,7 +225,7 @@ def audit() -> dict:
         "file_count": 0,
         "file_inventory": [],
         "selected_file": None,
-        "range_probe": None,
+        "sample_response": None,
         "data_sample": None,
         "credentials_used": False,
         "raw_values_stored": False,
@@ -250,48 +295,37 @@ def audit() -> dict:
             result["decision"] = "SELECTED_FILE_METADATA_INCOMPLETE"
             return result
 
-        sample_end = min(MAX_SAMPLE_BYTES - 1, size - 1)
-        sample = fetch_bounded(
-            uri,
-            limit=MAX_SAMPLE_BYTES,
-            range_header=f"bytes=0-{sample_end}",
-        )
-        content_range = parse_content_range(sample["headers"].get("Content-Range"))
+        sample = fetch_prefix_bounded(uri, limit=MAX_SAMPLE_BYTES)
+        mode = classify_sample_response(sample["status"], sample["headers"], sample["payload"], size, MAX_SAMPLE_BYTES)
         content_type = str(sample["headers"].get("Content-Type") or "").lower()
-        range_valid = bool(
-            content_range
-            and content_range[0] == 0
-            and content_range[1] == sample_end
-            and content_range[2] == size
-            and len(sample["payload"]) == sample_end + 1
-        )
-        is_html = "text/html" in content_type
-        result["range_probe"] = {
+        content_range = parse_content_range(sample["headers"].get("Content-Range"))
+        result["sample_response"] = {
             "http_status": sample["status"],
+            "mode": mode,
             "content_type": content_type,
-            "content_range_valid": range_valid,
+            "content_length": sample["headers"].get("Content-Length"),
             "content_range_total_bytes": content_range[2] if content_range else None,
             "bytes_read": len(sample["payload"]),
             "sha256": hashlib.sha256(sample["payload"]).hexdigest(),
             "host": urlsplit(sample["final_url"]).hostname,
-            "html_response": is_html,
+            "html_response": "text/html" in content_type,
         }
-        if sample["status"] != 206 or not range_valid or is_html:
-            result["decision"] = "BOUNDED_RANGE_NOT_CONFIRMED"
+        if mode is None:
+            result["decision"] = "BOUNDED_SAMPLE_NOT_CONFIRMED"
             return result
 
         complete_payload = _complete_csv_prefix(sample["payload"])
         if not complete_payload:
-            result["decision"] = "RANGE_SAMPLE_HAS_NO_COMPLETE_RECORD"
+            result["decision"] = "SAMPLE_HAS_NO_COMPLETE_CSV_RECORD"
             return result
         sample_summary = inspect_payload(name, complete_payload)
         sample_summary.pop("prefix_hex", None)
         result["data_sample"] = {
+            "sampling_mode": mode,
             "sample_range_start": 0,
-            "sample_range_end": sample_end,
-            "total_file_bytes": size,
             "sample_bytes": len(sample["payload"]),
             "complete_lines_bytes": len(complete_payload),
+            "total_file_bytes": size,
             "partial_prefix_sample": size > len(sample["payload"]),
             "sha256": hashlib.sha256(complete_payload).hexdigest(),
             "summary": sample_summary,
@@ -322,7 +356,7 @@ def main() -> None:
         "catalog_record_id_in_parent_children": receipt["catalog_record_id_in_parent_children"],
         "file_count": receipt["file_count"],
         "selected_file": receipt["selected_file"],
-        "range_probe": receipt["range_probe"],
+        "sample_response": receipt["sample_response"],
         "data_sample": receipt["data_sample"],
         "credentials_used": receipt["credentials_used"],
         "raw_values_stored": receipt["raw_values_stored"],
