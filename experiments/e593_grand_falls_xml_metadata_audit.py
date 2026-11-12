@@ -34,6 +34,7 @@ MAX_XML_BYTES = 65_536
 
 FIELD_CATEGORIES = {
     "title": "product_description",
+    "purpose": "product_description",
     "pubdate": "acquisition_dates",
     "begdate": "acquisition_dates",
     "enddate": "acquisition_dates",
@@ -68,6 +69,7 @@ FIELD_CATEGORIES = {
     "fillvalue": "nodata",
     "nullvalue": "nodata",
     "formname": "raster_representation",
+    "geoform": "raster_representation",
     "format": "raster_representation",
     "rasttype": "raster_representation",
     "rastdtyp": "raster_representation",
@@ -75,6 +77,14 @@ FIELD_CATEGORIES = {
     "rowcount": "raster_representation",
     "colcount": "raster_representation",
     "enttypl": "raster_representation",
+    "attracc": "accuracy_quality",
+    "attraccr": "accuracy_quality",
+    "complete": "accuracy_quality",
+    "logic": "accuracy_quality",
+    "posacc": "accuracy_quality",
+    "horizpa": "accuracy_quality",
+    "vertacc": "accuracy_quality",
+    "vertaccr": "accuracy_quality",
     "procdesc": "processing_lineage",
     "srcused": "processing_lineage",
     "srcprod": "processing_lineage",
@@ -222,7 +232,7 @@ def summarize_xml(payload: bytes) -> dict:
             return
         if tag == "attrlabl" and not re.search(r"no[\s_-]*data|missing|fill", value, re.IGNORECASE):
             return
-        safe = _safe_text(value, limit=1000 if category == "processing_lineage" else 600)
+        safe = _safe_text(value, limit=3000 if category == "processing_lineage" else 600)
         if not safe:
             return
         selected.append({
@@ -255,6 +265,7 @@ def summarize_xml(payload: bytes) -> dict:
         "acquisition_date_fields": by_category.get("acquisition_dates", []),
         "processing_lineage_fields": by_category.get("processing_lineage", []),
         "raster_representation_fields": by_category.get("raster_representation", []),
+        "accuracy_quality_fields": by_category.get("accuracy_quality", []),
         "product_description_fields": by_category.get("product_description", []),
         "reference_identifier_fields": by_category.get("reference_identifier", []),
         "metadata_categories_present": {
@@ -266,6 +277,7 @@ def summarize_xml(payload: bytes) -> dict:
             "acquisition_dates": bool(by_category.get("acquisition_dates")),
             "processing_lineage": bool(by_category.get("processing_lineage")),
             "raster_representation": bool(by_category.get("raster_representation")),
+            "accuracy_quality": bool(by_category.get("accuracy_quality")),
         },
         "raw_xml_stored": False,
         "raw_coordinates_stored": False,
