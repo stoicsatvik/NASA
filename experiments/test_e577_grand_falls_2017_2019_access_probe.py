@@ -3,6 +3,8 @@ import unittest
 import zipfile
 
 from experiments.e577_grand_falls_2017_2019_access_probe import (
+    ITEM_FIELDS,
+    ITEM_URL,
     choose_candidate,
     inspect_payload,
     parse_content_range,
@@ -13,6 +15,13 @@ from experiments.e577_grand_falls_2017_2019_access_probe import (
 
 
 class E577Tests(unittest.TestCase):
+    def test_metadata_query_projects_only_required_fields(self):
+        from urllib.parse import parse_qs, urlsplit
+        query = parse_qs(urlsplit(ITEM_URL).query)
+        self.assertEqual(query["format"], ["json"])
+        self.assertEqual(query["fields"], [ITEM_FIELDS])
+        self.assertNotIn("previewImage", ITEM_FIELDS)
+
     def test_url_summary_redacts_query_values(self):
         value = safe_url_summary("https://sciencebase.usgs.gov/manager/download/x?sig=secret&expires=123")
         self.assertEqual(value["host"], "sciencebase.usgs.gov")
