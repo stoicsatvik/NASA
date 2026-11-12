@@ -13,7 +13,8 @@ import json
 import re
 import shlex
 from pathlib import Path
-from urllib.parse import urlsplit
+from urllib.parse import urlencode, urlsplit, urlunsplit
+import xml.etree.ElementTree as ET
 
 try:
     from experiments.e582_ctx_qa_mola_audit import (
@@ -44,6 +45,9 @@ MAX_ITEMS = 9
 MAX_PROVENANCE_BYTES = 1_000_000
 MAX_TOTAL_PROVENANCE_BYTES = 5_000_000
 MAX_PROVENANCE_ASSETS = 9
+MAX_S3_PREFIX_BYTES = 500_000
+MAX_TOTAL_S3_BYTES = 5_000_000
+MAX_S3_KEYS = 100
 FILE_EXTENSIONS = {
     ".tif", ".tiff", ".csv", ".cub", ".pc", ".las", ".laz", ".ply",
     ".dem", ".txt", ".img", ".json",
@@ -480,6 +484,201 @@ def analyze_features(
     }
 
 
+def build_s3_list_url(dtm_href: str) -> str:
+    validate_public_url(dtm_href)
+    parsed = urlsplit(dtm_href)
+    directory = parsed.path.rsplit("/", 1)[0].lstrip("/") + "/"
+    query = urlencode({
+        "list-type": "2",
+        "prefix": directory,
+        "max-keys": str(MAX_S3_KEYS),
+    })
+    url = urlunsplit((parsed.scheme, parsed.netloc, "/", query, ""))
+    validate_public_url(url)
+    return url
+
+
+def _xml_local_name(tag: str) -> str:
+    return tag.rsplit("}", 1)[-1]
+
+
+def parse_s3_listing_xml(payload: bytes) -> dict:
+    root = ET.fromstring(payload)
+    root_name = _xml_local_name(root.tag)
+    if root_name == "Error":
+        code = next((child.text for child in root if _xml_local_name(child.tag) == "Code"), None)
+        return {"decision": "S3_ERROR_RESPONSE", "error_code": code, "objects": []}
+
+    values = {}
+    objects = []
+    for child in root:
+        name = _xml_local_name(child.tag)
+        if name == "IsTruncated":
+            values["is_truncated"] = (child.text or "").strip().lower() == "true"
+        elif name == "Contents":
+            fields = {_xml_local_name(node.tag): node.text for node in child}
+            key = fields.get("Key") or ""
+            basename = Path(key).name
+            if not basename:
+                continue
+            try:
+                size = int(fields.get("Size") or 0)
+            except ValueError:
+                size = None
+            etag = (fields.get("ETag") or "").strip('"') or None
+            objects.append({
+                "basename": basename,
+                "size_bytes": size,
+                "etag": etag,
+                "last_modified": fields.get("LastModified"),
+                "is_provenance_candidate": any(
+                    word in basename.lower() for word in ("provenance", "command", "processing", "pipeline")
+                ),
+                "is_control_candidate": any(
+                    word in basename.lower() for word in ("mola", "control", "pedr")
+                ),
+                "full_key_stored": False,
+            })
+    return {
+        "decision": "LISTED",
+        "is_truncated": values.get("is_truncated", False),
+        "objects": objects,
+    }
+
+
+def audit_s3_prefixes(features: list[dict], fetcher=fetch_bounded) -> dict:
+    total_bytes = 0
+    listed_count = 0
+    provenance_count = 0
+    control_count = 0
+    denied = False
+    incomplete = False
+    item_results = []
+
+    for feature in features[:MAX_ITEMS]:
+        item_id = feature.get("id")
+        assets = feature.get("assets") if isinstance(feature.get("assets"), dict) else {}
+        dtm = assets.get("dtm") if isinstance(assets.get("dtm"), dict) else {}
+        href = dtm.get("href")
+        result = {
+            "id": item_id,
+            "decision": "NOT_ATTEMPTED",
+            "prefix_source": "DTM_asset_directory",
+            "full_prefix_stored": False,
+        }
+        if not isinstance(href, str):
+            result["decision"] = "DTM_ASSET_HREF_MISSING"
+            incomplete = True
+            item_results.append(result)
+            continue
+        try:
+            url = build_s3_list_url(href)
+        except Exception:
+            result["decision"] = "DTM_ASSET_URL_NOT_ALLOWLISTED"
+            incomplete = True
+            item_results.append(result)
+            continue
+        result["request_url"] = safe_url_summary(url)
+        if total_bytes >= MAX_TOTAL_S3_BYTES:
+            result["decision"] = "TOTAL_S3_BYTE_CAP_REACHED"
+            incomplete = True
+            item_results.append(result)
+            continue
+        remaining = MAX_TOTAL_S3_BYTES - total_bytes
+        try:
+            response = fetcher(url, max_bytes=min(MAX_S3_PREFIX_BYTES, remaining))
+        except Exception as error:
+            result["decision"] = "S3_LIST_FETCH_ERROR"
+            result["error_type"] = type(error).__name__
+            incomplete = True
+            item_results.append(result)
+            continue
+        total_bytes += int(response.get("bytes_read", 0) or 0)
+        result["http_status"] = response.get("status")
+        result["bytes_read"] = response.get("bytes_read")
+        result["too_large"] = response.get("too_large")
+        if response.get("status") in (401, 403):
+            result["decision"] = "S3_LISTING_ACCESS_DENIED"
+            denied = True
+            item_results.append(result)
+            break
+        if response.get("status") != 200:
+            result["decision"] = "S3_LISTING_HTTP_FAILURE"
+            incomplete = True
+            item_results.append(result)
+            continue
+        if response.get("too_large"):
+            result["decision"] = "S3_LISTING_EXCEEDS_BYTE_CAP"
+            incomplete = True
+            item_results.append(result)
+            continue
+        try:
+            parsed = parse_s3_listing_xml(response.get("payload", b""))
+        except Exception as error:
+            result["decision"] = "S3_LISTING_XML_PARSE_ERROR"
+            result["error_type"] = type(error).__name__
+            incomplete = True
+            item_results.append(result)
+            continue
+        if parsed.get("decision") != "LISTED":
+            result.update(parsed)
+            incomplete = True
+            item_results.append(result)
+            continue
+
+        objects = parsed["objects"]
+        stac_basenames = {
+            Path(asset.get("href", "")).name
+            for asset in assets.values()
+            if isinstance(asset, dict) and isinstance(asset.get("href"), str)
+        }
+        unadvertised = sorted(
+            obj["basename"] for obj in objects
+            if obj["basename"] not in stac_basenames
+        )
+        item_provenance = sum(1 for obj in objects if obj["is_provenance_candidate"])
+        item_control = sum(1 for obj in objects if obj["is_control_candidate"])
+        provenance_count += item_provenance
+        control_count += item_control
+        listed_count += 1
+        if parsed.get("is_truncated"):
+            incomplete = True
+        result.update({
+            "decision": "LISTED",
+            "is_truncated": parsed.get("is_truncated", False),
+            "object_count": len(objects),
+            "provenance_object_count": item_provenance,
+            "control_object_count": item_control,
+            "unadvertised_object_basenames": unadvertised,
+            "objects": objects,
+        })
+        item_results.append(result)
+
+    if provenance_count:
+        decision = "PROVENANCE_OBJECT_FOUND"
+    elif denied and listed_count == 0:
+        decision = "S3_LISTING_ACCESS_DENIED"
+    elif incomplete or listed_count != min(len(features), MAX_ITEMS):
+        decision = "S3_LISTING_INCOMPLETE"
+    else:
+        decision = "NO_PROVENANCE_OBJECT_IN_ITEM_PREFIXES"
+
+    return {
+        "decision": decision,
+        "item_count_requested": min(len(features), MAX_ITEMS),
+        "item_prefixes_listed": listed_count,
+        "provenance_object_count": provenance_count,
+        "mola_or_control_object_count": control_count,
+        "bytes_read": total_bytes,
+        "max_keys_per_prefix": MAX_S3_KEYS,
+        "max_bytes_per_prefix": MAX_S3_PREFIX_BYTES,
+        "max_total_bytes": MAX_TOTAL_S3_BYTES,
+        "items": item_results,
+        "full_keys_stored": False,
+        "credentials_used": False,
+    }
+
+
 def audit(e583_receipt: dict) -> dict:
     payload = build_search_payload()
     response = fetch_bounded(
@@ -513,6 +712,9 @@ def audit(e583_receipt: dict) -> dict:
         raise ProbeError("STAC response is not a FeatureCollection")
     features = document.get("features")
     result = analyze_features(features, e583_receipt)
+    selected, mismatch = select_exact_features(features, e583_receipt)
+    if not mismatch:
+        result["s3_prefix_inventory"] = audit_s3_prefixes(selected)
     result["source"] = {
         "api": safe_url_summary(API_URL),
         "search_payload": payload,
@@ -561,6 +763,9 @@ def main() -> None:
         "provenance_asset_download_count": result.get("provenance_asset_download_count"),
         "provenance_bytes_read": result.get("provenance_bytes_read"),
         "relevant_command_count": result.get("relevant_command_count"),
+        "s3_prefix_decision": (result.get("s3_prefix_inventory") or {}).get("decision"),
+        "s3_prefixes_listed": (result.get("s3_prefix_inventory") or {}).get("item_prefixes_listed"),
+        "provenance_objects_in_prefixes": (result.get("s3_prefix_inventory") or {}).get("provenance_object_count"),
     }, sort_keys=True))
 
 
