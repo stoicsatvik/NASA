@@ -1,0 +1,62 @@
+name: E596 public analogue catalogue provenance audit
+
+on:
+  push:
+    branches:
+      - research/e596-analogue-catalogue-provenance-audit-20261112
+    paths:
+      - FOUNDRY_STATE.md
+      - experiments/e596_analogue_catalogue_provenance_audit.py
+      - experiments/test_e596_analogue_catalogue_provenance_audit.py
+      - research/E596_PUBLIC_ANALOGUE_CATALOGUE_AUDIT_20261112.md
+      - research/results/E596_PUBLIC_ANALOGUE_CATALOGUE_AUDIT_20261112.json
+      - .github/workflows/e596-public-analogue-catalogue-audit.yml
+  pull_request:
+    branches:
+      - research/e594-firms-keyless-modis-viirs-20261112
+    paths:
+      - FOUNDRY_STATE.md
+      - experiments/e596_analogue_catalogue_provenance_audit.py
+      - experiments/test_e596_analogue_catalogue_provenance_audit.py
+      - research/E596_PUBLIC_ANALOGUE_CATALOGUE_AUDIT_20261112.md
+      - research/results/E596_PUBLIC_ANALOGUE_CATALOGUE_AUDIT_20261112.json
+      - .github/workflows/e596-public-analogue-catalogue-audit.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e596-public-analogue-catalogue-audit
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run deterministic audit tests
+        run: python -m unittest experiments.test_e596_analogue_catalogue_provenance_audit -v
+      - name: Fetch exact pinned public catalogue snapshot
+        run: |
+          mkdir -p .artifacts/e596
+          curl --fail --silent --show-error --location --max-time 30 \
+            https://raw.githubusercontent.com/rachellelecussan/planetary-analogue-catalogue/62e6339bdf308de3bc987388d0faa7130cf57de9/data/sites.geojson \
+            --output .artifacts/e596/sites.geojson
+          test "$(git hash-object .artifacts/e596/sites.geojson)" = "156edd871599cf9ac9c083658d14d034f660e35d"
+      - name: Generate coordinate-free provenance receipt
+        run: python -m experiments.e596_analogue_catalogue_provenance_audit --input .artifacts/e596/sites.geojson --out .artifacts/e596/receipt.json
+      - name: Validate receipt
+        run: python -m json.tool .artifacts/e596/receipt.json > /dev/null
+      - name: Upload aggregate-only receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e596-analogue-catalogue-provenance
+          path: .artifacts/e596/receipt.json
+          if-no-files-found: ignore
+          retention-days: 7
