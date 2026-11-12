@@ -1,0 +1,44 @@
+{
+  "experiment": "E588",
+  "acquired_at": "2026-11-12",
+  "workflow_run": 43238810519,
+  "workflow_url": "https://github.com/stoicsatvik/NASA/actions/runs/43238810519",
+  "tested_commit": "fe3c383ec7b548e7039d491c2027044dcae75b33",
+  "current_branch_head": "6936605474e7ff52598a442d35612a4f57fde89e",
+  "collection": "mro_ctx_controlled_usgs_dtms",
+  "item_id": "P18_007925_1987_XN_18N282W__P19_008650_1987_XI_18N282W",
+  "endpoint_host": "g6goyz4w56.execute-api.us-west-2.amazonaws.com",
+  "search_http_status": 200,
+  "bytes_read": 10067,
+  "asset_keys": [
+    "dtm",
+    "image",
+    "intersection_error",
+    "mola_csv",
+    "orthoimage",
+    "qa_metrics",
+    "thumbnail"
+  ],
+  "mola_asset_title": "MOLA Spot Observations Used for initial pc-align",
+  "link_relations": [
+    "self",
+    "parent",
+    "collection",
+    "root"
+  ],
+  "provenance_property_keys": [],
+  "provenance_candidates_count": 0,
+  "decision": "NO_ITEM_SPECIFIC_PROVENANCE_EXPOSED_IN_PRODUCTION_STAC_ITEM",
+  "deterministic_tests": {
+    "passed": 7,
+    "failed": 0
+  },
+  "credentials_used": false,
+  "raw_item_json_stored": false,
+  "raw_provenance_stored": false,
+  "raw_local_paths_stored": false,
+  "public_asset_paths_in_safe_summary": true,
+  "signed_query_values_stored": false,
+  "artifact_id": 13953532728,
+  "artifact_zip_sha256": "59484393abe53740c896dd163cb413c147c358a2f2aa1b619dd6e676a0dedfdf"
+}

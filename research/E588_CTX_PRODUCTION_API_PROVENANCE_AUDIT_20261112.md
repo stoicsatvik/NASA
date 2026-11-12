@@ -29,7 +29,20 @@ The runner stores only selected STAC property keys, asset/link descriptors, comm
 
 ## Result
 
-Pending exact-head workflow. Distinguish production API inaccessible, exact item accessible without provenance, provenance metadata/asset exposed without commands, and item-specific pc_align/geodiff commands recovered. Do not infer order or sign from missing metadata.
+Exact-head workflow [#43238810519](https://github.com/stoicsatvik/NASA/actions/runs/43238810519) passed all 7 deterministic tests and the bounded production API GET. The exact item endpoint returned HTTP 200 / 10,067 bytes.
+
+The production item exposed the same seven assets as E587: dtm, image, intersection_error, mola_csv, orthoimage, qa_metrics and thumbnail. Link relations remained self, parent, collection and root. It exposed no provenance property, link, asset or command-bearing metadata. Result: **NO_ITEM_SPECIFIC_PROVENANCE_EXPOSED_IN_PRODUCTION_STAC_ITEM**.
+
+A useful source detail was recovered: the asset title for mola_csv is **“MOLA Spot Observations Used for initial pc-align”**. The production collection description also says these DTMs are absolutely controlled to MOLA using ASP pc_align. This confirms that the MOLA points are control inputs. It further weakens any attempt to use the same points or the post-control QA residuals as independent validation. The exact pc_align reference/source order, inverse-transform application and geodiff --reverse flag remain NOT ESTABLISHED.
+
+This negative result is bounded to both STAC item representations. The USGS documentation separately lists processing commands as a provenance asset, so a data-browser or S3 sidecar route may still expose them. E589 will test the verified public S3 object prefix; it will not assume that absence from STAC means absence from storage.
+
+- Workflow: [#43238810519](https://github.com/stoicsatvik/NASA/actions/runs/43238810519), 7/7 tests passed, production API GET succeeded.
+- Aggregate artifact: [#13953532728](https://github.com/stoicsatvik/NASA/actions/runs/43238810519/artifacts/13953532728), ZIP SHA-256 `59484393abe53740c896dd163cb413c147c358a2f2aa1b619dd6e676a0dedfdf`.
+- Current E588 branch head: `6936605474e7ff52598a442d35612a4f57fde89e`.
+- No credentials, raw item JSON, raw provenance text, local filesystem paths, coordinates or signed query values were retained. Safe URL summaries preserve public S3 object paths.
+
+No E001 known-site recovery or cross-body similarity test was run. All planetary-analogue and challenge-ranking claim states remain unchanged.
 
 ## Claim states
 
