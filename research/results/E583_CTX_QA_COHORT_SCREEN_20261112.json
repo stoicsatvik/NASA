@@ -1,0 +1,216 @@
+{
+  "experiment": "E583",
+  "acquired_at": "2026-11-12",
+  "workflow_run": 43217785725,
+  "workflow_url": "https://github.com/stoicsatvik/NASA/actions/runs/43217785725",
+  "commit": "556ada42b7ab049eadee8ca2786e2bd3f9b1f23c",
+  "collection": "mro_ctx_controlled_usgs_dtms",
+  "bbox_wgs84_lon_lat": [
+    76.69,
+    17.41,
+    78.69,
+    19.41
+  ],
+  "search": {
+    "http_status": 200,
+    "bytes_read": 90433,
+    "limit": 9,
+    "result_count": 9,
+    "selected_count": 9
+  },
+  "credentials_used": false,
+  "raw_item_json_stored": false,
+  "raw_qa_text_stored": false,
+  "qa_success_count": 9,
+  "items": [
+    {
+      "id": "N02_063242_1988_XN_18N283W__N03_063532_1988_XN_18N283W",
+      "bbox": [
+        76.76631507961969,
+        18.274198017266198,
+        77.36482295765892,
+        19.04816389097364
+      ],
+      "datetime": "2023-04-18T12:00:00Z",
+      "http_status": 200,
+      "declared_bytes": null,
+      "metrics": {
+        "max_difference_m": 88.8281,
+        "mean_difference_m": 21.4381,
+        "median_difference_m": 21.0239,
+        "stddev_difference_m": 13.973,
+        "min_difference_m": -52.3384,
+        "metric_count": 6
+      },
+      "sha256": "8582c44690d11f0b0c238619f9c871294dbd25236a5b491583d28b30815d088b"
+    },
+    {
+      "id": "N03_063453_1982_XN_18N282W__N03_063519_1982_XN_18N282W",
+      "bbox": [
+        76.89545517010949,
+        17.705022479652627,
+        77.4762591179978,
+        18.465812299846124
+      ],
+      "datetime": "2023-04-18T12:00:00Z",
+      "http_status": 200,
+      "declared_bytes": null,
+      "metrics": {
+        "max_difference_m": 116.428,
+        "mean_difference_m": 21.2787,
+        "median_difference_m": 22.0458,
+        "stddev_difference_m": 13.4709,
+        "min_difference_m": -154.729,
+        "metric_count": 6
+      },
+      "sha256": "e95e85e76887a52f2a2914f6291e36cfa17c4ca0f2b2cbb8270817301222d79e"
+    },
+    {
+      "id": "N04_063809_1982_XN_18N282W__N05_064231_1982_XN_18N282W",
+      "bbox": [
+        76.84069919206058,
+        17.713072988245518,
+        77.41663990926094,
+        18.435509545061567
+      ],
+      "datetime": "2023-04-18T12:00:00Z",
+      "http_status": 200,
+      "declared_bytes": null,
+      "metrics": {
+        "max_difference_m": 203.437,
+        "mean_difference_m": 37.0019,
+        "median_difference_m": 37.2683,
+        "stddev_difference_m": 12.9054,
+        "min_difference_m": -159.86,
+        "metric_count": 6
+      },
+      "sha256": "2cac0d467a93feb30e31c881c1b1533547896d104c8dc0f17c4949a0540e6e47"
+    },
+    {
+      "id": "N04_064020_1983_XN_18N283W__N04_063954_1982_XN_18N283W",
+      "bbox": [
+        76.68637364730407,
+        17.648444079042495,
+        77.2752174940917,
+        18.42581903782146
+      ],
+      "datetime": "2023-04-18T12:00:00Z",
+      "http_status": 200,
+      "declared_bytes": null,
+      "metrics": {
+        "max_difference_m": 110.363,
+        "mean_difference_m": 24.99,
+        "median_difference_m": 23.7453,
+        "stddev_difference_m": 12.1603,
+        "min_difference_m": -62.3288,
+        "metric_count": 6
+      },
+      "sha256": "adb322946684232656340bbbd4d411c80f510c96a62564bdf466c97317a00a8a"
+    },
+    {
+      "id": "N09_065774_1988_XN_18N283W__N10_066196_1987_XN_18N283W",
+      "bbox": [
+        76.12377741994237,
+        18.216870346105082,
+        76.71092229309578,
+        18.98200344468166
+      ],
+      "datetime": "2023-04-18T12:00:00Z",
+      "http_status": 200,
+      "declared_bytes": null,
+      "metrics": {
+        "max_difference_m": 140.139,
+        "mean_difference_m": 27.3646,
+        "median_difference_m": 26.9863,
+        "stddev_difference_m": 15.649,
+        "min_difference_m": -87.3519,
+        "metric_count": 6
+      },
+      "sha256": "4ebb4e4796be8ad1a34e810841fa044e5d08d54613d5ece1cb7398e54d5cc6d4"
+    },
+    {
+      "id": "N15_068162_1984_XN_18N283W__N12_067159_1988_XN_18N283W",
+      "bbox": [
+        76.3841464361562,
+        18.286009083916607,
+        76.9726387838785,
+        19.06751708840715
+      ],
+      "datetime": "2023-04-18T12:00:00Z",
+      "http_status": 200,
+      "declared_bytes": null,
+      "metrics": {
+        "max_difference_m": 121.15,
+        "mean_difference_m": 40.5091,
+        "median_difference_m": 40.0418,
+        "stddev_difference_m": 12.8508,
+        "min_difference_m": -38.2485,
+        "metric_count": 6
+      },
+      "sha256": "39832243ae6dac02570530b7d9302885589d4ccc5daa557586e0c8f9ef1e215c"
+    },
+    {
+      "id": "P02_001820_1984_XI_18N282W__P06_003442_1987_XI_18N282W",
+      "bbox": [
+        77.0410114626152,
+        17.879622711821042,
+        77.62151018726807,
+        18.651612805452483
+      ],
+      "datetime": "2023-04-18T12:00:00Z",
+      "http_status": 200,
+      "declared_bytes": null,
+      "metrics": {
+        "max_difference_m": 237.284,
+        "mean_difference_m": 38.1975,
+        "median_difference_m": 37.2336,
+        "stddev_difference_m": 15.061,
+        "min_difference_m": -154.232,
+        "metric_count": 6
+      },
+      "sha256": "656bea816c4e21a79c809a83ce508375b628793fe6470cdf26957ece40b89494"
+    },
+    {
+      "id": "P05_002809_1975_XI_17N283W__P13_006000_1974_XI_17N283W",
+      "bbox": [
+        75.91771659930976,
+        14.65135146010114,
+        77.0480588583663,
+        19.777888275132497
+      ],
+      "datetime": "2023-04-18T12:00:00Z",
+      "http_status": 200,
+      "declared_bytes": null,
+      "metrics": {
+        "max_difference_m": 162.402,
+        "mean_difference_m": 28.4886,
+        "median_difference_m": 27.9154,
+        "stddev_difference_m": 15.0384,
+        "min_difference_m": -501.057,
+        "metric_count": 6
+      },
+      "sha256": "b84f735791579c4e5e28a60be8737edcf3f43c25583e93463016fc77f5212bbf"
+    },
+    {
+      "id": "P18_007925_1987_XN_18N282W__P19_008650_1987_XI_18N282W",
+      "bbox": [
+        77.21281144352704,
+        17.757789235602306,
+        77.90597708129924,
+        19.342308862718042
+      ],
+      "datetime": "2023-04-18T12:00:00Z",
+      "http_status": 200,
+      "declared_bytes": null,
+      "metrics": {
+        "max_difference_m": 117.316,
+        "mean_difference_m": 27.3687,
+        "median_difference_m": 26.7783,
+        "stddev_difference_m": 10.934,
+        "min_difference_m": -79.9007,
+        "metric_count": 6
+      },
+      "sha256": "c577c0a83ccc58375b4a7790b6edd9eeee0d84de41f602c56ba00c424a8bcd5e"
+    }
+  ]
+}
