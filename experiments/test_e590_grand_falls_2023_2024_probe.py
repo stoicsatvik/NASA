@@ -42,6 +42,22 @@ class E590Tests(unittest.TestCase):
         self.assertNotIn('"123"', rendered)
         self.assertFalse(summary["download_uri"]["query_values_stored"])
 
+    def test_candidate_prefers_explicit_sciencebase_file_endpoint_over_html_page_url(self):
+        records = [
+            {
+                "name": "smaller-page.csv",
+                "size": 1_091_813,
+                "url": "https://sciencebase.usgs.gov/catalog/file/get/abc",
+            },
+            {
+                "name": "larger-direct.csv",
+                "size": 3_319_414,
+                "url": "https://www.sciencebase.gov/catalog/file/get/abc?f=larger-direct.csv",
+            },
+        ]
+        chosen = e590._choose_candidate(records)
+        self.assertEqual(chosen["name"], "larger-direct.csv")
+
     def test_extract_file_records_reads_top_level_and_facets(self):
         item = {
             "files": [{"name": "top.csv", "size": 10, "url": "https://www.sciencebase.gov/catalog/file/get/a"}],

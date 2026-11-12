@@ -135,8 +135,13 @@ def _choose_candidate(records: list[dict]) -> dict | None:
         size = _file_size(record)
         uri = _download_uri(record)
         if extension in DATA_EXTENSIONS and size is not None and size <= MAX_FILE_BYTES and uri:
-            candidates.append((size, _file_name(record).lower(), record))
-    return min(candidates, key=lambda item: (item[0], item[1]))[2] if candidates else None
+            parsed = urlsplit(uri)
+            query_keys = {key.lower() for key, _ in urllib.parse.parse_qsl(parsed.query, keep_blank_values=True)}
+            # Prefer ScienceBase's explicit ?f= file endpoint over the smaller
+            # sciencebase.usgs.gov page URL, which the first probe returned as HTML.
+            direct_file_score = 0 if parsed.hostname == "www.sciencebase.gov" and "f" in query_keys else 1
+            candidates.append((direct_file_score, size, _file_name(record).lower(), record))
+    return min(candidates, key=lambda item: (item[0], item[1], item[2]))[3] if candidates else None
 
 
 def _children_summary(document: dict) -> list[dict]:
