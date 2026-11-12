@@ -95,6 +95,107 @@ def parse_s3_listing(payload: bytes) -> dict[str, Any]:
     }
 
 
+
+
+def parse_provenance_payload(name: str, payload: bytes) -> dict[str, Any]:
+    """Parse text or JSON provenance in memory; return command roles only."""
+    is_json = name.lower().endswith(".json") or payload.lstrip().startswith((b"{", b"["))
+    if not is_json:
+        return parse_provenance_text(payload)
+    try:
+        document = json.loads(payload.decode("utf-8-sig"))
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        return {
+            "decision": "JSON_SIDECAR_PARSE_FAILED",
+            "text_sha256": hashlib.sha256(payload).hexdigest(),
+            "command_count": 0,
+            "commands": [],
+            "raw_json_stored": False,
+        }
+
+    commands: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    key_paths: list[dict[str, Any]] = []
+    node_counts = {"objects": 0, "arrays": 0, "strings": 0}
+    max_depth = 0
+
+    def add_line(line: str) -> None:
+        summary = _command_summary(line)
+        if summary is None:
+            return
+        digest = summary["command_line_sha256"]
+        if digest not in seen:
+            seen.add(digest)
+            commands.append(summary)
+
+    def walk(node: Any, path: str = "$", depth: int = 0, inherited_tool: str | None = None) -> None:
+        nonlocal max_depth
+        if depth > 24:
+            return
+        max_depth = max(max_depth, depth)
+        if isinstance(node, dict):
+            node_counts["objects"] += 1
+            local_tool = inherited_tool
+            for key in node:
+                if str(key).lower() in {"pc_align", "geodiff"}:
+                    local_tool = str(key).lower()
+            program = node.get("program") or node.get("tool") or node.get("executable") or local_tool
+            argv = node.get("argv")
+            args = node.get("args") or node.get("arguments")
+            if isinstance(argv, list) and all(isinstance(v, (str, int, float)) for v in argv):
+                add_line(shlex.join([str(v) for v in argv]))
+            elif isinstance(program, str) and program.lower().split("/")[-1] in {"pc_align", "geodiff"}:
+                if isinstance(args, list) and all(isinstance(v, (str, int, float)) for v in args):
+                    add_line(shlex.join([program] + [str(v) for v in args]))
+                elif isinstance(args, str):
+                    add_line(program + " " + args)
+            command = node.get("command") or node.get("cmd") or node.get("invocation")
+            if isinstance(command, str):
+                add_line(command)
+            elif isinstance(command, list) and all(isinstance(v, (str, int, float)) for v in command):
+                add_line(shlex.join([str(v) for v in command]))
+            for key, value in node.items():
+                key_text = str(key)
+                child_path = (path + "." + key_text)[:240]
+                if any(term in key_text.lower() for term in ("command", "argv", "args", "invocation", "process", "history", "program", "tool")):
+                    length = len(value) if isinstance(value, (str, list, dict)) else None
+                    key_paths.append({"path": child_path, "type": type(value).__name__, "length": length})
+                if isinstance(value, str):
+                    node_counts["strings"] += 1
+                    if "pc_align" in value.lower() or "geodiff" in value.lower():
+                        for parsed in parse_provenance_text(value.encode("utf-8")).get("commands", []):
+                            digest = parsed["command_line_sha256"]
+                            if digest not in seen:
+                                seen.add(digest)
+                                commands.append(parsed)
+                else:
+                    walk(value, child_path, depth + 1, local_tool)
+        elif isinstance(node, list):
+            node_counts["arrays"] += 1
+            for index, value in enumerate(node[:5000]):
+                walk(value, f"{path}[{index}]"[:240], depth + 1, inherited_tool)
+        elif isinstance(node, str):
+            node_counts["strings"] += 1
+            if "pc_align" in node.lower() or "geodiff" in node.lower():
+                for parsed in parse_provenance_text(node.encode("utf-8")).get("commands", []):
+                    digest = parsed["command_line_sha256"]
+                    if digest not in seen:
+                        seen.add(digest)
+                        commands.append(parsed)
+
+    walk(document)
+    return {
+        "decision": "JSON_PROCESSING_COMMANDS_FOUND" if commands else "JSON_WITHOUT_RECOGNIZED_COMMANDS",
+        "json_sha256": hashlib.sha256(payload).hexdigest(),
+        "top_level_keys": sorted(str(k) for k in document)[:120] if isinstance(document, dict) else [],
+        "node_counts": node_counts,
+        "max_depth": max_depth,
+        "command_like_key_paths": key_paths[:120],
+        "command_count": len(commands),
+        "commands": commands[:40],
+        "raw_json_stored": False,
+    }
+
 def audit() -> dict[str, Any]:
     url = build_list_url()
     response = fetch_bounded(url, allowed_hosts=ASSET_HOSTS, max_bytes=MAX_LIST_BYTES)
@@ -157,7 +258,7 @@ def audit() -> dict[str, Any]:
                 "raw_provenance_stored": False,
             }
             if fetched["status"] == 200 and not fetched["too_large"]:
-                parsed = parse_provenance_text(fetched["payload"])
+                parsed = parse_provenance_payload(name, fetched["payload"])
                 entry["summary"] = parsed
                 entry["sha256"] = hashlib.sha256(fetched["payload"]).hexdigest()
             receipt["provenance_assets"].append(entry)

@@ -8,6 +8,7 @@ from experiments.e589_ctx_s3_provenance_prefix_audit import (
     ITEM_PREFIX,
     _is_provenance_candidate,
     build_list_url,
+    parse_provenance_payload,
     parse_s3_listing,
     summarize_receipt,
 )
@@ -64,6 +65,40 @@ class E589Tests(unittest.TestCase):
         </ListBucketResult>'''
         result = parse_s3_listing(xml.encode("utf-8"))
         self.assertTrue(result["truncated"])
+
+
+    def test_json_sidecar_extracts_command_roles_without_raw_values(self):
+        payload = {
+            "processing": [
+                {
+                    "program": "/usr/bin/pc_align",
+                    "argv": ["/data/CTX_reference.tif", "/data/MOLA_source.csv", "-o", "/tmp/run"],
+                },
+                {
+                    "command": "geodiff /data/CTX_reference.tif /data/MOLA_source.csv --reverse -o /tmp/diff"
+                },
+            ],
+            "metadata": {"software": "ASP"},
+        }
+        result = parse_provenance_payload("provenance.json", json.dumps(payload).encode("utf-8"))
+        self.assertEqual(result["decision"], "JSON_PROCESSING_COMMANDS_FOUND")
+        self.assertEqual(result["command_count"], 2)
+        pc = next(c for c in result["commands"] if c["tool"] == "pc_align")
+        gd = next(c for c in result["commands"] if c["tool"] == "geodiff")
+        self.assertEqual(pc["reference_role"], "CTX_DTM")
+        self.assertEqual(pc["source_role"], "MOLA_CONTROL")
+        self.assertEqual(gd["effective_sign_semantics"], "MOLA_MINUS_CTX")
+        serialized = json.dumps(result)
+        self.assertNotIn("/data", serialized)
+        self.assertNotIn("/tmp", serialized)
+        self.assertNotIn("CTX_reference", serialized)
+
+    def test_json_sidecar_records_structure_when_no_commands_exist(self):
+        payload = {"software": {"name": "ASP"}, "processes": [{"name": "bundle_adjust"}]}
+        result = parse_provenance_payload("metadata.json", json.dumps(payload).encode("utf-8"))
+        self.assertEqual(result["decision"], "JSON_WITHOUT_RECOGNIZED_COMMANDS")
+        self.assertEqual(result["command_count"], 0)
+        self.assertIn("$.processes", [entry["path"] for entry in result["command_like_key_paths"]])
 
     def test_receipt_summary_contains_no_raw_keys_or_credentials(self):
         summary = summarize_receipt({
