@@ -3,7 +3,7 @@
 Updated: 2026-11-12
 Class: Tier A
 Time horizon: NASA Space Apps Challenge, 14–15 Nov 2026
-Working branch: `research/e577-grand-falls-2017-2019-access-20261112`
+Working branch: `research/e582-ctx-qa-mola-control-audit-20261112`
 Main objective: maximize uncertainty eliminated per run and converge on a scientifically defensible Space Apps entry.
 
 ## Current thesis
@@ -991,3 +991,14 @@ Claim states remain unchanged: repo operating system SUPPORTED; cross-body simil
 - No raw item JSON, QA text, CSV rows, individual coordinates, credentials or signed query values were stored.
 - Next: verify the difference sign convention from item-specific provenance if available; inspect the DTM, intersection-error raster and associated orthoimage for spatially coherent artifacts; obtain a genuinely independent reference before making accuracy claims. Slope summaries remain conditional on the collection-level metre inference and must carry the 3–5 m vertical-precision and coarser-effective-resolution caveats.
 - Claim states: QA/MOLA asset acquisition SUPPORTED; item QA residuals MEASURED AS REPORTED, sign unresolved; MOLA control schema SUPPORTED, not held-out validation; independent accuracy NOT YET MEASURED; route safety and E001/cross-body/novel-analogue/challenge superiority NOT YET PROVEN.
+
+
+## E582 — pinned CTX QA and MOLA-control audit (12 November 2026)
+
+- Branch `research/e582-ctx-qa-mola-control-audit-20261112`, draft PR #143 stacked on E581 / PR #141. Exact-head workflow #43215530283 passed the deterministic parser tests and acquired the pinned item's QA and MOLA-control assets. Aggregate artifact #13943192285; SHA-256 `3352effd5daf12b0bd1e1f29aaa5750ba1e885c48c83eeba2bfe9a36a4cf64f9`.
+- QA residuals: max +117.316 m, min -79.9007 m, mean +27.3687 m, median +26.7783 m, SD 10.934 m. Official USGS guidance treats mean/median/SD in the tens-to-hundreds-of-metres range as a quality warning; this item is not accepted for uncorrected absolute elevation or long-baseline slope use until residual structure is resolved.
+- MOLA control CSV: 8,750 rows; columns latitude/longitude/radius. The radius unit/reference is not explicit in the parsed header; no areoid conversion was made. These are control inputs, not independent held-out validation. Raw rows/coordinates were not retained.
+- Decision: pinned item is REJECTED PENDING RESIDUAL INVESTIGATION for uncorrected absolute-elevation use; relative/local relief remains NOT YET MEASURED. Do not treat a global mean as a correction without testing spatial structure.
+- Parallel companion: E582 slope-error sensitivity is recorded on PR #142 / branch `research/e582-ctx-slope-error-envelope-20261112`; 20 m primary slope rejected under the 3–5 m error envelope, 200 m remains a candidate only.
+- Next: E583 compare QA residuals across several additional Jezero CTX items before further raster-slope work. If no item passes, pivot to a better-controlled product. Full report: `research/E582_CTX_QA_MOLA_AUDIT_20261112.md`.
+- Claim states remain exact: repo operating system SUPPORTED; cross-body similarity NOT YET PROVEN; E001 known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN; challenge-selection superiority NOT YET PROVEN.
