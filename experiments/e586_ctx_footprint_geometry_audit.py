@@ -154,7 +154,7 @@ def pairwise_footprint_overlap(rows: list[dict]) -> dict:
     }
 
 
-def analyze_features(features: object, e583_receipt: dict) -> dict:
+def analyze_features(features: object, e583_receipt: dict, e585_bbox_audit: dict | None = None) -> dict:
     if not isinstance(e583_receipt, dict) or e583_receipt.get("experiment") != "E583":
         raise ValueError("input must be the committed E583 receipt")
     if e583_receipt.get("credentials_used") is not False:
@@ -199,6 +199,26 @@ def analyze_features(features: object, e583_receipt: dict) -> dict:
             "raw_geometry_stored": False,
         }
 
+    bbox_by_id = {}
+    if e585_bbox_audit is not None:
+        if not isinstance(e585_bbox_audit, dict) or e585_bbox_audit.get("experiment") != "E585":
+            raise ValueError("bbox comparison input must be the committed E585 result")
+        bbox_items = e585_bbox_audit.get("items")
+        if not isinstance(bbox_items, list):
+            raise ValueError("E585 result has no item list")
+        for item in bbox_items:
+            if not isinstance(item, dict) or not isinstance(item.get("id"), str):
+                raise ValueError("E585 bbox rows must have item IDs")
+            item_id = item["id"]
+            if item_id in bbox_by_id:
+                raise ValueError("E585 bbox item IDs must be unique")
+            value = item.get("bbox_intersection_fraction_of_item")
+            if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(float(value)):
+                raise ValueError(f"invalid E585 bbox fraction for {item_id}")
+            bbox_by_id[item_id] = float(value)
+        if set(bbox_by_id) != expected_ids:
+            raise ValueError("E585 and E583 item IDs do not match exactly")
+
     aoi_geometry = transform(_equal_area_xy, box(*JEZERO_BBOX))
     rows = []
     errors = []
@@ -230,6 +250,14 @@ def analyze_features(features: object, e583_receipt: dict) -> dict:
                 "footprint_area_km2": round(footprint_area / 1_000_000, 6),
                 "aoi_intersection_area_km2": round(intersection_area / 1_000_000, 6),
                 "fraction_of_footprint_inside_aoi": round(fraction, 8),
+                "bbox_intersection_fraction_of_item": (
+                    round(bbox_by_id[item_id], 8) if item_id in bbox_by_id else None
+                ),
+                "geometry_to_bbox_fraction_ratio": (
+                    round(fraction / bbox_by_id[item_id], 8)
+                    if item_id in bbox_by_id and bbox_by_id[item_id] > 0
+                    else None
+                ),
                 "geometry_bbox_max_delta_deg": round(bbox_delta, 9),
                 "qa_asset": safe_asset_summary(qa_asset),
                 "qa_mean_difference_m": _finite_metric(
@@ -259,6 +287,25 @@ def analyze_features(features: object, e583_receipt: dict) -> dict:
         if row["fraction_of_footprint_inside_aoi"] < 0.99
     ]
     pairwise = pairwise_footprint_overlap(rows)
+    contained_pairwise = pairwise_footprint_overlap(contained)
+    bbox_deltas = [
+        abs(row["fraction_of_footprint_inside_aoi"] - row["bbox_intersection_fraction_of_item"])
+        for row in rows
+        if row["bbox_intersection_fraction_of_item"] is not None
+    ]
+    bbox_comparison = {
+        "compared_item_count": len(bbox_deltas),
+        "median_absolute_fraction_difference": (
+            round(statistics.median(bbox_deltas), 8) if bbox_deltas else None
+        ),
+        "maximum_absolute_fraction_difference": (
+            round(max(bbox_deltas), 8) if bbox_deltas else None
+        ),
+        "interpretation": (
+            "Bounding-box area fractions are only a coarse envelope; actual footprint "
+            "fractions are computed from GeoJSON polygons."
+        ),
+    }
     complete = len(rows) == MAX_ITEMS and not errors
     result = {
         "experiment": "E586",
@@ -297,6 +344,8 @@ def analyze_features(features: object, e583_receipt: dict) -> dict:
             ),
         },
         "pairwise_footprint_overlap": pairwise,
+        "strict_geometry_contained_pairwise_footprint_overlap": contained_pairwise,
+        "bbox_vs_geometry_comparison": bbox_comparison,
         "qa_spatial_support": (
             "NOT ESTABLISHED BY ITEM GEOMETRY. The QA asset is attached to the "
             "product; no AOI-clipped support is inferred."
@@ -317,7 +366,7 @@ def analyze_features(features: object, e583_receipt: dict) -> dict:
     return result
 
 
-def audit(e583_receipt: dict) -> dict:
+def audit(e583_receipt: dict, e585_bbox_audit: dict | None = None) -> dict:
     payload = {
         "collections": [COLLECTION],
         "bbox": list(JEZERO_BBOX),
@@ -367,7 +416,7 @@ def audit(e583_receipt: dict) -> dict:
     if not isinstance(features, list):
         raise ProbeError("STAC FeatureCollection has no feature list")
     receipt["search_result_count"] = len(features)
-    result = analyze_features(features, e583_receipt)
+    result = analyze_features(features, e583_receipt, e585_bbox_audit)
     receipt.update(result)
     receipt["search_result_count"] = len(features)
     receipt["search_response_sha256"] = hashlib.sha256(
@@ -384,6 +433,11 @@ def main() -> None:
         default=Path("research/results/E583_CTX_QA_COHORT_SCREEN_20261112.json"),
     )
     parser.add_argument(
+        "--bbox-audit",
+        type=Path,
+        default=Path("research/results/E585_CTX_BBOX_OVERLAP_AUDIT_20261112.json"),
+    )
+    parser.add_argument(
         "--out",
         type=Path,
         default=Path(".artifacts/e586/ctx-footprint-geometry.json"),
@@ -391,7 +445,8 @@ def main() -> None:
     args = parser.parse_args()
     try:
         source = json.loads(args.receipt.read_text(encoding="utf-8"))
-        result = audit(source)
+        bbox_audit = json.loads(args.bbox_audit.read_text(encoding="utf-8"))
+        result = audit(source, bbox_audit)
     except Exception as error:
         result = {
             "experiment": "E586",
