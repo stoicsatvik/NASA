@@ -3,7 +3,7 @@
 Updated: 2026-11-12
 Class: Tier A
 Time horizon: NASA Space Apps Challenge, 14–15 Nov 2026
-Working branch: `research/e572-independent-analogue-catalogue-audit-20261112`
+Working branch: `research/e575-hirise-control-source-independence-audit-20261112`
 Main objective: maximize uncertainty eliminated per run and converge on a scientifically defensible Space Apps entry.
 
 ## Current thesis
@@ -859,5 +859,6 @@ Next: acquire analysis-grade, source-pinned Earth measurements and explicit nega
 - Localized offsets are reported near dune fields, smooth texture and dark regions; unresolved jitter or camera-model intrinsics are candidate causes. No cause or correction is established.
 - Challenge ranking remains provisional: Martian Map #11 4.10, MODIS/VIIRS #9 4.00, planetary analog #10 2.93. E575 changes no frozen score factor, so no numeric score change is made. No challenge is locked; planetary analog is not the current readiness-ranked leader.
 - Claim states: repo operating system SUPPORTED; internal HiRISE alignment SUPPORTED AS REPORTED; CTX-relative alignment SUPPORTED AS REPORTED; independent horizontal registration NOT YET MEASURED; absolute horizontal accuracy NOT ESTABLISHED; route safety NOT CLAIMED; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; planetary-analog challenge superiority NOT YET PROVEN.
-- Deterministic source-audit runner, report, receipt and six standard-library tests: experiments/e575_hirise_control_source_independence_audit.py, research/E575_HIRISE_CONTROL_SOURCE_INDEPENDENCE_AUDIT_20261112.md, research/results/E575_HIRISE_CONTROL_SOURCE_INDEPENDENCE_AUDIT_20261112.json, tests/test_e575_hirise_control_source_independence_audit.py. No raster acquisition, new elevation sample, route-safety claim, UI work or competition submission.
-- Next: acquire an independently controlled reference with documented control lineage, such as held-out MOLA PEDR tracks not used for control or an independently controlled HRSC product; measure multi-patch residuals without fitting corrections to evaluation points.
+- Deterministic source-audit runner, report, receipt and eight standard-library tests: experiments/e575_hirise_control_source_independence_audit.py, research/E575_HIRISE_CONTROL_SOURCE_INDEPENDENCE_AUDIT_20261112.md, research/results/E575_HIRISE_CONTROL_SOURCE_INDEPENDENCE_AUDIT_20261112.json, tests/test_e575_hirise_control_source_independence_audit.py. The CLI receipt is checked for valid JSON and a real trailing newline. No raster acquisition, new elevation sample, route-safety claim, UI work or competition submission.
+- MOLA PEDR is an independent sensor family, but its approximately 100 m shot footprint is too coarse to validate a 10.2 m horizontal residual; held-out tracks are suitable only for gross-error screening.
+- Next: acquire a separate control network or independently controlled product with documented horizontal uncertainty materially below 10.2 m; measure held-out multi-patch residuals without fitting corrections to evaluation points.
