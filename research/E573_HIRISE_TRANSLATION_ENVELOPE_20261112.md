@@ -38,6 +38,8 @@ Initial exact-head workflow [#43152358641](https://github.com/stoicsatvik/NASA/a
 
 The safe correction raises only the explicit 2020 point-window cap from 16 MiB to 32 MiB. This remains a hard bounded-range budget; it does not permit whole-file TIFF download. The deterministic test now asserts the 32 MiB cap. Exact-head bounded acquisition is pending. No support-sensitivity result is claimed until the live receipt reproduces the frozen zero-shift aggregates.
 
+The first corrected live retry [#43153122730](https://github.com/stoicsatvik/NASA/actions/runs/43153122730) passed **5/5 deterministic tests** and passed the 32 MiB range-plan preflight, but then failed at the first paired cross-tab with `ValueError: paired point masks must have equal lengths`. Artifact [#13914279372](https://github.com/stoicsatvik/NASA/actions/runs/43153122730/artifacts/13914279372) preserves the error. The 2020 reader returns a 1-D vector in boolean-indexed observed-point order (346 entries), while the new 2025 sampler initially returned the full 33×33 lattice masks (1,089 entries). The 2025 sampler now applies the identical `observed` boolean selection before returning masks. A deterministic fake-raster regression verifies the output length and observed-point ordering. No support counts or translation conclusion were produced by the failed retry.
+
 ## Interpretation boundary
 
 - A positive 2025-minus-2020 count means more of these MOLA point centers land on finite, non-nodata pixels in the 2025 raster. It does not mean the 2025 elevation is more accurate.
