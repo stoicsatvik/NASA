@@ -1,0 +1,51 @@
+name: E594 Grand Falls sensor data dictionary audit
+
+on:
+  pull_request:
+    branches:
+      - research/e592-grand-falls-timestamp-integrity-20261112
+    paths:
+      - experiments/e594_grand_falls_sensor_dictionary.py
+      - experiments/test_e594_grand_falls_sensor_dictionary.py
+      - research/E594_GRAND_FALLS_SENSOR_DICTIONARY_20261112.md
+      - .github/workflows/e594-grand-falls-sensor-dictionary.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e594-grand-falls-sensor-dictionary
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run deterministic E594 tests
+        run: python -m unittest experiments.test_e594_grand_falls_sensor_dictionary -v
+
+  live_probe:
+    if: github.event_name == 'pull_request'
+    needs: tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Fetch only the exact 41,313-byte source dictionary XML
+        run: python -m experiments.e594_grand_falls_sensor_dictionary --out .artifacts/e594/grand-falls-sensor-dictionary.json
+      - name: Preserve sanitized aggregate receipt only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e594-grand-falls-sensor-dictionary
+          path: .artifacts/e594/grand-falls-sensor-dictionary.json
+          if-no-files-found: ignore
+          retention-days: 7
