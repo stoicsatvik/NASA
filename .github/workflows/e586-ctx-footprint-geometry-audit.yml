@@ -1,0 +1,46 @@
+name: E586 actual Jezero CTX footprint geometry audit
+
+on:
+  push:
+    branches:
+      - research/e586-ctx-footprint-geometry-audit-20261112
+    paths:
+      - experiments/e586_ctx_footprint_geometry_audit.py
+      - tests/test_e586_ctx_footprint_geometry_audit.py
+      - research/E586_CTX_FOOTPRINT_GEOMETRY_AUDIT_20261112.md
+      - FOUNDRY_STATE.md
+      - .github/workflows/e586-ctx-footprint-geometry-audit.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e586-ctx-footprint-geometry-audit
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install pinned geometry dependency
+        run: python -m pip install --disable-pip-version-check shapely==2.1.2
+      - name: Run deterministic E586 tests
+        run: python -m unittest discover -s tests -p "test_e586_ctx_footprint_geometry_audit.py" -v
+      - name: Acquire and analyze the exact E583 CTX item set
+        run: >-
+          python experiments/e586_ctx_footprint_geometry_audit.py
+          --receipt research/results/E583_CTX_QA_COHORT_SCREEN_20261112.json
+          --out .artifacts/e586/ctx-footprint-geometry.json
+      - name: Upload aggregate E586 receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e586-ctx-footprint-geometry
+          path: .artifacts/e586/ctx-footprint-geometry.json
+          if-no-files-found: warn
+          retention-days: 7
