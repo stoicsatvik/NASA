@@ -314,6 +314,41 @@ def audit() -> dict:
     return result
 
 
+def summarize_receipt(receipt: dict) -> dict:
+    """Return a null-safe, credential-free summary of an E577 receipt."""
+    data_sample = receipt.get("data_sample")
+    data_summary = (
+        data_sample.get("data_summary")
+        if isinstance(data_sample, dict)
+        else None
+    )
+    row_count = (
+        data_summary.get("row_count")
+        if isinstance(data_summary, dict)
+        else None
+    )
+    if row_count is None and isinstance(data_summary, dict):
+        member_summary = data_summary.get("member_summary")
+        if isinstance(member_summary, dict):
+            row_count = member_summary.get("row_count")
+    selected_file = receipt.get("selected_file")
+    selected_name = (
+        selected_file.get("name")
+        if isinstance(selected_file, dict)
+        else None
+    )
+    return {
+        "experiment": receipt.get("experiment"),
+        "decision": receipt.get("decision"),
+        "metadata_http_status": receipt.get("metadata_http_status"),
+        "file_count": receipt.get("file_count"),
+        "selected_file": selected_name,
+        "data_rows": row_count,
+        "credentials_used": False,
+        "raw_values_stored": False,
+    }
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--out", type=Path, default=Path(".artifacts/e577/grand-falls-2017-2019.json"))
@@ -334,19 +369,7 @@ def main() -> None:
         }
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    print(json.dumps({
-        "experiment": receipt.get("experiment"),
-        "decision": receipt.get("decision"),
-        "metadata_http_status": receipt.get("metadata_http_status"),
-        "file_count": receipt.get("file_count"),
-        "selected_file": receipt.get("selected_file", {}).get("name") if receipt.get("selected_file") else None,
-        "data_rows": (
-            receipt.get("data_sample", {}).get("data_summary", {}).get("row_count")
-            or receipt.get("data_sample", {}).get("data_summary", {}).get("member_summary", {}).get("row_count")
-        ),
-        "credentials_used": False,
-        "raw_values_stored": False,
-    }, sort_keys=True))
+    print(json.dumps(summarize_receipt(receipt), sort_keys=True))
 
 
 if __name__ == "__main__":
