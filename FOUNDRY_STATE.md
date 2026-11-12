@@ -3,7 +3,7 @@
 Updated: 2026-11-12
 Class: Tier A
 Time horizon: NASA Space Apps Challenge, 14–15 Nov 2026
-Working branch: `research/e582-ctx-qa-mola-control-audit-20261112`
+Working branch: `research/e584-ctx-qa-residual-cohort-interpretation-20261112`
 Main objective: maximize uncertainty eliminated per run and converge on a scientifically defensible Space Apps entry.
 
 ## Current thesis
@@ -1012,3 +1012,16 @@ Claim states remain unchanged: repo operating system SUPPORTED; cross-body simil
 - E582-S companion [PR #142](https://github.com/stoicsatvik/NASA/pull/142) rejects 20 m slope as a robust primary descriptor under the 3–5 m vertical-error envelope (8.53–14.04° apparent error); 200 m remains a candidate only (0.86–1.43°), not a measured slope.
 - E583 cohort screen is isolated on [PR #145](https://github.com/stoicsatvik/NASA/pull/145), branch research/e583-ctx-qa-cohort-screen-20261112, stacked on PR #143. It performs one bounded Jezero STAC search (limit 9) and fetches only QA metrics assets, max 1 MB each. Deterministic tests and exact-head live screen are pending at this state update.
 - No raw item JSON, QA text, CSV rows, individual coordinates, credentials or signed query values are stored. No route-safety, independent-accuracy, E001, cross-body or challenge-superiority claim is made.
+
+
+## E583 / E584 — Jezero CTX QA cohort result (2026-11-12)
+
+E583 exact-head commit `556ada42b7ab049eadee8ca2786e2bd3f9b1f23c`, [Actions run #43217785725](https://github.com/stoicsatvik/NASA/actions/runs/43217785725), completed successfully. The official USGS STAC search returned 9 Jezero CTX products; all 9 bounded `qa_metrics` assets returned HTTP 200 and six numeric metrics each. Search response was 90,433 bytes. No credentials, raw item JSON, raw QA text, rasters, MOLA rows, individual control coordinates or signed URL values were retained.
+
+E584 preserves the aggregate receipt and computes descriptive cohort summaries. All 9 products have positive mean and median CTX–MOLA QA differences. Cohort median of item means is +27.3687 m (range +21.2787 to +40.5091 m); median of item medians is +26.9863 m (range +21.0239 to +40.0418 m); SD range is 10.934–15.649 m. The pinned E580 P18 item has mean +27.3687 m (5th/9 ascending) and the lowest SD (1st/9). Thus its approximately +27 m offset is not isolated within this bounded cohort, while its dispersion is comparatively low.
+
+This is descriptive product-level QA only. The first nine returned items are not a random/exhaustive sample; products may share control lineage and spatial coverage. Post-control residuals are not independent validation errors. The `geodiff` sign convention remains unresolved without item-specific input-order provenance. No p-value, absolute accuracy, route safety or E001 recovery is claimed.
+
+**Current NASA claim states unchanged:** repo operating system SUPPORTED; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN; challenge-selection superiority NOT YET PROVEN.
+
+Next gate: resolve item-specific `geodiff` order/control provenance; then inspect intersection-error and orthoimage assets only with a clear independent-control plan. Keep all 14 challenges open; E584 does not change the current challenge ranking. No UI polish, merge or main-branch write.
