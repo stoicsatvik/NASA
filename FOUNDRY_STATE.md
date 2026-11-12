@@ -991,3 +991,10 @@ Claim states remain unchanged: repo operating system SUPPORTED; cross-body simil
 - Exact claim states unchanged: public item/COG and E581 pixel-window acquisition SUPPORTED; direct TIFF/STAC vertical unit NOT REPORTED; metre interpretation only a collection-level processing-documentation inference; 200 m slope and QA residual analysis NOT YET MEASURED; E001, cross-body similarity, novel discovery, local validation advantage and challenge-selection superiority NOT YET PROVEN/NOT YET MEASURED.
 - Next: E583 bounded acquisition of `qa_metrics` and MOLA-control CSV, followed by 200 m/400 m slope summaries with valid-pair counts, nodata and detrending sensitivity. No route-safety claim.
 - Full report: `research/E582_CTX_SLOPE_ERROR_ENVELOPE_20261112.md`.
+
+
+## E582-S companion — slope sensitivity and QA cross-check (12 November 2026)
+
+- PR #142 / branch `research/e582-ctx-slope-error-envelope-20261112` records the source-backed 3–5 m vertical-error envelope: 20 m baseline 8.53°–14.04°; 200 m baseline 0.86°–1.43°. Local standard-library assertions passed. 20 m is rejected as the primary robust descriptor; 200 m remains a candidate only.
+- The parallel E582 QA/MOLA audit completed on PR #143 / branch `research/e582-ctx-qa-mola-control-audit-20261112`, workflow #43215530283. It found CTX–MOLA mean +27.3687 m, median +26.7783 m and SD 10.934 m for the pinned item. This is a quality warning; do not use the item for uncorrected absolute elevation or long-baseline slope until residual structure is resolved.
+- E583 now screens several additional Jezero CTX items by their QA assets before any further slope work. No route-safety claim.
