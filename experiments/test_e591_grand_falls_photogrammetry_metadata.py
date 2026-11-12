@@ -40,7 +40,7 @@ class E591Tests(unittest.TestCase):
         result = summarize_document(document, b"fixture")
         encoded = json.dumps(result)
         self.assertNotIn("secret-token", encoded)
-        self.assertNotIn("\\\"coordinates\\\":", encoded)
+        self.assertNotIn('"coordinates":', encoded)
         self.assertFalse(result["raw_urls_stored"])
         self.assertFalse(result["raw_coordinates_stored"])
 
