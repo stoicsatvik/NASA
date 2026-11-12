@@ -68,3 +68,12 @@ The next exact-head run [#43153663740](https://github.com/stoicsatvik/NASA/actio
 
 
 A subsequent exact-head test run [#43153757855](https://github.com/stoicsatvik/NASA/actions/runs/43153757855) again passed 5/6 tests. The Mars-CRS fixture then reached the sampler but omitted the GeoTIFF `nodata` attribute; the test failed with `AttributeError` before the live acquisition. The fake raster now declares `nodata = None`, matching a valid GeoTIFF with no nodata metadata. This is a test-fixture completeness correction only; no production code or scientific result changed. Exact-head validation remains pending.
+
+
+## Fixture hardening and nodata regression — 12 November 2026
+
+The latest failed test run [#43153757855](https://github.com/stoicsatvik/NASA/actions/runs/43153757855) stopped before live acquisition because the fake raster did not expose the `nodata` attribute expected by the sampler. The failure was a fixture-interface defect, not a raster or support result. The fixture now exposes `nodata = None` for the no-sentinel case.
+
+The test was strengthened beyond the immediate fixture correction. A parameterized regression now checks four pixel states at an in-bounds observed point: ordinary finite value (valid), explicit -9999 nodata sentinel (invalid), masked pixel (invalid), and NaN (invalid). This tests the actual validity contract rather than only making the fake object satisfy the sampler interface.
+
+Test update commit: [0919521](https://github.com/stoicsatvik/NASA/commit/0919521cc01c498fe8c001ca650d049716c81a78). The exact-head deterministic and bounded live workflow has been triggered by the branch update; results are pending. No translation-sensitivity or scientific result is claimed until that run reproduces the frozen zero-shift aggregates and completes both translation modes.
