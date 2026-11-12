@@ -10,6 +10,7 @@ from experiments.e570_lola_gdr_sample import (
     extract_window_rows,
     parse_label,
     pixel_index,
+    read_bounded_range_response,
     validate_content_range,
     validate_label,
     window_range,
@@ -124,3 +125,63 @@ def test_nonfinite_samples_are_counted_as_missing_not_imputed():
     result = describe_window(rows, 0.0, 1.89521)
     assert result["valid_pixel_count"] == 24
     assert result["missing_or_nonfinite_pixel_count"] == 1
+
+
+def test_label_validation_fails_closed_when_missing_constant_is_declared():
+    label = LABEL.replace(
+        "MINIMUM = -9.075",
+        "MISSING_CONSTANT = -3.4028235e38\nMINIMUM = -9.075",
+    )
+    fields = parse_label(label)
+    assert fields["declared_missing_constant"] is True
+    with pytest.raises(ValueError, match="missing constant"):
+        validate_label(fields)
+
+
+def test_projection_offset_changes_are_rejected_before_pixel_indexing():
+    label = LABEL.replace(
+        "SAMPLE_PROJECTION_OFFSET = 2879.5",
+        "SAMPLE_PROJECTION_OFFSET = 2878.5",
+    )
+    fields = parse_label(label)
+    with pytest.raises(ValueError, match="sample_projection_offset"):
+        validate_label(fields)
+
+
+class _FakeStreamResponse:
+    def __init__(self, status_code, headers, chunks):
+        self.status_code = status_code
+        self.headers = headers
+        self.chunks = chunks
+        self.iterated = False
+
+    def iter_content(self, chunk_size):
+        self.iterated = True
+        yield from self.chunks
+
+
+def test_range_reader_rejects_ignored_range_before_reading_body():
+    response = _FakeStreamResponse(200, {}, [b"x" * 100])
+    with pytest.raises(RuntimeError, match="did not honor bounded HTTP Range"):
+        read_bounded_range_response(response, 100, 115, 1000)
+    assert response.iterated is False
+
+
+def test_range_reader_caps_body_even_when_content_range_header_is_correct():
+    response = _FakeStreamResponse(
+        206,
+        {"Content-Range": "bytes 100-115/1000"},
+        [b"x" * 17],
+    )
+    with pytest.raises(RuntimeError, match="exceeded its byte cap"):
+        read_bounded_range_response(response, 100, 115, 1000)
+
+
+def test_range_reader_accepts_exact_streamed_payload():
+    response = _FakeStreamResponse(
+        206,
+        {"Content-Range": "bytes 100-115/1000"},
+        [b"01234567", b"89abcdef"],
+    )
+    assert read_bounded_range_response(response, 100, 115, 1000) == b"0123456789abcdef"
+    assert response.iterated is True
