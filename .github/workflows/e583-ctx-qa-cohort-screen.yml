@@ -1,6 +1,13 @@
 name: E583 bounded Jezero CTX QA cohort screen
 
 on:
+  push:
+    branches:
+      - research/e583-ctx-qa-cohort-screen-20261112
+    paths:
+      - experiments/e583_ctx_qa_cohort_screen.py
+      - tests/test_e583_ctx_qa_cohort_screen.py
+      - .github/workflows/e583-ctx-qa-cohort-screen.yml
   pull_request:
     branches:
       - research/e582-ctx-qa-mola-control-audit-20261112
