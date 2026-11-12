@@ -1152,3 +1152,16 @@ The tested VIIRS S-NPP 7-day candidate returned HTTP 404. A bounded request to t
 
 Decision: recent keyless MODIS file access **SUPPORTED** for the exact tested endpoint; keyless VIIRS access **NOT YET ESTABLISHED**; current VIIRS coverage via S-NPP ended 2026-11-02; NOAA-20/NOAA-21 keyless 7-day file access remains unverified; cross-sensor harmonization and challenge-selection superiority remain **NOT YET PROVEN**. The MODIS/VIIRS alternative is only partially data-ready, not a demonstrated superior challenge. No account, MAP_KEY, email, paid API or external submission is used.
 
+## E596 — independent public analogue-catalogue provenance audit (12 November 2026)
+
+Source: Rachelle Le Cussan, *Planetary Analogue Catalogue* v0.1, data repository commit `62e6339bdf308de3bc987388d0faa7130cf57de9`, GeoJSON blob `156edd871599cf9ac9c083658d14d034f660e35d`, data licence CC BY 4.0. The audit downloads the exact pinned GeoJSON at workflow time, verifies the Git blob hash, and stores only a coordinate-free summary.
+
+- The source advertises 16 sites, 96 references and 42 photos. Exact snapshot audit: **16/16 review_status = Draft; 0 Verified**.
+- Coordinate precision: 10 sites approximately 10 km, 2 approximately 1 km, 4 region-only. Seven records are marked sensitive. No coordinates are copied into the Foundry receipt or report.
+- Primary targets: Mars 10, early Earth 2, Moon 2, Enceladus 1, Europa 1. The source is a candidate catalogue, not a validated label set.
+- NASA's official Analog Explorer gallery independently names 11 analog pairs (including Kilauea/Moon, Atacama/Mars and Iceland/Mars or Moon), but is a gallery rather than a coordinate-bearing site-feature dataset. The USGS official terrestrial-analogs page names multiple northern-Arizona analog sites and use cases, but likewise does not expose a ready site-feature matrix in its page text.
+- The independent catalogue's own README states that new entries start Draft and become Verified only after someone other than the author checks science, references and ratings. Therefore **zero catalogue rows are admitted as E001 ground-truth labels**. No Draft status is silently promoted.
+- This is a source-readiness experiment, not E001. Known-site recovery remains **NOT YET MEASURED**; cross-body similarity and novel discovery remain **NOT YET PROVEN**.
+
+Next: independently review the primary references for a narrow analogue family, resolve site extents/coordinates from primary geospatial sources, and pair only verified site records with matched-footprint NASADEM/MOLA descriptors. The USGS TADP/ScienceBase geospatial source remains a candidate; prior metadata access timed out, so use a distinct public endpoint or preserve the failure. No author contact, account creation, field visit or raw-coordinate retention.
+
