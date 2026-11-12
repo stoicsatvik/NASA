@@ -1153,3 +1153,15 @@ No channel is missing in the prefix. Particle-count maxima are 48, 28 and 15, wi
 - Preserved failed workflow runs #43267066778 (missing pure row-summary helper) and #43267342440 (one assertion referenced the wrong nested aggregate key); neither reached live source acquisition. Exact-head run #43267508332 passed 4/4 tests and completed the one bounded 5 MB audit.
 - The E597 workflow now skips the live source request whenever the exact aggregate receipt is already committed. Future documentation/PR events rerun deterministic tests without re-reading the same 5 MB source prefix.
 - Next: E598 compares the distinct 1,091,813-byte February 2024 CSV entity to determine whether the six-row/repeated-vector pattern recurs in another release. No deduplication or wind/particle correlation is authorized before that comparison.
+
+
+## E598 — February 2024 Grand Falls source-route falsification (12 November 2026)
+
+- Isolated branch: research/e598-grand-falls-feb2024-row-semantics-20261112; stacked draft PR follows E597.
+- The exact metadata record for SensorData_02-14-24_to_02-16-24.csv is pinned at 1,091,813 bytes and catalog metadata SHA-256 ce33f7a8a18d0076d0b883f634447c0466fa8354e9c3577ff43b48171225e389.
+- Exact-head workflow #43271607662 passed 6/6 deterministic tests and the bounded request. The metadata-supplied URL returned HTTP 200 text/html, 4,255 bytes, no Content-Length header; the payload SHA-256 is 01d324b90d086dd7389e13cfabbc185a7b7afe7917620e05254248773d01e1a2. The header is not admissible as the 14-field CSV. Sanitized durable receipt: research/results/E598_GRAND_FALLS_FEB2024_ROW_SEMANTICS_20261112.json.
+- Result: exact catalogue file identity SUPPORTED AS PINNED; CSV payload NOT ESTABLISHED; February row semantics NOT YET MEASURED. This is a source-route negative, not a scientific null. Do not retry the same HTML route.
+- Data.gov exposes the DOI landing page and original XML metadata, not a direct CSV URL in its public distribution list. USGS release page: https://www.usgs.gov/data/imagery-sediment-collection-photogrammetry-and-meteorological-data-july-2023-november-2024. No field access or contact.
+- E001 remains NOT YET MEASURED; cross-body similarity NOT YET PROVEN; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN.
+
+Highest-value next action: stop the same-site CSV route work unless official metadata exposes a distinct direct file URI. Return compute to cross-body physically comparable feature evidence and the E001 known-analogue gate. Do not spend time on geospatial UI polish before evidence.
