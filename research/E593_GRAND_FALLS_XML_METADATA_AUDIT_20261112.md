@@ -68,3 +68,24 @@ The exact-head live result will be appended after the workflow completes. A miss
 ## Next gate
 
 If the XML exposes a defensible small-sample product and exact projection/vertical support, design one separately bounded archive-member inventory that reads only ZIP central-directory metadata and never extracts image/raster bytes. If it does not, keep all seven archives unopened and stop this branch at metadata-only evidence.
+
+
+## E593 exact-head live result — 12 November 2026
+
+- Final exact head: 503d83e2a355362b894d1e88830a84413e182f7a. Workflow [#43259099282](https://github.com/stoicsatvik/NASA/actions/runs/43259099282) completed successfully: **14/14 deterministic tests passed** and the one bounded live metadata acquisition succeeded. Artifact [#13962867109](https://github.com/stoicsatvik/NASA/actions/runs/43259099282/artifacts/13962867109), ZIP SHA-256 084057e510263038e4002847a20fb3df5d9ab96ad47a3eb5b168d50d1e34d732.
+- The initial 13-test run also parsed the same XML. Extending processing-lineage capture to 3,000 characters exposed a fixture defect: run [#43258901440](https://github.com/stoicsatvik/NASA/actions/runs/43258901440) failed 1/14 because the synthetic FGDC fixture omitted the newly tested accuracy/geoform fields; the live probe was skipped. The fixture was corrected, and the exact final head passed 14/14. This was a test-fixture failure, not a source-data failure.
+- The E591 item metadata SHA-256 matched exactly: f466468ba4b700ecb2a613727483100a9f62f14e8d26dfc8ba840b0122049424. Exactly one XML record matched the pinned filename and 12,658-byte size. Item metadata and XML requests returned HTTP 200; content type was application/fgdc+xml. XML SHA-256: 0811ca45fadb55c44c438c28a7dd1f6a52b47b09b5abd9f2440cb95ceddd1517.
+- The XML explicitly states: **“There is no geospatial data in this dataset, only non-projected point coordinates, so no topology tests were performed.”** The parser found no horizontal CRS, vertical datum, grid resolution, numeric nodata or nodata label fields. The XML tag inventory contains no FGDC spatial-reference section (spref/horizsys/vertdef).
+- The product is described as raster digital data. The process description records Nikon D750 / 35 mm imagery with roughly 60% overlap, Metashape high-accuracy camera alignment, filtering of reprojection/reconstruction/projection outliers, an ultra-high-quality dense cloud, a 2.5D height-field mesh, scale-bar marker distances for **relative geometry**, DEM generation with **edge-gap extrapolation**, and orthomosaics forced to match the corresponding DEM pixel dimensions.
+- The metadata's completeness statement places the observations at one location in the dune field, approximately 50 m south of the weather-station enclosure, over 2024-02-20 to 2024-07-25. The accuracy-report text is qualitative; it supplies no numeric checkpoint RMSE, independent control residuals, scale-bar uncertainty or vertical accuracy.
+- The product's logic statement is a decisive limitation: only non-projected point coordinates are supplied, not geospatial data. A DEM filename or raster form label does not create a CRS. Scale-bar-based relative geometry is not absolute georeferencing. Edge extrapolation also means edge cells are not all direct observations.
+- Only the exact 12,658-byte XML file was downloaded. No ZIP, raster, image, DEM or orthomosaic bytes were requested. The seven archives (about 1.56 GB) remain unopened. The durable aggregate receipt is research/results/E593_GRAND_FALLS_XML_METADATA_AUDIT_20261112.json; raw XML, coordinates, URLs, file paths and contact details were not retained.
+
+### Updated decision and next gate
+
+- Source-described local relative 2.5D morphology product: **SUPPORTED**.
+- Absolute geospatial placement / horizontal CRS: **NOT SUPPORTED BY THIS XML**.
+- Vertical datum, grid spacing and nodata semantics: **NOT ESTABLISHED**.
+- Independent geometric accuracy: **NOT ESTABLISHED**.
+- Direct MOLA/CTX registration, geospatial overlay or spatially calibrated Mars-analogue comparison: **NOT ADMISSIBLE FROM THIS SOURCE RECORD**.
+- Do not open the seven archives under the original georeferencing gate. The only defensible follow-on is a separately justified search for scale-bar calibration, non-projected control-point distances and independent checkpoint residuals. If those are absent, retain this as a local relative-morphology analogue and stop; do not manufacture a geospatial reference frame.

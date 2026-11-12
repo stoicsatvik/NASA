@@ -9,6 +9,7 @@ on:
       - experiments/test_e593_grand_falls_xml_metadata_audit.py
       - research/E593_GRAND_FALLS_XML_METADATA_AUDIT_20261112.md
       - research/results/E593_GRAND_FALLS_XML_METADATA_AUDIT_20261112.json
+      - research/results/E593_GRAND_FALLS_XML_METADATA_AUDIT_20261112.json
       - .github/workflows/e593-grand-falls-xml-metadata-audit.yml
 
 permissions:
