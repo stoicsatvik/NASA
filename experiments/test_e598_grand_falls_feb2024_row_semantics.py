@@ -113,7 +113,7 @@ class E598RowSemanticsTests(unittest.TestCase):
         from experiments.e598_grand_falls_feb2024_row_semantics import rejected_size_mismatch_receipt
 
         headers, _ = self.make_fixture()
-        payload = (",".join(headers) + "\\n").encode()
+        payload = (",".join(headers) + "\n").encode()
         receipt = rejected_size_mismatch_receipt(
             metadata_sha256="b" * 64,
             metadata_status=200,

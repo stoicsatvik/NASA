@@ -82,3 +82,11 @@ If the row-group pattern recurs, retain the mechanism as unresolved and stop tre
 - Cross-body similarity: NOT YET PROVEN.
 - Known-site recovery / E001: NOT YET MEASURED.
 - Novel analogue discovery and local validation advantage: NOT YET PROVEN.
+
+
+## Deterministic receipt-contract regression correction
+
+- Added a pure `rejected_size_mismatch_receipt` helper so response-size failures are represented as sanitized negative receipts without attempting CSV parsing.
+- Added regression checks for an HTML payload and for a schema-valid CSV header whose byte count still fails the pinned-size gate. Schema validity must never override the exact catalogue-size contract.
+- Exact-head runs #43273561878 and #43273625070 initially failed 9/10 tests because the new CSV fixture encoded a literal backslash-n instead of a newline. The live source-acquisition step was skipped on both runs; these are test-fixture failures, not source or parser results.
+- Corrected the fixture to contain a real CSV header line terminator. The next exact-head push run is deterministic-only: the prior source-route negative receipt is already committed, and no repeat live request is authorized by this commit.
