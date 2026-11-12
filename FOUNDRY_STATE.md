@@ -1120,3 +1120,14 @@ Next gate: resolve item-specific `geodiff` order/control provenance; then inspec
 1. One bounded metadata-only audit of the distinct photogrammetry child item `67b78df2d34e1a2e835b13b7`; establish whether a DEM/orthomosaic is listed, without downloading raster bytes.
 2. Fix the timestamp audit by parsing source strings and measuring ordering, duplicate timestamps, interval distribution and gaps; compare against the published one-minute logging description.
 3. Continue independent Earth positive/control acquisition and matched Mars-side feature admissibility. E001 remains gated.
+
+
+## E592 — Grand Falls sensor timestamp integrity (12 November 2026)
+
+- Draft PR #156, branch research/e592-grand-falls-timestamp-integrity-20261112, stacked on E590 / PR #154; main untouched.
+- Exact-head workflow [#43256647630](https://github.com/stoicsatvik/NASA/actions/runs/43256647630) passed **11/11 deterministic tests** and completed one bounded live audit. Artifact [#13962385226](https://github.com/stoicsatvik/NASA/actions/runs/43256647630/artifacts/13962385226); aggregate receipt is committed at research/results/E592_GRAND_FALLS_TIMESTAMP_AUDIT_20261112.json.
+- Re-read the exact catalogued 67,050,032-byte CSV only after matching item ID, filename and size. Read exactly 5,000,000 bytes; both the full-prefix and complete-line hashes exactly match E590. No full-file download or raw rows/timestamps/values were retained.
+- All 85,145 timestamps parsed. Naive chronological bounds: 2023-07-07 09:25 to 2023-07-17 05:56. Of 85,144 adjacent row intervals, 70,953 are zero seconds and 14,191 are exactly 60 seconds. No invalid timestamps, negative intervals or positive gaps over 60 seconds.
+- 14,192 distinct timestamp values are all repeated, approximately six rows per timestamp on average. The file is nondecreasing with duplicates; it is not one row per minute. The E590 lexicographic extrema are superseded for chronological interpretation, while the original E590 receipt remains unchanged.
+- Supported: timestamp parsing and minute-spaced transitions between distinct timestamp groups in this prefix. Not established: row semantics, raw 1 Hz acquisition, averaging algorithm, timezone, calibration, wBSNE mass conversion, sediment flux or E001 admissibility.
+- Next experiment: aggregate Record Number progression and per-timestamp group sizes/channel patterns from the same bounded prefix; reconcile against the source data dictionary before any temporal covariation analysis.
