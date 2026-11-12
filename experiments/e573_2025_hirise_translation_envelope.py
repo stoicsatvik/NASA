@@ -21,6 +21,8 @@ import requests
 from rasterio.windows import Window
 
 import experiments.e569_paired_hirise_support as e569
+
+MAX_2020_RANGE_BYTES = 16 * 1024 * 1024
 from experiments.e545_mola_observed_support import (
     COUNT_IMG,
     COUNT_LABEL,
@@ -165,6 +167,7 @@ def run() -> dict:
         "design": {
             "observed_point_source": "same frozen MOLA 33x33 window as E563/E569",
             "expected_observed_points": EXPECTED_OBSERVED_POINTS,
+            "2020_range_transfer_cap_bytes": MAX_2020_RANGE_BYTES,
             "translation_offsets_m": [
                 {"dx": dx, "dy": dy, "radius": math.hypot(dx, dy)}
                 for dx, dy in OFFSETS_M
@@ -189,6 +192,7 @@ def run() -> dict:
         "limitations": [
             "The 10.2 m value is a published 99th-percentile HiRISE-to-CTX alignment statistic, not a hard bound or a measured MOLA tie.",
             "The 13 deterministic translations are a sensitivity grid, not a probability distribution or confidence region.",
+            "The E573 2020 point-window range cap is 16 MiB (the inherited E569 cap was 4 MiB); actual transferred bytes remain bounded and recorded.",
             "Common-mode translations test shared map-frame sensitivity; differential_2025 translations test a 2025-only shift relative to the fixed 2020 mask.",
             "The 2025 mosaic is aligned to CTX and is not an independent horizontal control network.",
             "The denominator is 346 observed MOLA point centers, not area coverage.",
@@ -233,6 +237,8 @@ def run() -> dict:
 
         # Reuse E569's exact bounded 2020 reader with this experiment's frozen offsets.
         e569.TRANSLATION_OFFSETS_M = OFFSETS_M
+        # The wider 13-offset union needs a larger but still bounded range budget.
+        e569.MAX_2020_RANGE_BYTES = MAX_2020_RANGE_BYTES
         old_masks, old_transport, old_crs = e569._read_2020_point_masks(
             session, lat, lon, observed
         )
@@ -336,6 +342,7 @@ def run() -> dict:
             "total_bins": int(observed.size),
             "raw_counts_retained": False,
         }
+        old_transport["range_transfer_cap_bytes"] = MAX_2020_RANGE_BYTES
         receipt["2020_hirise"] = old_transport
         receipt["2025_hirise"] = {
             "product_page": "https://astrogeology.usgs.gov/search/map/mars-sample-return-terrain-relative-navigation-hirise-dtm-mosaic",
