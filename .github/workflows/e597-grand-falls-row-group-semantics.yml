@@ -42,10 +42,14 @@ jobs:
       - name: Fetch exact pinned 5 MB source prefix and audit row groups
         if: hashFiles('research/results/E597_GRAND_FALLS_ROW_GROUP_SEMANTICS_20261112.json') == ''
         run: python -m experiments.e597_grand_falls_row_group_semantics --out .artifacts/e597/receipt.json
-      - name: Validate aggregate receipt
+      - name: Validate fresh aggregate receipt
+        if: hashFiles('research/results/E597_GRAND_FALLS_ROW_GROUP_SEMANTICS_20261112.json') == ''
         run: python -m json.tool .artifacts/e597/receipt.json > /dev/null
+      - name: Validate committed aggregate receipt
+        if: hashFiles('research/results/E597_GRAND_FALLS_ROW_GROUP_SEMANTICS_20261112.json') != ''
+        run: python -m json.tool research/results/E597_GRAND_FALLS_ROW_GROUP_SEMANTICS_20261112.json > /dev/null
       - name: Upload aggregate-only result
-        if: always()
+        if: always() && hashFiles('research/results/E597_GRAND_FALLS_ROW_GROUP_SEMANTICS_20261112.json') == ''
         uses: actions/upload-artifact@v4
         with:
           name: e597-grand-falls-row-group-semantics
