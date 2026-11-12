@@ -108,3 +108,8 @@ This is a negative result and is preserved as such. No E001 run was attempted be
 Stop searching for another catalogue-only substitute. Acquire one analysis-grade, source-pinned Earth dataset for a narrow physical family (the previously identified Grand Falls aeolian source is a candidate), with actual raster/point data, footprints, units, resolution, nodata and uncertainty. Add defensible non-analogue controls from an independent source, then construct a matched-support Earth/planetary feature matrix and run frozen random, Euclidean and physically weighted leave-one-site-out E001 baselines. Preserve nulls; do not tune to rescue named sites.
 
 India/Maharashtra leads remain literature leads, not discoveries. No field measurements, permissions, site access or local validation are claimed.
+
+
+## E001 target-measurement completeness hardening (12 November 2026)
+
+The minimum E001 gate now requires at least one numeric target-body measurement field to be populated for **every** in-scope positive/control record. A field appearing on only one candidate is reported as partial coverage and cannot satisfy a matched feature-matrix requirement. The synthetic regression explicitly rejects that sparse-field case while retaining the fully matched positive/control fixture. The pinned live catalogue still has no target measurement fields: its `compare` values are only map-context latitude, longitude and view radius. The source-level conclusion is unchanged: candidate-site index SUPPORTED; stand-alone E001 labels/features REJECTED; known-site recovery NOT YET MEASURED.

@@ -183,12 +183,29 @@ def audit_document(document: dict) -> dict:
         for feature in positives
     ])
 
-    target_measurement_fields = sorted({
+    target_measurement_keys = sorted({
         key
         for feature in in_scope
         for key, value in (feature["properties"].get("compare") or {}).items()
         if is_number(value) and key not in {"lat", "lon", "view_km"}
     })
+    target_measurement_field_coverage = [
+        {
+            "field": key,
+            "count": sum(
+                1 for feature in in_scope
+                if is_number((feature["properties"].get("compare") or {}).get(key))
+            ),
+        }
+        for key in target_measurement_keys
+    ]
+    target_measurement_fields = [
+        row["field"] for row in target_measurement_field_coverage
+    ]
+    common_target_measurement_fields = [
+        row["field"] for row in target_measurement_field_coverage
+        if row["count"] == len(in_scope)
+    ]
 
     verified_positive_records = sum(
         1 for feature in positives
@@ -205,10 +222,11 @@ def audit_document(document: dict) -> dict:
             "positive/control record; the only common numeric fields are "
             "access_level and hazard_rating."
         )
-    if not target_measurement_fields:
+    if not common_target_measurement_fields:
         reasons.append(
-            "No matched target-body numeric measurement fields are supplied; "
-            "the compare block contains map context, not physical measurements."
+            "No target-body numeric measurement field is populated across every "
+            "in-scope positive/control record; map context alone is not a matched "
+            "physical measurement."
         )
 
     return {
@@ -230,7 +248,9 @@ def audit_document(document: dict) -> dict:
         "numeric_field_coverage": numeric_coverage,
         "common_numeric_fields": common_numeric,
         "common_physical_numeric_fields": common_physical,
+        "target_measurement_field_coverage": target_measurement_field_coverage,
         "target_measurement_fields": target_measurement_fields,
+        "common_target_measurement_fields": common_target_measurement_fields,
         "family_counts": dict(sorted(family_counts.items())),
         "families_with_two_or_more": families_with_two,
         "verified_positive_records": verified_positive_records,
@@ -312,6 +332,7 @@ def main() -> None:
         f"{result['verified_positive_records']} verified positives; "
         f"{result['explicit_non_analogue_controls']} controls; "
         f"{len(result['common_physical_numeric_fields'])} common physical fields; "
+        f"{len(result['common_target_measurement_fields'])} common target measurement fields; "
         f"minimum E001 gate={result['minimum_e001_input_gate_passed']}"
     )
 

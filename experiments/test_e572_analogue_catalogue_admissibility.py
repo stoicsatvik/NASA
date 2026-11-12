@@ -78,7 +78,39 @@ class E572CatalogueAuditTests(unittest.TestCase):
         self.assertEqual(result["explicit_non_analogue_controls"], 1)
         self.assertEqual(result["common_physical_numeric_fields"], ["slope_mean_deg"])
         self.assertEqual(result["target_measurement_fields"], ["elevation_m"])
+        self.assertEqual(result["common_target_measurement_fields"], ["elevation_m"])
         self.assertTrue(result["minimum_e001_input_gate_passed"])
+
+    def test_sparse_target_measurement_field_does_not_satisfy_minimum_gate(self):
+        document = {
+            "type": "FeatureCollection",
+            "features": [
+                feature(
+                    "positive-a", "Mars", "Volcanic", "Verified", [1, 2],
+                    {"slope_mean_deg": 3.0}, {"elevation_m": 100.0},
+                ),
+                feature(
+                    "positive-b", "Mars", "Volcanic", "Verified", [2, 3],
+                    {"slope_mean_deg": 4.0},
+                ),
+                feature(
+                    "control-a", "Mars", None, "Verified", [3, 4],
+                    {"is_analog": False, "control_role": "negative", "slope_mean_deg": 2.0},
+                ),
+            ],
+        }
+        result = audit_document(document)
+        self.assertEqual(
+            result["target_measurement_field_coverage"],
+            [{"field": "elevation_m", "count": 1}],
+        )
+        self.assertEqual(result["target_measurement_fields"], ["elevation_m"])
+        self.assertEqual(result["common_target_measurement_fields"], [])
+        self.assertFalse(result["minimum_e001_input_gate_passed"])
+        self.assertTrue(any(
+            "not populated across every in-scope positive/control record" in reason
+            for reason in result["e001_reasons"]
+        ))
 
     def test_duplicate_site_ids_are_rejected(self):
         first = feature("same", "Mars", "Volcanic", "Draft", [1, 2])

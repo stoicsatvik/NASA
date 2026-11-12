@@ -821,3 +821,6 @@ Result: this catalogue is SUPPORTED as a candidate-site discovery index but REJE
 The planetary-analog challenge remains a research challenger, not the current readiness leader. The all-14 screen still places Martian Map #11 (4.10) and MODIS/VIIRS #9 (4.00) in a provisional top tier; planetary analog #10 remains 2.93. E572 does not justify a numeric score change. No challenge is locked.
 
 Next: acquire analysis-grade, source-pinned Earth measurements and explicit negative controls for one narrow physical family, then construct a matched-support Earth/planetary matrix and run frozen E001 baselines. Do not substitute another catalogue-only audit or polish UI before that evidence exists.
+
+
+- E572 gate hardening: target-body numeric measurements are counted by record and must be common to every in-scope positive/control record. A one-record-only measurement fails the E001 gate. The pinned catalogue has only `compare` map context (lat/lon/view_km), so target-measurement coverage remains zero and the negative admissibility result is unchanged.
