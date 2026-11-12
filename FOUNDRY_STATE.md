@@ -922,3 +922,23 @@ Claim states remain unchanged: repo operating system SUPPORTED; cross-body simil
 - The live-probe job was skipped; no repeat network request was made.
 - Last live attempt remains [#43185828498](https://github.com/stoicsatvik/NASA/actions/runs/43185828498): null-safe receipt generation succeeded but data access remained `ACQUISITION_ERROR` with no captured HTTP status, selected file or rows.
 - No source absence or scientific null is inferred. Keep E001 NOT YET MEASURED and pivot to a different independent Earth-side source; do not retry the same endpoint using guessed URL variants.
+
+
+## E578 — independent USGS known-terrestrial-analogue source gate (12 November 2026)
+
+- Isolated branch: \`research/e578-usgs-known-terrestrial-analog-sites-20261112\`, stacked on E577 PR #137; main remains untouched.
+- Source: USGS data release DOI 10.5066/P9J72921, ScienceBase item 5f88940b82cebb8c13d912ee. This is distinct from the failed E577 Grand Falls item.
+- The frozen probe requests only projected metadata, requires an explicit metadata-linked download URI, caps metadata and any eligible vector package at 5 MB, validates a 4 KiB HTTP Range/Content-Range before a full read, and stores only hashes, file/schema/count/CRS summaries. No raw site rows or coordinates are committed.
+- Exact-head deterministic and bounded live results will be recorded after Actions completes.
+- Potential positive outcome: an independently sourced known-analogue point index with site/type fields and CRS. Even a successful point layer is not quantitative ground truth and supplies no non-analogue controls by itself.
+- Claim states remain: repo operating system SUPPORTED; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN; planetary-analog challenge superiority NOT YET PROVEN.
+
+
+## E578 exact-head result — independent USGS known-terrestrial-analogue source (12 November 2026)
+
+- Draft PR #138 on \`research/e578-usgs-known-terrestrial-analog-sites-20261112\`, stacked on E577 PR #137; tested head \`7e1bc6ad64beb9318f2f3d44b8144898fcb5f13f\`.
+- Actions #43193280091 completed successfully: 6/6 deterministic tests passed; bounded live-probe artifact #13930469672 was uploaded (SHA-256 ee198cf96f23a1d1b07fd33120392200e95a34949a04b4110814a45c5dc59963).
+- The live source decision was ACQUISITION_ERROR, TimeoutError: "The read operation timed out". Metadata HTTP status, file count and selected file are null. No data were acquired; no credentials, raw rows or raw files were used/stored.
+- This is a transport/access failure, not evidence that the USGS release contains no records and not a scientific null. Do not retry this item using guessed URL variants.
+- E001 known-site recovery remains NOT YET MEASURED; cross-body similarity, novel analogue discovery, local validation advantage and planetary-analog challenge superiority remain NOT YET PROVEN.
+- Next: pivot to a different independent public Earth-side source or a literature-backed catalogue with usable coordinates and defensible physical descriptors. No claim promotion.
