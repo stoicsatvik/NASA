@@ -159,11 +159,41 @@ def parse_item(document: dict) -> tuple[dict, dict]:
     properties = feature.get("properties")
     if not isinstance(properties, dict):
         properties = {}
+
+    def link_summary(link: dict) -> dict:
+        if not isinstance(link, dict):
+            return {"rel": None, "title": None, "type": None, "url": None}
+        href = link.get("href")
+        return {
+            "rel": link.get("rel"),
+            "title": link.get("title"),
+            "type": link.get("type"),
+            "method": link.get("method"),
+            "url": safe_url_summary(href) if isinstance(href, str) else None,
+        }
+
+    item_links = feature.get("links")
+    if not isinstance(item_links, list):
+        item_links = []
+    asset_summaries = []
+    for key, value in sorted(assets.items(), key=lambda pair: str(pair[0])):
+        if not isinstance(value, dict):
+            value = {}
+        href = value.get("href")
+        asset_summaries.append({
+            "key": str(key),
+            "title": value.get("title"),
+            "type": value.get("type"),
+            "roles": value.get("roles"),
+            "url": safe_url_summary(href) if isinstance(href, str) else None,
+        })
     summary = {
         "id": feature.get("id"),
         "collection": feature.get("collection"),
         "datetime": properties.get("datetime"),
         "asset_keys": sorted(str(key) for key in assets.keys()),
+        "item_links": [link_summary(link) for link in item_links],
+        "asset_summaries": asset_summaries,
     }
     return summary, assets
 
@@ -437,6 +467,8 @@ def summarize_receipt(receipt: dict) -> dict:
         "decision": receipt.get("decision"),
         "item_id": item.get("id"),
         "asset_keys": item.get("asset_keys", []),
+        "item_link_relations": [link.get("rel") for link in item.get("item_links", [])],
+        "asset_summaries": item.get("asset_summaries", []),
         "qa_metrics": asset_summary("qa_metrics"),
         "mola_csv": asset_summary("mola_csv"),
         "credentials_used": False,
