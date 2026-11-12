@@ -105,12 +105,14 @@ E599 completed a bounded official-documentation audit of CTX–MOLA QA sign and 
 
 E600 completed a source-level audit of Levy (2026) on McMurdo Dry Valleys thermal inertia. The MDV is a published Mars analogue and the article reports physical soil thermal inertia in TIU, but its satellite apparent thermal inertia is not directly interchangeable with physical TIU. The article itself reports poor point-scale ATI/TIU correspondence. Supporting Table S2 and sample georeferencing have not been retrieved. This is a candidate positive-site source, not E001 recovery.
 
+E601 completed a controlled CTX STAC access probe. Collection metadata is accessible and the official USGS tutorial documents 80 historical example matches for a Jezero bbox plus DTM/QA/MOLA asset keys. The item/search endpoints and S3 COG could not be retrieved in this automation runtime; container curl failed before HTTP due DNS resolution. This is a runtime access blocker, not evidence that the collection has no items and not a scientific null.
+
 The all-14 challenge screen remains provisional: #11 Martian Map 4.10 and #9 MODIS/VIIRS 4.00 exceed #10 planetary analog 2.93 on the current rubric. The 0.10 gap is below the predeclared meaningful threshold and factor ablations reverse the ranking; no challenge is locked.
 
 Next highest-information actions:
-1. Retrieve and source-hash E600 Supporting Table S2; verify whether sample IDs/coordinates support a defensible geospatial join.
-2. If georeferencing is valid, acquire matched Mars THEMIS physical TIU data, define non-analogue controls before scoring, and run a frozen single-site/leave-one-site-out baseline. Do not equate ATI with TIU.
-3. Continue the existing Martian Map CRS/coverage test and no-credential MODIS/VIIRS data-path validation. Re-score the all-14 challenge matrix only when a measured result changes a factor.
+1. Run the official `pystac-client` query from a network-enabled authorized environment for one Jezero CTX DTM item. Preserve raw item JSON, exact DTM/QA/MOLA asset URLs and hashes; verify WKT2, GSD, nodata, QA and COG byte-range access; then sample a small DTM window and compare it to same-area MOLA.
+2. Retrieve and source-hash E600 Supporting Table S2; verify whether sample IDs/coordinates support a defensible geospatial join. If so, acquire matched Mars THEMIS physical TIU, define non-analogue controls before scoring and run frozen leave-one-site-out baselines. Do not equate ATI with TIU.
+3. Continue the no-credential MODIS/VIIRS alternative search and the all-14 challenge matrix only when a measured result changes a factor.
 
 E001 remains NOT YET MEASURED; cross-body similarity, novel analogue discovery, local validation advantage and challenge-selection superiority remain NOT YET PROVEN. No UI polish before evidence.
 ## E514 real matched-footprint falsification (2026-11-03)
