@@ -34,9 +34,11 @@ class E598AssociationTests(unittest.TestCase):
         self.assertLessEqual(a["familywise_p_value"], 1.0)
         self.assertTrue(a["shift_draws_unique"])
 
-    def test_constant_series_is_rejected(self):
-        with self.assertRaises(ValueError):
-            correlation_matrix(np.ones((1, 8)), np.arange(8, dtype=float).reshape(1, 8), "spearman")
+    def test_constant_series_returns_null_correlation(self):
+        result = correlation_matrix(
+            np.ones((1, 8)), np.arange(8, dtype=float).reshape(1, 8), "spearman"
+        )
+        self.assertTrue(np.isnan(result[0, 0]))
 
 
 if __name__ == "__main__":
