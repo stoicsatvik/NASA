@@ -1,13 +1,14 @@
 name: E590 Grand Falls 2023-2024 public data access
 
 on:
-  push:
+  pull_request:
     branches:
-      - research/e590-grand-falls-2023-2024-access-20261112
+      - research/e588-ctx-production-api-provenance-audit-20261112
     paths:
       - experiments/e590_grand_falls_2023_2024_probe.py
       - experiments/test_e590_grand_falls_2023_2024_probe.py
       - research/E590_GRAND_FALLS_2023_2024_ACCESS_20261112.md
+      - research/results/E590_GRAND_FALLS_2023_2024_ACCESS_20261112.json
       - .github/workflows/e590-grand-falls-2023-2024.yml
 
 permissions:
@@ -30,8 +31,7 @@ jobs:
         run: python -m unittest experiments.test_e590_grand_falls_2023_2024_probe -v
 
   live_probe:
-    # One live request only: the workflow-file commit that arms this experiment.
-    if: contains(github.event.head_commit.message, 'E590: add one-shot')
+    if: github.event_name == 'pull_request'
     needs: tests
     runs-on: ubuntu-latest
     timeout-minutes: 8
@@ -40,10 +40,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Probe one distinct public USGS ScienceBase item
+      - name: Run the one-shot probe only while no durable receipt exists
+        if: hashFiles('research/results/E590_GRAND_FALLS_2023_2024_ACCESS_20261112.json') == ''
         run: python -m experiments.e590_grand_falls_2023_2024_probe --out .artifacts/e590/grand-falls-2023-2024-receipt.json
       - name: Preserve sanitized receipt only
-        if: always()
+        if: always() && hashFiles('research/results/E590_GRAND_FALLS_2023_2024_ACCESS_20261112.json') == ''
         uses: actions/upload-artifact@v4
         with:
           name: e590-grand-falls-2023-2024-receipt
