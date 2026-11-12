@@ -3,12 +3,12 @@
 Updated: 2026-11-12
 Class: Tier A
 Time horizon: NASA Space Apps Challenge, 14–15 Nov 2026
-Working branch: `research/e568-2025-hirise-dtm-observed-point-support-20261112`
+Working branch: `research/e572-independent-analogue-catalogue-audit-20261112`
 Main objective: maximize uncertainty eliminated per run and converge on a scientifically defensible Space Apps entry.
 
 ## Current thesis
 
-The leading candidate is the 2026 planetary-analog challenge: identify Earth environments analogous to Moon/Mars locations using open Earth + planetary datasets.
+The planetary-analog challenge remains the current scientific research thesis under test, but it is not the current readiness leader and is NOT YET PROVEN to be the best challenge. The all-14 screen currently places #11 Martian Map (4.10) and #9 MODIS/VIIRS (4.00) in a provisional top tier; #10 planetary analog remains 2.93. The 0.10 gap and factor-ablation reversal are below the predeclared meaningful threshold. No challenge is locked.
 
 This is **NOT YET PROVEN** to be the best challenge.
 
@@ -801,3 +801,23 @@ The highest-value next gate is to decompress only the 65.3 MB FOM_Confidence mem
 - Limitation: controls differ substantially (593.116 m relief difference; 6.656° p90-slope difference) and each overlaps the seam window by 3/11 rows. This is a **candidate seam confound**, not proof of causation; natural terrain variation remains viable.
 - Claim states: repo operating system SUPPORTED; bounded LOLA ingestion SUPPORTED for this pinned product; local seam/control comparison SUPPORTED for this one location; seam artifact attribution NOT YET PROVEN; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN; challenge-selection superiority NOT YET PROVEN.
 - Do not repeat another single-longitude seam variant. Next priority is to challenge the current leading alternatives in the 14-challenge screen (Martian Map and MODIS/VIIRS) with their own data/acceptance gates; a multi-longitude seam campaign is justified only if it can change feature admissibility. No UI polish before evidence.
+
+
+## E572 — independent public analogue-catalogue admissibility (12 November 2026)
+
+The pinned third-party Planetary Analogue Catalogue was audited as a possible independent E001 source. Source: \`rachellelecussan/planetary-analogue-catalogue\`, commit \`62e6339bdf308de3bc987388d0faa7130cf57de9\`, \`data/sites.geojson\`, Git blob SHA-1 \`156edd871599cf9ac9c083658d14d034f660e35d\`, 143,202 bytes, CC BY 4.0.
+
+- 16 total records; 12 primary Mars/Moon records (10 Mars, 2 Moon).
+- All 12 are Draft; zero Verified positives.
+- 68 in-scope references: 21 peer-reviewed, 20 peer-reviewed references supporting analogue/feature/science claims, 1 marked unverified.
+- Four broad type families have at least two records, but none has two Verified positives.
+- Zero explicit non-analogue controls.
+- Only common numeric fields are \`access_level\` and \`hazard_rating\`, both contributor ratings. Zero common physical numeric descriptors and zero target-body measurement fields.
+- Coordinate precision: 8 approximately 10 km, 3 region-only, 1 approximately 1 km.
+- Exact aggregate receipt: \`research/results/E572_ANALOGUE_CATALOGUE_ADMISSIBILITY_20261112.json\`. No raw GeoJSON, photos or coordinates were retained.
+
+Result: this catalogue is SUPPORTED as a candidate-site discovery index but REJECTED as a stand-alone E001 labels/features dataset. This does not reject any listed site as a genuine analogue. E001 known-site recovery remains NOT YET MEASURED; cross-body similarity, novel discovery, local validation advantage and challenge-selection superiority remain NOT YET PROVEN.
+
+The planetary-analog challenge remains a research challenger, not the current readiness leader. The all-14 screen still places Martian Map #11 (4.10) and MODIS/VIIRS #9 (4.00) in a provisional top tier; planetary analog #10 remains 2.93. E572 does not justify a numeric score change. No challenge is locked.
+
+Next: acquire analysis-grade, source-pinned Earth measurements and explicit negative controls for one narrow physical family, then construct a matched-support Earth/planetary matrix and run frozen E001 baselines. Do not substitute another catalogue-only audit or polish UI before that evidence exists.
