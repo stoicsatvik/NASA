@@ -6,9 +6,11 @@ from experiments.e589_ctx_s3_provenance_prefix_audit import (
     COLLECTION,
     ITEM_ID,
     ITEM_PREFIX,
+    _is_metadata_candidate,
     _is_provenance_candidate,
     build_list_url,
     parse_provenance_payload,
+    parse_qa_metrics,
     parse_s3_listing,
     summarize_receipt,
 )
@@ -34,6 +36,8 @@ class E589Tests(unittest.TestCase):
         self.assertFalse(_is_provenance_candidate("qa_metrics.txt"))
         self.assertFalse(_is_provenance_candidate(ITEM_ID.lower() + "_mola_shots.csv"))
         self.assertFalse(_is_provenance_candidate("image.tif"))
+        self.assertFalse(_is_provenance_candidate(ITEM_ID.lower() + ".json"))
+        self.assertTrue(_is_metadata_candidate(ITEM_ID.lower() + ".json"))
 
     def test_parses_listing_without_persisting_full_keys(self):
         xml = f'''<?xml version="1.0" encoding="UTF-8"?>
@@ -47,6 +51,7 @@ class E589Tests(unittest.TestCase):
         self.assertEqual(result["objects"][0]["name"], "dtm.tif")
         self.assertEqual(result["objects"][1]["name"], "provenance.txt")
         self.assertTrue(result["objects"][1]["provenance_candidate"])
+        self.assertTrue(result["objects"][1]["metadata_candidate"])
         serialized = json.dumps(result)
         self.assertNotIn(ITEM_PREFIX, serialized)
         self.assertNotIn("<Key>", serialized)
@@ -143,6 +148,16 @@ class E589Tests(unittest.TestCase):
         self.assertEqual(result["command_mentions_count"], 0)
         self.assertEqual(result["decision"], "JSON_WITHOUT_RECOGNIZED_COMMANDS")
 
+    def test_qa_metrics_parser_extracts_numeric_fields_without_raw_text(self):
+        payload = b"Mean difference: -1.25 m\\nMedian difference: -1.10 m\\nStandard deviation: 3.5 m\\nCTX-MOLA"
+        result = parse_qa_metrics(payload)
+        self.assertEqual(result["decision"], "QA_METRICS_PARSED")
+        self.assertEqual([m["metric"] for m in result["metrics"]], ["mean", "median", "standard_deviation"])
+        self.assertEqual(result["metrics"][0]["value"], -1.25)
+        self.assertIn("ctx-mola", result["sign_terms"])
+        self.assertNotIn("Mean difference", json.dumps(result))
+        self.assertFalse(result["raw_text_stored"])
+
     def test_receipt_summary_contains_no_raw_keys_or_credentials(self):
         summary = summarize_receipt({
             "experiment": "E589",
@@ -154,6 +169,7 @@ class E589Tests(unittest.TestCase):
         self.assertFalse(summary["raw_s3_xml_stored"])
         self.assertFalse(summary["full_object_keys_stored"])
         self.assertFalse(summary["raw_provenance_stored"])
+        self.assertFalse(summary["raw_qa_text_stored"])
         self.assertFalse(summary["local_paths_stored"])
         self.assertFalse(summary["signed_query_values_stored"])
 
