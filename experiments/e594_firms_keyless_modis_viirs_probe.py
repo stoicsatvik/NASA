@@ -10,11 +10,13 @@ import re
 import urllib.error
 import urllib.request
 from datetime import date
+from html.parser import HTMLParser
 from pathlib import Path
-from urllib.parse import urlsplit
+from urllib.parse import urljoin, urlsplit
 
 MAX_BYTES = 256 * 1024
 TIMEOUT_SECONDS = 25
+ROOT_LISTING_URL = "https://firms.modaps.eosdis.nasa.gov/data/active_fire/"
 ALLOWED_HOST = "firms.modaps.eosdis.nasa.gov"
 SOURCES = {
     "MODIS_C61": {
@@ -219,14 +221,140 @@ def probe_source(name: str, config: dict) -> dict:
     return result
 
 
+
+class _HrefCollector(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.hrefs = []
+
+    def handle_starttag(self, tag, attrs):
+        if tag.lower() == "a":
+            for key, value in attrs:
+                if key.lower() == "href" and value:
+                    self.hrefs.append(value)
+
+
+def probe_directory_listing(url: str) -> dict:
+    validate_url(url)
+    request = urllib.request.Request(
+        url,
+        headers={
+            "User-Agent": "Foundry-E594/1.0 (bounded public-directory discovery)",
+            "Accept": "text/html,*/*",
+            "Range": f"bytes=0-{MAX_BYTES - 1}",
+        },
+    )
+    result = {"url": url, "status": None, "content_type": None, "links": []}
+    opener = urllib.request.build_opener(StrictRedirectHandler())
+    try:
+        with opener.open(request, timeout=TIMEOUT_SECONDS) as response:
+            payload = response.read(MAX_BYTES + 1)
+            result.update({
+                "status": response.status,
+                "content_type": response.headers.get_content_type(),
+                "prefix_bytes": min(len(payload), MAX_BYTES),
+                "last_modified": response.headers.get("Last-Modified"),
+            })
+            if result["content_type"] != "text/html":
+                return result
+            parser = _HrefCollector()
+            parser.feed(payload[:MAX_BYTES].decode("utf-8", errors="replace"))
+            links = []
+            for href in parser.hrefs:
+                try:
+                    candidate = urljoin(url, href)
+                    validate_url(candidate)
+                    if candidate not in links:
+                        links.append(candidate)
+                except ValueError:
+                    continue
+            result["links"] = sorted(links)[:100]
+    except urllib.error.HTTPError as error:
+        result.update({
+            "status": error.code,
+            "content_type": error.headers.get_content_type() if error.headers else None,
+        })
+        error.close()
+    except Exception as error:
+        result["error_type"] = type(error).__name__
+    return result
+
+
+def discover_viirs_csv_candidates() -> dict:
+    root = probe_directory_listing(ROOT_LISTING_URL)
+    listings = []
+    candidates = []
+    viirs_dirs = [
+        url for url in root.get("links", [])
+        if url.endswith("/") and "viirs" in urlsplit(url).path.lower()
+    ][:3]
+    for directory in viirs_dirs:
+        first = probe_directory_listing(directory)
+        listings.append(first)
+        direct = first.get("links", [])
+        child_dirs = [
+            url for url in direct
+            if url.endswith("/") and urlsplit(url).path.rstrip("/").split("/")[-1].lower() in {"csv", "text", "global"}
+        ][:2]
+        for child in child_dirs:
+            second = probe_directory_listing(child)
+            listings.append(second)
+            direct.extend(second.get("links", []))
+        for url in direct:
+            name = urlsplit(url).path.rsplit("/", 1)[-1]
+            if (
+                "viirs" in name.lower()
+                and name.lower().endswith(".csv")
+                and ("global_7d" in name.lower() or "global_24h" in name.lower())
+                and url not in candidates
+            ):
+                candidates.append(url)
+    return {
+        "root_listing": {k: v for k, v in root.items() if k != "links"} | {
+            "viirs_directories": viirs_dirs
+        },
+        "directory_listings": [
+            {k: v for k, v in item.items() if k != "links"} | {
+                "viirs_subdirectories": [
+                    url for url in item.get("links", [])
+                    if url.endswith("/") and urlsplit(url).path.rstrip("/").split("/")[-1].lower() in {"csv", "text", "global"}
+                ],
+                "csv_candidates": [
+                    url for url in item.get("links", [])
+                    if url.lower().endswith(".csv") and "viirs" in url.lower()
+                ],
+            }
+            for item in listings
+        ],
+        "candidate_urls": sorted(candidates)[:6],
+    }
+
 def run_probe() -> dict:
     results = [probe_source(name, config) for name, config in SOURCES.items()]
+    directory_discovery = discover_viirs_csv_candidates()
+    for index, url in enumerate(directory_discovery["candidate_urls"]):
+        filename = urlsplit(url).path.rsplit("/", 1)[-1]
+        platform = "NOAA-20" if "NOAA20" in filename.upper() else (
+            "NOAA-21" if "NOAA21" in filename.upper() else "Suomi-NPP"
+        )
+        name = "VIIRS_DISCOVERED_" + str(index + 1)
+        results.append(probe_source(name, {
+            "platform": platform,
+            "nominal_product_resolution": "375 m",
+            "url": url,
+        }))
     modis_ok = any(
         item["source"].startswith("MODIS_") and item["access_state"] == "ACCESSIBLE_BOUNDED_CSV_PREFIX"
         for item in results
     )
     viirs_ok = any(
         item["source"].startswith("VIIRS_") and item["access_state"] == "ACCESSIBLE_BOUNDED_CSV_PREFIX"
+        for item in results
+    )
+    current_viirs_ok = any(
+        item["source"].startswith("VIIRS_")
+        and item["platform"] in {"NOAA-20", "NOAA-21"}
+        and item["access_state"] == "ACCESSIBLE_BOUNDED_CSV_PREFIX"
         for item in results
     )
     successful = [
@@ -250,25 +378,27 @@ def run_probe() -> dict:
             "raw_observations_retained": False,
             "raw_coordinates_retained": False,
         },
+        "directory_discovery": directory_discovery,
         "products": results,
         "recent_modis_access_supported": modis_ok,
         "viirs_keyless_7d_file_access_supported": viirs_ok,
-        "viirs_current_coverage_available": False,
+        "viirs_current_coverage_available": current_viirs_ok,
         "both_sensor_families_keyless_7d_file_access": modis_ok and viirs_ok,
         "common_fields_across_successful_products": sorted(common),
         "interpretation": (
-            "Keyless 7-day file access is supported for the exact successful product endpoints only. "
-            "The tested VIIRS S-NPP product has official coverage ending 2026-11-02, so it is not a current 12-Nov stream. "
+            "Keyless 7-day file access is supported for MODIS and at least one VIIRS endpoint. "
+            "Current VIIRS coverage is supported only if a NOAA-20/NOAA-21 endpoint was discovered and sampled. "
             "This does not establish archive access, complete seven-day coverage, detection equivalence, "
             "cross-sensor bias correction or a validated harmonization model."
             if modis_ok and viirs_ok else
-            "At least one sensor-family endpoint did not yield an admissible bounded CSV sample. "
-            "Preserve endpoint-specific access results; do not infer that all FIRMS products are unavailable."
+            "Preserve endpoint-specific access results. MODIS access can be supported independently; "
+            "failed S-NPP or NOAA candidate paths do not prove that all VIIRS products are unavailable."
         ),
         "claim_state": {
             "recent_modis_keyless_access": "SUPPORTED" if modis_ok else "NOT_YET_ESTABLISHED",
-            "viirs_snpp_keyless_7d_file_access": "SUPPORTED" if viirs_ok else "NOT_YET_ESTABLISHED",
-            "current_viirs_product_coverage": "ENDED_2026-11-02" if viirs_ok else "NOT_YET_ESTABLISHED",
+            "viirs_snpp_keyless_7d_file_access": "SUPPORTED" if any(item["source"] == "VIIRS_SNPP" and item["access_state"] == "ACCESSIBLE_BOUNDED_CSV_PREFIX" for item in results) else "NOT_YET_ESTABLISHED",
+            "viirs_noaa20_21_keyless_recent_file_access": "SUPPORTED" if current_viirs_ok else "NOT_YET_ESTABLISHED",
+            "current_viirs_product_coverage": "SUPPORTED_FOR_NOAA20_21" if current_viirs_ok else "ENDED_2026-11-02_FOR_SNPP; NOAA20_21_NOT_YET_ESTABLISHED",
             "cross_sensor_harmonization": "NOT_YET_PROVEN",
             "historical_archive_keyless_access": "NOT_YET_PROVEN",
             "challenge_selection_superiority": "NOT_YET_PROVEN",
