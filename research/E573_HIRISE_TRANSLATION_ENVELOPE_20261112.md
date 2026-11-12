@@ -65,3 +65,6 @@ If the 2025 support advantage survives both tested translation modes, keep the 2
 
 
 The next exact-head run [#43153663740](https://github.com/stoicsatvik/NASA/actions/runs/43153663740) passed the other **5/6 deterministic tests**, but the new fake-raster regression failed while constructing a PROJ transformer: its fixture used EPSG:4326 (Earth) against the production Mars-sphere source CRS, and PROJ correctly rejected a cross-celestial-body transform. The live acquisition was skipped. This is a test-fixture CRS mismatch, not a data or production-sampler result. The fixture now uses the same Mars reference sphere as the frozen MOLA transform; the production code remains unchanged by this correction. Exact-head validation is pending.
+
+
+A subsequent exact-head test run [#43153757855](https://github.com/stoicsatvik/NASA/actions/runs/43153757855) again passed 5/6 tests. The Mars-CRS fixture then reached the sampler but omitted the GeoTIFF `nodata` attribute; the test failed with `AttributeError` before the live acquisition. The fake raster now declares `nodata = None`, matching a valid GeoTIFF with no nodata metadata. This is a test-fixture completeness correction only; no production code or scientific result changed. Exact-head validation remains pending.
