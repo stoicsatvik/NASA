@@ -170,6 +170,34 @@ def pixel_index(latitude_deg: float, longitude_deg_east: float, resolution: floa
     return row, min(5759, max(0, col))
 
 
+LOLA_45_DEGREE_BAND_BOUNDARIES = (-90.0, -45.0, 0.0, 45.0, 90.0)
+
+
+def latitude_band_diagnostic(
+    latitude_deg: float,
+    resolution_pix_per_degree: float = 16.0,
+    window_size: int = WINDOW_SIZE,
+) -> dict[str, Any]:
+    """Flag windows intersecting the PDS-documented 45-degree grid-band seams."""
+    if not math.isfinite(latitude_deg) or not -90.0 <= latitude_deg <= 90.0:
+        raise ValueError("latitude must be finite and within [-90, 90]")
+    if resolution_pix_per_degree <= 0 or window_size <= 0 or window_size % 2 == 0:
+        raise ValueError("resolution must be positive and window size must be positive and odd")
+    half_span = (window_size // 2) / resolution_pix_per_degree
+    lower = latitude_deg - half_span
+    upper = latitude_deg + half_span
+    crossed = [
+        boundary
+        for boundary in LOLA_45_DEGREE_BAND_BOUNDARIES
+        if lower <= boundary <= upper
+    ]
+    return {
+        "window_latitude_bounds_deg": [lower, upper],
+        "documented_band_boundaries_crossed_deg": crossed,
+        "crosses_documented_45_degree_band_boundary": bool(crossed),
+    }
+
+
 def window_range(
     row_start: int,
     row_end: int,
@@ -416,6 +444,11 @@ def fetch_window(
         "center_column_zero_based": col,
         "window_rows_zero_based": [row_start, row_end],
         "window_columns_zero_based": [col_start, col_end],
+        **latitude_band_diagnostic(
+            float(center["latitude_deg"]),
+            float(fields["map_resolution_pix_per_degree"]),
+            WINDOW_SIZE,
+        ),
         "requested_byte_range": [start, end],
         "range_bytes_transferred": len(payload),
         "range_sha256": hashlib.sha256(payload).hexdigest(),
