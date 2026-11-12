@@ -1,9 +1,10 @@
 name: E580 STAC item and DTM range probe
 
 on:
-  push:
+  pull_request:
     branches:
-      - research/e580-stac-search-post-20261112
+      - research/e579-martian-map-stac-readiness-20261112
+    types: [opened, synchronize]
     paths:
       - experiments/e580_stac_search_probe.py
       - tests/test_e580_stac_search_probe.py
