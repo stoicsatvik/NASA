@@ -1,0 +1,67 @@
+name: E578 USGS known terrestrial analogue data probe
+
+on:
+  push:
+    branches:
+      - research/e578-usgs-known-terrestrial-analog-sites-20261112
+    paths:
+      - experiments/e578_known_terrestrial_analog_sites_probe.py
+      - experiments/test_e578_known_terrestrial_analog_sites_probe.py
+      - .github/workflows/e578-known-terrestrial-analog-sites.yml
+      - research/E578_KNOWN_TERRESTRIAL_ANALOG_SITES_20261112.md
+  pull_request:
+    branches:
+      - research/e577-grand-falls-2017-2019-access-20261112
+      - main
+    paths:
+      - experiments/e578_known_terrestrial_analog_sites_probe.py
+      - experiments/test_e578_known_terrestrial_analog_sites_probe.py
+      - .github/workflows/e578-known-terrestrial-analog-sites.yml
+      - research/E578_KNOWN_TERRESTRIAL_ANALOG_SITES_20261112.md
+  workflow_dispatch:
+    inputs:
+      run_live_probe:
+        description: "Run one bounded anonymous ScienceBase metadata and small-file probe"
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e578-known-terrestrial-analog-sites-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run deterministic E578 tests
+        run: python -m unittest experiments.test_e578_known_terrestrial_analog_sites_probe -v
+
+  live_probe:
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.run_live_probe == 'true')
+    needs: tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Probe one bounded public USGS analogue source
+        run: python -m experiments.e578_known_terrestrial_analog_sites_probe --out .artifacts/e578/known-terrestrial-analog-sites.json
+      - name: Preserve sanitized receipt only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e578-known-terrestrial-analog-sites-receipt
+          path: .artifacts/e578/known-terrestrial-analog-sites.json
+          if-no-files-found: ignore
+          retention-days: 7
