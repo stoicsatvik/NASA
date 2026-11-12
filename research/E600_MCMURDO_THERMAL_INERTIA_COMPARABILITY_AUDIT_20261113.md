@@ -89,7 +89,7 @@ This is a candidate data source, not a blocker or a discovery. No fieldwork, des
 
 ## E600A — nominal sample-to-pixel support sensitivity (13 November 2026)
 
-A deterministic scale audit was added in `research/e600a_sample_to_pixel_support_sensitivity.py` and executed locally: **6/6 assertions passed**.
+A deterministic scale audit was added in `research/e600a_sample_to_pixel_support_sensitivity.py`; its arithmetic was independently recomputed locally and **6/6 assertions passed**. The committed script was not executed from a repository checkout and no CI run was triggered.
 
 Inputs are the paper's approximately 500 mL soil sample, collected from the upper 10 cm, and its Landsat 8 resolutions: OLI 30 m/pixel and TIRS 100 m/pixel. Under an explicitly idealized assumption that the entire 500 mL sample represents a uniform 0.10 m-thick slab, the nominal equivalent sample area is **0.005 m²** (about a 7.07 cm square). A 100 m TIRS pixel covers **10,000 m²**, or **2,000,000×** that nominal area; a 30 m OLI pixel covers **900 m²**, or **180,000×**. This is an order-of-magnitude support diagnostic, not the measured sample footprint: the paper does not provide a precise sample geometry, and no coordinate join was made.
 
