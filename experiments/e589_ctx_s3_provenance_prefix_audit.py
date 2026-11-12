@@ -375,6 +375,7 @@ def audit() -> dict[str, Any]:
         "raw_s3_xml_stored": False,
         "full_object_keys_stored": False,
         "raw_provenance_stored": False,
+        "raw_qa_text_stored": False,
         "local_paths_stored": False,
         "signed_query_values_stored": False,
     }
@@ -389,12 +390,84 @@ def audit() -> dict[str, Any]:
         receipt["decision"] = "S3_PREFIX_LISTING_DENIED_OR_FAILED"
         receipt["s3_error_code"] = listing.get("error_code")
         return receipt
-    candidates = [obj for obj in listing["objects"] if obj.get("provenance_candidate")]
-    receipt["provenance_candidate_names"] = [obj["name"] for obj in candidates]
-    receipt["provenance_assets"] = []
+    candidates = [obj for obj in listing["objects"] if obj.get("metadata_candidate") or obj.get("provenance_candidate")]
+    receipt["metadata_candidate_names"] = [obj["name"] for obj in candidates]
+    receipt["inspected_metadata_assets"] = []
+    receipt["qa_metrics"] = None
     if listing.get("truncated"):
         receipt["decision"] = "S3_PREFIX_LISTING_TRUNCATED"
         return receipt
+
+    for obj in candidates[:MAX_TEXT_ASSETS]:
+        name = obj["name"]
+        if "/" in name:
+            receipt["inspected_metadata_assets"].append({"name": name, "decision": "NESTED_OBJECT_NOT_FETCHED"})
+            continue
+        object_url = BUCKET_URL + urllib.parse.quote(ITEM_PREFIX + name, safe="/")
+        try:
+            fetched = fetch_bounded(object_url, allowed_hosts=ASSET_HOSTS, max_bytes=MAX_PROVENANCE_BYTES)
+            entry = {
+                "name": name,
+                "http_status": fetched["status"],
+                "bytes_read": fetched["bytes_read"],
+                "declared_bytes": fetched["declared_bytes"],
+                "too_large": fetched["too_large"],
+                "raw_asset_stored": False,
+            }
+            if fetched["status"] == 200 and not fetched["too_large"]:
+                entry["summary"] = parse_provenance_payload(name, fetched["payload"])
+                entry["sha256"] = hashlib.sha256(fetched["payload"]).hexdigest()
+            receipt["inspected_metadata_assets"].append(entry)
+        except Exception as error:
+            receipt["inspected_metadata_assets"].append({
+                "name": name,
+                "decision": "SAFE_FETCH_REJECTED_OR_FAILED",
+                "error_type": type(error).__name__,
+                "raw_asset_stored": False,
+            })
+
+    qa_name = "qa_metrics.txt"
+    if any(obj.get("name") == qa_name for obj in listing["objects"]):
+        qa_url = BUCKET_URL + urllib.parse.quote(ITEM_PREFIX + qa_name, safe="/")
+        try:
+            qa_response = fetch_bounded(qa_url, allowed_hosts=ASSET_HOSTS, max_bytes=4096)
+            qa_entry = {
+                "http_status": qa_response["status"],
+                "bytes_read": qa_response["bytes_read"],
+                "declared_bytes": qa_response["declared_bytes"],
+                "too_large": qa_response["too_large"],
+                "raw_text_stored": False,
+            }
+            if qa_response["status"] == 200 and not qa_response["too_large"]:
+                qa_entry["summary"] = parse_qa_metrics(qa_response["payload"])
+                qa_entry["sha256"] = hashlib.sha256(qa_response["payload"]).hexdigest()
+            receipt["qa_metrics"] = qa_entry
+        except Exception as error:
+            receipt["qa_metrics"] = {"decision": "SAFE_FETCH_REJECTED_OR_FAILED", "error_type": type(error).__name__}
+
+    commands = [
+        command
+        for asset in receipt["inspected_metadata_assets"]
+        for command in asset.get("summary", {}).get("commands", [])
+    ]
+    has_geodiff = any(c.get("tool") == "geodiff" and c.get("operand_count", 0) >= 2 for c in commands)
+    has_pc_align = any(c.get("tool") == "pc_align" and c.get("operand_count", 0) >= 2 for c in commands)
+    qa_terms = receipt.get("qa_metrics", {}).get("summary", {}).get("sign_terms", [])
+    has_stac_mirror = any(asset.get("summary", {}).get("document_kind") == "STAC_ITEM_JSON" for asset in receipt["inspected_metadata_assets"])
+    qa_parsed = receipt.get("qa_metrics", {}).get("summary", {}).get("decision") == "QA_METRICS_PARSED"
+    if has_geodiff and has_pc_align:
+        receipt["decision"] = "ITEM_COMMAND_ORDER_RECOVERED_FROM_S3_SIDECAR"
+    elif has_stac_mirror and qa_parsed:
+        receipt["decision"] = "STAC_JSON_MIRROR_AND_POST_CONTROL_QA_ONLY"
+    elif has_stac_mirror:
+        receipt["decision"] = "STAC_METADATA_JSON_MIRROR_NOT_PROCESSING_PROVENANCE"
+    elif qa_terms:
+        receipt["decision"] = "QA_LABEL_PRESENT_COMMAND_ORDER_UNKNOWN"
+    elif receipt["inspected_metadata_assets"]:
+        receipt["decision"] = "METADATA_SIDECAR_PRESENT_COMMANDS_NOT_RECOVERED"
+    else:
+        receipt["decision"] = "NO_PROVENANCE_OR_METADATA_SIDECAR_IN_LISTED_PREFIX"
+    return receipt
     if not candidates:
         receipt["decision"] = "NO_PROVENANCE_SIDECAR_IN_LISTED_PREFIX"
         return receipt
@@ -466,8 +539,9 @@ def summarize_receipt(receipt: dict[str, Any]) -> dict[str, Any]:
         "object_count": listing.get("object_count"),
         "objects": listing.get("objects", []),
         "truncated": listing.get("truncated"),
-        "provenance_candidate_names": receipt.get("provenance_candidate_names", []),
-        "provenance_assets": receipt.get("provenance_assets", []),
+        "metadata_candidate_names": receipt.get("metadata_candidate_names", []),
+        "inspected_metadata_assets": receipt.get("inspected_metadata_assets", []),
+        "qa_metrics": receipt.get("qa_metrics"),
         "credentials_used": False,
         "raw_s3_xml_stored": False,
         "full_object_keys_stored": False,
