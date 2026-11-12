@@ -2,8 +2,8 @@
 
 Date: 2026-11-12  
 Parent: E573 / PR #132  
-Source workflow: [E573 exact-head run #43153845215](https://github.com/stoicsatvik/NASA/actions/runs/43153845215)  
-Source artifact: #13915515652; receipt SHA-256 `939e3c3b81917f50065f4a1296e909bcfd95144e20257fc8939035ae0f5450a0`
+Source workflow: [E573 exact-head run #43155697664](https://github.com/stoicsatvik/NASA/actions/runs/43155697664)  
+Source artifact: #13916101713; receipt SHA-256 `939e3c3b81917f50065f4a1296e909bcfd95144e20257fc8939035ae0f5450a0`; source head `7f6541e10a823402c2c50bcf6647e425d037ca3a`
 
 ## Question
 
@@ -54,3 +54,12 @@ This is still only point-support availability. E573 does not provide an independ
 ## Next decisive gate
 
 Find an independent horizontal control or registration source for the pinned Mars area. Do not turn point-support availability into an accuracy or safety claim. Keep the planetary-analog challenge conditional; the current challenge-ranking evidence still places Martian Map and MODIS/VIIRS in a provisional tie, with planetary analog outside the top five under the E541 factor ablations.
+
+
+## Validation history and provenance hardening — 12 November 2026
+
+The first E574 workflow run [#43156436125](https://github.com/stoicsatvik/NASA/actions/runs/43156436125) failed before executing any tests because the workflow invoked `python -m pytest` in a clean Python 3.11 environment without installing pytest. The tests themselves use the standard-library `unittest` framework. No decomposition script ran and no E574 receipt was produced. This is an environment/runner-command failure, not a failed scientific hypothesis or arithmetic result.
+
+The source summary is now pinned to the latest exact-head E573 run #43155697664 / artifact #13916101713. The receipt JSON SHA-256 is unchanged at `939e3c3b81917f50065f4a1296e909bcfd95144e20257fc8939035ae0f5450a0`; the source head is `7f6541e10a823402c2c50bcf6647e425d037ca3a`. Recalculation from that artifact independently reproduces common-mode components (+21–22 shared, +73 footprint) and differential components (+22 shared, +73 footprint) across all 13 offsets.
+
+The implementation now fails closed on source run/artifact/commit/hash mismatch; validates the 239-point shared-footprint partition, both product valid totals, baseline +22/+73/+95 arithmetic, and every min/max offset decomposition. The workflow now invokes standard-library unittest rather than requiring pytest. Exact-head E574 validation is pending; the result remains a deterministic decomposition of the E573 aggregate, not a new raster acquisition.
