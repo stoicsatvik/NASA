@@ -19,7 +19,32 @@ E588 found that the official production STAC item exposes seven assets but no pr
 
 ## Result
 
-Pending exact-head workflow. Distinguish listing denied, truncated listing, no sidecar, sidecar present without commands, and command sequence recovered. A denied listing is not evidence that no object exists.
+Exact-head workflow [#43242642721](https://github.com/stoicsatvik/NASA/actions/runs/43242642721) passed **12/12 tests**. Anonymous S3 ListObjectsV2 returned HTTP 200, 3,067 bytes, 8 objects, not truncated.
+
+The prefix contains one 13,095-byte JSON metadata object, one 398-byte qa_metrics.txt, and the DTM/image/hillshade/intersection-error/orthoimage/MOLA-control assets. The JSON is a **STAC item mirror**, not a processing-provenance sidecar: it has the ordinary STAC Feature keys, the same seven assets and 18 ordinary properties. It contains one textual pc_align mention with zero operands, no structured tool record and no executable command. A regression test now ensures that a tool-name mention without arguments is not counted as a command.
+
+The QA file parsed to the following **post-control CTX–MOLA diagnostics**:
+
+| Metric | Value |
+|---|---:|
+| Maximum | 117.316 m |
+| Minimum | -79.9007 m |
+| Mean | 27.3687 m |
+| Standard deviation | 10.934 m |
+| Median | 26.7783 m |
+
+The QA text mentions geodiff but contains no DEM operand order, CTX–MOLA versus MOLA–CTX label, or --reverse flag. These values are post-ground-control diagnostics, not independent accuracy or validation. The MOLA CSV is explicitly titled “MOLA Spot Observations Used for initial pc-align”; those points are control inputs, not held-out evidence.
+
+**Result: STAC_JSON_MIRROR_AND_POST_CONTROL_QA_ONLY.** The item prefix contains no separate processing-command sidecar. Combined with E587 and E588, both STAC representations and the verified S3 item prefix have now been checked. The USGS documentation still lists processing commands as available provenance, so a separate data-browser/collection provenance route may exist; its location is not yet established. Do not infer command order or sign from the QA metrics.
+
+- Workflow: [#43242642721](https://github.com/stoicsatvik/NASA/actions/runs/43242642721), 12/12 tests.
+- Aggregate artifact: [#13956436025](https://github.com/stoicsatvik/NASA/actions/runs/43242642721/artifacts/13956436025), ZIP SHA-256 `a7b3a9331886816f34697e30db7733dfb597165ac006ba6ee3a5631e5e335040`.
+- Metadata JSON SHA-256: `05146f1b8636737d653bc6e2cfecfe7a5d43ff602c2e08e5d97b35da0321622d`.
+- QA text SHA-256: `c577c0a83ccc58375b4a7790b6edd9eeee0d84de41f602c56ba00c424a8bcd5e`.
+- Current E589 branch head: `26bf8183033d0668a7baa18fa3328fff7ee8edad`.
+- No raster, raw JSON, raw QA text, full S3 key, local path, credential or signed query value was stored.
+
+E001 known-site recovery remains NOT YET MEASURED. Cross-body similarity, novel analogue discovery, local validation advantage and challenge-selection superiority remain NOT YET PROVEN.
 
 ## Claim states
 

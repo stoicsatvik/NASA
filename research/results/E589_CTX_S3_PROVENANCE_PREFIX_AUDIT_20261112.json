@@ -1,0 +1,97 @@
+{
+  "experiment": "E589",
+  "workflow_run": 43242642721,
+  "workflow_url": "https://github.com/stoicsatvik/NASA/actions/runs/43242642721",
+  "tested_commit": "26bf8183033d0668a7baa18fa3328fff7ee8edad",
+  "branch": "research/e589-ctx-s3-provenance-prefix-audit-20261112",
+  "pull_request": 152,
+  "collection": "mro_ctx_controlled_usgs_dtms",
+  "item_id": "P18_007925_1987_XN_18N282W__P19_008650_1987_XI_18N282W",
+  "bucket_host": "astrogeo-ard.s3-us-west-2.amazonaws.com",
+  "listing_http_status": 200,
+  "listing_bytes": 3067,
+  "object_count": 8,
+  "truncated": false,
+  "metadata_json": {
+    "name": "P18_007925_1987_XN_18N282W__P19_008650_1987_XI_18N282W.json",
+    "bytes": 13095,
+    "sha256": "05146f1b8636737d653bc6e2cfecfe7a5d43ff602c2e08e5d97b35da0321622d",
+    "document_kind": "STAC_ITEM_JSON",
+    "asset_keys": [
+      "dtm",
+      "image",
+      "intersection_error",
+      "mola_csv",
+      "orthoimage",
+      "qa_metrics",
+      "thumbnail"
+    ],
+    "property_keys": [
+      "cube:dimensions",
+      "datetime",
+      "description",
+      "end_datetime",
+      "gsd",
+      "instruments",
+      "license",
+      "missions",
+      "proj:bbox",
+      "proj:centroid",
+      "proj:epsg",
+      "proj:projjson",
+      "proj:shape",
+      "proj:transform",
+      "proj:wkt2",
+      "ssys:targets",
+      "start_datetime",
+      "title"
+    ],
+    "command_mentions_count": 1,
+    "command_count": 0,
+    "tool_records": []
+  },
+  "qa_metrics": {
+    "name": "qa_metrics.txt",
+    "bytes": 398,
+    "sha256": "c577c0a83ccc58375b4a7790b6edd9eeee0d84de41f602c56ba00c424a8bcd5e",
+    "metrics_m": [
+      {
+        "metric": "max",
+        "value": 117.316
+      },
+      {
+        "metric": "min",
+        "value": -79.9007
+      },
+      {
+        "metric": "mean",
+        "value": 27.3687
+      },
+      {
+        "metric": "stddev",
+        "value": 10.934
+      },
+      {
+        "metric": "median",
+        "value": 26.7783
+      }
+    ],
+    "sign_terms": [
+      "geodiff"
+    ]
+  },
+  "decision": "STAC_JSON_MIRROR_AND_POST_CONTROL_QA_ONLY",
+  "deterministic_tests": {
+    "passed": 12,
+    "failed": 0
+  },
+  "artifact_id": 13956436025,
+  "artifact_zip_sha256": "a7b3a9331886816f34697e30db7733dfb597165ac006ba6ee3a5631e5e335040",
+  "credentials_used": false,
+  "raw_s3_xml_stored": false,
+  "full_object_keys_stored": false,
+  "raw_provenance_stored": false,
+  "raw_qa_text_stored": false,
+  "local_paths_stored": false,
+  "signed_query_values_stored": false
+}
