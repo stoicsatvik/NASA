@@ -35,7 +35,7 @@ The production item exposed the same seven assets as E587: dtm, image, intersect
 
 A useful source detail was recovered: the asset title for mola_csv is **“MOLA Spot Observations Used for initial pc-align”**. The production collection description also says these DTMs are absolutely controlled to MOLA using ASP pc_align. This confirms that the MOLA points are control inputs. It further weakens any attempt to use the same points or the post-control QA residuals as independent validation. The exact pc_align reference/source order, inverse-transform application and geodiff --reverse flag remain NOT ESTABLISHED.
 
-This negative result is bounded to both STAC item representations. The USGS documentation separately lists processing commands as a provenance asset, so a data-browser or S3 sidecar route may still expose them. E589 will test the verified public S3 object prefix; it will not assume that absence from STAC means absence from storage.
+This negative result is bounded to both STAC item representations. The USGS documentation separately lists processing commands as a provenance asset, so the product-folder inventory also matters. E587's exact-nine-item S3-prefix follow-on includes this same P18 product: the production-API DTM path exactly matches the documented-STAC DTM path, and the corresponding directory listing returned 8 objects, including one MOLA control object, zero provenance candidates, and no truncation. A separate E589 query against this same directory would therefore be redundant. This still does not rule out provenance stored elsewhere in the bucket or through a distinct data-browser route.
 
 - Workflow: [#43238810519](https://github.com/stoicsatvik/NASA/actions/runs/43238810519), 7/7 tests passed, production API GET succeeded.
 - Aggregate artifact: [#13953532728](https://github.com/stoicsatvik/NASA/actions/runs/43238810519/artifacts/13953532728), ZIP SHA-256 `59484393abe53740c896dd163cb413c147c358a2f2aa1b619dd6e676a0dedfdf`.
@@ -48,8 +48,8 @@ No E001 known-site recovery or cross-body similarity test was run. All planetary
 
 - Repo operating system: SUPPORTED.
 - CTX/MOLA source and QA access for the pinned item: SUPPORTED.
-- Item-specific pc_align lineage: NOT YET ESTABLISHED pending E588.
-- Item-specific geodiff sign: NOT YET ESTABLISHED pending E588.
+- Item-specific pc_align lineage: NOT YET ESTABLISHED; the production STAC item exposes no command provenance, and the exact product-folder listing exposes no provenance-named sidecar.
+- Item-specific geodiff sign: NOT YET ESTABLISHED; no item-linked command or --reverse flag was exposed.
 - Independent accuracy, E001 known-site recovery, cross-body similarity, novel analogue discovery, local validation advantage and challenge-selection superiority: NOT YET PROVEN.
 
 ## Sources
