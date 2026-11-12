@@ -1,0 +1,38 @@
+name: E581 pinned CTX COG pixel sampling
+
+on:
+  pull_request:
+    branches:
+      - research/e580-stac-search-post-20261112
+    types: [opened, synchronize]
+    paths:
+      - experiments/e581_ctx_cog_pixel_sample.py
+      - tests/test_e581_ctx_cog_pixel_sample.py
+      - .github/workflows/e581-ctx-cog-sample.yml
+
+permissions:
+  contents: read
+
+jobs:
+  e581:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install pinned raster reader
+        run: python -m pip install --disable-pip-version-check numpy==2.2.4 rasterio==1.4.3
+      - name: Run deterministic COG contract tests
+        run: python -m unittest discover -s tests -p "test_e581_ctx_cog_pixel_sample.py" -v
+      - name: Acquire pinned public CTX COG and sample bounded windows
+        run: python experiments/e581_ctx_cog_pixel_sample.py --out .artifacts/e581/ctx-cog-summary.json
+      - name: Upload aggregate receipt only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e581-ctx-cog-receipt
+          path: .artifacts/e581/ctx-cog-summary.json
+          if-no-files-found: warn
+          retention-days: 7
