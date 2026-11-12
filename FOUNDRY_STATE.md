@@ -1063,3 +1063,13 @@ Next gate: resolve item-specific `geodiff` order/control provenance; then inspec
 - Aggregate artifact [#13951818805](https://github.com/stoicsatvik/NASA/actions/runs/43235910834/artifacts/13951818805), ZIP SHA-256 `a69f4ebea3f3aa58a1b84adfae1f2bc6e6b64790a4394d4d5f6ce93a536e8470`; durable receipt: `research/results/E587_CTX_PROCESSING_PROVENANCE_AUDIT_20261112.json`.
 - Interpretation: ASP tool semantics are SUPPORTED by official documentation; item-specific sign/order remain NOT ESTABLISHED. MOLA control points remain training/control inputs, not independent validation. The nine E583/E586 products remain correlated post-control QA evidence, not held-out accuracy samples.
 - Next decisive move: seek a distinct public provenance endpoint or a genuinely independent altimetry/DTM control source. Do not keep sampling the same post-control QA cohort or treat it as validation. All core scientific claim states remain unchanged.
+
+
+## E588 — production CTX STAC item provenance audit (12 November 2026)
+
+- Isolated branch research/e588-ctx-production-api-provenance-audit-20261112, stacked on E587 / PR #149. Main remains untouched.
+- The USGS CTX documentation explicitly lists processing commands as available provenance information, while E587 found no provenance fields/assets in the pinned item returned by the documentation-site STAC search endpoint. E588 tests the distinct official production API linked from the collection metadata.
+- Frozen target: one exact GET for collection mro_ctx_controlled_usgs_dtms / item P18_007925_1987_XN_18N282W__P19_008650_1987_XI_18N282W. At most two allowlisted text provenance assets, 2 MB cap, 20 s timeout, same-host/allowlisted redirects only.
+- No credentials, raw STAC JSON, raw provenance text, local paths, coordinates or signed query values are retained.
+- E588 result: PENDING exact-head workflow.
+- Claim states remain unchanged; item-specific pc_align order and geodiff sign are NOT YET ESTABLISHED until actually recovered from this item.

@@ -1,0 +1,42 @@
+name: E588 production CTX STAC provenance audit
+
+on:
+  pull_request:
+    branches:
+      - research/e587-ctx-processing-provenance-audit-20261112
+    types: [opened, synchronize]
+    paths:
+      - experiments/e588_ctx_production_api_provenance_audit.py
+      - tests/test_e588_ctx_production_api_provenance_audit.py
+      - .github/workflows/e588-ctx-production-api-provenance-audit.yml
+      - FOUNDRY_STATE.md
+      - research/E588_CTX_PRODUCTION_API_PROVENANCE_AUDIT_20261112.md
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e588-ctx-production-api-provenance-audit
+  cancel-in-progress: true
+
+jobs:
+  e588:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run deterministic production-endpoint tests
+        run: python -m unittest discover -s tests -p "test_e588_ctx_production_api_provenance_audit.py" -v
+      - name: Query exact production STAC item and bounded provenance assets
+        run: python experiments/e588_ctx_production_api_provenance_audit.py --out .artifacts/e588/production-stac-audit.json
+      - name: Upload aggregate receipt only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e588-ctx-production-api-provenance-audit
+          path: .artifacts/e588/production-stac-audit.json
+          if-no-files-found: ignore
+          retention-days: 7
