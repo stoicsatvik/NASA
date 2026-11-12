@@ -72,10 +72,14 @@ class E594FirmsProbeTests(unittest.TestCase):
     def test_directory_listing_parser_keeps_only_same_host_paths(self):
         from unittest.mock import patch
 
+        from email.message import Message
+
         with patch("experiments.e594_firms_keyless_modis_viirs_probe.urllib.request.build_opener") as build:
             class Response:
                 status = 200
-                headers = {"Content-Type": "text/html", "Last-Modified": "Thu, 12 Nov 2026 00:00:00 GMT"}
+                headers = Message()
+                headers["Content-Type"] = "text/html"
+                headers["Last-Modified"] = "Thu, 12 Nov 2026 00:00:00 GMT"
                 def __enter__(self): return self
                 def __exit__(self, *args): return False
                 def read(self, limit):
