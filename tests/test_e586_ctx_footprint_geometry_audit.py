@@ -129,6 +129,22 @@ class E586Tests(unittest.TestCase):
         self.assertEqual(parsed.geom_type, "MultiPolygon")
         self.assertGreater(projected.area, 0)
 
+    def test_bbox_comparison_and_contained_subset_overlap_are_reported(self):
+        ids = [f"item-{index}" for index in range(9)]
+        bbox_items = [
+            {"id": item_id, "bbox_intersection_fraction_of_item": 1.0}
+            for item_id in ids
+        ]
+        result = analyze_features(
+            features(ids), receipt(ids),
+            {"experiment": "E585", "items": bbox_items},
+        )
+        self.assertEqual(result["bbox_vs_geometry_comparison"]["compared_item_count"], 9)
+        self.assertEqual(
+            result["strict_geometry_contained_pairwise_footprint_overlap"]["total_pairs"],
+            36,
+        )
+
     def test_item_set_mismatch_fails_closed(self):
         ids = [f"item-{index}" for index in range(9)]
         data = features(ids)
