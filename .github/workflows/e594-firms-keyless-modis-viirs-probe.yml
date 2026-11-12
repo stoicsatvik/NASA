@@ -1,0 +1,62 @@
+name: E594 official FIRMS keyless MODIS VIIRS sample probe
+
+on:
+  push:
+    branches:
+      - research/e594-firms-keyless-modis-viirs-20261112
+    paths:
+      - FOUNDRY_STATE.md
+      - experiments/e594_firms_keyless_modis_viirs_probe.py
+      - experiments/test_e594_firms_keyless_modis_viirs_probe.py
+      - .github/workflows/e594-firms-keyless-modis-viirs-probe.yml
+  pull_request:
+    branches:
+      - research/e593-grand-falls-xml-metadata-audit-20261112
+    paths:
+      - FOUNDRY_STATE.md
+      - experiments/e594_firms_keyless_modis_viirs_probe.py
+      - experiments/test_e594_firms_keyless_modis_viirs_probe.py
+      - research/E594_FIRMS_KEYLESS_MODIS_VIIRS_20261112.md
+      - research/results/E594_FIRMS_KEYLESS_MODIS_VIIRS_20261112.json
+      - .github/workflows/e594-firms-keyless-modis-viirs-probe.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e594-firms-keyless-modis-viirs-probe
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run deterministic parser and policy tests
+        run: python -m unittest experiments.test_e594_firms_keyless_modis_viirs_probe -v
+
+  live_probe:
+    needs: tests
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Probe bounded public MODIS and VIIRS CSV prefixes
+        run: python -m experiments.e594_firms_keyless_modis_viirs_probe --out .artifacts/e594/firms-keyless-probe.json
+      - name: Upload aggregate-only receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e594-firms-keyless-modis-viirs
+          path: .artifacts/e594/firms-keyless-probe.json
+          if-no-files-found: ignore
+          retention-days: 7
