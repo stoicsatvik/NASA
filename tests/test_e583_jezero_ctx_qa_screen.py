@@ -35,7 +35,7 @@ class E583Tests(unittest.TestCase):
         self.assertEqual(parsed[0]["datetime"], "2023-04-18T12:00:00Z")
         self.assertIn("qa_metrics", parsed[0]["assets"])
         with self.assertRaises(ProbeError):
-            parse_features({"type": "FeatureCollection", "features": [self._feature(item_id="OTHER", qa_href=None)]}, max_items=10)
+            parse_features({"type": "FeatureCollection", "features": [self._feature(item_id="")]}, max_items=10)
         wrong = self._feature()
         wrong["collection"] = "other"
         with self.assertRaises(ProbeError):
