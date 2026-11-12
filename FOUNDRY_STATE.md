@@ -1154,7 +1154,7 @@ Decision: recent keyless MODIS file access **SUPPORTED** for the exact tested en
 
 ## E596 — independent public analogue-catalogue provenance audit (12 November 2026)
 
-Source: Rachelle Le Cussan, *Planetary Analogue Catalogue* v0.1, data repository commit `62e6339bdf308de3bc987388d0faa7130cf57de9`, GeoJSON blob `156edd871599cf9ac9c083658d14d034f660e35d`, data licence CC BY 4.0. The audit downloads the exact pinned GeoJSON at workflow time, verifies the Git blob hash, and stores only a coordinate-free summary.
+Source: Rachelle Le Cussan, *Planetary Analogue Catalogue* v0.1, data repository commit `62e6339bdf308de3bc987388d0faa7130cf57de9`, GeoJSON blob `156edd871599cf9ac9c083658d14d034f660e35d`, data licence CC BY 4.0. E596 workflow run [43265462598](https://github.com/stoicsatvik/NASA/actions/runs/43265462598) passed 4/4 deterministic tests, fetched the pinned GeoJSON, verified its Git blob hash, and generated a coordinate-free receipt. The workflow retains no raw site coordinates or geometry.
 
 - The source advertises 16 sites, 96 references and 42 photos. Exact snapshot audit: **16/16 review_status = Draft; 0 Verified**.
 - Coordinate precision: 10 sites approximately 10 km, 2 approximately 1 km, 4 region-only. Seven records are marked sensitive. No coordinates are copied into the Foundry receipt or report.
