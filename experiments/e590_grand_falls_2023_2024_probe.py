@@ -159,16 +159,17 @@ def audit() -> dict:
             result["full_file_bytes"] = len(full["payload"])
             return result
 
+        sample_summary = inspect_payload(name, full["payload"])
+        sample_summary.pop("prefix_hex", None)
         result["data_sample"] = {
             "bytes": len(full["payload"]),
             "sha256": hashlib.sha256(full["payload"]).hexdigest(),
-            "summary": inspect_payload(name, full["payload"]),
+            "summary": sample_summary,
         }
         result["decision"] = "SMALL_PUBLIC_FIELD_DATA_FILE_ACQUIRED_AND_PROFILED"
         return result
     except Exception as exc:  # preserve bounded transport/parser failure without leaking URLs
         result["error_type"] = type(exc).__name__
-        result["error_message"] = str(exc)[:240]
         return result
 
 
