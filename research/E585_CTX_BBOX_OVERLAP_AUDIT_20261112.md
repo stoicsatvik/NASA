@@ -14,7 +14,7 @@ Does the E583 STAC bbox search identify nine products whose QA summaries are spa
 - AOI: [76.69, 17.41, 78.69, 19.41] WGS84 longitude/latitude.
 - No new network requests, raster reads, raw item JSON, QA text, or MOLA rows.
 - Compute the intersection of each STAC item bounding box with the AOI.
-- Compute rectangle areas on a sphere (Earth radius 6,371,008.8 m) and report intersection-area fractions.
+- Compute unit-sphere solid angles (steradians) and report scale-free intersection fractions and bbox IoU; no body-specific radius or absolute-area claim is needed.
 - Use 99% item-bbox containment as a conservative descriptive screen, not a scientific accuracy threshold.
 - Compute pairwise bounding-box intersection and IoU. These are bounding-box diagnostics, not actual polygon/raster-footprint overlap.
 
@@ -68,6 +68,12 @@ This makes independence especially implausible as a default assumption. Bounding
 - Exact-head Actions run [#43222673590](https://github.com/stoicsatvik/NASA/actions/runs/43222673590) passed all 7 deterministic offline tests and recomputed the committed E585 result with a structural match to the E583 receipt.
 - The initial recomputation mismatch exposed a P05 item-ID transcription error in the expected receipt; the ID was corrected against the source E583 receipt. Earlier failed runs remain preserved.
 - No live source request or external-data workflow is used.
+
+## Geometry-measure correction — 12 November 2026
+
+Code review found that the first implementation multiplied spherical-rectangle solid angles by Earth's radius squared even though the coordinates describe a Mars study area and the experiment uses only dimensionless fractions and IoU. The common radius-squared factor cancels from every ratio, so the previously reported values are unchanged; however, the Earth-radius label was physically inappropriate and implied an absolute-area calculation that the report does not use.
+
+The corrected implementation computes unit-sphere solid angle in steradians directly. No Earth or Mars radius and no absolute surface area are reported. The 99% containment screen, item fractions, pairwise IoU, and all scientific claim boundaries remain unchanged. Exact-head revalidation of this correction is recorded in the PR conversation.
 
 ## Next decisive gate
 
