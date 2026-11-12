@@ -13,7 +13,6 @@ import math
 import statistics
 from pathlib import Path
 
-EARTH_RADIUS_M = 6_371_008.8
 CONTAINMENT_THRESHOLD = 0.99
 
 
@@ -36,15 +35,16 @@ def validate_bbox(value: object, label: str = "bbox") -> tuple[float, float, flo
     return west, south, east, north
 
 
-def spherical_rectangle_area_m2(bbox: tuple[float, float, float, float]) -> float:
+def spherical_rectangle_solid_angle_sr(bbox: tuple[float, float, float, float]) -> float:
+    """Return a lon/lat rectangle's solid angle on the unit sphere (steradians).
+
+    The common planetary-radius-squared factor is intentionally omitted:
+    E585 reports only dimensionless fractions and IoU, not absolute area.
+    """
     west, south, east, north = bbox
-    return (
-        EARTH_RADIUS_M**2
-        * math.radians(east - west)
-        * (
-            math.sin(math.radians(north))
-            - math.sin(math.radians(south))
-        )
+    return math.radians(east - west) * (
+        math.sin(math.radians(north))
+        - math.sin(math.radians(south))
     )
 
 
@@ -82,13 +82,13 @@ def _pairwise_summary(items: list[dict]) -> dict:
             intersection = intersection_bbox(left["bbox"], right["bbox"])
             if intersection is None:
                 continue
-            intersection_area = spherical_rectangle_area_m2(intersection)
-            union_area = (
-                spherical_rectangle_area_m2(left["bbox"])
-                + spherical_rectangle_area_m2(right["bbox"])
-                - intersection_area
+            intersection_solid_angle = spherical_rectangle_solid_angle_sr(intersection)
+            union_solid_angle = (
+                spherical_rectangle_solid_angle_sr(left["bbox"])
+                + spherical_rectangle_solid_angle_sr(right["bbox"])
+                - intersection_solid_angle
             )
-            iou = intersection_area / union_area
+            iou = intersection_solid_angle / union_solid_angle
             intersecting += 1
             if iou >= 0.1:
                 iou_ge_0_1 += 1
@@ -148,15 +148,15 @@ def analyze(receipt: dict) -> dict:
                 raise ValueError(f"non-finite {key} for {item_id}")
             values[key] = value
 
-        item_area = spherical_rectangle_area_m2(bbox)
-        intersection_area = spherical_rectangle_area_m2(intersection)
-        aoi_area = spherical_rectangle_area_m2(aoi)
+        item_solid_angle = spherical_rectangle_solid_angle_sr(bbox)
+        intersection_solid_angle = spherical_rectangle_solid_angle_sr(intersection)
+        aoi_solid_angle = spherical_rectangle_solid_angle_sr(aoi)
         normalized.append({
             "id": item_id,
             "bbox": bbox,
             "intersection_bbox": intersection,
-            "bbox_intersection_fraction_of_item": intersection_area / item_area,
-            "bbox_intersection_fraction_of_aoi": intersection_area / aoi_area,
+            "bbox_intersection_fraction_of_item": intersection_solid_angle / item_solid_angle,
+            "bbox_intersection_fraction_of_aoi": intersection_solid_angle / aoi_solid_angle,
             **values,
         })
 
@@ -195,8 +195,9 @@ def analyze(receipt: dict) -> dict:
         "experiment": "E585",
         "source_experiment": "E583",
         "aoi_bbox_wgs84_lon_lat": list(aoi),
-        "area_method": (
-            "Spherical rectangle area using Earth radius 6371008.8 m; "
+        "spatial_measure_method": (
+            "Unit-sphere spherical-rectangle solid angle in steradians; "
+            "scale-free fractions and IoU, no body-specific radius or absolute-area claim; "
             "bounding boxes only, not item polygons or raster footprints."
         ),
         "containment_threshold": CONTAINMENT_THRESHOLD,
