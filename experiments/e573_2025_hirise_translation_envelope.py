@@ -22,7 +22,7 @@ from rasterio.windows import Window
 
 import experiments.e569_paired_hirise_support as e569
 
-MAX_2020_RANGE_BYTES = 16 * 1024 * 1024
+MAX_2020_RANGE_BYTES = 32 * 1024 * 1024
 from experiments.e545_mola_observed_support import (
     COUNT_IMG,
     COUNT_LABEL,
@@ -192,7 +192,7 @@ def run() -> dict:
         "limitations": [
             "The 10.2 m value is a published 99th-percentile HiRISE-to-CTX alignment statistic, not a hard bound or a measured MOLA tie.",
             "The 13 deterministic translations are a sensitivity grid, not a probability distribution or confidence region.",
-            "The E573 2020 point-window range cap is 16 MiB (the inherited E569 cap was 4 MiB); actual transferred bytes remain bounded and recorded.",
+            "The E573 2020 point-window range cap is 32 MiB (the inherited E569 cap was 4 MiB); the first 16 MiB preflight was insufficient for the union of 13 translated point windows. The exact planned byte count is now included in any cap failure; actual transferred bytes remain bounded and recorded.",
             "Common-mode translations test shared map-frame sensitivity; differential_2025 translations test a 2025-only shift relative to the fixed 2020 mask.",
             "The 2025 mosaic is aligned to CTX and is not an independent horizontal control network.",
             "The denominator is 346 observed MOLA point centers, not area coverage.",
