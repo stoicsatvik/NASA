@@ -1,0 +1,49 @@
+name: E570 bounded LOLA GDR sample
+
+on:
+  push:
+    branches:
+      - research/e570-lola-gdr-window-20261112
+    paths:
+      - experiments/e570_lola_gdr_sample.py
+      - tests/test_e570_lola_gdr_sample.py
+      - .github/workflows/e570-lola-gdr-sample.yml
+  pull_request:
+    branches:
+      - research/e569-paired-hirise-support-20261112
+    paths:
+      - experiments/e570_lola_gdr_sample.py
+      - tests/test_e570_lola_gdr_sample.py
+      - .github/workflows/e570-lola-gdr-sample.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e570-lola-gdr-sample
+  cancel-in-progress: true
+
+jobs:
+  sample:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install bounded dependencies
+        run: python -m pip install "requests>=2.31,<3" "pytest>=8,<9"
+      - name: Run deterministic metadata, range and descriptor controls
+        run: python -m pytest -q tests/test_e570_lola_gdr_sample.py
+      - name: Acquire three bounded real LOLA windows
+        run: python -m experiments.e570_lola_gdr_sample --out .artifacts/e570/receipt.json
+      - name: Upload compact receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e570-lola-gdr-sample
+          path: .artifacts/e570/receipt.json
+          if-no-files-found: ignore
+          retention-days: 14
