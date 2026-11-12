@@ -62,3 +62,6 @@ The first corrected live retry [#43153122730](https://github.com/stoicsatvik/NAS
 ## Next decision
 
 If the 2025 support advantage survives both tested translation modes, keep the 2025 mosaic as a higher-coverage candidate but retain the published localized-misalignment caveat. If it fails either mode, prefer the more conservative 2020 coverage for any event-day map and keep the 2025 layer visibly conditional. In either case, independent horizontal-control residuals remain required before any safety-relevant routing claim.
+
+
+The next exact-head run [#43153663740](https://github.com/stoicsatvik/NASA/actions/runs/43153663740) passed the other **5/6 deterministic tests**, but the new fake-raster regression failed while constructing a PROJ transformer: its fixture used EPSG:4326 (Earth) against the production Mars-sphere source CRS, and PROJ correctly rejected a cross-celestial-body transform. The live acquisition was skipped. This is a test-fixture CRS mismatch, not a data or production-sampler result. The fixture now uses the same Mars reference sphere as the frozen MOLA transform; the production code remains unchanged by this correction. Exact-head validation is pending.
