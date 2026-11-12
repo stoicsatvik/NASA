@@ -3,11 +3,12 @@
 Status values:
 - **verified** = official source identified
 - **access-test** = source identified but ingestion not yet reproduced in this repo
+- **bounded-sample** = bounded live sample acquired and metadata/units documented for the tested window; not proof of full-product coverage or cross-body comparability
 - **research** = feature/data choice still needs scientific justification
 
 | Body | Variable | Mission/product | Official source | Status | Why it may matter |
 |---|---|---|---|---|---|
-| Moon | topography / altimetry | LRO LOLA | https://pds.nasa.gov/ds-view/pds/viewDataset.jsp?dsid=LRO-L-LOLA-3-RADR-V1.0 | access-test | terrain geometry / relief / roughness derivation |
+| Moon | topography / altimetry | LRO LOLA GDR `LDEM_16_FLOAT` | https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/cylindrical/float_img/ | bounded-sample | Three 11×11 windows acquired with a 696,471-byte total body-transfer budget; 16 px/degree, 1.89521 km/pixel at equator, 32-bit PC_REAL, km, reference-sphere-relative height. No geoid correction. PDS warns of possible 45° band-edge artifacts; the −45° window is flagged and must not be treated as clean terrain morphology. See E570. |
 | Moon | thermal / solar reflectance | LRO Diviner GDR | https://pds.nasa.gov/ds-view/pds/viewProfile.jsp?dsid=LRO-L-DLRE-5-GDR-V1.0 | access-test | temperature and surface/mineral-related comparison |
 | Mars | global topography | MGS MOLA MEGDR | https://pds.nasa.gov/ds-view/pds/viewDataset.jsp?dsid=MGS-M-MOLA-5-MEGDR-L3-V1.0 | access-test | planetary terrain reference |
 | Mars | thermal infrared | Mars Odyssey THEMIS IR RDR | https://pds.nasa.gov/ds-view/pds/viewProfile.jsp?dsid=ODY-M-THM-3-IRRDR-V1.0 | access-test | thermal/spectral behavior |
