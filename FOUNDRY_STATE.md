@@ -3,7 +3,7 @@
 Updated: 2026-11-12
 Class: Tier A
 Time horizon: NASA Space Apps Challenge, 14–15 Nov 2026
-Working branch: `research/e590-grand-falls-2023-2024-access-20261112`
+Working branch: `research/e591-grand-falls-photogrammetry-metadata-20261112`
 Main objective: maximize uncertainty eliminated per run and converge on a scientifically defensible Space Apps entry.
 
 ## Current thesis
@@ -1120,3 +1120,16 @@ Next gate: resolve item-specific `geodiff` order/control provenance; then inspec
 1. One bounded metadata-only audit of the distinct photogrammetry child item `67b78df2d34e1a2e835b13b7`; establish whether a DEM/orthomosaic is listed, without downloading raster bytes.
 2. Fix the timestamp audit by parsing source strings and measuring ordering, duplicate timestamps, interval distribution and gaps; compare against the published one-minute logging description.
 3. Continue independent Earth positive/control acquisition and matched Mars-side feature admissibility. E001 remains gated.
+
+
+## E591 — Grand Falls ripple-photogrammetry child metadata (2026-11-12)
+
+- Draft PR #155, branch `research/e591-grand-falls-photogrammetry-metadata-20261112`, code head `b853ce5f0d59ec71d18cfd11c4b21c84d44ceb96`.
+- Exact-head workflow #43254742040 passed **5/5 deterministic tests** and one anonymous metadata GET. Artifact #13960847379; ZIP SHA-256 654f29850cdd12e484c73ca501dc262968455787ff81ee13dcb00c4a1eb16085.
+- Official child item `67b78df2d34e1a2e835b13b7` returned HTTP 200 / 7,491 bytes; metadata SHA-256 f466468ba4b700ecb2a613727483100a9f62f14e8d26dfc8ba840b0122049424.
+- Inventory contains seven dated ZIP archives totaling **1,561,281,654 bytes** plus a 12,658-byte XML metadata file. No standalone raster extension was listed; archive contents remain uninspected. Spatial extent presence is supported, but no raw coordinates were retained.
+- No raster, image, DEM or archive bytes were downloaded. No CRS, vertical datum, grid spacing, nodata, georegistration or morphology descriptor is established.
+
+Claim states unchanged: repo operating system SUPPORTED; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN; challenge-selection superiority NOT YET PROVEN.
+
+Next highest-information action: retrieve only the 12,658-byte XML metadata file, parse its source-described raster types, CRS, vertical datum, grid spacing, nodata, acquisition dates and processing lineage if present. Do not download the 1.56 GB archive set without a specific validation question and a bounded sample path.
