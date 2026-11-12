@@ -25,7 +25,7 @@ The E587 first exact-head run #43236020927 passed 10/10 tests and uploaded aggre
 
 The second phase derives each exact product-folder prefix from that item's advertised DTM asset URL; it does not guess object paths. It issues a metadata-only S3 ListObjectsV2 request with max-keys=100, 500 KB per prefix, 5 MB total, and stops after access denial. It stores only object basenames, sizes, ETags and last-modified timestamps; full object keys and query values are not stored. It downloads no sidecar contents, MOLA CSV, QA text or raster.
 
-The result of the exact-head S3 prefix listing is pending.
+Exact-head S3-prefix result: all 9/9 exact DTM product directories were listed without truncation. Each contained 8 objects; 9 MOLA/control objects were identified in total and zero provenance-named objects were found. Decision: NO_PROVENANCE_OBJECT_IN_ITEM_PREFIXES. No object contents were downloaded. The result is bounded to the exact product directories and the first 100 keys per prefix; it does not establish global absence elsewhere in the bucket.
 
 ## Tool semantics pinned from primary documentation
 
@@ -45,4 +45,4 @@ The MOLA CSV is a control input, not held-out validation. Generic ASP documentat
 ## Validation
 
 - First exact-head run #43236020927: 10/10 deterministic tests passed; exact E583 item set 9/9; zero provenance assets exposed.
-- Second exact-head run: includes URL-derived S3-prefix inventory and fail-closed access-denial/truncation tests; result pending.
+- The first S3-prefix follow-on run [#43238468861](https://github.com/stoicsatvik/NASA/actions/runs/43238468861) failed in a deterministic test fixture before any live request: the test passed include_provenance_asset/provenance_link arguments that the fixture helper did not accept. Commit [bf0459c](https://github.com/stoicsatvik/NASA/commit/bf0459c5ae0aa00720ea77e2811f074b8405fb6e) corrected the fixture and supplied DTM assets. Exact-head rerun [#43238755380](https://github.com/stoicsatvik/NASA/actions/runs/43238755380) passed 14/14 tests and completed the bounded live listing. Aggregate artifact [#13953742377](https://github.com/stoicsatvik/NASA/actions/runs/43238755380/artifacts/13953742377).
