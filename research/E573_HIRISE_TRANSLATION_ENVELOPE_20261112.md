@@ -50,9 +50,9 @@ The first corrected live retry [#43153122730](https://github.com/stoicsatvik/NAS
 
 ## Claim states
 
-- Zero-shift 2020/2025 point-support counts: NOT YET RE-MEASURED.
-- 2025 support advantage under common-mode translation: NOT YET MEASURED.
-- 2025 support advantage under differential translation: NOT YET MEASURED.
+- Zero-shift 2020/2025 point-support counts: REPRODUCED EXACTLY (346 observed; 164 valid in 2020; 259 valid in 2025).
+- 2025 support advantage under common-mode translation: SUPPORTED FOR ALL 13 TESTED OFFSETS; net support margin 94–95 points.
+- 2025 support advantage under differential translation: SUPPORTED FOR ALL 13 TESTED OFFSETS; net support margin +95 points at every offset.
 - Independent horizontal registration: NOT YET MEASURED.
 - Cross-body similarity: NOT YET PROVEN.
 - Known-site recovery: NOT YET MEASURED.
@@ -61,7 +61,7 @@ The first corrected live retry [#43153122730](https://github.com/stoicsatvik/NAS
 
 ## Next decision
 
-If the 2025 support advantage survives both tested translation modes, keep the 2025 mosaic as a higher-coverage candidate but retain the published localized-misalignment caveat. If it fails either mode, prefer the more conservative 2020 coverage for any event-day map and keep the 2025 layer visibly conditional. In either case, independent horizontal-control residuals remain required before any safety-relevant routing claim.
+The exact-head run reproduced the frozen zero-shift baseline and retained a positive 2025 point-support margin at every tested common-mode and differential translation. Keep the 2025 mosaic as a higher-coverage candidate for this 346-point Jezero window, with the published localized-misalignment caveat. This is not a fitted registration, accuracy comparison, or safety result. Independent horizontal-control residuals remain required before any safety-relevant routing claim.
 
 
 The next exact-head run [#43153663740](https://github.com/stoicsatvik/NASA/actions/runs/43153663740) passed the other **5/6 deterministic tests**, but the new fake-raster regression failed while constructing a PROJ transformer: its fixture used EPSG:4326 (Earth) against the production Mars-sphere source CRS, and PROJ correctly rejected a cross-celestial-body transform. The live acquisition was skipped. This is a test-fixture CRS mismatch, not a data or production-sampler result. The fixture now uses the same Mars reference sphere as the frozen MOLA transform; the production code remains unchanged by this correction. Exact-head validation is pending.
@@ -76,4 +76,16 @@ The latest failed test run [#43153757855](https://github.com/stoicsatvik/NASA/ac
 
 The test was strengthened beyond the immediate fixture correction. A parameterized regression now checks four pixel states at an in-bounds observed point: ordinary finite value (valid), explicit -9999 nodata sentinel (invalid), masked pixel (invalid), and NaN (invalid). This tests the actual validity contract rather than only making the fake object satisfy the sampler interface.
 
-Test update commit: [0919521](https://github.com/stoicsatvik/NASA/commit/0919521cc01c498fe8c001ca650d049716c81a78). The exact-head deterministic and bounded live workflow has been triggered by the branch update; results are pending. No translation-sensitivity or scientific result is claimed until that run reproduces the frozen zero-shift aggregates and completes both translation modes.
+Test update commit: [0919521](https://github.com/stoicsatvik/NASA/commit/0919521cc01c498fe8c001ca650d049716c81a78). Exact-head workflow [#43155697664](https://github.com/stoicsatvik/NASA/actions/runs/43155697664) completed successfully: **10/10 deterministic tests passed**, the bounded 2020/2025 acquisition completed, and aggregate receipt artifact [#13916101713](https://github.com/stoicsatvik/NASA/actions/runs/43155697664/artifacts/13916101713) was uploaded.
+
+
+## Exact-head result — E573 run 21 (12 November 2026)
+
+- Validated branch head: `7f6541e10a823402c2c50bcf6647e425d037ca3a`.
+- Baseline reconciliation: all frozen aggregates reproduced exactly — 346 observed MOLA point centers; 2020 valid 164/346; 2025 valid 259/346.
+- Common-mode translation: 13 deterministic offsets applied to both product lookups; 2020 valid support 164–165, 2025 259, net 2025-minus-2020 margin 94–95 at every offset.
+- Differential translation: 13 offsets applied to 2025 only while 2020 remained fixed; 2020 valid 164, 2025 valid 259, margin +95 at every offset.
+- The 10.2 m envelope is the published 99th-percentile HiRISE-to-CTX alignment statistic used to define a sensitivity grid. It is not a hard bound, a fitted MOLA tie, or a probability distribution.
+- Bounded transfer: 2020 point-row reads 6,895,643 bytes in 213 ranges under the 32 MiB cap; 2025 ZIP-member reads 676,334,995 bytes in 649 ranges under the 850 MiB cap. No full archive, FOM confidence member or orthoimage was read; temporary DTM was deleted. No raw elevations, pixels, point coordinates or shot counts were retained beyond aggregate counts.
+- The 2020 GeoTIFF parser emitted a non-fatal warning while interpreting the GDAL_NODATA tag. The pinned nodata value was independently read by the experiment's resolver and the acquisition completed; the warning remains recorded rather than suppressed.
+- Interpretation: 2025 finite-pixel support is higher at every tested offset for this frozen 346-point window. This does not establish better elevations, independent registration, area coverage, route safety, or analogue similarity.
