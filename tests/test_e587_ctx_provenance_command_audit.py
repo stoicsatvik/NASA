@@ -10,6 +10,9 @@ from experiments.e587_ctx_provenance_command_audit import (
     build_s3_list_url,
     parse_s3_listing_xml,
     audit_s3_prefixes,
+    build_s3_object_url,
+    summarize_sidecar_json,
+    audit_sidecar_json,
 )
 
 COLLECTION = "mro_ctx_controlled_usgs_dtms"
@@ -240,6 +243,78 @@ class E587Tests(unittest.TestCase):
         self.assertEqual(result["decision"], "S3_LISTING_ACCESS_DENIED")
         self.assertEqual(result["item_prefixes_listed"], 0)
         self.assertEqual(len(calls), 1)
+
+
+    def test_sidecar_object_url_uses_exact_listed_basename(self):
+        url = build_s3_object_url(
+            "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/item/item_dtm.tif",
+            "item.json",
+        )
+        self.assertEqual(
+            url,
+            "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/item/item.json",
+        )
+        with self.assertRaises(Exception):
+            build_s3_object_url(
+                "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/item/item_dtm.tif",
+                "../other.json",
+            )
+
+    def test_sidecar_summary_extracts_commands_without_raw_values(self):
+        payload = {
+            "processing": {
+                "commands": [
+                    "pc_align --max-displacement 100 /work/CTX_PC.tif /work/MOLA.csv -o run",
+                    "geodiff /work/CTX_DTM.tif /work/MOLA.csv -o qa",
+                ],
+                "notes": "internal /private/work/path",
+            },
+            "unrelated": {"version": "1.0"},
+        }
+        import json
+        result = summarize_sidecar_json(json.dumps(payload).encode("utf-8"))
+        self.assertEqual(result["command_count"], 2)
+        self.assertEqual(result["top_level_keys"], ["processing", "unrelated"])
+        self.assertIn("processing.commands", result["relevant_key_paths"])
+        self.assertNotIn("/work", str(result))
+        self.assertNotIn("/private", str(result))
+        self.assertFalse(result["raw_json_stored"])
+
+    def test_sidecar_inventory_downloads_only_exact_listed_json_sidecars(self):
+        ids = [f"item-{index}" for index in range(9)]
+        rows = features(ids, include_provenance_asset=False, provenance_link=False)
+        prefix_items = []
+        for item_id in ids:
+            prefix_items.append({
+                "id": item_id,
+                "objects": [{
+                    "basename": f"{item_id}.json",
+                    "size_bytes": 100,
+                }],
+            })
+        prefix_inventory = {"items": prefix_items}
+        payload = b'{"processing":{"commands":["geodiff /work/CTX.tif /work/MOLA.csv -o qa"]}}'
+        calls = []
+
+        def fake_fetcher(url, *, max_bytes):
+            calls.append((url, max_bytes))
+            return {
+                "status": 200,
+                "headers": {"Content-Type": "application/json"},
+                "payload": payload,
+                "bytes_read": len(payload),
+                "declared_bytes": len(payload),
+                "final_url": url,
+                "too_large": False,
+            }
+
+        result = audit_sidecar_json(rows, prefix_inventory, fetcher=fake_fetcher)
+        self.assertEqual(result["decision"], "SIDECAR_COMMANDS_FOUND")
+        self.assertEqual(result["sidecar_download_count"], 9)
+        self.assertEqual(result["relevant_command_count"], 9)
+        self.assertEqual(len(calls), 9)
+        self.assertTrue(all(limit <= 64_000 for _, limit in calls))
+        self.assertNotIn("/work", str(result))
 
 
 if __name__ == "__main__":
