@@ -14,10 +14,10 @@ from experiments.e569_paired_hirise_support import (
 
 def test_paired_cross_tab_reports_gains_losses_and_footprint_separately():
     result = build_paired_cross_tab(
-        old_inside=[1, 1, 0, 1, 0, 1],
-        old_valid=[1, 0, 0, 1, 0, 0],
-        new_inside=[1, 1, 1, 1, 1, 0],
-        new_valid=[1, 1, 0, 0, 1, 0],
+        old_inside=[1, 1, 0, 1, 0, 0, 1],
+        old_valid=[1, 0, 0, 1, 0, 0, 0],
+        new_inside=[1, 1, 1, 0, 1, 0, 1],
+        new_valid=[1, 1, 0, 0, 1, 0, 0],
     )
 
     assert result["observed_points"] == 6
@@ -28,10 +28,12 @@ def test_paired_cross_tab_reports_gains_losses_and_footprint_separately():
     assert result["both_valid"] == 1
     assert result["2020_valid_only"] == 1
     assert result["2025_valid_only"] == 2
-    assert result["both_invalid"] == 2
+    assert result["both_invalid"] == 3
     assert result["net_valid_support_change_2025_minus_2020"] == 1
     assert result["paired_gain_minus_loss"] == 1
     assert result["validity_jaccard"] == pytest.approx(1 / 4)
+    assert result["both_nodata_within_shared_footprint"] == 1
+    assert result["2025_only_valid_within_shared_footprint"] == 1
 
 
 def test_paired_cross_tab_rejects_valid_samples_outside_own_raster():
