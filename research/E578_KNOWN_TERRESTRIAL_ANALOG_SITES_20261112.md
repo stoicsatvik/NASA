@@ -40,3 +40,13 @@ This audit cannot establish cross-body physical similarity, known-site recovery,
 ## Validation
 
 Deterministic tests and the bounded live probe run on the isolated branch. Exact-head outcomes are appended after Actions completes.
+
+
+## Exact-head result — 12 November 2026
+
+- Branch head tested: \`7e1bc6ad64beb9318f2f3d44b8144898fcb5f13f\`; draft PR #138, stacked on E577 PR #137.
+- Actions run [#43193280091](https://github.com/stoicsatvik/NASA/actions/runs/43193280091) completed successfully. Deterministic tests: **6/6 passed**. The bounded live-probe job completed and uploaded artifact [#13930469672](https://github.com/stoicsatvik/NASA/actions/runs/43193280091/artifacts/13930469672), SHA-256 \`ee198cf96f23a1d1b07fd33120392200e95a34949a04b4110814a45c5dc59963\`.
+- Actual source decision: **ACQUISITION_ERROR**, \`TimeoutError: The read operation timed out\`. Metadata HTTP status, file count and selected file are all null. No rows or raw files were acquired; no credentials were used.
+- The workflow's green status means the bounded runner handled and preserved the failure correctly. It does **not** mean the USGS data were acquired or that the source contains no records.
+- This is an access/transport failure, not a scientific null. E001 known-site recovery remains **NOT YET MEASURED**; cross-body similarity, novel analogue discovery, local validation advantage and challenge-selection superiority remain **NOT YET PROVEN**.
+- One-shot guard: the live probe is now pinned to the tested head so later documentation/test updates do not repeat the same external request.
