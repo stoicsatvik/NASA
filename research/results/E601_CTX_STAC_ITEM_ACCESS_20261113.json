@@ -1,0 +1,76 @@
+{
+  "experiment": "E601",
+  "date": "2026-11-13",
+  "collection": "mro_ctx_controlled_usgs_dtms",
+  "target": "Mars",
+  "instrument": "MRO CTX",
+  "collection_url": "https://stac.astrogeology.usgs.gov/api/collections/mro_ctx_controlled_usgs_dtms",
+  "metadata_access": "SUCCESS",
+  "metadata": {
+    "license": "CC0-1.0",
+    "temporal_extent": [
+      "2023-04-18T12:00:00Z",
+      "2025-07-04T00:00:00Z"
+    ],
+    "providers": [
+      "NASA producer",
+      "USGS processor/host"
+    ],
+    "gsd_m": [
+      20.0002065,
+      35.9625866
+    ],
+    "projection": "Mars 2015 ocentric equirectangular WKT2, central longitude 0",
+    "control": "Ames Stereo Pipeline CTX DTMs aligned to MOLA using pc_align",
+    "quality_warning": "some DTMs jittery and/or contain large nodata regions"
+  },
+  "official_tutorial": {
+    "url": "https://stac.astrogeology.usgs.gov/docs/tutorials/mosaic_json/",
+    "aoi_name": "Jezero",
+    "center_lon_lat": [
+      77.69,
+      18.41
+    ],
+    "bbox_lon_lat": [
+      76.69,
+      17.41,
+      78.69,
+      19.41
+    ],
+    "tutorial_reported_matches": 80,
+    "tutorial_reported_matches_is_live_count": false,
+    "example_asset_keys": [
+      "dtm",
+      "image",
+      "intersection_error",
+      "mola_csv",
+      "orthoimage",
+      "qa_metrics",
+      "thumbnail"
+    ],
+    "exact_dtm_asset_href_observed": false,
+    "exact_hillshade_and_orthoimage_hrefs_observed": true
+  },
+  "retrieval": {
+    "collection_metadata_get": "SUCCESS",
+    "items_href_web_get": "INACCESSIBLE",
+    "public_host_items_get": "INACCESSIBLE",
+    "public_host_search_get": "INACCESSIBLE",
+    "s3_cog_web_get": "INACCESSIBLE",
+    "container_curl": "DNS_RESOLUTION_FAILURE",
+    "actual_item_json_downloaded": false,
+    "actual_dtm_raster_downloaded": false,
+    "current_live_item_count_measured": false
+  },
+  "decision": "SOURCE_READINESS_SUPPORTED; ITEM_RASTER_INGESTION_BLOCKED_IN_CURRENT_AUTOMATION_RUNTIME",
+  "interpretation": "transport/runtime failure, not evidence of zero items or scientific null",
+  "next_test": "Use pystac-client from a network-enabled authorized environment for one pinned Jezero item; preserve item JSON, exact assets, CRS, GSD, nodata, QA and hashes; sample DTM and compare to same-area MOLA.",
+  "claims": {
+    "repo_operating_system": "SUPPORTED",
+    "cross_body_similarity": "NOT_YET_PROVEN",
+    "known_site_recovery": "NOT_YET_MEASURED",
+    "novel_analogue_discovery": "NOT_YET_PROVEN",
+    "local_validation_advantage": "NOT_YET_PROVEN",
+    "challenge_selection_superiority": "NOT_YET_PROVEN"
+  }
+}
