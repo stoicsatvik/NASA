@@ -48,6 +48,8 @@ MAX_PROVENANCE_ASSETS = 9
 MAX_S3_PREFIX_BYTES = 500_000
 MAX_TOTAL_S3_BYTES = 5_000_000
 MAX_S3_KEYS = 100
+MAX_SIDECAR_BYTES = 64_000
+MAX_TOTAL_SIDECAR_BYTES = 512_000
 FILE_EXTENSIONS = {
     ".tif", ".tiff", ".csv", ".cub", ".pc", ".las", ".laz", ".ply",
     ".dem", ".txt", ".img", ".json",
@@ -679,6 +681,174 @@ def audit_s3_prefixes(features: list[dict], fetcher=fetch_bounded) -> dict:
     }
 
 
+def build_s3_object_url(dtm_href: str, basename: str) -> str:
+    validate_public_url(dtm_href)
+    if (
+        not isinstance(basename, str)
+        or not basename.endswith(".json")
+        or "/" in basename
+        or "\\" in basename
+        or basename in {".", ".."}
+    ):
+        raise ProbeError("sidecar basename is not an exact JSON object name")
+    parsed = urlsplit(dtm_href)
+    directory = parsed.path.rsplit("/", 1)[0]
+    url = urlunsplit((parsed.scheme, parsed.netloc, directory + "/" + basename, "", ""))
+    validate_public_url(url)
+    return url
+
+
+def _walk_json_strings(value: object, path: tuple[str, ...] = ()):
+    if isinstance(value, dict):
+        for key, child in value.items():
+            yield from _walk_json_strings(child, path + (str(key),))
+    elif isinstance(value, list):
+        if value and all(isinstance(child, str) for child in value):
+            yield " ".join(value), path
+        for index, child in enumerate(value):
+            yield from _walk_json_strings(child, path + (str(index),))
+    elif isinstance(value, str):
+        yield value, path
+
+
+def summarize_sidecar_json(payload: bytes) -> dict:
+    document = json.loads(payload.decode("utf-8-sig"))
+    if not isinstance(document, (dict, list)):
+        raise ValueError("sidecar JSON root must be an object or array")
+    relevant_paths = set()
+    commands = {}
+    relevant_value_hashes = []
+    keywords = ("provenance", "processing", "command", "pipeline", "mola", "align", "geodiff")
+    for text_value, path in _walk_json_strings(document):
+        path_text = ".".join(path)
+        if any(word in path_text.lower() for word in keywords):
+            relevant_paths.add(path_text)
+            relevant_value_hashes.append(hashlib.sha256(text_value.encode("utf-8")).hexdigest())
+        for command in parse_commands(text_value):
+            commands[command["command_sha256"]] = command
+    top_level_keys = sorted(document.keys()) if isinstance(document, dict) else []
+    return {
+        "top_level_keys": [str(key) for key in top_level_keys],
+        "relevant_key_paths": sorted(relevant_paths),
+        "relevant_value_sha256": sorted(set(relevant_value_hashes)),
+        "commands": [commands[key] for key in sorted(commands)],
+        "command_count": len(commands),
+        "decision": "COMMANDS_FOUND" if commands else "JSON_SIDECAR_NO_RELEVANT_COMMANDS",
+        "raw_json_stored": False,
+        "raw_string_values_stored": False,
+        "full_paths_stored": False,
+    }
+
+
+def audit_sidecar_json(
+    features: list[dict],
+    prefix_inventory: dict,
+    fetcher=fetch_bounded,
+) -> dict:
+    prefix_items = {
+        row.get("id"): row
+        for row in prefix_inventory.get("items", [])
+        if isinstance(row, dict)
+    }
+    total_bytes = 0
+    downloaded = 0
+    total_commands = 0
+    results = []
+
+    for feature in features[:MAX_ITEMS]:
+        item_id = feature.get("id")
+        assets = feature.get("assets") if isinstance(feature.get("assets"), dict) else {}
+        dtm = assets.get("dtm") if isinstance(assets.get("dtm"), dict) else {}
+        dtm_href = dtm.get("href")
+        listing = prefix_items.get(item_id, {})
+        listed_objects = listing.get("objects", [])
+        expected_basename = f"{item_id}.json"
+        matches = [
+            row for row in listed_objects
+            if row.get("basename") == expected_basename
+        ]
+        result = {
+            "id": item_id,
+            "decision": "NOT_ATTEMPTED",
+            "sidecar_basename": expected_basename,
+            "raw_json_stored": False,
+        }
+        if not matches:
+            result["decision"] = "EXACT_JSON_SIDECAR_NOT_LISTED"
+            results.append(result)
+            continue
+        if not isinstance(dtm_href, str):
+            result["decision"] = "DTM_ASSET_HREF_MISSING"
+            results.append(result)
+            continue
+        if total_bytes >= MAX_TOTAL_SIDECAR_BYTES:
+            result["decision"] = "TOTAL_SIDECAR_BYTE_CAP_REACHED"
+            results.append(result)
+            continue
+        try:
+            url = build_s3_object_url(dtm_href, expected_basename)
+        except Exception:
+            result["decision"] = "SIDECAR_URL_NOT_ALLOWLISTED"
+            results.append(result)
+            continue
+        result["request_url"] = safe_url_summary(url)
+        remaining = MAX_TOTAL_SIDECAR_BYTES - total_bytes
+        try:
+            response = fetcher(url, max_bytes=min(MAX_SIDECAR_BYTES, remaining))
+        except Exception as error:
+            result["decision"] = "SIDECAR_FETCH_ERROR"
+            result["error_type"] = type(error).__name__
+            results.append(result)
+            continue
+        total_bytes += int(response.get("bytes_read", 0) or 0)
+        result["http_status"] = response.get("status")
+        result["bytes_read"] = response.get("bytes_read")
+        result["too_large"] = response.get("too_large")
+        if response.get("status") != 200:
+            result["decision"] = "SIDECAR_HTTP_FAILURE"
+            results.append(result)
+            continue
+        if response.get("too_large"):
+            result["decision"] = "SIDECAR_EXCEEDS_BYTE_CAP"
+            results.append(result)
+            continue
+        payload = response.get("payload", b"")
+        result["sha256"] = hashlib.sha256(payload).hexdigest()
+        try:
+            summary = summarize_sidecar_json(payload)
+        except Exception as error:
+            result["decision"] = "SIDECAR_JSON_PARSE_ERROR"
+            result["error_type"] = type(error).__name__
+            results.append(result)
+            continue
+        result.update(summary)
+        downloaded += 1
+        total_commands += summary["command_count"]
+        results.append(result)
+
+    if total_commands:
+        decision = "SIDECAR_COMMANDS_FOUND"
+    elif downloaded == len(features[:MAX_ITEMS]) and downloaded:
+        decision = "SIDECAR_JSON_ACQUIRED_NO_RELEVANT_COMMANDS"
+    elif downloaded:
+        decision = "SIDECAR_JSON_PARTIAL_NO_RELEVANT_COMMANDS"
+    else:
+        decision = "SIDECAR_JSON_NOT_ACQUIRED"
+    return {
+        "decision": decision,
+        "item_count_requested": min(len(features), MAX_ITEMS),
+        "sidecar_download_count": downloaded,
+        "total_bytes_read": total_bytes,
+        "relevant_command_count": total_commands,
+        "max_bytes_per_sidecar": MAX_SIDECAR_BYTES,
+        "max_total_bytes": MAX_TOTAL_SIDECAR_BYTES,
+        "items": results,
+        "raw_json_stored": False,
+        "raw_string_values_stored": False,
+        "credentials_used": False,
+    }
+
+
 def audit(e583_receipt: dict) -> dict:
     payload = build_search_payload()
     response = fetch_bounded(
@@ -714,7 +884,9 @@ def audit(e583_receipt: dict) -> dict:
     result = analyze_features(features, e583_receipt)
     selected, mismatch = select_exact_features(features, e583_receipt)
     if not mismatch:
-        result["s3_prefix_inventory"] = audit_s3_prefixes(selected)
+        prefix_inventory = audit_s3_prefixes(selected)
+        result["s3_prefix_inventory"] = prefix_inventory
+        result["sidecar_json_inventory"] = audit_sidecar_json(selected, prefix_inventory)
     result["source"] = {
         "api": safe_url_summary(API_URL),
         "search_payload": payload,
@@ -766,6 +938,9 @@ def main() -> None:
         "s3_prefix_decision": (result.get("s3_prefix_inventory") or {}).get("decision"),
         "s3_prefixes_listed": (result.get("s3_prefix_inventory") or {}).get("item_prefixes_listed"),
         "provenance_objects_in_prefixes": (result.get("s3_prefix_inventory") or {}).get("provenance_object_count"),
+        "sidecar_json_decision": (result.get("sidecar_json_inventory") or {}).get("decision"),
+        "sidecar_json_download_count": (result.get("sidecar_json_inventory") or {}).get("sidecar_download_count"),
+        "sidecar_relevant_command_count": (result.get("sidecar_json_inventory") or {}).get("relevant_command_count"),
     }, sort_keys=True))
 
 
