@@ -906,3 +906,11 @@ Do not repeat the same ScienceBase endpoint with more guessed URL variants. Pivo
 
 Claim states remain unchanged: repo operating system SUPPORTED; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN; challenge-selection superiority NOT YET PROVEN.
 
+## E577 null-safe receipt correction — 12 November 2026
+
+- Run [#43185820740](https://github.com/stoicsatvik/NASA/actions/runs/43185820740): 7/7 deterministic tests passed; the live receipt had data_sample=null and the CLI summary formatter raised AttributeError on nested .get access. The sanitized artifact still uploaded. This is a software robustness failure, not a scientific result.
+- Run [#43185828498](https://github.com/stoicsatvik/NASA/actions/runs/43185828498): workflow and 7/7 deterministic tests passed; receipt decision remained ACQUISITION_ERROR, with metadata_http_status=null, no file_count, no selected file and no data rows. Artifact 13928595688 uploaded. No credentials or raw values.
+- Added a null-safe receipt summarizer and regression tests for null, delimited and ZIP data summaries. The E577 workflow now runs tests on push/PR; the live ScienceBase probe is manual-only to avoid repeating the same external request on documentation/test changes.
+- No new data were acquired. This is not evidence that the USGS release contains no data and not a scientific null. E001 remains NOT YET MEASURED.
+- Next: pivot to a different independent Earth-side dataset/source. Do not repeat the same ScienceBase endpoint with guessed URL variants.
+
