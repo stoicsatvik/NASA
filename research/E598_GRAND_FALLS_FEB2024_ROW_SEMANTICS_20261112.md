@@ -54,3 +54,11 @@ If the row-group pattern recurs, retain the mechanism as unresolved and stop tre
 - The bounded source request reached the exact-size response, but the first implementation rejected its media type because it was not text/csv. The run did not produce a receipt and is preserved as a failed acquisition attempt, not a data null.
 - The revised parser records the exact response media type, byte count and payload hash. A nonstandard media type is admitted only if the complete pinned-size payload decodes as CSV and its unique header contains the full 14-field E595 dictionary schema. HTML, malformed text, duplicate headers and missing fields remain rejected.
 - This correction does not weaken the exact catalogue identity, size, HTTPS host/redirect, or 5 MB read-ceiling checks.
+
+
+## Preserved second exact-head failure and fail-closed size receipt
+
+- Workflow #43271278785 again passed all 6 deterministic tests.
+- The metadata-supplied endpoint returned a payload whose Content-Length did not equal the pinned 1,091,813-byte catalogue size. The implementation rejected it before parsing.
+- The corrected code now records the actual response media type, Content-Length, bytes read, payload hash, host and header-admissibility flag as a sanitized negative receipt. It does not reinterpret an HTML or truncated response as sensor data.
+- This is an endpoint/payload-integrity result, not evidence about the physical row-group pattern.
