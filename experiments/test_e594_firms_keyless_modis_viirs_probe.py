@@ -62,7 +62,7 @@ class E594FirmsProbeTests(unittest.TestCase):
                     validate_url(url)
 
     def test_all_sources_are_fixed_official_https_endpoints(self):
-        self.assertEqual(set(SOURCES), {"MODIS_C61", "VIIRS_NOAA20", "VIIRS_NOAA21"})
+        self.assertEqual(set(SOURCES), {"MODIS_C61", "VIIRS_SNPP"})
         for source in SOURCES.values():
             validate_url(source["url"])
             self.assertTrue(source["url"].startswith("https://firms.modaps.eosdis.nasa.gov/"))
