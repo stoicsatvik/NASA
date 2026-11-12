@@ -240,7 +240,7 @@ def parse_provenance_payload(name: str, payload: bytes) -> dict[str, Any]:
             for key, value in node.items():
                 key_text = str(key)
                 child_path = (path + "." + key_text)[:240]
-                if any(term in key_text.lower() for term in ("command", "argv", "args", "invocation", "process", "history", "program", "tool")):
+                if any(term in key_text.lower() for term in ("command", "argv", "args", "invocation", "process", "history", "program", "tool", "pc_align", "geodiff", "reference", "source", "inputs", "outputs", "parameters", "options", "provenance")):
                     length = len(value) if isinstance(value, (str, list, dict)) else None
                     key_paths.append({"path": child_path, "type": type(value).__name__, "length": length})
                 if isinstance(value, str):
@@ -267,6 +267,8 @@ def parse_provenance_payload(name: str, payload: bytes) -> dict[str, Any]:
                     if digest not in seen:
                         seen.add(digest)
                         commands.append(parsed)
+
+    walk(document)
 
     tool_records: list[dict[str, Any]] = []
     def collect_tool_records(node: Any, path: str = "$", depth: int = 0) -> None:
