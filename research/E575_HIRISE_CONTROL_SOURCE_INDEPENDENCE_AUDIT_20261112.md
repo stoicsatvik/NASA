@@ -27,6 +27,8 @@ No independent horizontal-control residual for the pinned 2025 MSR DTM was found
 - 1 m / 3 m: relative alignment between HiRISE orthoimage mosaics, measured by image correlation.
 - ~100 m: general best-case horizontal-accuracy guidance relative to MOLA PEDR, not a specific 2025 measurement.
 
+MOLA PEDR is an independent sensor family, but its approximately 100 m shot footprint is too coarse to validate a 10.2 m horizontal residual. A held-out PEDR track can provide a coarse gross-error cross-check only; it cannot certify the published CTX-relative 10.2 m statistic.
+
 The 10.2 m translation grid used by E573/E574 remains a legitimate sensitivity diagnostic for the CTX-relative statistic. It must not be described as an absolute horizontal-error bound or independent MOLA registration.
 
 The paper also notes localized offsets correlated with dune fields, smooth texture and dark regions, with unresolved jitter or camera-model intrinsics as possible causes. This makes the local quality caveat especially relevant in aeolian terrain; it does not identify a cause or justify a correction.
@@ -50,4 +52,9 @@ The latest all-14 screen and E541 factor ablations still place Martian Map #11 (
 
 ## Next decisive gate
 
-Acquire an independently controlled reference with documented control lineage, such as a held-out MOLA PEDR track set whose points were not used in the product control, or an independently controlled HRSC product. Measure multi-patch residuals and preserve the evaluation points as held out; do not fit a correction to the same points used for validation. If the required control lineage cannot be established, retain the NOT YET MEASURED claim and keep challenge selection conditional.
+For a 10 m-scale horizontal residual, acquire a separate control network or independently controlled product with documented horizontal uncertainty materially below 10.2 m. A held-out MOLA PEDR track may be used only as an independent coarse cross-check because its approximately 100 m shot footprint cannot resolve a 10.2 m residual. Measure multi-patch residuals and preserve evaluation points as held out; do not fit a correction to the same points used for validation. If no sufficiently precise independent control exists, retain the NOT YET MEASURED claim and keep challenge selection conditional.
+
+
+## Validation
+
+The source-provenance audit is deterministic and does not acquire or sample a raster. Eight standard-library tests cover the CTX-relative interpretation, internal versus independent control, the approximately 100 m MOLA support limitation, conditional challenge ranking, committed receipt equality, and CLI JSON/newline integrity. The dedicated E575 workflow validates the exact branch head and uploads only the aggregate source-audit receipt.
