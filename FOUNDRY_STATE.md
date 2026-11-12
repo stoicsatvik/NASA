@@ -3,7 +3,7 @@
 Updated: 2026-11-13
 Class: Tier A
 Time horizon: NASA Space Apps Challenge, 14–15 Nov 2026
-Working branch: `research/e600-mcmurdo-thermal-inertia-comparability-audit-20261113`
+Working branch: `research/e601-ctx-stac-item-access-20261113`
 Main objective: maximize uncertainty eliminated per run and converge on a scientifically defensible Space Apps entry.
 
 ## Current thesis
@@ -105,12 +105,14 @@ E599 completed a bounded official-documentation audit of CTX–MOLA QA sign and 
 
 E600 completed a source-level audit of Levy (2026) on McMurdo Dry Valleys thermal inertia. The MDV is a published Mars analogue and the article reports physical soil thermal inertia in TIU, but its satellite apparent thermal inertia is not directly interchangeable with physical TIU. The article itself reports poor point-scale ATI/TIU correspondence. Supporting Table S2 and sample georeferencing have not been retrieved. This is a candidate positive-site source, not E001 recovery.
 
+E601 is a current-runtime re-acquisition check, not first data access. E580 already acquired the pinned P18 item and a 4 KiB DTM range; E581 downloaded the 18.1 MB COG in memory and sampled 20,480 valid pixels across five windows; E582 acquired its QA metrics and 8,750-row MOLA control CSV. E583/E584/E586 screened nine products and actual footprints. E601's web/API/S3 attempts failed in this runtime due retrieval/DNS limits, but do not invalidate prior successful GitHub Actions acquisitions. The P18 item remains unsuitable for uncorrected absolute elevation/long-baseline slope pending residual structure; MOLA rows remain control inputs, not held-out validation.
+
 The all-14 challenge screen remains provisional: #11 Martian Map 4.10 and #9 MODIS/VIIRS 4.00 exceed #10 planetary analog 2.93 on the current rubric. The 0.10 gap is below the predeclared meaningful threshold and factor ablations reverse the ranking; no challenge is locked.
 
 Next highest-information actions:
-1. Retrieve and source-hash E600 Supporting Table S2; verify whether sample IDs/coordinates support a defensible geospatial join.
-2. If georeferencing is valid, acquire matched Mars THEMIS physical TIU data, define non-analogue controls before scoring, and run a frozen single-site/leave-one-site-out baseline. Do not equate ATI with TIU.
-3. Continue the existing Martian Map CRS/coverage test and no-credential MODIS/VIIRS data-path validation. Re-score the all-14 challenge matrix only when a measured result changes a factor.
+1. Do not repeat the P18 item/QA/MOLA acquisition. E580–E588 and E599 already exhausted the same-item STAC, COG, QA, cohort, geometry and bounded provenance surfaces. Resume CTX work only for a genuinely distinct provenance route or independent control source; keep MOLA controls out of held-out validation.
+2. Retrieve and source-hash E600 Supporting Table S2; verify whether sample IDs/coordinates support a defensible geospatial join. If so, acquire matched Mars THEMIS physical TIU, define non-analogue controls before scoring and run frozen leave-one-site-out baselines. Do not equate ATI with TIU.
+3. Continue the no-credential MODIS/VIIRS alternative search and the all-14 challenge matrix only when a measured result changes a factor.
 
 E001 remains NOT YET MEASURED; cross-body similarity, novel analogue discovery, local validation advantage and challenge-selection superiority remain NOT YET PROVEN. No UI polish before evidence.
 ## E514 real matched-footprint falsification (2026-11-03)
@@ -1196,4 +1198,16 @@ Draft report: research/E600_MCMURDO_THERMAL_INERTIA_COMPARABILITY_AUDIT_20261113
 - The same paper uses Landsat 8 OLI 30 m and TIRS 100 m observations on 6 Aug, 20 Oct and 30 Dec 2024, with 1 m lidar terrain correction. Its apparent thermal inertia is a proxy, not physical TIU. The paper reports poor point-scale ATI/TIU correspondence and says one-to-one calibration is not possible without contemporaneous field moisture and representative thermal-pixel sampling.
 - Decision: reject naive ATI=TIU substitution. Physical TIU is a candidate feature, but Supporting Table S2, sample georeferencing, a matched Mars THEMIS TIU product and non-analogue controls are not yet available in the audited evidence. E001 was not run.
 - The 17 samples are within one known analogue region and must not be treated as 17 independent analogue sites. No site rows or rankings were added.
+- Claim states unchanged: cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN; challenge-selection superiority NOT YET PROVEN.
+
+
+## E601 — controlled CTX STAC item-access probe (13 November 2026)
+
+Draft report: research/E601_CTX_STAC_ITEM_ACCESS_20261113.md; structured receipt: research/results/E601_CTX_STAC_ITEM_ACCESS_20261113.json. Branch research/e601-ctx-stac-item-access-20261113, stacked on E600 / PR #166; main untouched.
+
+- Live official USGS collection metadata GET succeeded for mro_ctx_controlled_usgs_dtms. It reports Mars/CTX, CC0-1.0, NASA producer/USGS processor, Mars 2015 ocentric equirectangular WKT2, GSD 20.0002–35.9626 m, MOLA control via Ames Stereo Pipeline/pc_align, and explicit jitter/nodata warnings.
+- The official USGS Mosaic.json tutorial uses Jezero at 77.69 E, 18.41 N and reports 80 matching items for bbox [76.69, 17.41, 78.69, 19.41] in its historical example. It documents the DTM/QA/MOLA asset keys; this is not a live count from this run.
+- Item/search endpoints and the exact S3 COG URL were inaccessible through the current web retrieval path; container curl failed before HTTP with DNS resolution failure. No item JSON, DTM raster, current live item count, pixel sample or terrain measurement was acquired.
+- Decision: public source readiness SUPPORTED; actual item/raster ingestion BLOCKED IN THIS RUNTIME by DNS/API access. This is not a scientific null and does not block the NASA repository as a whole.
+- Next: run the official pystac-client query from a network-enabled authorized environment, retrieve one pinned item and its dtm/qa_metrics/intersection_error/mola_csv assets, hash metadata, validate CRS/GSD/nodata/QA, then compare a small DTM window with same-area MOLA.
 - Claim states unchanged: cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN; challenge-selection superiority NOT YET PROVEN.
