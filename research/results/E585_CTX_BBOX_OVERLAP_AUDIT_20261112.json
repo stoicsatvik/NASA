@@ -1,0 +1,147 @@
+{
+  "all_selected_items_pairwise_bbox_overlap": {
+    "bbox_intersecting_pairs": 28,
+    "bbox_iou_ge_0_1_pairs": 14,
+    "maximum_bbox_iou": 0.782143,
+    "maximum_pair": [
+      "N03_063453_1982_XN_18N282W__N03_063519_1982_XN_18N282W",
+      "N04_063809_1982_XN_18N282W__N05_064231_1982_XN_18N282W"
+    ],
+    "total_pairs": 36
+  },
+  "aoi_bbox_wgs84_lon_lat": [76.69, 17.41, 78.69, 19.41],
+  "spatial_measure_method": "Unit-sphere spherical-rectangle solid angle in steradians; scale-free fractions and IoU, no body-specific radius or absolute-area claim; bounding boxes only, not item polygons or raster footprints.",
+  "containment_threshold": 0.99,
+  "experiment": "E585",
+  "interpretation_boundary": [
+    "A STAC bbox search admits any item whose bounding box intersects the AOI; it does not guarantee the whole item lies inside the AOI.",
+    "Three selected item bounding boxes are materially partial under the 99% containment screen; their product-level QA summaries are not demonstrated to be AOI-clipped.",
+    "Six item bounding boxes are at least 99% contained, and their descriptive positive-mean/median pattern persists, but their bounding boxes overlap substantially.",
+    "Bounding-box intersection and IoU are not actual polygon/raster-footprint overlap and do not establish independent samples.",
+    "QA residuals remain post-control product QA, not held-out accuracy, independent validation, or route-safety evidence."
+  ],
+  "items": [
+    {
+      "bbox_intersection_fraction_of_aoi": 0.115641,
+      "bbox_intersection_fraction_of_item": 1.0,
+      "id": "N02_063242_1988_XN_18N283W__N03_063532_1988_XN_18N283W",
+      "intersection_bbox_wgs84_lon_lat": [76.76631508, 18.27419802, 77.36482296, 19.04816389],
+      "mean_difference_m": 21.4381,
+      "median_difference_m": 21.0239,
+      "stddev_difference_m": 13.973
+    },
+    {
+      "bbox_intersection_fraction_of_aoi": 0.110679,
+      "bbox_intersection_fraction_of_item": 1.0,
+      "id": "N03_063453_1982_XN_18N282W__N03_063519_1982_XN_18N282W",
+      "intersection_bbox_wgs84_lon_lat": [76.89545517, 17.70502248, 77.47625912, 18.4658123],
+      "mean_difference_m": 21.2787,
+      "median_difference_m": 22.0458,
+      "stddev_difference_m": 13.4709
+    },
+    {
+      "bbox_intersection_fraction_of_aoi": 0.104226,
+      "bbox_intersection_fraction_of_item": 1.0,
+      "id": "N04_063809_1982_XN_18N282W__N05_064231_1982_XN_18N282W",
+      "intersection_bbox_wgs84_lon_lat": [76.84069919, 17.71307299, 77.41663991, 18.43550955],
+      "mean_difference_m": 37.0019,
+      "median_difference_m": 37.2683,
+      "stddev_difference_m": 12.9054
+    },
+    {
+      "bbox_intersection_fraction_of_aoi": 0.113982,
+      "bbox_intersection_fraction_of_item": 0.993842,
+      "id": "N04_064020_1983_XN_18N283W__N04_063954_1982_XN_18N283W",
+      "intersection_bbox_wgs84_lon_lat": [76.69, 17.64844408, 77.27521749, 18.42581904],
+      "mean_difference_m": 24.99,
+      "median_difference_m": 23.7453,
+      "stddev_difference_m": 12.1603
+    },
+    {
+      "bbox_intersection_fraction_of_aoi": 0.003998,
+      "bbox_intersection_fraction_of_item": 0.035634,
+      "id": "N09_065774_1988_XN_18N283W__N10_066196_1987_XN_18N283W",
+      "intersection_bbox_wgs84_lon_lat": [76.69, 18.21687035, 76.71092229, 18.98200344],
+      "mean_difference_m": 27.3646,
+      "median_difference_m": 26.9863,
+      "stddev_difference_m": 15.649
+    },
+    {
+      "bbox_intersection_fraction_of_aoi": 0.055137,
+      "bbox_intersection_fraction_of_item": 0.480276,
+      "id": "N15_068162_1984_XN_18N283W__N12_067159_1988_XN_18N283W",
+      "intersection_bbox_wgs84_lon_lat": [76.69, 18.28600908, 76.97263878, 19.06751709],
+      "mean_difference_m": 40.5091,
+      "median_difference_m": 40.0418,
+      "stddev_difference_m": 12.8508
+    },
+    {
+      "bbox_intersection_fraction_of_aoi": 0.112133,
+      "bbox_intersection_fraction_of_item": 1.0,
+      "id": "P02_001820_1984_XI_18N282W__P06_003442_1987_XI_18N282W",
+      "intersection_bbox_wgs84_lon_lat": [77.04101146, 17.87962271, 77.62151019, 18.65161281],
+      "mean_difference_m": 38.1975,
+      "median_difference_m": 37.2336,
+      "stddev_difference_m": 15.061
+    },
+    {
+      "bbox_intersection_fraction_of_aoi": 0.179029,
+      "bbox_intersection_fraction_of_item": 0.12279,
+      "id": "P05_002809_1975_XI_17N283W__P13_006000_1974_XI_17N283W",
+      "intersection_bbox_wgs84_lon_lat": [76.69, 17.41, 77.04805886, 19.41],
+      "mean_difference_m": 28.4886,
+      "median_difference_m": 27.9154,
+      "stddev_difference_m": 15.0384
+    },
+    {
+      "bbox_intersection_fraction_of_aoi": 0.274365,
+      "bbox_intersection_fraction_of_item": 1.0,
+      "id": "P18_007925_1987_XN_18N282W__P19_008650_1987_XI_18N282W",
+      "intersection_bbox_wgs84_lon_lat": [77.21281144, 17.75778924, 77.90597708, 19.34230886],
+      "mean_difference_m": 27.3687,
+      "median_difference_m": 26.7783,
+      "stddev_difference_m": 10.934
+    }
+  ],
+  "partial_bbox_intersection_count": 3,
+  "selected_item_count": 9,
+  "source_experiment": "E583",
+  "strict_bbox_contained_count": 6,
+  "strict_bbox_contained_subset": {
+    "item_ids": [
+      "N02_063242_1988_XN_18N283W__N03_063532_1988_XN_18N283W",
+      "N03_063453_1982_XN_18N282W__N03_063519_1982_XN_18N282W",
+      "N04_063809_1982_XN_18N282W__N05_064231_1982_XN_18N282W",
+      "N04_064020_1983_XN_18N283W__N04_063954_1982_XN_18N283W",
+      "P02_001820_1984_XI_18N282W__P06_003442_1987_XI_18N282W",
+      "P18_007925_1987_XN_18N282W__P19_008650_1987_XI_18N282W"
+    ],
+    "mean_difference_m": {
+      "maximum": 38.1975,
+      "median": 26.17935,
+      "minimum": 21.2787,
+      "positive_count": 6
+    },
+    "median_difference_m": {
+      "maximum": 37.2683,
+      "median": 25.2618,
+      "minimum": 21.0239,
+      "positive_count": 6
+    },
+    "pairwise_bbox_overlap": {
+      "bbox_intersecting_pairs": 15,
+      "bbox_iou_ge_0_1_pairs": 12,
+      "maximum_bbox_iou": 0.782143,
+      "maximum_pair": [
+        "N03_063453_1982_XN_18N282W__N03_063519_1982_XN_18N282W",
+        "N04_063809_1982_XN_18N282W__N05_064231_1982_XN_18N282W"
+      ],
+      "total_pairs": 15
+    },
+    "stddev_difference_m": {
+      "maximum": 15.061,
+      "median": 13.18815,
+      "minimum": 10.934
+    }
+  }
+}

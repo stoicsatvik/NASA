@@ -3,7 +3,7 @@
 Updated: 2026-11-12
 Class: Tier A
 Time horizon: NASA Space Apps Challenge, 14–15 Nov 2026
-Working branch: `research/e584-ctx-qa-residual-cohort-interpretation-20261112`
+Working branch: `research/e585-ctx-bbox-overlap-audit-20261112`
 Main objective: maximize uncertainty eliminated per run and converge on a scientifically defensible Space Apps entry.
 
 ## Current thesis
@@ -1025,3 +1025,23 @@ This is descriptive product-level QA only. The first nine returned items are not
 **Current NASA claim states unchanged:** repo operating system SUPPORTED; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN; challenge-selection superiority NOT YET PROVEN.
 
 Next gate: resolve item-specific `geodiff` order/control provenance; then inspect intersection-error and orthoimage assets only with a clear independent-control plan. Keep all 14 challenges open; E584 does not change the current challenge ranking. No UI polish, merge or main-branch write.
+
+## E585 — Jezero CTX AOI bounding-box overlap qualification (12 November 2026)
+
+- Draft follow-on to E584 / PR #146: E585 is isolated on branch research/e585-ctx-bbox-overlap-audit-20261112. Main remains untouched.
+- Recomputed spatial scope from the committed E583 aggregate receipt only; no network requests, rasters, raw QA text, MOLA rows or coordinates were accessed.
+- Of nine STAC bbox-intersecting items, six item bounding boxes are at least 99% contained in the Jezero AOI. Three are materially partial: N09_065 only 3.56% of its bbox intersects the AOI, N15_068 48.03%, and P05_002 12.28%.
+- The positive mean/median QA pattern persists in the six-item >=99%-contained subset: median of item means +26.17935 m (range +21.2787 to +38.1975 m); median of item medians +25.26180 m (range +21.0239 to +37.2683 m). This remains post-control product QA, not local accuracy or independent validation.
+- Bounding-box overlap is substantial: 28/36 pairs intersect, 14/36 have bbox IoU >=0.1, maximum 0.782143. In the six-item contained subset, 15/15 pairs intersect and 12/15 have bbox IoU >=0.1. Bbox overlap is not proof of actual raster-footprint overlap or shared control lineage.
+- Qualification: E584's nine-item result applies to the first nine returned bbox-intersecting products, not necessarily nine AOI-local QA summaries. Actual item geometries, raster-footprint overlap and QA metric spatial support remain unresolved.
+- Exact-head Actions [#43222673590](https://github.com/stoicsatvik/NASA/actions/runs/43222673590) passed 7/7 deterministic tests and recomputed the committed E585 result with a structural match to the E583 receipt. The first recomputation exposed a P05 item-ID transcription mismatch; the expected receipt was corrected against E583 and earlier failures remain preserved. No new live source access is performed.
+- Next: retrieve the nine STAC geometries and compute polygon/AOI intersections; establish whether QA assets summarize full products or AOI-clipped support; keep initial pc-align controls separate from held-out validation.
+- Claim states unchanged: absolute accuracy NOT YET MEASURED; independent validation NOT YET MEASURED; route safety NOT YET PROVEN; E001 known-site recovery NOT YET MEASURED; cross-body similarity, novel analogue discovery, local validation advantage and challenge-selection superiority NOT YET PROVEN.
+
+
+## E585 unit-sphere measure correction (12 November 2026)
+
+- Review found that E585 multiplied spherical-rectangle solid angles by Earth's radius squared even though the study coordinates describe Mars and the analysis uses only dimensionless intersection fractions and bbox IoU.
+- The common radius-squared factor cancels from every ratio, so all previously reported fractions and IoU values remain unchanged. The Earth-radius label was nevertheless physically inappropriate and suggested an absolute-area result that was never used.
+- Replaced the radius-scaled area helper with unit-sphere solid angle in steradians. No body-specific radius or absolute surface area is reported. The 99% containment screen, cohort summaries and claim boundaries are unchanged.
+- Added a scale-free fraction regression test and an output-metadata assertion. Exact-head revalidation is recorded in PR #147 after the new workflow completes.

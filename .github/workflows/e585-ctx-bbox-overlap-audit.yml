@@ -1,0 +1,57 @@
+name: E585 Jezero CTX bounding-box overlap audit
+
+on:
+  push:
+    branches:
+      - research/e585-ctx-bbox-overlap-audit-20261112
+    paths:
+      - experiments/e585_ctx_bbox_overlap_audit.py
+      - tests/test_e585_ctx_bbox_overlap_audit.py
+      - research/results/E583_CTX_QA_COHORT_SCREEN_20261112.json
+      - research/results/E585_CTX_BBOX_OVERLAP_AUDIT_20261112.json
+      - research/E585_CTX_BBOX_OVERLAP_AUDIT_20261112.md
+      - FOUNDRY_STATE.md
+      - .github/workflows/e585-ctx-bbox-overlap-audit.yml
+  pull_request:
+    branches:
+      - research/e584-ctx-qa-residual-cohort-interpretation-20261112
+    paths:
+      - experiments/e585_ctx_bbox_overlap_audit.py
+      - tests/test_e585_ctx_bbox_overlap_audit.py
+      - research/results/E583_CTX_QA_COHORT_SCREEN_20261112.json
+      - research/results/E585_CTX_BBOX_OVERLAP_AUDIT_20261112.json
+      - research/E585_CTX_BBOX_OVERLAP_AUDIT_20261112.md
+      - FOUNDRY_STATE.md
+      - .github/workflows/e585-ctx-bbox-overlap-audit.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e585-ctx-bbox-overlap-audit
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run deterministic E585 tests
+        run: python -m unittest discover -s tests -p "test_e585_ctx_bbox_overlap_audit.py" -v
+      - name: Recompute and compare committed E585 result
+        run: >-
+          python experiments/e585_ctx_bbox_overlap_audit.py
+          --receipt research/results/E583_CTX_QA_COHORT_SCREEN_20261112.json
+          --out .artifacts/e585/result.json
+          --expected research/results/E585_CTX_BBOX_OVERLAP_AUDIT_20261112.json
+      - name: Upload derived aggregate result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e585-ctx-bbox-overlap-audit
+          path: .artifacts/e585/result.json
+          if-no-files-found: warn
