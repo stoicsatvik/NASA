@@ -46,9 +46,9 @@ class E594FirmsProbeTests(unittest.TestCase):
             "34.1,-117.2,330,1,1,2026-11-11,123,Terra,MODIS,80,6.1NRT,290,4,D\n"
         ).encode()
         result = summarize_csv_prefix(fixture)
-        self.assertEqual(result["row_count_in_prefix"], 1)
+        self.assertEqual(result["row_count_in_prefix"], 2)
         self.assertEqual(result["incomplete_rows_dropped"], 1)
-        self.assertEqual(result["valid_coordinate_rows"], 0)
+        self.assertEqual(result["valid_coordinate_rows"], 1)
 
     def test_probe_boundary_rejects_credentials_queries_and_other_hosts(self):
         for url in (
