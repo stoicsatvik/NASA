@@ -1,0 +1,40 @@
+name: E583 bounded Jezero CTX QA cohort screen
+
+on:
+  pull_request:
+    branches:
+      - research/e582-ctx-qa-mola-control-audit-20261112
+    types: [opened, synchronize]
+    paths:
+      - experiments/e583_ctx_qa_cohort_screen.py
+      - tests/test_e583_ctx_qa_cohort_screen.py
+      - .github/workflows/e583-ctx-qa-cohort-screen.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e583-ctx-qa-cohort-screen
+  cancel-in-progress: true
+
+jobs:
+  e583:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run deterministic cohort-selection tests
+        run: python -m unittest discover -s tests -p "test_e583_ctx_qa_cohort_screen.py" -v
+      - name: Screen up to nine Jezero CTX QA metrics assets
+        run: python experiments/e583_ctx_qa_cohort_screen.py --out .artifacts/e583/ctx-qa-cohort.json
+      - name: Upload aggregate QA cohort receipt only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e583-ctx-qa-cohort
+          path: .artifacts/e583/ctx-qa-cohort.json
+          if-no-files-found: ignore
+          retention-days: 7
