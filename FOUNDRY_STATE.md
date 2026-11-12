@@ -1051,3 +1051,13 @@ Next gate: resolve item-specific `geodiff` order/control provenance; then inspec
 - Exact-head workflow [#43225029602](https://github.com/stoicsatvik/NASA/actions/runs/43225029602) passed 10/10 deterministic tests and completed the bounded live acquisition. Aggregate artifact [#13947177574](https://github.com/stoicsatvik/NASA/actions/runs/43225029602/artifacts/13947177574); durable aggregate receipt: `research/results/E586_CTX_FOOTPRINT_GEOMETRY_AUDIT_20261112.json`.
 - This improves footprint and sampling-dependence understanding only. It does not establish QA spatial support, independent accuracy, route safety, E001 recovery, cross-body similarity, novel analogue discovery, local validation advantage or challenge-selection superiority. All scientific claim states remain unchanged.
 - Next decisive gate: resolve the CTX–MOLA `geodiff` input order and initial pc-align control lineage from public processing documentation/metadata, or identify a genuinely independent control set. Do not treat the nine QA products as AOI-clipped or independent validation.
+
+
+## E587 — item-specific CTX processing provenance audit (12 November 2026)
+
+- Isolated on research/e587-ctx-provenance-command-audit-20261112, stacked on E586 / PR #148. Main remains untouched.
+- Re-queries the exact nine E583 Jezero CTX item set and inventories item asset metadata. Only explicit provenance/processing-command text assets may be fetched.
+- Hard limits: 1 MB per provenance asset, 5 MB aggregate provenance bytes, nine candidate assets; allowlisted HTTPS only. No MOLA CSV, QA text, raster, binary archive, raw STAC JSON, raw provenance text, full local path, signed query value or credential is retained.
+- Parses only geodiff and pc_align command semantics. ASP docs define geodiff as first DEM minus second by default (or reversed with --reverse), and pc_align as first fixed reference / second movable source. Exact item-linked commands are required before assigning CTX/MOLA roles.
+- E587 is a provenance audit, not an independent accuracy test. MOLA control points remain control inputs, not held-out validation. A pc_align command alone does not prove which transformed output generated the released DTM.
+- Exact-head validation and live acquisition are pending. Preserve missing/inaccessible provenance as a negative source-access result; do not infer command order from generic documentation alone.
