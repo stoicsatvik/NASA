@@ -1,5 +1,7 @@
 import math
 
+import numpy as np
+import pyproj
 import pytest
 
 from experiments.e573_2025_hirise_translation_envelope import (
@@ -9,6 +11,7 @@ from experiments.e573_2025_hirise_translation_envelope import (
     OFFSETS_M,
     offset_key,
     summarize_tabs,
+    sample_2025_at_offset,
 )
 
 
@@ -53,3 +56,32 @@ def test_summary_reports_worst_case_margin_without_inferential_language():
 def test_summary_rejects_empty_input():
     with pytest.raises(ValueError, match="at least one"):
         summarize_tabs({})
+
+class _SinglePixelDataset:
+    driver = "GTiff"
+    count = 1
+    width = 1
+    height = 1
+    crs = pyproj.CRS.from_epsg(4326)
+
+    def index(self, x, y):
+        return 0, 0
+
+    def read(self, *args, **kwargs):
+        return np.ma.array([[42.0]], mask=False)
+
+
+def test_2025_masks_are_flattened_to_the_same_observed_point_order_as_2020():
+    observed = np.asarray([[True, False], [False, True]])
+    lat = np.zeros((2, 2), dtype=float)
+    lon = np.zeros((2, 2), dtype=float)
+
+    inside, valid = sample_2025_at_offset(
+        _SinglePixelDataset(), lat, lon, observed, 0.0, 0.0
+    )
+
+    assert inside.shape == (int(observed.sum()),)
+    assert valid.shape == (int(observed.sum()),)
+    assert inside.tolist() == [True, True]
+    assert valid.tolist() == [True, True]
+
