@@ -57,6 +57,7 @@
     "1m_3m_inter_mosaic_values_are_independent_ground_control": false,
     "1m_3m_method_uses_orthoimage_correlation": true,
     "mola_pedr_is_an_independent_sensor_family": true,
+    "mola_pedr_horizontal_support_sufficient_for_10m_validation": false,
     "2025_product_specific_held_out_mola_horizontal_residual_found": false,
     "independent_horizontal_control_for_pinned_2025_dtm_found": false
   },
@@ -93,5 +94,5 @@
     "novel_analogue_discovery": "NOT YET PROVEN",
     "planetary_analog_challenge_superiority": "NOT YET PROVEN"
   },
-  "next_gate": "Acquire a genuinely independent reference with documented control lineage (for example, a held-out MOLA PEDR track set or an independently controlled HRSC product), then measure multi-patch residuals without fitting a corrective shift to the evaluation points."
+  "next_gate": "A held-out MOLA PEDR track is an independent sensor-family cross-check but its approximately 100 m shot footprint is too coarse to validate a 10.2 m residual; use it only for gross-error screening. For a 10 m-scale horizontal residual, acquire a separate control network or independently controlled product with documented horizontal uncertainty materially below 10.2 m, then measure held-out multi-patch residuals without fitting a corrective shift to evaluation points."
 }
