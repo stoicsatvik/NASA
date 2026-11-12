@@ -54,11 +54,14 @@ def _relative_name(key: str) -> str | None:
 
 def _is_provenance_candidate(name: str) -> bool:
     lower = name.lower()
-    if any(term in lower for term in ("provenance", "processing", "command", "lineage", "history")):
-        return True
-    if lower in KNOWN_NON_PROVENANCE_TEXT:
-        return False
-    return lower.endswith((".txt", ".json", ".xml", ".log"))
+    return lower not in KNOWN_NON_PROVENANCE_TEXT and any(
+        term in lower for term in ("provenance", "processing", "command", "lineage", "history")
+    )
+
+
+def _is_metadata_candidate(name: str) -> bool:
+    lower = name.lower()
+    return lower not in KNOWN_NON_PROVENANCE_TEXT and lower.endswith((".json", ".txt", ".xml", ".log"))
 
 
 def parse_s3_listing(payload: bytes) -> dict[str, Any]:
@@ -84,6 +87,7 @@ def parse_s3_listing(payload: bytes) -> dict[str, Any]:
             "etag": etag[:120] if etag else None,
             "last_modified": modified[:40] if modified else None,
             "provenance_candidate": _is_provenance_candidate(name),
+            "metadata_candidate": _is_metadata_candidate(name),
         })
     truncated = root.findtext("s3:IsTruncated", default="false", namespaces=S3_NS).lower() == "true"
     return {
