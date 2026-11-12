@@ -43,7 +43,7 @@ class E594FirmsProbeTests(unittest.TestCase):
             "latitude,longitude,brightness,scan,track,acq_date,acq_time,satellite,instrument,"
             "confidence,version,bright_t31,frp,daynight\n"
             "999,181,330,1,1,2026-11-11,123,Terra,MODIS,80,6.1NRT,290,4,D\n"
-            "34.1,-117.2,330,1,1,2026-11-11,123,Terra,MODIS,80,6.1NRT,290,4,D\n"
+            "34.1,-117.2,330,1,1,2026-11-11,123,Terra,MODIS,80,6.1NRT,290,4\n"
         ).encode()
         result = summarize_csv_prefix(fixture)
         self.assertEqual(result["row_count_in_prefix"], 2)
