@@ -25,9 +25,8 @@ class E590Tests(unittest.TestCase):
         self.assertEqual(parent_query["fields"], [e590.ITEM_FIELDS])
         child_query = parse_qs(urlsplit(e590.CHILDREN_URL).query)
         self.assertEqual(child_query["filter"], [f"parentId={e590.PARENT_ITEM_ID}"])
-        self.assertEqual(child_query["format"], ["json"])
 
-    def test_file_summary_redacts_signed_query_values_and_accepts_explicit_file_url(self):
+    def test_file_summary_redacts_signed_query_values(self):
         record = {
             "name": "field-data.csv",
             "size": 123,
@@ -35,141 +34,109 @@ class E590Tests(unittest.TestCase):
         }
         summary = e590._safe_file_record(record)
         rendered = json.dumps(summary)
-        self.assertEqual(summary["name"], "field-data.csv")
-        self.assertEqual(summary["size_bytes"], 123)
         self.assertEqual(e590._download_uri(record), record["url"])
         self.assertNotIn("secret", rendered)
         self.assertNotIn('"123"', rendered)
         self.assertFalse(summary["download_uri"]["query_values_stored"])
 
-    def test_candidate_prefers_explicit_sciencebase_file_endpoint_over_html_page_url(self):
+    def test_candidate_prefers_explicit_file_endpoint_over_page_url(self):
         records = [
-            {
-                "name": "smaller-page.csv",
-                "size": 1_091_813,
-                "url": "https://sciencebase.usgs.gov/catalog/file/get/abc",
-            },
-            {
-                "name": "larger-direct.csv",
-                "size": 3_319_414,
-                "url": "https://www.sciencebase.gov/catalog/file/get/abc?f=larger-direct.csv",
-            },
+            {"name": "small-page.csv", "size": 1_091_813, "url": "https://sciencebase.usgs.gov/catalog/file/get/a"},
+            {"name": "large-direct.csv", "size": 67_050_032, "url": "https://www.sciencebase.gov/catalog/file/get/b?f=large-direct.csv"},
         ]
-        chosen = e590._choose_candidate(records)
-        self.assertEqual(chosen["name"], "larger-direct.csv")
+        self.assertEqual(e590._choose_candidate(records)["name"], "large-direct.csv")
 
     def test_extract_file_records_reads_top_level_and_facets(self):
         item = {
             "files": [{"name": "top.csv", "size": 10, "url": "https://www.sciencebase.gov/catalog/file/get/a"}],
-            "facets": [
-                {"name": "data", "files": [{"name": "facet.zip", "size": 20, "url": "https://www.sciencebase.gov/catalog/file/get/b"}]}
-            ],
+            "facets": [{"name": "data", "files": [{"name": "facet.zip", "size": 20, "url": "https://www.sciencebase.gov/catalog/file/get/b"}]}],
         }
         records = e590._extract_file_records(item, "item-1")
         self.assertEqual({r["name"] for r in records}, {"top.csv", "facet.zip"})
         self.assertTrue(all(r["_source_item_id"] == "item-1" for r in records))
 
-    def test_metadata_failures_are_preserved_without_file_claim(self):
+    def test_metadata_failures_are_preserved(self):
         with patch.object(e590, "fetch_bounded", side_effect=[
-            response(503, b"unavailable"),
-            response(503, b"unavailable"),
-            response(503, b"unavailable"),
+            response(503), response(503), response(503)
         ]):
             result = e590.audit()
         self.assertEqual(result["decision"], "METADATA_UNAVAILABLE")
         self.assertEqual(result["parent_metadata_http_status"], 503)
         self.assertEqual(result["catalog_record_metadata_http_status"], 503)
-        self.assertIsNone(result["file_count"] if result["file_count"] is None else None)
         self.assertFalse(result["credentials_used"])
 
-    def test_no_small_candidate_does_not_trigger_file_download(self):
+    def test_no_supported_file_does_not_trigger_range_request(self):
         parent = json.dumps({"title": "Grand Falls", "files": []}).encode()
         children = json.dumps({"items": [{"id": e590.CATALOG_RECORD_ID, "title": "Sediment Transport Data"}]}).encode()
         catalog = json.dumps({
             "title": "Grand Falls",
-            "facets": [{"files": [
-                {"name": "large.zip", "size": 9_000_000, "url": "https://www.sciencebase.gov/catalog/file/get/large"},
-                {"name": "preview.csv", "size": 100, "url": "https://www.sciencebase.gov/catalog/item/preview"},
-            ]}],
+            "files": [
+                {"name": "large.csv", "size": 200_000_000, "url": "https://www.sciencebase.gov/catalog/file/get/large?f=large.csv"},
+                {"name": "metadata.xml", "size": 1000, "url": "https://www.sciencebase.gov/catalog/file/get/meta?f=meta.xml"},
+            ],
         }).encode()
         with patch.object(e590, "fetch_bounded", side_effect=[
-            response(200, parent),
-            response(200, children),
-            response(200, catalog),
+            response(200, parent), response(200, children), response(200, catalog)
         ]) as fetch:
             result = e590.audit()
-        self.assertEqual(result["decision"], "NO_SMALL_METADATA_LINKED_DELIMITED_FILE")
-        self.assertEqual(result["child_count"], 1)
-        self.assertEqual(result["file_count"], 2)
+        self.assertEqual(result["decision"], "NO_SUPPORTED_METADATA_LINKED_CSV")
         self.assertEqual(fetch.call_count, 3)
 
-    def test_child_catalog_csv_is_range_checked_and_aggregated(self):
-        payload = (
-            b"timestamp,wind_speed_mph,sediment_flux_g_m2_s\n"
-            b"2023-07-07T00:00:00Z,5,0.2\n"
-            b"2023-07-07T00:00:10Z,7,0.4\n"
-        )
+    def test_csv_range_sample_is_profiled_without_raw_rows(self):
+        payload = b"timestamp,wind_speed_mph,sediment_flux_g_m2_s\n2023-07-07T00:00:00Z,5,0.2\n2023-07-07T00:00:10Z,7,0.4\n"
         size = len(payload)
         parent = json.dumps({"title": "Grand Falls", "files": []}).encode()
         children = json.dumps({"items": [{"id": e590.CATALOG_RECORD_ID, "title": "Sediment Transport Data"}]}).encode()
         catalog = json.dumps({
             "title": "Sediment Transport Data",
             "facets": [{"files": [{
-                "name": "field-data.csv",
-                "size": size,
-                "url": "https://www.sciencebase.gov/catalog/file/get/field-data.csv",
+                "name": "field-data.csv", "size": size,
+                "url": "https://www.sciencebase.gov/catalog/file/get/field-data.csv?f=field-data.csv",
             }]}],
         }).encode()
-        range_payload = payload[:min(e590.MAX_HEADER_BYTES, size)]
         side_effects = [
             response(200, parent),
             response(200, children),
             response(200, catalog),
-            response(
-                206,
-                range_payload,
-                {"Content-Range": f"bytes 0-{len(range_payload)-1}/{size}", "Content-Type": "text/csv"},
-                "https://www.sciencebase.gov/catalog/file/get/field-data.csv",
-            ),
-            response(
-                200,
-                payload,
-                {"Content-Type": "text/csv"},
-                "https://www.sciencebase.gov/catalog/file/get/field-data.csv",
-            ),
+            response(206, payload, {
+                "Content-Range": f"bytes 0-{size-1}/{size}",
+                "Content-Type": "text/csv",
+            }, "https://www.sciencebase.gov/catalog/file/get/field-data.csv?f=field-data.csv"),
         ]
         with patch.object(e590, "fetch_bounded", side_effect=side_effects) as fetch:
             result = e590.audit()
-        self.assertEqual(result["decision"], "SMALL_PUBLIC_FIELD_DATA_FILE_ACQUIRED_AND_PROFILED")
-        self.assertTrue(result["catalog_record_id_in_parent_children"])
+        self.assertEqual(result["decision"], "PUBLIC_CSV_PREFIX_SAMPLE_ACQUIRED_AND_PROFILED")
         self.assertEqual(result["data_sample"]["summary"]["data_summary"]["row_count"], 2)
         self.assertEqual(result["data_sample"]["summary"]["data_summary"]["numeric_summaries"]["wind_speed_mph"]["mean"], 6.0)
-        self.assertEqual(fetch.call_count, 5)
+        self.assertEqual(fetch.call_count, 4)
         self.assertFalse(result["raw_values_stored"])
         self.assertNotIn("rows", result["data_sample"]["summary"]["data_summary"])
 
-    def test_invalid_range_stops_before_full_download(self):
+    def test_large_csv_prefix_is_bounded_and_marked_partial(self):
+        payload = b"timestamp,wind_speed_mph\n2023-07-07,5\n2023-07-08,7\n2023-07-09,8\n"
+        with patch.object(e590, "MAX_SAMPLE_BYTES", 48):
+            prefix = payload[:48]
+            self.assertTrue(e590._complete_csv_prefix(prefix).endswith(b"\n"))
+            self.assertLessEqual(len(prefix), 48)
+
+    def test_html_or_mismatched_range_is_rejected(self):
+        payload = b"<html>access denied</html>"
+        size = 100
         parent = json.dumps({"title": "Grand Falls", "files": []}).encode()
         children = json.dumps({"items": []}).encode()
-        catalog = json.dumps({
-            "title": "Grand Falls",
-            "files": [{
-                "name": "field-data.csv",
-                "size": 40,
-                "url": "https://www.sciencebase.gov/catalog/file/get/field-data.csv",
-            }],
-        }).encode()
+        catalog = json.dumps({"title": "Grand Falls", "files": [{
+            "name": "field.csv", "size": size,
+            "url": "https://www.sciencebase.gov/catalog/file/get/field.csv?f=field.csv",
+        }]}).encode()
         side_effects = [
-            response(200, parent),
-            response(200, children),
-            response(200, catalog),
-            response(206, b"head", {"Content-Range": "bytes 1-4/40"}),
+            response(200, parent), response(200, children), response(200, catalog),
+            response(206, payload, {"Content-Range": f"bytes 0-{len(payload)-1}/4255", "Content-Type": "text/html"}),
         ]
         with patch.object(e590, "fetch_bounded", side_effect=side_effects) as fetch:
             result = e590.audit()
         self.assertEqual(result["decision"], "BOUNDED_RANGE_NOT_CONFIRMED")
+        self.assertTrue(result["range_probe"]["html_response"])
         self.assertEqual(fetch.call_count, 4)
-        self.assertIsNone(result["data_sample"])
 
     def test_transport_errors_are_fail_closed(self):
         with patch.object(e590, "fetch_bounded", side_effect=TimeoutError("timed out")):

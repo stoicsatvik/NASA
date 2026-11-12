@@ -1,11 +1,4 @@
-"""E590: bounded access audit for the 2023–2024 Grand Falls USGS release.
-
-The DOI landing item and the Data.gov catalog identifier are distinct
-ScienceBase/catalog identifiers. This probe checks the documented parent/
-child structure and both top-level and facet-attached files. At most one
-small metadata-listed delimited file/ZIP is acquired; only aggregate
-summaries and hashes are retained.
-"""
+"""E590: bounded access audit for the 2023–2024 Grand Falls USGS release."""
 from __future__ import annotations
 
 import argparse
@@ -17,7 +10,6 @@ from urllib.parse import urlsplit
 
 from experiments.e577_grand_falls_2017_2019_access_probe import (
     ALLOWED_HOSTS,
-    MAX_FILE_BYTES,
     MAX_HEADER_BYTES,
     MAX_METADATA_BYTES,
     fetch_bounded,
@@ -29,6 +21,8 @@ PARENT_ITEM_ID = "677ee6bed34e760b392c4aa3"
 CATALOG_RECORD_ID = "67bf94acd34e8876fcbfc91b"
 DOI = "10.5066/P13HPPYM"
 ITEM_FIELDS = "title,files,facets"
+MAX_SAMPLE_BYTES = 5_000_000
+MAX_REMOTE_FILE_BYTES = 100_000_000
 PARENT_ITEM_URL = (
     f"https://www.sciencebase.gov/catalog/item/{PARENT_ITEM_ID}?"
     + urllib.parse.urlencode({"format": "json", "fields": ITEM_FIELDS})
@@ -46,7 +40,7 @@ CHILDREN_URL = (
         "max": "100",
     })
 )
-DATA_EXTENSIONS = {".csv", ".txt", ".tsv", ".dat", ".zip"}
+DATA_EXTENSIONS = {".csv", ".txt", ".tsv", ".dat"}
 
 
 def _file_name(record: dict) -> str:
@@ -134,13 +128,14 @@ def _choose_candidate(records: list[dict]) -> dict | None:
         extension = PurePosixPath(_file_name(record)).suffix.lower()
         size = _file_size(record)
         uri = _download_uri(record)
-        if extension in DATA_EXTENSIONS and size is not None and size <= MAX_FILE_BYTES and uri:
-            parsed = urlsplit(uri)
-            query_keys = {key.lower() for key, _ in urllib.parse.parse_qsl(parsed.query, keep_blank_values=True)}
-            # Prefer ScienceBase's explicit ?f= file endpoint over the smaller
-            # sciencebase.usgs.gov page URL, which the first probe returned as HTML.
-            direct_file_score = 0 if parsed.hostname == "www.sciencebase.gov" and "f" in query_keys else 1
-            candidates.append((direct_file_score, size, _file_name(record).lower(), record))
+        if extension not in DATA_EXTENSIONS or size is None or size > MAX_REMOTE_FILE_BYTES or not uri:
+            continue
+        parsed = urlsplit(uri)
+        query_keys = {key.lower() for key, _ in urllib.parse.parse_qsl(parsed.query, keep_blank_values=True)}
+        # Prefer the explicit ScienceBase ?f= file endpoint after the smaller
+        # sciencebase.usgs.gov URL returned an HTML page instead of CSV bytes.
+        direct_file_score = 0 if parsed.hostname == "www.sciencebase.gov" and "f" in query_keys else 1
+        candidates.append((direct_file_score, size, _file_name(record).lower(), record))
     return min(candidates, key=lambda item: (item[0], item[1], item[2]))[3] if candidates else None
 
 
@@ -157,6 +152,11 @@ def _children_summary(document: dict) -> list[dict]:
         if item_id:
             result.append({"id": str(item_id), "title": str(title or "")})
     return result
+
+
+def _complete_csv_prefix(payload: bytes) -> bytes:
+    end = payload.rfind(b"\n")
+    return payload[:end + 1] if end >= 0 else b""
 
 
 def audit() -> dict:
@@ -239,7 +239,7 @@ def audit() -> dict:
 
         candidate = _choose_candidate(all_files)
         if candidate is None:
-            result["decision"] = "NO_SMALL_METADATA_LINKED_DELIMITED_FILE"
+            result["decision"] = "NO_SUPPORTED_METADATA_LINKED_CSV"
             return result
 
         name = _file_name(candidate)
@@ -250,48 +250,53 @@ def audit() -> dict:
             result["decision"] = "SELECTED_FILE_METADATA_INCOMPLETE"
             return result
 
-        expected_end = min(MAX_HEADER_BYTES - 1, size - 1)
-        header = fetch_bounded(
+        sample_end = min(MAX_SAMPLE_BYTES - 1, size - 1)
+        sample = fetch_bounded(
             uri,
-            limit=MAX_HEADER_BYTES,
-            range_header=f"bytes=0-{expected_end}",
+            limit=MAX_SAMPLE_BYTES,
+            range_header=f"bytes=0-{sample_end}",
         )
-        content_range = parse_content_range(header["headers"].get("Content-Range"))
+        content_range = parse_content_range(sample["headers"].get("Content-Range"))
+        content_type = str(sample["headers"].get("Content-Type") or "").lower()
         range_valid = bool(
             content_range
             and content_range[0] == 0
-            and content_range[1] == expected_end
+            and content_range[1] == sample_end
             and content_range[2] == size
-            and len(header["payload"]) == expected_end + 1
+            and len(sample["payload"]) == sample_end + 1
         )
+        is_html = "text/html" in content_type
         result["range_probe"] = {
-            "http_status": header["status"],
-            "content_type": header["headers"].get("Content-Type"),
+            "http_status": sample["status"],
+            "content_type": content_type,
             "content_range_valid": range_valid,
             "content_range_total_bytes": content_range[2] if content_range else None,
-            "bytes_read": len(header["payload"]),
-            "sha256": hashlib.sha256(header["payload"]).hexdigest(),
-            "host": urlsplit(header["final_url"]).hostname,
+            "bytes_read": len(sample["payload"]),
+            "sha256": hashlib.sha256(sample["payload"]).hexdigest(),
+            "host": urlsplit(sample["final_url"]).hostname,
+            "html_response": is_html,
         }
-        if header["status"] != 206 or not range_valid:
+        if sample["status"] != 206 or not range_valid or is_html:
             result["decision"] = "BOUNDED_RANGE_NOT_CONFIRMED"
             return result
 
-        full = fetch_bounded(uri, limit=MAX_FILE_BYTES)
-        if full["status"] != 200 or len(full["payload"]) != size:
-            result["decision"] = "FULL_FILE_SIZE_OR_STATUS_MISMATCH"
-            result["full_file_http_status"] = full["status"]
-            result["full_file_bytes"] = len(full["payload"])
+        complete_payload = _complete_csv_prefix(sample["payload"])
+        if not complete_payload:
+            result["decision"] = "RANGE_SAMPLE_HAS_NO_COMPLETE_RECORD"
             return result
-
-        sample_summary = inspect_payload(name, full["payload"])
+        sample_summary = inspect_payload(name, complete_payload)
         sample_summary.pop("prefix_hex", None)
         result["data_sample"] = {
-            "bytes": len(full["payload"]),
-            "sha256": hashlib.sha256(full["payload"]).hexdigest(),
+            "sample_range_start": 0,
+            "sample_range_end": sample_end,
+            "total_file_bytes": size,
+            "sample_bytes": len(sample["payload"]),
+            "complete_lines_bytes": len(complete_payload),
+            "partial_prefix_sample": size > len(sample["payload"]),
+            "sha256": hashlib.sha256(complete_payload).hexdigest(),
             "summary": sample_summary,
         }
-        result["decision"] = "SMALL_PUBLIC_FIELD_DATA_FILE_ACQUIRED_AND_PROFILED"
+        result["decision"] = "PUBLIC_CSV_PREFIX_SAMPLE_ACQUIRED_AND_PROFILED"
         return result
     except Exception as exc:
         result["error_type"] = type(exc).__name__
@@ -317,6 +322,7 @@ def main() -> None:
         "catalog_record_id_in_parent_children": receipt["catalog_record_id_in_parent_children"],
         "file_count": receipt["file_count"],
         "selected_file": receipt["selected_file"],
+        "range_probe": receipt["range_probe"],
         "data_sample": receipt["data_sample"],
         "credentials_used": receipt["credentials_used"],
         "raw_values_stored": receipt["raw_values_stored"],
