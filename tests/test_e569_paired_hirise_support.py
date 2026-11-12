@@ -20,7 +20,23 @@ def test_paired_cross_tab_reports_gains_losses_and_footprint_separately():
         new_valid=[1, 1, 0, 0, 1, 0, 0],
     )
 
-    assert result["observed_points"] == 6
+    # Seven paired positions are supplied; every cross-tab partition must
+    # account for each position exactly once.
+    assert result["observed_points"] == 7
+    assert (
+        result["both_valid"]
+        + result["2020_valid_only"]
+        + result["2025_valid_only"]
+        + result["both_invalid"]
+        == result["observed_points"]
+    )
+    assert (
+        result["both_inside_bounds"]
+        + result["2020_only_footprint"]
+        + result["2025_only_footprint"]
+        + result["both_outside_bounds"]
+        == result["observed_points"]
+    )
     assert result["both_inside_bounds"] == 3
     assert result["2020_only_footprint"] == 1
     assert result["2025_only_footprint"] == 2
