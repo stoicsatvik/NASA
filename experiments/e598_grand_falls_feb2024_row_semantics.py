@@ -173,6 +173,52 @@ def summarize_payload(payload: bytes) -> dict:
     }
 
 
+def rejected_size_mismatch_receipt(
+    *,
+    metadata_sha256: str,
+    metadata_status: int,
+    response_status: int,
+    content_type: str,
+    content_length: int,
+    payload: bytes,
+    final_host: str,
+) -> dict:
+    """Return a sanitized negative receipt without parsing a size-mismatched payload."""
+    return {
+        "experiment": EXPERIMENT,
+        "parse_status": "REJECTED_CATALOGUE_SIZE_MISMATCH",
+        "source_item_id": CATALOG_RECORD_ID,
+        "source_file_name": EXPECTED_FILE_NAME,
+        "source_file_size_bytes": EXPECTED_FILE_SIZE,
+        "response": {
+            "http_status": response_status,
+            "content_type": content_type,
+            "content_length_header": content_length,
+            "bytes_read": len(payload),
+            "payload_sha256": hashlib.sha256(payload).hexdigest(),
+            "catalogue_size_match": False,
+            "csv_header_admissible": classify_csv_response(content_type, payload) is not None,
+        },
+        "claim_state": {
+            "exact_catalogue_file_identity": "SUPPORTED_AS_PINNED",
+            "metadata_supplied_download_payload": "NOT_ESTABLISHED",
+            "row_semantics": "NOT_YET_MEASURED",
+            "cross_body_similarity": "NOT_YET_PROVEN",
+            "known_site_recovery": "NOT_YET_MEASURED",
+        },
+        "provenance": {
+            "catalog_metadata_sha256": metadata_sha256,
+            "catalog_metadata_http_status": metadata_status,
+            "csv_http_status": response_status,
+            "csv_final_host": final_host,
+            "credentials_used": False,
+            "read_limit_bytes": MAX_FILE_BYTES,
+            "raw_payload_retained": False,
+            "raw_urls_retained": False,
+        },
+    }
+
+
 def acquire_and_audit() -> dict:
     metadata = fetch_strict_bounded(CATALOG_RECORD_URL, limit=MAX_METADATA_BYTES)
     if metadata["status"] != 200:
@@ -203,41 +249,15 @@ def acquire_and_audit() -> dict:
     content_length = int(headers.get("Content-Length") or 0)
     payload = response["payload"]
     if content_length != EXPECTED_FILE_SIZE or len(payload) != EXPECTED_FILE_SIZE:
-        return {
-            "experiment": EXPERIMENT,
-            "parse_status": "REJECTED_CATALOGUE_SIZE_MISMATCH",
-            "source_item_id": CATALOG_RECORD_ID,
-            "source_file_name": EXPECTED_FILE_NAME,
-            "source_file_size_bytes": EXPECTED_FILE_SIZE,
-            "response": {
-                "http_status": response["status"],
-                "content_type": content_type,
-                "content_length_header": content_length,
-                "bytes_read": len(payload),
-                "payload_sha256": hashlib.sha256(payload).hexdigest(),
-                "catalogue_size_match": False,
-                "csv_header_admissible": (
-                    classify_csv_response(content_type, payload) is not None
-                ),
-            },
-            "claim_state": {
-                "exact_catalogue_file_identity": "SUPPORTED_AS_PINNED",
-                "metadata_supplied_download_payload": "NOT_ESTABLISHED",
-                "row_semantics": "NOT_YET_MEASURED",
-                "cross_body_similarity": "NOT_YET_PROVEN",
-                "known_site_recovery": "NOT_YET_MEASURED",
-            },
-            "provenance": {
-                "catalog_metadata_sha256": metadata_sha,
-                "catalog_metadata_http_status": metadata["status"],
-                "csv_http_status": response["status"],
-                "csv_final_host": response["final_url"].split("/")[2],
-                "credentials_used": False,
-                "read_limit_bytes": MAX_FILE_BYTES,
-                "raw_payload_retained": False,
-                "raw_urls_retained": False,
-            },
-        }
+        return rejected_size_mismatch_receipt(
+            metadata_sha256=metadata_sha,
+            metadata_status=metadata["status"],
+            response_status=response["status"],
+            content_type=content_type,
+            content_length=content_length,
+            payload=payload,
+            final_host=response["final_url"].split("/")[2],
+        )
 
     content_type_policy = classify_csv_response(content_type, payload)
     if content_type_policy is None:

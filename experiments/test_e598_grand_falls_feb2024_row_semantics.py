@@ -85,6 +85,50 @@ class E598RowSemanticsTests(unittest.TestCase):
             "NONSTANDARD_CONTENT_TYPE_BUT_EXACT_CSV_SCHEMA_VALID",
         )
 
+    def test_size_mismatch_returns_sanitized_negative_receipt(self):
+        from experiments.e598_grand_falls_feb2024_row_semantics import rejected_size_mismatch_receipt
+        import hashlib
+
+        payload = b"<html>proxy response</html>"
+        receipt = rejected_size_mismatch_receipt(
+            metadata_sha256="a" * 64,
+            metadata_status=200,
+            response_status=200,
+            content_type="text/html",
+            content_length=27,
+            payload=payload,
+            final_host="www.sciencebase.gov",
+        )
+        self.assertEqual(receipt["parse_status"], "REJECTED_CATALOGUE_SIZE_MISMATCH")
+        self.assertFalse(receipt["response"]["catalogue_size_match"])
+        self.assertFalse(receipt["response"]["csv_header_admissible"])
+        self.assertEqual(receipt["response"]["bytes_read"], len(payload))
+        self.assertEqual(receipt["response"]["payload_sha256"], hashlib.sha256(payload).hexdigest())
+        self.assertFalse(receipt["provenance"]["raw_payload_retained"])
+        self.assertFalse(receipt["provenance"]["raw_urls_retained"])
+        self.assertNotIn("payload", receipt)
+        self.assertNotIn("url", receipt)
+
+    def test_schema_valid_payload_is_still_rejected_when_size_mismatches(self):
+        from experiments.e598_grand_falls_feb2024_row_semantics import rejected_size_mismatch_receipt
+
+        headers, _ = self.make_fixture()
+        payload = (",".join(headers) + "\\n").encode()
+        receipt = rejected_size_mismatch_receipt(
+            metadata_sha256="b" * 64,
+            metadata_status=200,
+            response_status=200,
+            content_type="application/octet-stream",
+            content_length=EXPECTED_FILE_SIZE,
+            payload=payload,
+            final_host="www.sciencebase.gov",
+        )
+        self.assertEqual(receipt["parse_status"], "REJECTED_CATALOGUE_SIZE_MISMATCH")
+        self.assertTrue(receipt["response"]["csv_header_admissible"])
+        self.assertFalse(receipt["response"]["catalogue_size_match"])
+        self.assertEqual(receipt["response"]["bytes_read"], len(payload))
+
+
     def test_html_payload_is_not_admitted_as_csv(self):
         self.assertIsNone(classify_csv_response("text/html", b"<html><body>not csv</body></html>"))
 

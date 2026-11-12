@@ -42,11 +42,13 @@ jobs:
       - name: Run deterministic selection and row-summary tests
         run: python -m unittest experiments.test_e598_grand_falls_feb2024_row_semantics -v
       - name: Acquire exact small CSV and write aggregate-only receipt
+        if: github.event_name == 'push' && contains(github.event.head_commit.message, '[live-probe]')
         run: python -m experiments.e598_grand_falls_feb2024_row_semantics --out .artifacts/e598/receipt.json
       - name: Validate aggregate receipt
+        if: github.event_name == 'push' && contains(github.event.head_commit.message, '[live-probe]')
         run: python -m json.tool .artifacts/e598/receipt.json > /dev/null
       - name: Upload aggregate-only result
-        if: always()
+        if: always() && github.event_name == 'push' && contains(github.event.head_commit.message, '[live-probe]')
         uses: actions/upload-artifact@v4
         with:
           name: e598-grand-falls-feb2024-row-semantics
