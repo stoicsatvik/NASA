@@ -23,36 +23,52 @@ def receipt(ids):
     }
 
 
-def features(ids, asset_key="provenance"):
+def features(ids, asset_key="provenance", include_provenance_asset=True, provenance_link=False):
     rows = []
     for item_id in ids:
+        assets = {
+            "dtm": {
+                "href": f"https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/{item_id}/{item_id}_dtm.tif",
+                "title": "Digital Terrain Model",
+                "type": "image/tiff",
+                "roles": ["data"],
+            },
+            "mola_control": {
+                "href": f"https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/{item_id}/{item_id}_mola.csv",
+                "title": "MOLA control points",
+                "type": "text/csv",
+                "roles": ["metadata"],
+            },
+            "qa_metrics": {
+                "href": f"https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/{item_id}/qa_metrics.txt",
+                "title": "ASP Generated Quality Assurance Metrics",
+                "type": "text/plain",
+                "roles": ["metadata"],
+            },
+        }
+        if include_provenance_asset:
+            assets[asset_key] = {
+                "href": f"https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/{item_id}/provenance.txt?X-Amz-Signature=SECRET",
+                "title": "Processing provenance commands",
+                "type": "text/plain",
+                "roles": ["metadata"],
+            }
+        links = [{"rel": "self", "href": "https://stac.astrogeology.usgs.gov/item.json", "type": "application/geo+json"}]
+        if provenance_link:
+            links.append({
+                "rel": "provenance",
+                "href": f"https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/{item_id}/processing.txt?X-Amz-Signature=SECRET",
+                "title": "Processing commands",
+                "type": "text/plain",
+            })
         rows.append({
             "type": "Feature",
             "id": item_id,
             "collection": COLLECTION,
-            "assets": {
-                asset_key: {
-                    "href": "https://astrogeo-ard.s3.amazonaws.com/provenance.txt?X-Amz-Signature=SECRET",
-                    "title": "Processing provenance commands",
-                    "type": "text/plain",
-                    "roles": ["metadata"],
-                },
-                "mola_control": {
-                    "href": "https://astrogeo-ard.s3.amazonaws.com/mola.csv",
-                    "title": "MOLA control points",
-                    "type": "text/csv",
-                    "roles": ["metadata"],
-                },
-                "qa_metrics": {
-                    "href": "https://astrogeo-ard.s3.amazonaws.com/qa_metrics.txt",
-                    "title": "ASP Generated Quality Assurance Metrics",
-                    "type": "text/plain",
-                    "roles": ["metadata"],
-                },
-            },
+            "assets": assets,
+            "links": links,
         })
     return rows
-
 
 class E587Tests(unittest.TestCase):
     def test_geodiff_default_is_first_minus_second_and_maps_ctx_mola(self):
