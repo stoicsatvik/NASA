@@ -228,7 +228,7 @@ def _read_2020_point_masks(
         row_plan = build_row_range_plan(index_sets)
         planned_bytes = sum((last - first + 1) * 4 for first, last in row_plan.values())
         if planned_bytes <= 0 or planned_bytes > MAX_2020_RANGE_BYTES:
-            raise RuntimeError("2020 HiRISE point-window plan exceeds the 4 MiB range cap")
+            raise RuntimeError(f"2020 HiRISE point-window plan requires {planned_bytes} bytes, exceeding the configured {MAX_2020_RANGE_BYTES}-byte cap")
 
         row_buffers: dict[int, tuple[int, np.ndarray]] = {}
         for row, (first_col, last_col) in row_plan.items():
