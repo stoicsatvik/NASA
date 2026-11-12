@@ -122,3 +122,10 @@ A pinned South Asia daily VIIRS file returned HTTP 303 without credentials; a bo
 **Scoring decision:** do not change the 14-challenge numeric scores from this one access audit. MODIS/VIIRS (#9) remains viable if a legitimate participant credential is available, but its no-credential data path is not established. Keep #9 and Martian Map (#11) as a provisional top tier; their 0.10 baseline gap and reversal when portfolio reuse is removed remain below the predeclared 0.25 meaningful-difference threshold. Challenge-selection superiority remains NOT YET PROVEN.
 
 Next factor-changing test: measure actual CRS registration, pixel support and nodata overlap for MOLA/CTX/HiRISE over one pinned Mars footprint. If the common support or registration fails, reduce Martian Map data readiness and rerun the all-14 screen.
+
+
+## E572 independent public catalogue audit (2026-11-12)
+
+The third-party Planetary Analogue Catalogue (CC BY 4.0; pinned commit \`62e6339bdf308de3bc987388d0faa7130cf57de9\`) adds 12 primary Mars/Moon candidate records, but all are Draft. Across the in-scope records there are 68 references (21 peer-reviewed, 20 peer-reviewed label/feature-supporting, 1 unverified), no explicit non-analogue controls, no common physical numeric descriptors and no target-body measurement fields. Only contributor access/hazard ratings are common numeric fields. Coordinate precision is approximately 10 km for eight sites, region-only for three and approximately 1 km for one.
+
+This is a useful candidate-site index, not an E001 dataset. It does not change the 14-challenge numeric scores: Martian Map and MODIS/VIIRS remain a provisional top tier; planetary analog remains a conditional challenger, NOT YET PROVEN. Known-site recovery remains NOT YET MEASURED. Full method and pinned result: \`research/E572_ANALOGUE_CATALOGUE_ADMISSIBILITY_20261112.md\`.

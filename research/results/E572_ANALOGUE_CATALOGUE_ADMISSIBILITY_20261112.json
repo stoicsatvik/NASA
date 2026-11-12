@@ -1,0 +1,127 @@
+{
+  "common_numeric_fields": [
+    "access_level",
+    "hazard_rating"
+  ],
+  "common_physical_numeric_fields": [],
+  "common_target_measurement_fields": [],
+  "coordinate_precision_counts": {
+    "Approximately 1 km": 1,
+    "Approximately 10 km": 8,
+    "Region only": 3
+  },
+  "e001_reasons": [
+    "No analogue family has at least two Verified positive sites.",
+    "No explicit non-analogue control sites are supplied.",
+    "No physical numeric descriptor is populated across every in-scope positive/control record; the only common numeric fields are access_level and hazard_rating.",
+    "No target-body numeric measurement field is populated across every in-scope positive/control record; map context alone is not a matched physical measurement."
+  ],
+  "explicit_non_analogue_controls": 0,
+  "families_with_two_or_more": [
+    {
+      "count": 2,
+      "family": "Habitability / biological"
+    },
+    {
+      "count": 3,
+      "family": "Mineralogical"
+    },
+    {
+      "count": 2,
+      "family": "Operational (instrument, rover or crew testing)"
+    },
+    {
+      "count": 2,
+      "family": "Volcanic"
+    }
+  ],
+  "family_counts": {
+    "Geochemical": 1,
+    "Geological / geomorphological": 1,
+    "Habitability / biological": 2,
+    "Impact": 1,
+    "Mineralogical": 3,
+    "Operational (instrument, rover or crew testing)": 2,
+    "Volcanic": 2
+  },
+  "generated": "2026-10-12",
+  "in_scope_by_body": {
+    "Mars": 10,
+    "Moon": 2
+  },
+  "in_scope_features": 12,
+  "in_scope_positive_records": 12,
+  "minimum_e001_input_gate_passed": false,
+  "missing_coordinates": 0,
+  "numeric_field_coverage": [
+    {
+      "count": 12,
+      "field": "access_level"
+    },
+    {
+      "count": 5,
+      "field": "altitude_max_m"
+    },
+    {
+      "count": 2,
+      "field": "altitude_min_m"
+    },
+    {
+      "count": 6,
+      "field": "extent_km2"
+    },
+    {
+      "count": 12,
+      "field": "hazard_rating"
+    },
+    {
+      "count": 3,
+      "field": "ph_max"
+    },
+    {
+      "count": 3,
+      "field": "ph_min"
+    },
+    {
+      "count": 6,
+      "field": "temp_max_c"
+    },
+    {
+      "count": 4,
+      "field": "temp_min_c"
+    }
+  ],
+  "primary_type_counts": {
+    "Geochemical": 1,
+    "Geological / geomorphological": 1,
+    "Habitability / biological": 2,
+    "Impact": 1,
+    "Mineralogical": 3,
+    "Operational (instrument, rover or crew testing)": 2,
+    "Volcanic": 2
+  },
+  "references": {
+    "peer_reviewed": 21,
+    "peer_reviewed_label_support": 20,
+    "total": 68,
+    "unverified": 1
+  },
+  "review_status_counts": {
+    "Draft": 12
+  },
+  "source": {
+    "bytes": 143202,
+    "citation": "Le Cussan, R. (2026). Planetary Analogue Catalogue, v0.1.",
+    "commit": "62e6339bdf308de3bc987388d0faa7130cf57de9",
+    "git_blob_sha1": "156edd871599cf9ac9c083658d14d034f660e35d",
+    "license": "CC BY 4.0",
+    "path": "data/sites.geojson",
+    "repository": "rachellelecussan/planetary-analogue-catalogue"
+  },
+  "target_measurement_field_coverage": [],
+  "target_measurement_fields": [],
+  "total_features": 16,
+  "verified_families_with_two_or_more": [],
+  "verified_positive_family_counts": {},
+  "verified_positive_records": 0
+}
