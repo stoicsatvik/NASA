@@ -58,21 +58,26 @@ def test_summary_rejects_empty_input():
     with pytest.raises(ValueError, match="at least one"):
         summarize_tabs({})
 
+
 class _SinglePixelDataset:
     driver = "GTiff"
     count = 1
     width = 1
     height = 1
-    nodata = None
     crs = pyproj.CRS.from_proj4(
         f"+proj=longlat +a={MOLA_RADIUS_FALLBACK_M} +b={MOLA_RADIUS_FALLBACK_M} +no_defs +type=crs"
     )
+
+    def __init__(self, value=42.0, nodata=None, masked=False):
+        self.value = value
+        self.nodata = nodata
+        self.masked = masked
 
     def index(self, x, y):
         return 0, 0
 
     def read(self, *args, **kwargs):
-        return np.ma.array([[42.0]], mask=False)
+        return np.ma.array([[self.value]], mask=[[self.masked]])
 
 
 def test_2025_masks_are_flattened_to_the_same_observed_point_order_as_2020():
@@ -89,3 +94,25 @@ def test_2025_masks_are_flattened_to_the_same_observed_point_order_as_2020():
     assert inside.tolist() == [True, True]
     assert valid.tolist() == [True, True]
 
+
+@pytest.mark.parametrize(
+    ("dataset", "expected_valid"),
+    [
+        (_SinglePixelDataset(value=42.0, nodata=None), True),
+        (_SinglePixelDataset(value=-9999.0, nodata=-9999.0), False),
+        (_SinglePixelDataset(value=42.0, masked=True), False),
+        (_SinglePixelDataset(value=float("nan")), False),
+    ],
+    ids=["ordinary-finite", "explicit-nodata-sentinel", "masked-pixel", "non-finite-pixel"],
+)
+def test_2025_validity_mask_rejects_nodata_masked_and_nonfinite_samples(dataset, expected_valid):
+    observed = np.asarray([[True]])
+    lat = np.zeros((1, 1), dtype=float)
+    lon = np.zeros((1, 1), dtype=float)
+
+    inside, valid = sample_2025_at_offset(
+        dataset, lat, lon, observed, 0.0, 0.0
+    )
+
+    assert inside.tolist() == [True]
+    assert valid.tolist() == [expected_valid]
