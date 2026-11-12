@@ -4,6 +4,7 @@ import unittest
 from experiments.e598_grand_falls_feb2024_row_semantics import (
     EXPECTED_FILE_NAME,
     EXPECTED_FILE_SIZE,
+    classify_csv_response,
     select_exact_file,
     summarize_payload,
 )
@@ -72,6 +73,20 @@ class E598RowSemanticsTests(unittest.TestCase):
     def test_exact_file_size_gate_precedes_parsing(self):
         with self.assertRaises(ValueError):
             summarize_payload(b"too short")
+
+
+    def test_nonstandard_content_type_requires_exact_csv_header(self):
+        header = ["Date and Time", "Record Number"] + [
+            column for family in CHANNELS.values() for column in family
+        ]
+        payload = (",".join(header) + "\n").encode()
+        self.assertEqual(
+            classify_csv_response("application/octet-stream", payload),
+            "NONSTANDARD_CONTENT_TYPE_BUT_EXACT_CSV_SCHEMA_VALID",
+        )
+
+    def test_html_payload_is_not_admitted_as_csv(self):
+        self.assertIsNone(classify_csv_response("text/html", b"<html><body>not csv</body></html>"))
 
 
 if __name__ == "__main__":
