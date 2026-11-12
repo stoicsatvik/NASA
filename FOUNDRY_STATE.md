@@ -1197,3 +1197,8 @@ Draft report: research/E600_MCMURDO_THERMAL_INERTIA_COMPARABILITY_AUDIT_20261113
 - Decision: reject naive ATI=TIU substitution. Physical TIU is a candidate feature, but Supporting Table S2, sample georeferencing, a matched Mars THEMIS TIU product and non-analogue controls are not yet available in the audited evidence. E001 was not run.
 - The 17 samples are within one known analogue region and must not be treated as 17 independent analogue sites. No site rows or rankings were added.
 - Claim states unchanged: cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN; challenge-selection superiority NOT YET PROVEN.
+
+
+### E600A support-scale result (13 November 2026)
+
+The nominal sample-to-pixel support experiment is recorded in `research/e600a_sample_to_pixel_support_sensitivity.py`. Using the paper's ~500 mL sample and upper-10-cm collection depth as an idealized slab gives 0.005 m² nominal sample area; a 100 m TIRS pixel is 2,000,000× that area and a 30 m OLI pixel is 180,000×. Six deterministic local assertions passed. This is a nominal support diagnostic, not an observed footprint or coordinate join. The [285,694] Earth dry-TIU range overlaps the cited [150,350] Mars sandy/rocky context range over 65 TIU (15.89% of Earth range width), but that range arithmetic is not a distribution or site score. No E001 rows/ranking were added. Direct point-sample ATI/TIU calibration remains REJECTED; cross-body similarity remains NOT YET PROVEN.
