@@ -1,0 +1,42 @@
+name: E587 CTX processing provenance command audit
+
+on:
+  push:
+    branches:
+      - research/e587-ctx-provenance-command-audit-20261112
+    paths:
+      - experiments/e587_ctx_provenance_command_audit.py
+      - tests/test_e587_ctx_provenance_command_audit.py
+      - .github/workflows/e587-ctx-provenance-command-audit.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e587-ctx-provenance-command-audit
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run deterministic E587 tests
+        run: python -m unittest discover -s tests -p "test_e587_ctx_provenance_command_audit.py" -v
+      - name: Acquire bounded provenance for exact E583 item set
+        run: >-
+          python experiments/e587_ctx_provenance_command_audit.py
+          --receipt research/results/E583_CTX_QA_COHORT_SCREEN_20261112.json
+          --out .artifacts/e587/ctx-provenance-command-audit.json
+      - name: Upload aggregate E587 receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e587-ctx-provenance-command-audit
+          path: .artifacts/e587/ctx-provenance-command-audit.json
+          if-no-files-found: warn
+          retention-days: 7
