@@ -4,6 +4,7 @@ import unittest
 from experiments.e594_firms_keyless_modis_viirs_probe import (
     COMMON_FIELDS,
     MAX_BYTES,
+    probe_directory_listing,
     SOURCES,
     summarize_csv_prefix,
     validate_url,
@@ -67,6 +68,33 @@ class E594FirmsProbeTests(unittest.TestCase):
             validate_url(source["url"])
             self.assertTrue(source["url"].startswith("https://firms.modaps.eosdis.nasa.gov/"))
         self.assertEqual(MAX_BYTES, 256 * 1024)
+
+    def test_directory_listing_parser_keeps_only_same_host_paths(self):
+        from unittest.mock import patch
+
+        with patch("experiments.e594_firms_keyless_modis_viirs_probe.urllib.request.build_opener") as build:
+            class Response:
+                status = 200
+                headers = {"Content-Type": "text/html", "Last-Modified": "Thu, 12 Nov 2026 00:00:00 GMT"}
+                def __enter__(self): return self
+                def __exit__(self, *args): return False
+                def read(self, limit):
+                    return b'<a href="viirs-noaa20-1/">N20</a><a href="https://example.com/out.csv">bad</a><a href="../private/">bad</a>'
+
+            class Opener:
+                def open(self, request, timeout):
+                    return Response()
+
+            build.return_value = Opener()
+            result = probe_directory_listing(
+                "https://firms.modaps.eosdis.nasa.gov/data/active_fire/"
+            )
+        self.assertEqual(result["status"], 200)
+        self.assertEqual(
+            result["links"],
+            ["https://firms.modaps.eosdis.nasa.gov/data/active_fire/viirs-noaa20-1/"],
+        )
+
 
 
 if __name__ == "__main__":
