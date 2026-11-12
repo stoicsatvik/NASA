@@ -33,7 +33,7 @@ Raster contract:
 
 ## Sample-window results
 
-The COG and STAC band metadata do **not** explicitly declare a vertical unit: `raster:bands[].unit` is absent and GeoTIFF band units are null. Therefore these values are recorded as raw raster values, not labelled metres.
+The COG and STAC band metadata do **not** explicitly declare a vertical unit: `raster:bands[].unit` is absent and GeoTIFF band units are null. The numeric values below therefore remain recorded as raw raster values, not as a direct metadata assertion of metres.
 
 | Window | Min | P05 | Median | Mean | P95 | Max | SD |
 |---|---:|---:|---:|---:|---:|---:|---:|
@@ -43,15 +43,29 @@ The COG and STAC band metadata do **not** explicitly declare a vertical unit: `r
 | North-mid | -2027.18 | -2021.35 | -2002.91 | -1980.77 | -1872.30 | -1848.70 | 46.45 |
 | South-mid | -2617.66 | -2607.35 | -2553.26 | -2557.73 | -2512.03 | -2475.15 | 28.00 |
 
-No slope was computed because the file's vertical-unit metadata is absent. This is deliberate, not a parser failure.
+No slope was computed in E581. That is deliberate, not a parser failure.
 
-## Source interpretation and next gate
+## Source interpretation and unit boundary
 
-The official USGS CTX DTM documentation says the products contain heights above/below the Mars areoid and are processed through `dem_geoid` after ASP `point2dem`. The ASP documentation states that `point2dem` DEM heights are in metres and describes conversion to the MOLA areoid. This is a potentially sufficient *documented processing-chain inference* for metres, but it is not encoded in this COG's band metadata:
-- https://stac.astrogeology.usgs.gov/docs/data/mars/ctxdtms/
-- https://stereopipeline.readthedocs.io/en/stable/tools/point2dem.html
+The official USGS CTX DTM collection documentation states that these products are generated with Ames Stereo Pipeline, that a 20 m/post DTM is extracted with `point2dem`, and that the DTM is then processed with `dem_geoid` to obtain heights above the equipotential Mars surface (areoid):  
+https://stac.astrogeology.usgs.gov/docs/data/mars/ctxdtms/
 
-Next: record the unit as an explicitly sourced inference, not as TIFF metadata; compute multi-baseline slope summaries (20 m and 200 m) with the unit caveat; inspect the item's QA metrics asset. USGS warns that 20 m posting is not 20 m effective resolution, that typical vertical precision is around 3–5 m, and that short-baseline slope can be highly sensitive to this error. No route-safety claim follows from these five windows.
+The ASP `point2dem` documentation states that `point2dem -r mars` produces elevations in metres relative to the IAU reference spheroid, and that `dem_geoid` converts those heights to the MOLA areoid:  
+https://stereopipeline.readthedocs.io/en/stable/tools/point2dem.html
+
+The ASP `dem_geoid` documentation describes the ellipsoid-to-areoid adjustment and identifies the Mars correction source; its custom correction GeoTIFF is specified in metres:  
+https://stereopipeline.readthedocs.io/en/stable/tools/dem_geoid.html
+
+**Refined conclusion:** the documented collection-level processing chain supports a metre-valued elevation interpretation relative to the Mars areoid. This is stronger than an unsupported guess from raster magnitudes. It is still a **processing-documentation inference**, not a value read from the COG's missing unit field. The exact per-item processing command/provenance has not yet been independently inspected, so the receipt continues to report `vertical_unit: unknown` from file metadata.
+
+The USGS documentation also reports typical vertical precision around 3–5 m and warns that effective resolution is coarser than the 20 m posting. A 20 m adjacent-pixel slope is therefore especially sensitive to stereo noise; even a 200 m baseline needs a stated uncertainty and quality context. No slope or route-safety claim follows from the five sampled windows.
+
+## Next discriminating gate
+
+1. Inspect the item's `qa_metrics` asset and MOLA-control CSV, retaining only bounded summaries and hashes. Determine whether the item exposes useful residual statistics and whether the CSV has the expected control-point schema.
+2. Look for item-specific provenance commands or a pinned processing manifest. If absent, retain the metre label as a collection-level documented inference rather than promoting it to direct metadata.
+3. Only then calculate conditional 20 m and 200 m slope summaries. Label any result as conditional on the documented unit inference, report valid-pair counts and nodata handling, and keep the USGS 3–5 m vertical-precision caveat attached.
+4. Do not infer route traversability from local slope summaries alone.
 
 ## Claim states
 
@@ -59,7 +73,7 @@ Next: record the unit as an explicitly sourced inference, not as TIFF metadata; 
 - Raster/STAC shape and transform agreement: SUPPORTED FOR THIS ITEM.
 - Five valid pixel windows acquired: SUPPORTED.
 - Vertical unit in TIFF/STAC band metadata: NOT REPORTED.
-- Vertical unit in metres from documented ASP/USGS processing chain: CANDIDATE SOURCE-BACKED INFERENCE; not yet applied to slope.
+- Metre-valued elevation relative to areoid from documented collection processing chain: SUPPORTED AS A COLLECTION-LEVEL INFERENCE; item-specific command not independently verified.
 - Slope descriptors: NOT YET MEASURED.
 - QA/control residual assessment: NOT YET MEASURED.
 - Cross-body similarity, E001 known-site recovery, novel analogue discovery, local validation advantage and challenge-selection superiority: unchanged / NOT YET PROVEN.
