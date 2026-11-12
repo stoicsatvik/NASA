@@ -1,0 +1,53 @@
+name: E592 Grand Falls sensor timestamp integrity audit
+
+on:
+  pull_request:
+    branches:
+      - research/e590-grand-falls-2023-2024-access-20261112
+    paths:
+      - experiments/e592_grand_falls_timestamp_audit.py
+      - experiments/test_e592_grand_falls_timestamp_audit.py
+      - research/E592_GRAND_FALLS_TIMESTAMP_AUDIT_20261112.md
+      - research/results/E592_GRAND_FALLS_TIMESTAMP_AUDIT_20261112.json
+      - .github/workflows/e592-grand-falls-timestamp-audit.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e592-grand-falls-timestamp-audit
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run deterministic E592 tests
+        run: python -m unittest experiments.test_e592_grand_falls_timestamp_audit -v
+
+  live_probe:
+    if: github.event_name == 'pull_request'
+    needs: tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run one bounded metadata and CSV-prefix audit
+        if: hashFiles('research/results/E592_GRAND_FALLS_TIMESTAMP_AUDIT_20261112.json') == ''
+        run: python -m experiments.e592_grand_falls_timestamp_audit --out .artifacts/e592/grand-falls-timestamp-audit.json
+      - name: Preserve sanitized aggregate receipt only
+        if: always() && hashFiles('research/results/E592_GRAND_FALLS_TIMESTAMP_AUDIT_20261112.json') == ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: e592-grand-falls-timestamp-audit
+          path: .artifacts/e592/grand-falls-timestamp-audit.json
+          if-no-files-found: ignore
+          retention-days: 7
