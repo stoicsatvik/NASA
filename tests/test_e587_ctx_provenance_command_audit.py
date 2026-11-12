@@ -317,5 +317,11 @@ class E587Tests(unittest.TestCase):
         self.assertNotIn("/work", str(result))
 
 
+    def test_prose_mention_of_pc_align_is_not_a_command(self):
+        self.assertIsNone(
+            parse_command_line("MOLA Spot Observations Used for initial pc_align")
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
