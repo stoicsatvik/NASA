@@ -58,3 +58,11 @@ For a 10 m-scale horizontal residual, acquire a separate control network or inde
 ## Validation
 
 The source-provenance audit is deterministic and does not acquire or sample a raster. Eight standard-library tests cover the CTX-relative interpretation, internal versus independent control, the approximately 100 m MOLA support limitation, conditional challenge ranking, committed receipt equality, and CLI JSON/newline integrity. The dedicated E575 workflow validates the exact branch head and uploads only the aggregate source-audit receipt.
+
+
+### Exact-head Actions result
+
+- First run [#43167610009](https://github.com/stoicsatvik/NASA/actions/runs/43167610009) is preserved: the CLI regression correctly caught a literal backslash-n instead of a real newline.
+- Second run [#43167695733](https://github.com/stoicsatvik/NASA/actions/runs/43167695733) is preserved: all eight tests and CLI generation passed, but bytewise receipt comparison rejected different JSON key ordering.
+- Final exact-head run [#43167818230](https://github.com/stoicsatvik/NASA/actions/runs/43167818230) passed **8/8 tests**, CLI generation, JSON parsing and semantic equality between generated and committed receipts. Aggregate artifact: [#13920647500](https://github.com/stoicsatvik/NASA/actions/runs/43167818230/artifacts/13920647500).
+- The inherited E572 source-audit workflow also passed on the same branch commit: [#43167818221](https://github.com/stoicsatvik/NASA/actions/runs/43167818221).
