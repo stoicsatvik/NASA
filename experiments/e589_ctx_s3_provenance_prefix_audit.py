@@ -193,19 +193,31 @@ def parse_provenance_payload(name: str, payload: bytes) -> dict[str, Any]:
         }
 
     commands: list[dict[str, Any]] = []
+    command_mentions: list[dict[str, Any]] = []
     seen: set[str] = set()
+    seen_mentions: set[str] = set()
     key_paths: list[dict[str, Any]] = []
     node_counts = {"objects": 0, "arrays": 0, "strings": 0}
     max_depth = 0
 
+    def add_summary(summary: dict[str, Any]) -> None:
+        digest = summary["command_line_sha256"]
+        if summary.get("operand_count", 0) >= 2:
+            if digest not in seen:
+                seen.add(digest)
+                commands.append(summary)
+        elif digest not in seen_mentions:
+            seen_mentions.add(digest)
+            command_mentions.append({
+                "tool": summary.get("tool"),
+                "command_line_sha256": digest,
+                "operand_count": summary.get("operand_count", 0),
+            })
+
     def add_line(line: str) -> None:
         summary = _command_summary(line)
-        if summary is None:
-            return
-        digest = summary["command_line_sha256"]
-        if digest not in seen:
-            seen.add(digest)
-            commands.append(summary)
+        if summary is not None:
+            add_summary(summary)
 
     def walk(node: Any, path: str = "$", depth: int = 0, inherited_tool: str | None = None) -> None:
         nonlocal max_depth
@@ -249,10 +261,7 @@ def parse_provenance_payload(name: str, payload: bytes) -> dict[str, Any]:
                         continue
                     if "pc_align" in value.lower() or "geodiff" in value.lower():
                         for parsed in parse_provenance_text(value.encode("utf-8")).get("commands", []):
-                            digest = parsed["command_line_sha256"]
-                            if digest not in seen:
-                                seen.add(digest)
-                                commands.append(parsed)
+                            add_summary(parsed)
                 else:
                     walk(value, child_path, depth + 1, local_tool)
         elif isinstance(node, list):
@@ -263,10 +272,7 @@ def parse_provenance_payload(name: str, payload: bytes) -> dict[str, Any]:
             node_counts["strings"] += 1
             if "pc_align" in node.lower() or "geodiff" in node.lower():
                 for parsed in parse_provenance_text(node.encode("utf-8")).get("commands", []):
-                    digest = parsed["command_line_sha256"]
-                    if digest not in seen:
-                        seen.add(digest)
-                        commands.append(parsed)
+                    add_summary(parsed)
 
     walk(document)
 
@@ -288,9 +294,17 @@ def parse_provenance_payload(name: str, payload: bytes) -> dict[str, Any]:
     collect_tool_records(document)
     property_keys = sorted(str(k) for k in document.get("properties", {})) if isinstance(document, dict) and isinstance(document.get("properties"), dict) else []
     asset_keys = sorted(str(k) for k in document.get("assets", {})) if isinstance(document, dict) and isinstance(document.get("assets"), dict) else []
-    commands.extend(record for record in tool_records if record.get("tool") in {"pc_align", "geodiff"} and record.get("operand_count", 0) >= 2)
+    for record in tool_records:
+        if record.get("tool") in {"pc_align", "geodiff"} and record.get("operand_count", 0) >= 2:
+            commands.append(record)
+    top_keys = set(str(k) for k in document) if isinstance(document, dict) else set()
+    is_stac_item = {"type", "stac_version", "id", "assets", "properties", "links"}.issubset(top_keys)
+    decision = "JSON_PROCESSING_COMMANDS_FOUND" if commands else (
+        "JSON_TOOL_MENTION_WITHOUT_EXECUTABLE_ARGS" if command_mentions else "JSON_WITHOUT_RECOGNIZED_COMMANDS"
+    )
     return {
-        "decision": "JSON_PROCESSING_COMMANDS_FOUND" if commands else "JSON_WITHOUT_RECOGNIZED_COMMANDS",
+        "decision": decision,
+        "document_kind": "STAC_ITEM_JSON" if is_stac_item else "JSON_OTHER",
         "json_sha256": hashlib.sha256(payload).hexdigest(),
         "top_level_keys": sorted(str(k) for k in document)[:120] if isinstance(document, dict) else [],
         "property_keys": property_keys[:160],
@@ -301,6 +315,8 @@ def parse_provenance_payload(name: str, payload: bytes) -> dict[str, Any]:
         "command_like_key_paths": key_paths[:120],
         "tool_records": tool_records[:40],
         "command_count": len(commands),
+        "command_mentions_count": len(command_mentions),
+        "command_mentions": command_mentions[:40],
         "commands": commands[:40],
         "raw_json_stored": False,
     }
@@ -388,8 +404,14 @@ def audit() -> dict[str, Any]:
     has_pc_align = any(c.get("tool") == "pc_align" and c.get("operand_count", 0) >= 2 for c in commands)
     if has_geodiff and has_pc_align:
         receipt["decision"] = "ITEM_COMMAND_ORDER_RECOVERED_FROM_S3_SIDECAR"
+    elif any(asset.get("summary", {}).get("document_kind") == "STAC_ITEM_JSON" for asset in receipt["provenance_assets"]):
+        receipt["decision"] = "STAC_METADATA_JSON_MIRROR_NOT_PROCESSING_PROVENANCE"
+    elif any(asset.get("summary", {}).get("command_count", 0) for asset in receipt["provenance_assets"]):
+        receipt["decision"] = "PROVENANCE_SIDECAR_PRESENT_PARTIAL_COMMAND_EVIDENCE"
+    elif any(asset.get("summary", {}).get("command_mentions_count", 0) for asset in receipt["provenance_assets"]):
+        receipt["decision"] = "PROVENANCE_SIDECAR_TOOL_MENTION_ONLY"
     elif receipt["provenance_assets"]:
-        receipt["decision"] = "PROVENANCE_SIDECAR_FOUND_COMMANDS_PARTIAL_OR_UNREADABLE"
+        receipt["decision"] = "SIDECAR_PRESENT_WITHOUT_EXECUTABLE_COMMANDS"
     else:
         receipt["decision"] = "PROVENANCE_OBJECT_FOUND_NOT_FETCHED"
     return receipt
