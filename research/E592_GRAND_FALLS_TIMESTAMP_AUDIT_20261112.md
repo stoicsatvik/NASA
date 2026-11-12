@@ -71,3 +71,24 @@ E590's existing receipt remains unchanged and its original negative/uncertain st
 ## Next gate
 
 Only if the parsed prefix has a stable timestamp sequence should a later experiment examine temporal covariation among wind and wBSNE voltage channels. That would still require calibration and instrument documentation before any sediment-mass or flux interpretation. No full CSV download and no E001 feature admission are authorized by this experiment.
+
+
+## E592 exact-head result — 12 November 2026
+
+- Exact PR head at live acquisition: d95e6d79519938203813158ae066faefb69e3841; workflow [#43256647630](https://github.com/stoicsatvik/NASA/actions/runs/43256647630) completed successfully. Deterministic tests: **11/11 passed**. Aggregate artifact [#13962385226](https://github.com/stoicsatvik/NASA/actions/runs/43256647630/artifacts/13962385226), ZIP SHA-256 c2caa4adce531aa0371d158bc9fc3ba28ae521d6d9cae6a775a278cab5dedbe0.
+- Exact catalog item/filename/size matched. Metadata GET: HTTP 200. Bounded CSV GET: HTTP 200, text/csv, Content-Length 67,050,032; exactly 5,000,000 bytes read. No full file was downloaded.
+- Both the 5 MB prefix SHA-256 and the complete-line SHA-256 exactly match E590's original receipt. No source/prefix drift was observed.
+- All **85,145/85,145** timestamps parsed using MM/DD/YYYY HH:MM. The corrected chronological range is **2023-07-07 09:25 through 2023-07-17 05:56**, interpreted as naive wall-clock values because the column does not encode a timezone.
+- There are **85,144 adjacent row intervals**: **70,953 are zero seconds** and **14,191 are exactly 60 seconds**. No negative intervals, no invalid timestamps, and no positive gaps over 60 seconds were observed.
+- The file therefore has nondecreasing timestamps with extensive duplicates, not one unique row per minute. There are 14,192 distinct timestamp values, all repeated, with approximately six rows per timestamp on average. The 60-second fraction across adjacent rows is 16.667%; among positive intervals, every interval is exactly 60 seconds.
+- This is compatible with minute-spaced timestamp groups, but not evidence that each row is a one-minute record or that the raw sensor stream was sampled at 1 Hz. The reason for the repeated rows is NOT YET ESTABLISHED; multiple sensor/instrument records, aggregation structure or another source convention must be checked rather than guessed.
+- The E590 lexicographic extrema are superseded for chronological interpretation by the parsed bounds above. E590's original receipt remains unchanged as historical evidence.
+- Durable aggregate receipt: research/results/E592_GRAND_FALLS_TIMESTAMP_AUDIT_20261112.json. It contains no raw rows, sensor values, raw timestamp strings, URLs, signed query values or coordinates.
+
+### Interpretation and next experiment
+
+- Timestamp parseability and row-order monotonicity in this bounded prefix: **SUPPORTED**.
+- One-minute transitions between distinct timestamp groups: **MEASURED**.
+- One-row-per-minute cadence: **NOT SUPPORTED**.
+- Raw 1 Hz acquisition, averaging algorithm, timezone, calibration and wBSNE mass conversion: **NOT YET ESTABLISHED**.
+- Next highest-information action: audit Record Number progression and per-timestamp group sizes/channel values using the same bounded prefix, then reconcile the row semantics against the source data dictionary. Do not calculate wind/wBSNE temporal covariation or sediment flux until the repeated-row structure and instrument calibration are understood.
