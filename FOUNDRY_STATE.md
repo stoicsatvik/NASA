@@ -3,7 +3,7 @@
 Updated: 2026-11-12
 Class: Tier A
 Time horizon: NASA Space Apps Challenge, 14–15 Nov 2026
-Working branch: `research/e585-ctx-bbox-overlap-audit-20261112`
+Working branch: `research/e586-ctx-footprint-geometry-audit-20261112`
 Main objective: maximize uncertainty eliminated per run and converge on a scientifically defensible Space Apps entry.
 
 ## Current thesis
@@ -1037,3 +1037,17 @@ Next gate: resolve item-specific `geodiff` order/control provenance; then inspec
 - Exact-head Actions [#43222673590](https://github.com/stoicsatvik/NASA/actions/runs/43222673590) passed 7/7 deterministic tests and recomputed the committed E585 result with a structural match to the E583 receipt. The first recomputation exposed a P05 item-ID transcription mismatch; the expected receipt was corrected against E583 and earlier failures remain preserved. No new live source access is performed.
 - Next: retrieve the nine STAC geometries and compute polygon/AOI intersections; establish whether QA assets summarize full products or AOI-clipped support; keep initial pc-align controls separate from held-out validation.
 - Claim states unchanged: absolute accuracy NOT YET MEASURED; independent validation NOT YET MEASURED; route safety NOT YET PROVEN; E001 known-site recovery NOT YET MEASURED; cross-body similarity, novel analogue discovery, local validation advantage and challenge-selection superiority NOT YET PROVEN.
+
+
+## E586 — actual Jezero CTX footprint geometry audit (12 November 2026)
+
+- E586 is isolated on `research/e586-ctx-footprint-geometry-audit-20261112`, stacked on E585 / PR #147. No main-branch write or merge.
+- Repeated one anonymous USGS Astrogeology STAC POST for collection `mro_ctx_controlled_usgs_dtms`, Jezero bbox [76.69, 17.41, 78.69, 19.41], limit 9. HTTP 200; 90,433-byte response; exact nine E583 item IDs matched. Response SHA-256: `0298b4ef52fe96ad0595657c364da321d81a56e299d9e1a1fe8d22132aa475c5`.
+- All nine geometries were valid Polygon features; zero invalid items and zero geometry/bbox bound differences. Raw geometries were hashed and discarded. No raw item JSON, coordinates, QA text, signed query values or credentials were stored.
+- Actual footprint/AOI area fractions: six items are >=99% inside the AOI; three are partial. N09 is 0.505837% inside versus 3.5634% from its bbox; N15 is 47.814014% versus 48.0276%; P05 is only 0.043425% versus 12.279%. The P05 bbox therefore overstates its actual footprint fraction by about 282.8x. E585's count of six contained / three partial is unchanged, but bbox fractions were materially misleading for P05 and N09.
+- Actual footprint overlap is 22/36 pairs, with 10/36 IoU >=0.1 and maximum IoU 0.747534. Within the six >=99%-contained items, 14/15 pairs still intersect and 7/15 have IoU >=0.1. This is less overlap than the bbox audit (28/36; 14/36 IoU >=0.1), but still not an independent sample.
+- The contained six retain median item QA mean +26.17935 m and median item QA median +25.2618 m. All nine STAC QA assets are titled "ASP Generated Quality Assurance Metrics" and typed text/plain. Their AOI-clipped spatial support remains NOT ESTABLISHED; footprint geometry cannot prove QA summary clipping.
+- Area ratios use a spherical cylindrical equal-area approximation with Mars 2015 semi-major radius 3,396,190 m. The CRS reference records Mars 2015 ocentric ellipsoid parameters; the approximation is explicit and not a terrain measurement. Source: https://voparis-vespa-crs.obspm.fr/web/mars.html . USGS API/tutorial: https://stac.astrogeology.usgs.gov/docs/reference/api/ and https://stac.astrogeology.usgs.gov/docs/tutorials/mosaic_json/ .
+- Exact-head workflow [#43225029602](https://github.com/stoicsatvik/NASA/actions/runs/43225029602) passed 10/10 deterministic tests and completed the bounded live acquisition. Aggregate artifact [#13947177574](https://github.com/stoicsatvik/NASA/actions/runs/43225029602/artifacts/13947177574); durable aggregate receipt: `research/results/E586_CTX_FOOTPRINT_GEOMETRY_AUDIT_20261112.json`.
+- This improves footprint and sampling-dependence understanding only. It does not establish QA spatial support, independent accuracy, route safety, E001 recovery, cross-body similarity, novel analogue discovery, local validation advantage or challenge-selection superiority. All scientific claim states remain unchanged.
+- Next decisive gate: resolve the CTX–MOLA `geodiff` input order and initial pc-align control lineage from public processing documentation/metadata, or identify a genuinely independent control set. Do not treat the nine QA products as AOI-clipped or independent validation.
