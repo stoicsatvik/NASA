@@ -78,12 +78,16 @@ This leaves the exact \`geodiff\` input order unresolved. The public ASP documen
 - The COG/STAC band unit remains unreported. Collection-level ASP/USGS documentation supports a metre-valued areoid interpretation, but the item's exact processing command remains unverified.
 - No raw item JSON, QA text, CSV rows, individual coordinates, credentials or signed query values were stored.
 
-## Next discriminating gate
+## Companion sensitivity and next discriminating gate
 
-1. Inspect the intersection-error raster and co-registered orthoimage for spatially coherent stereo artifacts; keep this distinct from independent validation.
+The parallel E582-S companion report on [PR #142](https://github.com/stoicsatvik/NASA/pull/142) computes the documented 3–5 m vertical-error envelope: a 20 m slope is rejected as a robust primary descriptor (8.53–14.04° apparent error), while 200 m remains a candidate (0.86–1.43°) and is not yet validated. This is a source-backed sensitivity calculation, not a slope measurement from this raster.
+
+The next gate is the bounded multi-item Jezero QA screen on [E583 PR #145](https://github.com/stoicsatvik/NASA/pull/145), which tests whether the E580 residual is unusual before more terrain analysis. After that:
+
+1. Inspect intersection-error rasters and co-registered orthoimages only for candidate items with defensible QA residuals; keep this distinct from independent validation.
 2. Seek an item-specific processing manifest from the USGS release or a source-controlled pipeline record. Do not guess the \`geodiff\` input order.
 3. Do not use the MOLA control points as held-out validation. A separate independent reference is required for that claim.
-4. If slope summaries are computed, label the unit basis as a collection-level processing-documentation inference, report valid-pair counts and preserve the USGS 3–5 m typical vertical-precision and coarser-effective-resolution caveats.
+4. If slope summaries are later computed, use 200 m or longer candidate baselines, label the unit basis as a collection-level processing-documentation inference, report valid-pair counts and preserve the USGS 3–5 m typical vertical-precision and coarser-effective-resolution caveats.
 
 ## Claim states
 
