@@ -1002,3 +1002,12 @@ Claim states remain unchanged: repo operating system SUPPORTED; cross-body simil
 - Parallel companion: E582 slope-error sensitivity is recorded on PR #142 / branch `research/e582-ctx-slope-error-envelope-20261112`; 20 m primary slope rejected under the 3–5 m error envelope, 200 m remains a candidate only.
 - Next: E583 compare QA residuals across several additional Jezero CTX items before further raster-slope work. If no item passes, pivot to a better-controlled product. Full report: `research/E582_CTX_QA_MOLA_AUDIT_20261112.md`.
 - Claim states remain exact: repo operating system SUPPORTED; cross-body similarity NOT YET PROVEN; E001 known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN; challenge-selection superiority NOT YET PROVEN.
+
+
+## E583 — multi-item Jezero CTX QA screen (12 November 2026)
+
+- Branch `research/e583-jezero-ctx-qa-multi-item-screen-20261112`, draft PR stacked on E582 QA/MOLA audit PR #143. The experiment queries the first ten CTX items returned for the frozen Jezero bbox and separately re-includes the pinned E581 item if absent, then fetches only each item's bounded `qa_metrics` asset.
+- It preserves item IDs, acquisition times, metric summaries, hashes and redacted URL summaries only. No raw item JSON, QA text, raster, MOLA rows or coordinates are retained.
+- Deterministic parser tests and one bounded live acquisition are required before interpreting any result. The first-ten result is a screening sample, not an exhaustive or random sample of the collection.
+- Purpose: determine whether E582's +27 m mean/median residual is item-specific or common across the first returned Jezero CTX items. Do not treat a lower residual as ground-truth validation; it is only a quality screen.
+- Next: if a candidate item has small residuals, inspect its QA provenance, vertical-unit chain and raster support before slope analysis. If all items show large residuals, pivot away from this CTX collection for absolute terrain scoring.

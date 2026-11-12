@@ -1,0 +1,40 @@
+name: E583 Jezero CTX multi-item QA screen
+
+on:
+  pull_request:
+    branches:
+      - research/e582-ctx-qa-mola-control-audit-20261112
+    types: [opened, synchronize]
+    paths:
+      - experiments/e583_jezero_ctx_qa_screen.py
+      - tests/test_e583_jezero_ctx_qa_screen.py
+      - .github/workflows/e583-jezero-ctx-qa-screen.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e583-jezero-ctx-qa-screen
+  cancel-in-progress: true
+
+jobs:
+  e583:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run deterministic multi-item parser tests
+        run: python -m unittest discover -s tests -p "test_e583_jezero_ctx_qa_screen.py" -v
+      - name: Screen first ten Jezero CTX items and pinned baseline
+        run: python experiments/e583_jezero_ctx_qa_screen.py --out .artifacts/e583/jezero-ctx-qa-screen.json
+      - name: Upload aggregate QA receipt only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e583-jezero-ctx-qa-screen
+          path: .artifacts/e583/jezero-ctx-qa-screen.json
+          if-no-files-found: ignore
+          retention-days: 7
