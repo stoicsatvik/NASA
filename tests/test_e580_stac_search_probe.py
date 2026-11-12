@@ -106,7 +106,7 @@ class E580Tests(unittest.TestCase):
         self.assertTrue(result["range_verified"])
         self.assertEqual(result["status"], 206)
         self.assertEqual(result["bytes_read"], MAX_RANGE_BYTES)
-        self.assertNotIn("query_values_stored", result["url"])
+        self.assertFalse(result["url"]["query_values_stored"])
 
     def test_receipt_summary_is_null_safe_and_never_claims_pixels(self):
         summary = summarize_receipt({"experiment": "E580", "decision": "ACQUISITION_ERROR"})
