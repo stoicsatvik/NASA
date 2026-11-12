@@ -1,0 +1,47 @@
+name: E572 independent analogue catalogue audit
+on:
+  pull_request:
+    paths:
+      - experiments/e572_analogue_catalogue_admissibility.py
+      - experiments/test_e572_analogue_catalogue_admissibility.py
+      - research/E572_ANALOGUE_CATALOGUE_ADMISSIBILITY_20261112.md
+      - research/results/E572_ANALOGUE_CATALOGUE_ADMISSIBILITY_20261112.json
+      - .github/workflows/e572-analogue-catalogue-audit.yml
+      - FOUNDRY_STATE.md
+      - docs/CHALLENGE_SCORECARD.md
+      - research/CHALLENGE_SELECTION_SCREEN_20261111.md
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run deterministic offline fixtures
+        run: python -m unittest experiments.test_e572_analogue_catalogue_admissibility -v
+      - name: Fetch and audit pinned public source
+        run: python -m experiments.e572_analogue_catalogue_admissibility --download --output /tmp/e572.json
+      - name: Verify exact committed aggregate receipt
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          actual = json.loads(Path('/tmp/e572.json').read_text())
+          expected = json.loads(Path('research/results/E572_ANALOGUE_CATALOGUE_ADMISSIBILITY_20261112.json').read_text())
+          assert actual == expected, 'Live pinned-source receipt differs from committed aggregate'
+          print('Pinned source and committed aggregate match exactly.')
+          print('E001 minimum gate:', actual['minimum_e001_input_gate_passed'])
+          PY
+      - name: Upload aggregate receipt only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e572-analogue-catalogue-aggregate
+          path: /tmp/e572.json
+          if-no-files-found: ignore
+          retention-days: 14
