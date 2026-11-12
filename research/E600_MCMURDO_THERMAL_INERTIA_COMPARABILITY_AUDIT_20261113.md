@@ -85,3 +85,16 @@ This is a candidate data source, not a blocker or a discovery. No fieldwork, des
 - No raw sample table, raster or new field measurement was downloaded.
 - No code, CI, benchmark or E001 ranking was run.
 - No specimen/site rows were added to the production dataset.
+
+
+## E600A — nominal sample-to-pixel support sensitivity (13 November 2026)
+
+A deterministic scale audit was added in `research/e600a_sample_to_pixel_support_sensitivity.py` and executed locally: **6/6 assertions passed**.
+
+Inputs are the paper's approximately 500 mL soil sample, collected from the upper 10 cm, and its Landsat 8 resolutions: OLI 30 m/pixel and TIRS 100 m/pixel. Under an explicitly idealized assumption that the entire 500 mL sample represents a uniform 0.10 m-thick slab, the nominal equivalent sample area is **0.005 m²** (about a 7.07 cm square). A 100 m TIRS pixel covers **10,000 m²**, or **2,000,000×** that nominal area; a 30 m OLI pixel covers **900 m²**, or **180,000×**. This is an order-of-magnitude support diagnostic, not the measured sample footprint: the paper does not provide a precise sample geometry, and no coordinate join was made.
+
+A separate range-only arithmetic check finds the intersection of the reported Earth dry TIU range [285, 694] with the cited Mars sandy/rocky range [150, 350] is [285, 350], a 65-TIU overlap or **15.89%** of the Earth dry-range width. This is not a distributional overlap, site match, or analogue score; the Mars bands are literature context cited by the same article, not an independent validation dataset.
+
+**Decision:** the nominal support mismatch is extremely large and reinforces rejection of point-sample ATI/TIU calibration without area-representative field sampling and contemporaneous moisture. It does not prove that the MDV is a poor analogue; it proves this specific point-to-pixel comparison is not E001-ready. No sample rows, rankings, E001 result, or cross-body similarity claim were added.
+
+Next: retrieve Supporting Table S2 and determine whether coordinates and sample IDs can be verified. If they cannot, do not digitize approximate points as exact coordinates; seek a separate area-representative Earth thermal dataset and matched Mars THEMIS physical TIU.
