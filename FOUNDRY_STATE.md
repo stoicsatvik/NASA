@@ -3,7 +3,7 @@
 Updated: 2026-11-12
 Class: Tier A
 Time horizon: NASA Space Apps Challenge, 14–15 Nov 2026
-Working branch: `research/e568-2025-hirise-dtm-observed-point-support-20261112`
+Working branch: `research/e570-lola-gdr-window-20261112` (stacked on E569 → E568)
 Main objective: maximize uncertainty eliminated per run and converge on a scientifically defensible Space Apps entry.
 
 ## Current thesis
@@ -788,3 +788,16 @@ The highest-value next gate is to decompress only the 65.3 MB FOM_Confidence mem
 - The 2020 TIFF reader emitted a non-fatal tifffile warning while parsing the GDAL_NODATA tag; the experiment's own nodata resolver read the tag and completed. Treat the warning as a parser warning, not as proof of a data error. A separate explicit nodata-sentinel encoding audit remains a possible hardening step.
 - Claim boundary: paired point support is MEASURED for this frozen 346-point window; area coverage, vertical datum equivalence, elevation accuracy, independent horizontal registration, route safety, cross-body similarity, known-site recovery and novel analogue discovery remain NOT YET PROVEN/MEASURED or NOT CLAIMED.
 
+
+## E570 bounded LOLA GDR sample and seam audit (12 November 2026)
+
+- Draft PR #129 on `research/e570-lola-gdr-window-20261112`, stacked on E569. Main remains unchanged.
+- Pinned official PDS3 `LRO-L-LOLA-4-GDR-V1.0 / LDEM_16_FLOAT`. The label declares 2,880 × 5,760 pixel-registered simple cylindrical grid, 16 px/degree, 1.89521 km/pixel at equator, 32-bit PC_REAL, km, scaling 1, 1,737.4 km reference sphere, and `MEAN EARTH/POLAR AXIS OF DE421` coordinates. Label SHA-256 `b39b1e1ec3d7dbd0ec451f1d4df0304ab383f6ebbc52601b8bf819e0a8d5111a`.
+- Exact-head code/test commit `3625a95acf4df69a5d1ccb0181790d6939c16327`; Actions [#43133147310](https://github.com/stoicsatvik/NASA/actions/runs/43133147310) passed **19/19 deterministic tests** and completed three bounded live 11×11 acquisitions. Compact receipt artifact [#13905583586](https://github.com/stoicsatvik/NASA/actions/runs/43133147310/artifacts/13905583586).
+- Transport: 3 exact HTTP Range requests, 691,332 range bytes + 5,139 label bytes = **696,471 total body bytes** under the 1,000,000-byte cap. Full 66,355,200-byte IMG not downloaded; raw pixels not retained. Range responses now use streamed reads, validate HTTP 206 and exact Content-Range before reading body bytes, and stop at the requested byte cap.
+- Metadata guard pins projection center/offsets/rotation, first/last pixel, geographic extent, coordinate system, dimensions, sample type/units/scaling and reference sphere. The label declares no MISSING_CONSTANT/MISSING_VALUE; the code fails closed if one appears until its semantics are decoded.
+- Windows A/B/C have 121 finite samples each and no non-finite values. Their p95–p05 reference-sphere-relative height ranges are 179.60 m, 418.61 m and 1,662.64 m; median gradient proxies 0.210°, 0.765° and 5.138° respectively.
+- **Critical caveat:** the PDS label says the grid was produced in 45° latitude bands and warns of possible edge artifacts at those boundaries. Window C is centered at −45° and spans −45.3125° to −44.6875°; the receipt now flags it as crossing the −45° seam. Do not interpret its high relief/gradient as natural terrain roughness. This is a plausible confound, not proof that the seam caused the values.
+- The PDS label defines HEIGHT = DN × SCALING_FACTOR, PLANETARY_RADIUS = HEIGHT + OFFSET, and topography = PLANETARY_RADIUS − GEOID_RADIUS. No geoid correction was applied; these are reference-sphere-relative height diagnostics, not geoid-corrected elevation or cross-body features.
+- Claim state: bounded LOLA sample ingestion SUPPORTED for this pinned product/window; seam-free morphology NOT YET ESTABLISHED; geoid-corrected topography, cross-body similarity, known-site recovery and novel analogue discovery NOT YET PROVEN.
+- **Next:** E571 seam-sensitivity diagnostic using same-longitude windows at −44.5° and −45.5° against the existing −45° seam-crossing baseline. Retain row-level aggregates only; preserve null results. Then consider a separately bounded Diviner or Mars MOLA sample with independent unit/temporal/footprint semantics.
