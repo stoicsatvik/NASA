@@ -5,10 +5,15 @@ import pytest
 from experiments.e573_2025_hirise_translation_envelope import (
     INNER_RADIUS_M,
     OUTER_RADIUS_M,
+    MAX_2020_RANGE_BYTES,
     OFFSETS_M,
     offset_key,
     summarize_tabs,
 )
+
+
+def test_2020_range_budget_is_explicitly_bounded():
+    assert MAX_2020_RANGE_BYTES == 16 * 1024 * 1024
 
 
 def test_translation_grid_is_unique_and_within_published_radial_envelope():
