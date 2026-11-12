@@ -40,6 +40,7 @@ jobs:
       - name: Run deterministic row/group tests
         run: python -m unittest experiments.test_e597_grand_falls_row_group_semantics -v
       - name: Fetch exact pinned 5 MB source prefix and audit row groups
+        if: hashFiles('research/results/E597_GRAND_FALLS_ROW_GROUP_SEMANTICS_20261112.json') == ''
         run: python -m experiments.e597_grand_falls_row_group_semantics --out .artifacts/e597/receipt.json
       - name: Validate aggregate receipt
         run: python -m json.tool .artifacts/e597/receipt.json > /dev/null
