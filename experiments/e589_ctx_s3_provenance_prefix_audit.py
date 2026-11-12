@@ -23,7 +23,7 @@ from experiments.e588_ctx_production_api_provenance_audit import (  # noqa: E402
     fetch_bounded,
     safe_url_summary,
 )
-from experiments.e587_ctx_processing_provenance_audit import parse_provenance_text  # noqa: E402
+from experiments.e587_ctx_processing_provenance_audit import _command_summary, parse_provenance_text  # noqa: E402
 
 BUCKET_URL = "https://astrogeo-ard.s3-us-west-2.amazonaws.com/"
 ITEM_PREFIX = f"mars/mro/ctx/controlled/usgs/{ITEM_ID}/"
