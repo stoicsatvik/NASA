@@ -140,8 +140,8 @@ class E589Tests(unittest.TestCase):
         result = parse_provenance_payload("item.json", json.dumps(payload).encode("utf-8"))
         self.assertEqual(result["document_kind"], "STAC_ITEM_JSON")
         self.assertEqual(result["command_count"], 0)
-        self.assertGreaterEqual(result["command_mentions_count"], 1)
-        self.assertEqual(result["decision"], "JSON_TOOL_MENTION_WITHOUT_EXECUTABLE_ARGS")
+        self.assertEqual(result["command_mentions_count"], 0)
+        self.assertEqual(result["decision"], "JSON_WITHOUT_RECOGNIZED_COMMANDS")
 
     def test_receipt_summary_contains_no_raw_keys_or_credentials(self):
         summary = summarize_receipt({
