@@ -8,6 +8,7 @@ import pytest
 from experiments.e570_lola_gdr_sample import (
     describe_window,
     extract_window_rows,
+    latitude_band_diagnostic,
     parse_label,
     pixel_index,
     read_bounded_range_response,
@@ -204,3 +205,16 @@ def test_projection_rotation_and_extent_are_pinned():
     fields = parse_label(label)
     with pytest.raises(ValueError, match="map_projection_rotation_deg"):
         validate_label(fields)
+
+
+def test_lola_window_on_minus_45_degree_seam_is_explicitly_flagged():
+    result = latitude_band_diagnostic(-45.0, 16.0, 11)
+    assert result["window_latitude_bounds_deg"] == pytest.approx([-45.3125, -44.6875])
+    assert result["documented_band_boundaries_crossed_deg"] == [-45.0]
+    assert result["crosses_documented_45_degree_band_boundary"] is True
+
+
+def test_lola_window_away_from_45_degree_seams_is_not_flagged():
+    result = latitude_band_diagnostic(32.8, 16.0, 11)
+    assert result["documented_band_boundaries_crossed_deg"] == []
+    assert result["crosses_documented_45_degree_band_boundary"] is False
