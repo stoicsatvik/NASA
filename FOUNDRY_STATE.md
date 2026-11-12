@@ -1131,3 +1131,25 @@ Next gate: resolve item-specific `geodiff` order/control provenance; then inspec
 - 14,192 distinct timestamp values are all repeated, approximately six rows per timestamp on average. The file is nondecreasing with duplicates; it is not one row per minute. The E590 lexicographic extrema are superseded for chronological interpretation, while the original E590 receipt remains unchanged.
 - Supported: timestamp parsing and minute-spaced transitions between distinct timestamp groups in this prefix. Not established: row semantics, raw 1 Hz acquisition, averaging algorithm, timezone, calibration, wBSNE mass conversion, sediment flux or E001 admissibility.
 - Next experiment: aggregate Record Number progression and per-timestamp group sizes/channel patterns from the same bounded prefix; reconcile against the source data dictionary before any temporal covariation analysis.
+
+## E597 — bounded Grand Falls row-group and sensor-channel semantics (12 November 2026)
+
+Follow-up to E592's exact 5 MB CSV prefix and E595's parsed source dictionary. E595 establishes that `Record_Number` is a sequential row identifier, not a sensor identifier; the CSV has three wind-speed, three particle-count, three uncalibrated kinetic-energy and three wBSNE voltage columns. E597 re-reads only the exact E590/E592 5,000,000-byte prefix, verifies both pinned prefix hashes, and measures row-ID progression, timestamp-group sizes, per-row channel completeness and within-group channel-vector uniqueness.
+
+The audit stores no CSV rows, timestamps, record IDs, coordinates or channel values. It retains only aggregate counts, distributions and the two prefix hashes.
+
+**Live result:** workflow [43267508332](https://github.com/stoicsatvik/NASA/actions/runs/43267508332) passed 4/4 deterministic tests and the exact bounded source audit. The metadata SHA, 5 MB prefix SHA and complete-line SHA matched E590/E592. The sample contains 85,145 complete rows and 14,192 timestamp groups; group sizes are 6 rows for 14,190 groups, 3 rows for one group, and 2 rows for one group. Record_Number is unique and strictly sequential across the 85,145 rows (85,144 unit steps; no gaps, resets or duplicates).
+
+All 12 channel columns are present and numeric in every row. The within-timestamp channel-vector uniqueness distribution is: 1 unique vector in 10,480 groups; 2 in 2,902; 3 in 614; 4 in 176; 5 in 18; and 6 in 2. Thus 14,190/14,192 groups contain repeated complete channel vectors; 66,213 of 85,145 row slots are repeats beyond the first unique vector within each timestamp group (77.76%). Only two groups contain six distinct vectors. This strongly falsifies the naive interpretation that six rows per timestamp represent six distinct sensor channels. It does not identify whether the repeats are export duplication, repeated full records or another acquisition/export behavior.
+
+No channel is missing in the prefix. Particle-count maxima are 48, 28 and 15, with zero values at the documented 7,999 saturation limit. Wind-speed fields are in mph at 20 cm, 60 cm and 1 m; particle-count fields are one-minute counts at about 12 cm; kinetic-energy fields are uncalibrated instrument units; wBSNE fields are mV/V and are not a sediment-mass conversion. The wBSNE #3 height remains “XX cm”. Timestamps are parsed as naive wall-clock values; no timezone is encoded.
+
+**Claim states:** observed row-ID progression and timestamp-group structure MEASURED; repeated-row mechanism NOT YET PROVEN; sensor synchronization, calibration and sediment mass conversion NOT YET PROVEN; E001 known-site recovery NOT YET MEASURED; cross-body similarity NOT YET PROVEN. E597 is one Earth-site data-integrity/semantics experiment, not an E001 recovery result.
+
+
+### E597 exact-head validation reconciliation
+
+- Corrected the durable E597 receipt to the exact E595 catalog metadata SHA-256 and exact aggregate values from artifact 13966637360. Earlier manually transcribed channel statistics were not source-of-truth and have been replaced with the workflow artifact values.
+- Preserved failed workflow runs #43267066778 (missing pure row-summary helper) and #43267342440 (one assertion referenced the wrong nested aggregate key); neither reached live source acquisition. Exact-head run #43267508332 passed 4/4 tests and completed the one bounded 5 MB audit.
+- The E597 workflow now skips the live source request whenever the exact aggregate receipt is already committed. Future documentation/PR events rerun deterministic tests without re-reading the same 5 MB source prefix.
+- Next: E598 compares the distinct 1,091,813-byte February 2024 CSV entity to determine whether the six-row/repeated-vector pattern recurs in another release. No deduplication or wind/particle correlation is authorized before that comparison.

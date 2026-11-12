@@ -1,0 +1,58 @@
+name: E597 Grand Falls row-group and sensor-channel semantics
+
+on:
+  push:
+    branches:
+      - research/e597-grand-falls-row-group-semantics-20261112
+    paths:
+      - FOUNDRY_STATE.md
+      - experiments/e597_grand_falls_row_group_semantics.py
+      - experiments/test_e597_grand_falls_row_group_semantics.py
+      - .github/workflows/e597-grand-falls-row-group-semantics.yml
+  pull_request:
+    branches:
+      - research/e595-grand-falls-sensor-dictionary-20261112
+    paths:
+      - FOUNDRY_STATE.md
+      - experiments/e597_grand_falls_row_group_semantics.py
+      - experiments/test_e597_grand_falls_row_group_semantics.py
+      - research/E597_GRAND_FALLS_ROW_GROUP_SEMANTICS_20261112.md
+      - research/results/E597_GRAND_FALLS_ROW_GROUP_SEMANTICS_20261112.json
+      - .github/workflows/e597-grand-falls-row-group-semantics.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e597-grand-falls-row-group-semantics
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run deterministic row/group tests
+        run: python -m unittest experiments.test_e597_grand_falls_row_group_semantics -v
+      - name: Fetch exact pinned 5 MB source prefix and audit row groups
+        if: hashFiles('research/results/E597_GRAND_FALLS_ROW_GROUP_SEMANTICS_20261112.json') == ''
+        run: python -m experiments.e597_grand_falls_row_group_semantics --out .artifacts/e597/receipt.json
+      - name: Validate fresh aggregate receipt
+        if: hashFiles('research/results/E597_GRAND_FALLS_ROW_GROUP_SEMANTICS_20261112.json') == ''
+        run: python -m json.tool .artifacts/e597/receipt.json > /dev/null
+      - name: Validate committed aggregate receipt
+        if: hashFiles('research/results/E597_GRAND_FALLS_ROW_GROUP_SEMANTICS_20261112.json') != ''
+        run: python -m json.tool research/results/E597_GRAND_FALLS_ROW_GROUP_SEMANTICS_20261112.json > /dev/null
+      - name: Upload aggregate-only result
+        if: always() && hashFiles('research/results/E597_GRAND_FALLS_ROW_GROUP_SEMANTICS_20261112.json') == ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: e597-grand-falls-row-group-semantics
+          path: .artifacts/e597/receipt.json
+          if-no-files-found: ignore
+          retention-days: 7
