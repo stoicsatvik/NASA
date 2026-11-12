@@ -82,3 +82,21 @@ These definitions explain intended columns but do not prove the CSV's repeated t
 ## Next experiment after corrected receipt
 
 E596 should re-fetch only the same bounded 5 MB CSV prefix and retain aggregate checks only: Record_Number monotonicity/gaps/resets; timestamp-group size distribution; per-row non-null counts by wind, particle-count, kinetic-energy and wBSNE channel families; and whether each repeated timestamp group contains distinct sequential row IDs. No row values, coordinates or raw CSV are to be retained. The result may distinguish repeated rows from minute-level channel columns, but still cannot prove physical synchronization or calibration.
+
+
+## Corrected exact-head receipt — 12 November 2026
+
+Workflow [#43263184946](https://github.com/stoicsatvik/NASA/actions/runs/43263184946) passed **15/15 deterministic tests**, then completed the one bounded XML request and uploaded artifact [#13964781873](https://github.com/stoicsatvik/NASA/actions/runs/43263184946/artifacts/13964781873).
+
+- Catalog metadata: HTTP 200, 4,880 bytes, SHA-256 \`ce33f7a8a18d0076d0b883f634447c0466fa8354e9c3577ff43b48171225e389\`.
+- Exact XML: HTTP 200, \`application/fgdc+xml\`, 41,313 bytes, SHA-256 \`ece31278b299c144dddc48ed7554737a1b51bbcbd33dd6092bf50fba66e1259a\`.
+- Four CSV entity definitions contain 56 attribute occurrences but only **14 unique field definitions**; all 14 occur in all four entities.
+- Unique field categories: 1 timestamp, 1 record identifier, 3 wind-speed channels, 3 particle-count channels, 3 kinetic-energy channels and 3 wBSNE voltage channels.
+- \`Date_Time\` is defined as \`mm/dd/year hh:mm\`; the metadata says time is reported in ISO 8601. No explicit timezone offset is established.
+- \`Record_Number\` is a sequential number assigned to each row by the computer. The metadata does not state whether numbering resets between files.
+- The corrected receipt preserves \`mm/dd/year\` and \`mV/V\`; the previous overbroad path redaction no longer damages these strings.
+- No CSV bytes, sensor rows, raw values, coordinates, raw XML, URLs or contact data were retained.
+
+Durable sanitized aggregate receipt: \`research/results/E595_GRAND_FALLS_SENSOR_DICTIONARY_20261112.json\`.
+
+The next experiment remains E596: re-read the exact E592 5 MB prefix (file \`SensorData_07-07-23_to_11-03-23.csv\`, 67,050,032 bytes) and aggregate Record_Number progression, timestamp-group sizes and per-channel-family non-null occupancy. The data dictionary alone does not resolve why 14,192 timestamp values are repeated.

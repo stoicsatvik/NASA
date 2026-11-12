@@ -1,0 +1,149 @@
+{
+  "experiment": "E595",
+  "date": "2026-11-12",
+  "workflow_run_id": 43263184946,
+  "head_sha": "9bb36ea3063113eb468bbc1e4796016c28d893ab",
+  "deterministic_tests": {
+    "passed": 15,
+    "total": 15
+  },
+  "catalog": {
+    "item_id": "67bf94acd34e8876fcbfc91b",
+    "http_status": 200,
+    "bytes": 4880,
+    "sha256": "ce33f7a8a18d0076d0b883f634447c0466fa8354e9c3577ff43b48171225e389"
+  },
+  "xml": {
+    "file_name": "Sediment_Transport_Data.xml.xml",
+    "bytes": 41313,
+    "http_status": 200,
+    "content_type": "application/fgdc+xml",
+    "sha256": "ece31278b299c144dddc48ed7554737a1b51bbcbd33dd6092bf50fba66e1259a"
+  },
+  "entity_type_count": 4,
+  "entity_type_labels": [
+    "SensorData_02-14-24_to_02-16-24.csv",
+    "SensorData_03-24-24_to_04-30-24.csv",
+    "SensorData_07-07-23_to_11-03-23.csv",
+    "SensorData_11-12-24_to_11-18-24.csv"
+  ],
+  "attribute_occurrence_count": 56,
+  "attribute_count": 14,
+  "category_counts": {
+    "timestamp": 1,
+    "record_identifier": 1,
+    "wind_speed": 3,
+    "particle_count": 3,
+    "kinetic_energy": 3,
+    "sediment_sensor_voltage": 3
+  },
+  "attributes": [
+    {
+      "label": "Date_Time",
+      "category": "timestamp",
+      "definition": "The date and time are reported in the format mm/dd/year hh:mm. Time is reported in international standard ISO 8601",
+      "occurrences": 4,
+      "entity_type_count": 4
+    },
+    {
+      "label": "Record_Number",
+      "category": "record_identifier",
+      "definition": "Sequential number assigned to row by computer",
+      "occurrences": 4,
+      "entity_type_count": 4
+    },
+    {
+      "label": "Wind_Speed_Low_mph",
+      "category": "wind_speed",
+      "definition": "Wind speed measured at approximately 20 cm AGL, sampled at one second intervals, one sample value reported each minute in mph.",
+      "occurrences": 4,
+      "entity_type_count": 4
+    },
+    {
+      "label": "Wind_Speed_Mid_mph",
+      "category": "wind_speed",
+      "definition": "Wind speed measured at approximately 60 cm AGL, sampled at one second intervals, one sample value reported each minute in mph.",
+      "occurrences": 4,
+      "entity_type_count": 4
+    },
+    {
+      "label": "Wind_Speed_High_mph",
+      "category": "wind_speed",
+      "definition": "Wind speed measured at approximately 1 m AGL, sampled at one second intervals, one sample value reported each minute in mph.",
+      "occurrences": 4,
+      "entity_type_count": 4
+    },
+    {
+      "label": "Particle_Count_Tot_1",
+      "category": "particle_count",
+      "definition": "Total particle count for one-minute interval, measured by Sensit. Approximately 12 cm AGL. The count saturates at 7999, and so can underestimate particle movement during high wind events.",
+      "occurrences": 4,
+      "entity_type_count": 4
+    },
+    {
+      "label": "Particle_Count_Tot_2",
+      "category": "particle_count",
+      "definition": "Total particle count for one-minute interval, measured by Sensit. Approximately 12 cm AGL. The count saturates at 7999, and so can underestimate particle movement during high wind events.",
+      "occurrences": 4,
+      "entity_type_count": 4
+    },
+    {
+      "label": "Particle_Count_Tot_3",
+      "category": "particle_count",
+      "definition": "Total particle count for one-minute interval, measured by Sensit. Approximately 12 cm AGL. The count saturates at 7999, and so can underestimate particle movement during high wind events.",
+      "occurrences": 4,
+      "entity_type_count": 4
+    },
+    {
+      "label": "Kinetic_Energy_Tot_1",
+      "category": "kinetic_energy",
+      "definition": "A measure of the energy that has impacted the Sensit, reported in uncalibrated instrument units. It is the total recorded for the one-minute interval.",
+      "occurrences": 4,
+      "entity_type_count": 4
+    },
+    {
+      "label": "Kinetic_Energy_Tot_2",
+      "category": "kinetic_energy",
+      "definition": "A measure of the energy that has impacted the Sensit, reported in uncalibrated instrument units. It is the total recorded for the one-minute interval.",
+      "occurrences": 4,
+      "entity_type_count": 4
+    },
+    {
+      "label": "Kinetic_Energy_Tot_3",
+      "category": "kinetic_energy",
+      "definition": "A measure of the energy that has impacted the Sensit, reported in uncalibrated instrument units. It is the total recorded for the one-minute interval.",
+      "occurrences": 4,
+      "entity_type_count": 4
+    },
+    {
+      "label": "wBSNE_1_average",
+      "category": "sediment_sensor_voltage",
+      "definition": "Voltage was measured at one second intervals and averaged over one minute. Instrument located approximately 20 cm AGL, reported in mV/V.",
+      "occurrences": 4,
+      "entity_type_count": 4
+    },
+    {
+      "label": "wBSNE_2_average",
+      "category": "sediment_sensor_voltage",
+      "definition": "Voltage was measured at one second intervals and averaged over one minute. Instrument located approximately 20 cm AGL, reported in mV/V.",
+      "occurrences": 4,
+      "entity_type_count": 4
+    },
+    {
+      "label": "wBSNE_3_average",
+      "category": "sediment_sensor_voltage",
+      "definition": "Voltage was measured at one second intervals and averaged over one minute. Instrument located approximately XX cm AGL, reported in mV/V.",
+      "occurrences": 4,
+      "entity_type_count": 4
+    }
+  ],
+  "record_number_definition_found": true,
+  "timestamp_definition_found": true,
+  "sensor_channel_definition_count": 12,
+  "raw_xml_stored": false,
+  "raw_coordinates_stored": false,
+  "raw_urls_stored": false,
+  "raw_contact_data_stored": false,
+  "sensor_csv_bytes_downloaded": false,
+  "sensor_rows_downloaded": false
+}
