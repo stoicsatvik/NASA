@@ -1,0 +1,52 @@
+name: E590 Grand Falls 2023-2024 public data access
+
+on:
+  push:
+    branches:
+      - research/e590-grand-falls-2023-2024-access-20261112
+    paths:
+      - experiments/e590_grand_falls_2023_2024_probe.py
+      - experiments/test_e590_grand_falls_2023_2024_probe.py
+      - research/E590_GRAND_FALLS_2023_2024_ACCESS_20261112.md
+      - .github/workflows/e590-grand-falls-2023-2024.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e590-grand-falls-2023-2024
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run deterministic E590 tests
+        run: python -m unittest experiments.test_e590_grand_falls_2023_2024_probe -v
+
+  live_probe:
+    # One live request only: the workflow-file commit that arms this experiment.
+    if: contains(github.event.head_commit.message, 'E590: add one-shot')
+    needs: tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Probe one distinct public USGS ScienceBase item
+        run: python -m experiments.e590_grand_falls_2023_2024_probe --out .artifacts/e590/grand-falls-2023-2024-receipt.json
+      - name: Preserve sanitized receipt only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e590-grand-falls-2023-2024-receipt
+          path: .artifacts/e590/grand-falls-2023-2024-receipt.json
+          if-no-files-found: ignore
+          retention-days: 7
