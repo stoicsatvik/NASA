@@ -10,7 +10,7 @@
     "total_pairs": 36
   },
   "aoi_bbox_wgs84_lon_lat": [76.69, 17.41, 78.69, 19.41],
-  "area_method": "Spherical rectangle area using Earth radius 6371008.8 m; bounding boxes only, not item polygons or raster footprints.",
+  "spatial_measure_method": "Unit-sphere spherical-rectangle solid angle in steradians; scale-free fractions and IoU, no body-specific radius or absolute-area claim; bounding boxes only, not item polygons or raster footprints.",
   "containment_threshold": 0.99,
   "experiment": "E585",
   "interpretation_boundary": [
