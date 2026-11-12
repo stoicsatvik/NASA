@@ -852,3 +852,11 @@ E541 already rescored all 14 official 2026 challenge candidates under five singl
 ## Next highest-information work
 
 Do not repeat E573 translations or another catalogue-only audit. Seek an independent horizontal control/registration source for the pinned Mars area, and separately obtain analysis-grade Earth positive sites plus explicit non-analogue controls for E001. E001 remains NOT YET MEASURED because the E572 catalogue has zero Verified positives, zero controls and zero common physical numeric descriptors. Reassess Martian Map vs MODIS/VIIRS only when a measured data/validation gate changes the scorecard. No UI polish before the evidence gate.
+
+
+## E574 — support-gain decomposition validation correction (12 November 2026)
+
+- Initial workflow [#43156436125](https://github.com/stoicsatvik/NASA/actions/runs/43156436125) failed before tests because it invoked pytest without installing pytest; the test suite uses standard-library unittest. No decomposition output or E574 artifact was produced. This is a runner-command failure, not a scientific negative.
+- Re-pinned the aggregate source to the latest E573 exact-head run #43155697664, artifact #13916101713, receipt JSON SHA-256 `939e3c3b81917f50065f4a1296e909bcfd95144e20257fc8939035ae0f5450a0`, source commit `7f6541e10a823402c2c50bcf6647e425d037ca3a`.
+- Added fail-closed checks for source provenance, 239-point shared-footprint partition, both product valid totals, baseline +22 shared / +73 footprint / +95 total arithmetic, and all min/max offset decompositions.
+- Replaced pytest invocation with `python -m unittest discover`; exact-head E574 validation pending.
