@@ -3,7 +3,7 @@
 Updated: 2026-11-12
 Class: Tier A
 Time horizon: NASA Space Apps Challenge, 14–15 Nov 2026
-Working branch: `research/e591-grand-falls-photogrammetry-metadata-20261112`
+Working branch: `research/e594-firms-keyless-modis-viirs-20261112`
 Main objective: maximize uncertainty eliminated per run and converge on a scientifically defensible Space Apps entry.
 
 ## Current thesis
@@ -1133,3 +1133,18 @@ Next gate: resolve item-specific `geodiff` order/control provenance; then inspec
 Claim states unchanged: repo operating system SUPPORTED; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN; challenge-selection superiority NOT YET PROVEN.
 
 Next highest-information action: retrieve only the 12,658-byte XML metadata file, parse its source-described raster types, CRS, vertical datum, grid spacing, nodata, acquisition dates and processing lineage if present. Do not download the 1.56 GB archive set without a specific validation question and a bounded sample path.
+
+## E594 — official FIRMS keyless recent-file access test (12 November 2026)
+
+Question: can the MODIS/VIIRS hot-spot challenge obtain a real recent sample from both sensor families without an Earthdata account or MAP_KEY, and do the two CSV schemas expose a defensible common field set?
+
+This is a challenge-readiness falsification experiment, not a fire-event validation or a finished harmonization system. It probes bounded prefixes only, sends no credentials, stores no raw detections or coordinates, and does not use the FIRMS archive request workflow. Official FIRMS documentation distinguishes the last-24/48-hour/7-day downloads from the daily two-month HTTPS folder that requires Earthdata Login. A successful recent-file sample would not establish credentialless historical access.
+
+- Candidate official 7-day endpoints: MODIS C6.1 Global; VIIRS NOAA-20 Global; VIIRS NOAA-21 Global.
+- Each request is capped at 256 KiB with a byte-range request and a strict host/redirect boundary.
+- The receipt stores HTTP/content metadata, prefix hash, schema, aggregate row/coordinate/date/FRP counts and field intersections only. No individual observation or coordinate is retained.
+- If both MODIS and at least one VIIRS endpoint return a parseable sample, recent public data access is SUPPORTED for those exact endpoints. If a path fails, preserve the exact HTTP/access class; do not infer that all FIRMS public products are unavailable.
+- Cross-sensor harmonization, detection-bias correction, historical-calendar completeness and challenge-selection superiority remain NOT YET PROVEN until separately measured.
+
+The live result is pending the E594 Actions artifact. No account, MAP_KEY, email, paid API or external submission is used.
+
