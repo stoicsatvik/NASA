@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import json
+import subprocess
+import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -43,6 +46,34 @@ class E575HiRISEControlIndependenceTests(unittest.TestCase):
         self.assertFalse(audit["independent_horizontal_control_for_pinned_2025_dtm_found"])
         self.assertEqual(claims["independent_horizontal_registration"], "NOT YET MEASURED")
         self.assertEqual(claims["route_safety"], "NOT CLAIMED")
+
+    def test_mola_is_independent_but_too_coarse_for_10m_validation(self):
+        audit = self.result["control_independence_audit"]
+        guidance = self.result["sources"]["usgs_hirise_ard_guidance"]["facts"]
+        self.assertTrue(audit["mola_pedr_is_an_independent_sensor_family"])
+        self.assertFalse(audit["mola_pedr_horizontal_support_sufficient_for_10m_validation"])
+        self.assertEqual(guidance["mola_shot_footprint_approx_m"], 100.0)
+        self.assertIn("too coarse to validate a 10.2 m residual", self.result["next_gate"])
+
+    def test_cli_writes_parseable_json_with_a_real_newline(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output = Path(temp_dir) / "receipt.json"
+            subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "experiments.e575_hirise_control_source_independence_audit",
+                    "--out",
+                    str(output),
+                ],
+                cwd=ROOT,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            payload = output.read_text(encoding="utf-8")
+            self.assertTrue(payload.endswith("\\n"))
+            self.assertEqual(json.loads(payload), self.result)
 
     def test_challenge_ranking_remains_conditional(self):
         selection = self.result["challenge_selection"]
