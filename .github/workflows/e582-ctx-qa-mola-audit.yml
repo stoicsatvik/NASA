@@ -1,0 +1,40 @@
+name: E582 CTX QA and MOLA-control asset audit
+
+on:
+  pull_request:
+    branches:
+      - research/e581-ctx-cog-pixel-sampling-20261112
+    types: [opened, synchronize]
+    paths:
+      - experiments/e582_ctx_qa_mola_audit.py
+      - tests/test_e582_ctx_qa_mola_audit.py
+      - .github/workflows/e582-ctx-qa-mola-audit.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e582-ctx-qa-mola-audit
+  cancel-in-progress: true
+
+jobs:
+  e582:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run deterministic asset-parser tests
+        run: python -m unittest discover -s tests -p "test_e582_ctx_qa_mola_audit.py" -v
+      - name: Fetch pinned QA metrics and MOLA-control CSV with byte caps
+        run: python experiments/e582_ctx_qa_mola_audit.py --out .artifacts/e582/ctx-qa-mola-summary.json
+      - name: Upload aggregate receipt only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e582-ctx-qa-mola-summary
+          path: .artifacts/e582/ctx-qa-mola-summary.json
+          if-no-files-found: ignore
+          retention-days: 7
