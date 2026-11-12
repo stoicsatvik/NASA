@@ -23,7 +23,8 @@ from experiments.e577_grand_falls_2017_2019_access_probe import (
     parse_content_range,
 )
 
-ITEM_ID = "677ee6bed34e760b392c4aa3"
+ITEM_ID = "67bf94acd34e8876fcbfc91b"
+DOI_REDIRECT_ITEM_ID = "677ee6bed34e760b392c4aa3"
 DOI = "10.5066/P13HPPYM"
 ITEM_FIELDS = "title,files.name,files.size,files.downloadUri,files.url"
 ITEM_URL = (
@@ -78,6 +79,7 @@ def audit() -> dict:
         "experiment": "E590",
         "doi": DOI,
         "item_id": ITEM_ID,
+        "doi_redirect_item_id": DOI_REDIRECT_ITEM_ID,
         "source": "USGS Grand Falls Dune Field, July 2023–November 2024",
         "metadata_fields_requested": ITEM_FIELDS.split(","),
         "metadata_http_status": None,
