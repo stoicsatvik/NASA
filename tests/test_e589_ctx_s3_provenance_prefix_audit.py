@@ -127,6 +127,22 @@ class E589Tests(unittest.TestCase):
         self.assertNotIn("/data", serialized)
         self.assertIn("$.properties.processing.pc_align", serialized)
 
+
+    def test_stac_json_description_mention_is_not_a_command(self):
+        payload = {
+            "type": "Feature",
+            "stac_version": "1.0.0",
+            "id": ITEM_ID,
+            "assets": {},
+            "properties": {"description": "Controlled using ASP pc_align."},
+            "links": [],
+        }
+        result = parse_provenance_payload("item.json", json.dumps(payload).encode("utf-8"))
+        self.assertEqual(result["document_kind"], "STAC_ITEM_JSON")
+        self.assertEqual(result["command_count"], 0)
+        self.assertGreaterEqual(result["command_mentions_count"], 1)
+        self.assertEqual(result["decision"], "JSON_TOOL_MENTION_WITHOUT_EXECUTABLE_ARGS")
+
     def test_receipt_summary_contains_no_raw_keys_or_credentials(self):
         summary = summarize_receipt({
             "experiment": "E589",
