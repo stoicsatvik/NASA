@@ -29,7 +29,8 @@ DATASET_DOI = "10.17189/1520642"
 BUNDLE_DOI = "10.17189/tnyt-7007"
 EXPECTED_FILE_BYTES = 66_355_200
 WINDOW_SIZE = 11
-MAX_TOTAL_RANGE_BYTES = 1_000_000
+MAX_LABEL_BYTES = 64 * 1024
+MAX_TOTAL_TRANSFER_BYTES = 1_000_000
 USER_AGENT = "Unified-Parallel-Foundry-E570/1.0"
 
 # Analyst-selected sample centers only. They are not ground-truth analogue labels.
@@ -113,10 +114,21 @@ def validate_label(fields: dict[str, Any]) -> None:
         "file_records": 2880,
         "map_projection_type": "SIMPLE CYLINDRICAL",
         "longitude_direction": "EAST",
+        "coordinate_system_name": "MEAN EARTH/POLAR AXIS OF DE421",
+        "center_latitude_deg": 0.0,
+        "center_longitude_deg": 180.0,
+        "line_projection_offset": 1439.5,
+        "sample_projection_offset": 2879.5,
+        "minimum_km": -9.075,
+        "maximum_km": 10.790,
     }
     for key, value in expected.items():
         if fields.get(key) != value:
             raise ValueError(f"PDS metadata mismatch for {key}: {fields.get(key)!r} != {value!r}")
+    if fields.get("declared_missing_constant"):
+        raise ValueError(
+            "pinned LOLA product declares a missing constant; decode its sentinel before sampling"
+        )
     if fields["file_records"] * fields["record_bytes"] != EXPECTED_FILE_BYTES:
         raise ValueError("PDS fixed-record dimensions do not match the pinned IMG byte size")
     if fields["line_samples"] * 4 != fields["record_bytes"]:
@@ -157,7 +169,7 @@ def window_range(
 def validate_content_range(
     status_code: int,
     content_range: str | None,
-    payload_length: int,
+    expected_length: int,
     start: int,
     end: int,
     total_bytes: int,
@@ -167,8 +179,54 @@ def validate_content_range(
         raise RuntimeError(f"server did not honor bounded HTTP Range (status {status_code})")
     if content_range != expected:
         raise RuntimeError(f"Content-Range mismatch: {content_range!r} != {expected!r}")
-    if payload_length != end - start + 1:
-        raise RuntimeError("HTTP Range payload length mismatch")
+    if expected_length != end - start + 1:
+        raise RuntimeError("HTTP Range expected length does not match the requested interval")
+
+
+def read_bounded_payload(
+    response: Any,
+    max_bytes: int,
+    expected_length: int | None = None,
+) -> bytes:
+    """Read a streamed response without buffering beyond its explicit byte cap."""
+    if max_bytes < 0:
+        raise ValueError("response byte cap must be nonnegative")
+    payload = bytearray()
+    chunk_size = max(1, min(8192, max_bytes + 1))
+    for chunk in response.iter_content(chunk_size=chunk_size):
+        if not chunk:
+            continue
+        payload.extend(chunk)
+        if len(payload) > max_bytes:
+            raise RuntimeError("HTTP response body exceeded its byte cap")
+    if expected_length is not None and len(payload) != expected_length:
+        raise RuntimeError(
+            f"HTTP response body length mismatch: {len(payload)} != {expected_length}"
+        )
+    return bytes(payload)
+
+
+def read_bounded_range_response(
+    response: Any,
+    start: int,
+    end: int,
+    total_bytes: int,
+) -> bytes:
+    """Validate Range metadata before reading any response body bytes."""
+    expected_length = end - start + 1
+    validate_content_range(
+        response.status_code,
+        response.headers.get("Content-Range"),
+        expected_length,
+        start,
+        end,
+        total_bytes,
+    )
+    return read_bounded_payload(
+        response,
+        max_bytes=expected_length,
+        expected_length=expected_length,
+    )
 
 
 def extract_window_rows(
@@ -262,20 +320,25 @@ def fetch_label(session: requests.Session) -> tuple[str, dict[str, Any]]:
         LABEL_URL,
         headers={"Accept-Encoding": "identity", "User-Agent": USER_AGENT},
         timeout=(10, 30),
+        stream=True,
     )
-    if response.status_code != 200:
-        raise RuntimeError(f"LOLA label HTTP status {response.status_code}")
-    label = response.text
-    fields = parse_label(label)
-    validate_label(fields)
-    receipt = {
-        "url": LABEL_URL,
-        "http_status": response.status_code,
-        "content_bytes": len(response.content),
-        "sha256": hashlib.sha256(response.content).hexdigest(),
-        "pds_fields": fields,
-    }
-    return label, receipt
+    try:
+        if response.status_code != 200:
+            raise RuntimeError(f"LOLA label HTTP status {response.status_code}")
+        payload = read_bounded_payload(response, max_bytes=MAX_LABEL_BYTES)
+        label = payload.decode("utf-8")
+        fields = parse_label(label)
+        validate_label(fields)
+        receipt = {
+            "url": LABEL_URL,
+            "http_status": response.status_code,
+            "content_bytes": len(payload),
+            "sha256": hashlib.sha256(payload).hexdigest(),
+            "pds_fields": fields,
+        }
+        return label, receipt
+    finally:
+        response.close()
 
 
 def fetch_window(
@@ -304,17 +367,20 @@ def fetch_window(
             "User-Agent": USER_AGENT,
         },
         timeout=(10, 60),
+        stream=True,
     )
-    validate_content_range(
-        response.status_code,
-        response.headers.get("Content-Range"),
-        len(response.content),
-        start,
-        end,
-        fields["file_records"] * fields["record_bytes"],
-    )
+    try:
+        content_range = response.headers.get("Content-Range")
+        payload = read_bounded_range_response(
+            response,
+            start,
+            end,
+            fields["file_records"] * fields["record_bytes"],
+        )
+    finally:
+        response.close()
     rows = extract_window_rows(
-        response.content,
+        payload,
         row_start,
         row_end,
         col_start,
@@ -333,13 +399,13 @@ def fetch_window(
         "window_rows_zero_based": [row_start, row_end],
         "window_columns_zero_based": [col_start, col_end],
         "requested_byte_range": [start, end],
-        "range_bytes_transferred": len(response.content),
-        "range_sha256": hashlib.sha256(response.content).hexdigest(),
-        "content_range": response.headers.get("Content-Range"),
+        "range_bytes_transferred": len(payload),
+        "range_sha256": hashlib.sha256(payload).hexdigest(),
+        "content_range": content_range,
         "raw_pixel_values_retained": False,
         "descriptor": descriptor,
     }
-    return receipt, len(response.content), hashlib.sha256(response.content).hexdigest()
+    return receipt, len(payload), hashlib.sha256(payload).hexdigest()
 
 
 def run() -> dict[str, Any]:
@@ -375,25 +441,46 @@ def run() -> dict[str, Any]:
         _, label_receipt = fetch_label(session)
         fields = label_receipt["pds_fields"]
         receipt["label"] = label_receipt
-        total_bytes = 0
-        windows = []
-        hashes = []
+        label_bytes = int(label_receipt["content_bytes"])
+        if label_bytes > MAX_LABEL_BYTES:
+            raise RuntimeError("LOLA label exceeded its 64 KiB safety cap")
+
+        total_bytes = label_bytes
+        windows: list[dict[str, Any]] = []
+        hashes: list[str] = []
+        receipt["windows"] = windows
+        receipt["transport"] = {
+            "range_requests": 0,
+            "range_bytes_transferred": 0,
+            "label_bytes_transferred": label_bytes,
+            "total_bytes_transferred": total_bytes,
+            "total_transfer_cap_bytes": MAX_TOTAL_TRANSFER_BYTES,
+            "full_img_downloaded": False,
+            "raw_pixel_values_retained": False,
+            "sample_range_hashes": hashes,
+        }
+        if total_bytes > MAX_TOTAL_TRANSFER_BYTES:
+            raise RuntimeError("LOLA label alone exceeded the 1 MB total transfer cap")
+
         for center in SAMPLE_CENTERS:
             window_receipt, transferred, digest = fetch_window(session, fields, center)
             total_bytes += transferred
             windows.append(window_receipt)
             hashes.append(digest)
-            if total_bytes > MAX_TOTAL_RANGE_BYTES:
-                raise RuntimeError("bounded LOLA sample exceeded the 1 MB transfer cap")
-        receipt["windows"] = windows
-        receipt["transport"] = {
-            "range_requests": len(windows),
-            "range_bytes_transferred": total_bytes,
-            "range_transfer_cap_bytes": MAX_TOTAL_RANGE_BYTES,
-            "full_img_downloaded": False,
-            "raw_pixel_values_retained": False,
-            "sample_range_hashes": hashes,
-        }
+            receipt["windows"] = list(windows)
+            receipt["transport"] = {
+                "range_requests": len(windows),
+                "range_bytes_transferred": total_bytes - label_bytes,
+                "label_bytes_transferred": label_bytes,
+                "total_bytes_transferred": total_bytes,
+                "total_transfer_cap_bytes": MAX_TOTAL_TRANSFER_BYTES,
+                "full_img_downloaded": False,
+                "raw_pixel_values_retained": False,
+                "sample_range_hashes": list(hashes),
+            }
+            if total_bytes > MAX_TOTAL_TRANSFER_BYTES:
+                raise RuntimeError("bounded LOLA sample exceeded the 1 MB total transfer cap")
+
         receipt["claim_state"] = {
             "LOLA_GDR_metadata": "SUPPORTED FOR PINNED PDS3 PRODUCT LABEL",
             "LOLA_real_sample_ingestion": "MEASURED FOR THREE BOUNDED 11x11 WINDOWS",
