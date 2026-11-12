@@ -63,32 +63,11 @@ def _number(value: str | None) -> float | None:
     return number if math.isfinite(number) else None
 
 
-def summarize_prefix(prefix: bytes) -> dict:
-    if len(prefix) != MAX_PREFIX_BYTES:
-        raise ValueError(f"expected exactly {MAX_PREFIX_BYTES} prefix bytes")
-    prefix_sha = hashlib.sha256(prefix).hexdigest()
-    if prefix_sha != EXPECTED_PREFIX_SHA256:
-        raise ValueError("5 MB prefix hash differs from the E590/E592 pinned sample")
-    complete_bytes = prefix.rfind(b"\n") + 1
-    complete = prefix[:complete_bytes]
-    complete_sha = hashlib.sha256(complete).hexdigest()
-    if complete_bytes != EXPECTED_COMPLETE_LINES_BYTES or complete_sha != EXPECTED_COMPLETE_LINES_SHA256:
-        raise ValueError("complete-line prefix differs from E592")
-
-    text = complete.decode("utf-8-sig")
-    reader = csv.DictReader(io.StringIO(text))
-    header = reader.fieldnames or []
-    required = {"Date and Time", "Record Number", *ALL_CHANNELS}
-    missing_header = sorted(required.difference(header))
-    if missing_header:
-        raise ValueError(f"required source columns missing: {missing_header}")
-
-    row_count = 0
-    incomplete_rows = 0
-    invalid_timestamp = 0
-    invalid_record_number = 0
-    record_ids = []
-    timestamps = []
+def _summarize_dict_rows(rows: list[dict[str, str]]) -> dict:
+    row_count = len(rows)
+    invalid_timestamp = invalid_record_number = 0
+    record_ids: list[int] = []
+    timestamps: list[datetime] = []
     groups = defaultdict(list)
     per_channel_values = {column: [] for column in ALL_CHANNELS}
     per_channel_missing = Counter()
@@ -97,11 +76,7 @@ def summarize_prefix(prefix: bytes) -> dict:
     family_complete_rows = Counter()
     family_any_rows = Counter()
 
-    for row in reader:
-        if None in row:
-            incomplete_rows += 1
-            continue
-        row_count += 1
+    for row in rows:
         raw_timestamp = (row.get("Date and Time") or "").strip()
         try:
             timestamp = datetime.strptime(raw_timestamp, TIMESTAMP_FORMAT)
@@ -148,26 +123,20 @@ def summarize_prefix(prefix: bytes) -> dict:
                 "nonnull_channels": nonnull,
             })
 
-    if row_count != EXPECTED_ROW_COUNT:
-        raise ValueError(f"row count changed: expected {EXPECTED_ROW_COUNT}, got {row_count}")
     if invalid_timestamp or invalid_record_number:
         raise ValueError("invalid timestamp or record-number values found")
 
     record_diffs = [b - a for a, b in zip(record_ids, record_ids[1:])]
     diff_counts = Counter(record_diffs)
     group_sizes = Counter(len(group) for group in groups.values())
-    group_record_distinct = 0
-    group_record_sequential = 0
-    group_all_rows_distinct = 0
-    group_all_rows_identical = 0
+    group_record_distinct = group_record_sequential = 0
+    group_all_rows_distinct = group_all_rows_identical = 0
     group_partial_signature_duplicates = 0
-    group_all_channels_complete = 0
-    group_any_channel_missing = 0
+    group_all_channels_complete = group_any_channel_missing = 0
     unique_signatures_per_group = Counter()
     for group in groups.values():
         ids = [item["record_id"] for item in group]
-        unique_ids = len(set(ids))
-        if unique_ids == len(ids):
+        if len(set(ids)) == len(ids):
             group_record_distinct += 1
         if len(ids) > 1 and all(b - a == 1 for a, b in zip(ids, ids[1:])):
             group_record_sequential += 1
@@ -190,15 +159,6 @@ def summarize_prefix(prefix: bytes) -> dict:
         for earlier, later in zip(timestamps, timestamps[1:])
     )
     nondecreasing = all(b >= a for a, b in zip(timestamps, timestamps[1:]))
-    record_diffs_summary = {
-        "difference_counts": dict(sorted((str(k), v) for k, v in diff_counts.items())),
-        "strictly_increasing": all(diff > 0 for diff in record_diffs),
-        "unit_step_count": sum(diff == 1 for diff in record_diffs),
-        "gap_count": sum(diff > 1 for diff in record_diffs),
-        "reset_or_duplicate_count": sum(diff <= 0 for diff in record_diffs),
-        "unique_record_ids": len(set(record_ids)),
-        "record_count": len(record_ids),
-    }
     channel_summary = {}
     for column, values in per_channel_values.items():
         channel_summary[column] = {
@@ -212,29 +172,18 @@ def summarize_prefix(prefix: bytes) -> dict:
         }
 
     return {
-        "experiment": EXPERIMENT,
-        "source_item_id": CATALOG_RECORD_ID,
-        "source_file_name": EXPECTED_FILE_NAME,
-        "source_file_size_bytes": EXPECTED_FILE_SIZE,
-        "sample": {
-            "mode": "bounded_stream_prefix",
-            "prefix_bytes": len(prefix),
-            "complete_lines_bytes": complete_bytes,
-            "prefix_sha256": prefix_sha,
-            "complete_lines_sha256": complete_sha,
-            "row_count": row_count,
-            "incomplete_rows_dropped": incomplete_rows,
-            "column_count": len(header),
-            "columns": header,
-            "raw_rows_retained": False,
-            "raw_timestamps_retained": False,
-            "raw_record_numbers_retained": False,
-            "raw_channel_values_retained": False,
-        },
-        "record_number": record_diffs_summary | {
+        "row_count": row_count,
+        "record_number": {
             "source_definition": "Sequential number assigned to row by computer",
-            "min_record_id": min(record_ids),
-            "max_record_id": max(record_ids),
+            "numeric_record_count": len(record_ids),
+            "unique_record_ids": len(set(record_ids)),
+            "min_record_id": min(record_ids) if record_ids else None,
+            "max_record_id": max(record_ids) if record_ids else None,
+            "strictly_increasing": all(diff > 0 for diff in record_diffs),
+            "unit_step_count": sum(diff == 1 for diff in record_diffs),
+            "gap_count": sum(diff > 1 for diff in record_diffs),
+            "reset_or_duplicate_count": sum(diff <= 0 for diff in record_diffs),
+            "difference_counts": dict(sorted((str(k), v) for k, v in diff_counts.items())),
             "timestamp_groups_with_distinct_record_ids": group_record_distinct,
             "timestamp_groups_with_sequential_record_ids": group_record_sequential,
         },
@@ -269,10 +218,70 @@ def summarize_prefix(prefix: bytes) -> dict:
             "family_rows_with_any_channel_present": dict(sorted(family_any_rows.items())),
         },
         "channel_summary": channel_summary,
+    }
+
+
+def summarize_rows(header: list[str], rows: list[list[str]]) -> dict:
+    if not header or len(set(header)) != len(header):
+        raise ValueError("invalid CSV header")
+    required = {"Date and Time", "Record Number", *ALL_CHANNELS}
+    missing_header = sorted(required.difference(header))
+    if missing_header:
+        raise ValueError(f"required source columns missing: {missing_header}")
+    dict_rows = []
+    incomplete = 0
+    for row in rows:
+        if len(row) != len(header):
+            incomplete += 1
+            continue
+        dict_rows.append(dict(zip(header, row)))
+    result = _summarize_dict_rows(dict_rows)
+    result["incomplete_rows_dropped"] = incomplete
+    return result
+
+
+def summarize_prefix(prefix: bytes) -> dict:
+    if len(prefix) != MAX_PREFIX_BYTES:
+        raise ValueError(f"expected exactly {MAX_PREFIX_BYTES} prefix bytes")
+    prefix_sha = hashlib.sha256(prefix).hexdigest()
+    if prefix_sha != EXPECTED_PREFIX_SHA256:
+        raise ValueError("5 MB prefix hash differs from the E590/E592 pinned sample")
+    complete_bytes = prefix.rfind(b"\n") + 1
+    complete = prefix[:complete_bytes]
+    complete_sha = hashlib.sha256(complete).hexdigest()
+    if complete_bytes != EXPECTED_COMPLETE_LINES_BYTES or complete_sha != EXPECTED_COMPLETE_LINES_SHA256:
+        raise ValueError("complete-line prefix differs from E592")
+    reader = csv.reader(io.StringIO(complete.decode("utf-8-sig")))
+    header = next(reader)
+    rows = list(reader)
+    summary = summarize_rows(header, rows)
+    if summary["row_count"] != EXPECTED_ROW_COUNT:
+        raise ValueError(f"row count changed: expected {EXPECTED_ROW_COUNT}, got {summary['row_count']}")
+    return {
+        "experiment": EXPERIMENT,
+        "source_item_id": CATALOG_RECORD_ID,
+        "source_file_name": EXPECTED_FILE_NAME,
+        "source_file_size_bytes": EXPECTED_FILE_SIZE,
+        "sample": {
+            "mode": "bounded_stream_prefix",
+            "prefix_bytes": len(prefix),
+            "complete_lines_bytes": complete_bytes,
+            "prefix_sha256": prefix_sha,
+            "complete_lines_sha256": complete_sha,
+            "row_count": summary["row_count"],
+            "incomplete_rows_dropped": summary["incomplete_rows_dropped"],
+            "column_count": len(header),
+            "columns": header,
+            "raw_rows_retained": False,
+            "raw_timestamps_retained": False,
+            "raw_record_numbers_retained": False,
+            "raw_channel_values_retained": False,
+        },
+        **{key: value for key, value in summary.items() if key not in {"row_count", "incomplete_rows_dropped"}},
         "interpretation_boundary": (
-            "A repeated timestamp group with sequential Record_Number values is a set of distinct row records. "
-            "It does not by itself identify the physical reason for repeated rows, prove sensor synchronization, "
-            "replicate independence, calibration, or sediment mass flux."
+            "Repeated timestamp groups with sequential Record_Number values are distinct row records. "
+            "They do not by themselves identify why multiple rows share a minute, prove sensor synchronization, "
+            "replicate independence, calibration or sediment mass flux."
         ),
         "claim_state": {
             "source_dictionary_row_id_semantics": "SUPPORTED_AS_REPORTED",
