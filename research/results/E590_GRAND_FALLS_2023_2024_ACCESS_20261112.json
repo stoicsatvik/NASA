@@ -1,0 +1,196 @@
+{
+  "experiment": "E590",
+  "doi": "10.5066/P13HPPYM",
+  "doi_parent_item_id": "677ee6bed34e760b392c4aa3",
+  "data_gov_catalog_record_id": "67bf94acd34e8876fcbfc91b",
+  "source": "USGS Grand Falls Dune Field, July 2023–November 2024",
+  "metadata": {
+    "parent_http_status": 200,
+    "parent_sha256": "0a818c832106c4717b327840444466acc12fc49dfc101d1a8bc1b0cf456a8597",
+    "children_http_status": 200,
+    "children_sha256": "8a78f4f262c3178e86c6c257c4f927d3d2c5a9fc165f65b198894d656478f85c",
+    "child_count": 5,
+    "catalog_http_status": 200,
+    "catalog_sha256": "ce33f7a8a18d0076d0b883f634447c0466fa8354e9c3577ff43b48171225e389",
+    "catalog_item_in_children": true
+  },
+  "child_items": [
+    {
+      "id": "67b78df2d34e1a2e835b13b7",
+      "title": "Ripple Photogrammetry at Grand Falls Dune Field, Arizona, from February 2024 to July 2024"
+    },
+    {
+      "id": "67ca4b16d34ed3737708ce2c",
+      "title": "Sediment Collection from July 2023 to November 2024, Grand Falls Dune Field, Arizona"
+    },
+    {
+      "id": "67bf94acd34e8876fcbfc91b",
+      "title": "Sediment Transport Data from July 2023 to November 2024, Grand Falls Dune Field, Arizona"
+    },
+    {
+      "id": "67818cf2d34ee8e22c8b655c",
+      "title": "Meteorological data from July 2023 to November 2024, Grand Falls Dune Field, Arizona"
+    },
+    {
+      "id": "678a94bed34e76fa5e3d6c8b",
+      "title": "Images and time-lapse videos of a ripple field in Grand Falls Dune Field, Arizona, from July 2023 to November 2024, Grand Falls Dune Field, Arizona"
+    }
+  ],
+  "file_inventory": [
+    {
+      "name": "SensorData_07-07-23_to_11-03-23.csv",
+      "extension": ".csv",
+      "size_bytes": 67050032,
+      "host": "www.sciencebase.gov",
+      "query_key_names": [
+        "f"
+      ],
+      "query_values_stored": false
+    },
+    {
+      "name": "SensorData_02-14-24_to_02-16-24.csv",
+      "extension": ".csv",
+      "size_bytes": 1091813,
+      "host": "sciencebase.usgs.gov",
+      "query_key_names": [],
+      "query_values_stored": false
+    },
+    {
+      "name": "SensorData_03-24-24_to_04-30-24.csv",
+      "extension": ".csv",
+      "size_bytes": 21451467,
+      "host": "sciencebase.usgs.gov",
+      "query_key_names": [],
+      "query_values_stored": false
+    },
+    {
+      "name": "SensorData_11-12-24_to_11-18-24.csv",
+      "extension": ".csv",
+      "size_bytes": 3319414,
+      "host": "sciencebase.usgs.gov",
+      "query_key_names": [],
+      "query_values_stored": false
+    },
+    {
+      "name": "Sediment_Transport_Data.xml.xml",
+      "extension": ".xml",
+      "size_bytes": 41313,
+      "host": "www.sciencebase.gov",
+      "query_key_names": [
+        "f"
+      ],
+      "query_values_stored": false
+    }
+  ],
+  "selected_file": {
+    "name": "SensorData_07-07-23_to_11-03-23.csv",
+    "extension": ".csv",
+    "size_bytes": 67050032,
+    "source_item_id": "67bf94acd34e8876fcbfc91b"
+  },
+  "sample_response": {
+    "http_status": 200,
+    "mode": "bounded_stream_prefix",
+    "content_type": "text/csv",
+    "content_length": "67050032",
+    "bytes_read": 5000000,
+    "host": "www.sciencebase.gov",
+    "html_response": false,
+    "sha256": "f9f150f9eee2f3a8e477614b1ad4cd2d4fd4de5de20d3d74e3350dc4f41e86a6"
+  },
+  "data_sample": {
+    "sampling_mode": "bounded_stream_prefix",
+    "sample_range_start": 0,
+    "sample_bytes": 5000000,
+    "complete_lines_bytes": 4999997,
+    "total_file_bytes": 67050032,
+    "partial_prefix_sample": true,
+    "sha256": "29f68a77ac948949d869a64790b7e7e7b795681fb81f2c6a4962657e980737f7",
+    "row_count": 85145,
+    "header_columns": [
+      "Date and Time",
+      "Record Number",
+      "Wind Speed - Low (mph)",
+      "Wind Speed - Mid (mph)",
+      "Wind Speed - High (mph)",
+      "Particle Count_Tot(1)",
+      "Particle Count_Tot(2)",
+      "Particle Count_Tot(3)",
+      "Kinetic Energy_Tot(1)",
+      "Kinetic Energy_Tot(2)",
+      "Kinetic Energy_Tot(3)",
+      "wBSNE #1 average (mV/V)",
+      "wBSNE #2 average (mV/V)",
+      "wBSNE #3 average (mV/V)"
+    ],
+    "numeric_summaries": {
+      "Wind Speed - Low (mph)": {
+        "n": 85145,
+        "min": 0,
+        "max": 10.12,
+        "mean": 0.00046320981854483523,
+        "std_sample": 0.054549895937746715,
+        "missing_or_non_numeric": 0
+      },
+      "Wind Speed - Mid (mph)": {
+        "n": 85145,
+        "min": 0,
+        "max": 10.12,
+        "mean": 0.0008518997005108931,
+        "std_sample": 0.07491134997363232,
+        "missing_or_non_numeric": 0
+      },
+      "Wind Speed - High (mph)": {
+        "n": 85145,
+        "min": 0,
+        "max": 9.56,
+        "mean": 0.0040800869105643315,
+        "std_sample": 0.08325999041576129,
+        "missing_or_non_numeric": 0
+      },
+      "wBSNE #1 average (mV/V)": {
+        "n": 85145,
+        "min": 0.068,
+        "max": 0.079,
+        "mean": 0.06900200833871631,
+        "std_sample": 0.0001256691463997769,
+        "missing_or_non_numeric": 0
+      },
+      "wBSNE #2 average (mV/V)": {
+        "n": 85145,
+        "min": 0.098,
+        "max": 0.107,
+        "mean": 0.09930106289271243,
+        "std_sample": 0.00047581450029876067,
+        "missing_or_non_numeric": 0
+      },
+      "wBSNE #3 average (mV/V)": {
+        "n": 85145,
+        "min": 0.012,
+        "max": 0.014,
+        "mean": 0.012877444359621822,
+        "std_sample": 0.0003441456100807718,
+        "missing_or_non_numeric": 0
+      }
+    },
+    "time_bounds_raw_strings": {
+      "min": "7/10/2023 0:00",
+      "max": "7/9/2023 9:59",
+      "n": 85145
+    },
+    "time_bounds_semantics": "lexicographic string extrema; not validated chronological bounds"
+  },
+  "credentials_used": false,
+  "raw_values_stored": false,
+  "raw_files_committed": false,
+  "signed_query_values_stored": false,
+  "claim_state": {
+    "public_csv_prefix_access": "SUPPORTED",
+    "timestamp_integrity": "NOT_YET_ESTABLISHED",
+    "sensor_calibration": "NOT_YET_ESTABLISHED",
+    "sediment_mass_conversion": "NOT_YET_ESTABLISHED",
+    "earth_descriptor_extraction": "NOT_YET_MEASURED",
+    "mars_earth_comparability": "NOT_YET_PROVEN",
+    "e001_known_site_recovery": "NOT_YET_MEASURED"
+  }
+}
