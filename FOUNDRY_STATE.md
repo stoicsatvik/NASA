@@ -824,3 +824,15 @@ Next: acquire analysis-grade, source-pinned Earth measurements and explicit nega
 
 
 - E572 gate hardening: target-body numeric measurements are counted by record and must be common to every in-scope positive/control record. A one-record-only measurement fails the E001 gate. The pinned catalogue has only `compare` map context (lat/lon/view_km), so target-measurement coverage remains zero and the negative admissibility result is unchanged.
+
+
+## E573 — exact-head 10.2 m translation sensitivity result (12 November 2026)
+
+- Branch head after nodata/masked-pixel regression: `7f6541e10a823402c2c50bcf6647e425d037ca3a`; exact-head Actions [#43155697664](https://github.com/stoicsatvik/NASA/actions/runs/43155697664) passed **10/10 deterministic tests** and completed bounded live acquisition; receipt [artifact #13916101713](https://github.com/stoicsatvik/NASA/actions/runs/43155697664/artifacts/13916101713).
+- Baseline reproduced exactly: 346 observed MOLA point centers; 2020 valid 164/346; 2025 valid 259/346.
+- Common-mode 13-offset grid: 2020 valid 164–165; 2025 valid 259; 2025-minus-2020 support margin 94–95 at every offset.
+- Differential 2025-only 13-offset grid: 2020 fixed at 164; 2025 fixed at 259; margin +95 at every offset.
+- Bounded transport: 2020 6,895,643 bytes in 213 ranges under 32 MiB; 2025 676,334,995 bytes in 649 ranges under 850 MiB. No full archive, FOM, orthoimage or raw pixel/coordinate values retained; temporary DTM deleted.
+- A non-fatal tifffile GDAL_NODATA parse warning remains recorded. The experiment's resolver read the pinned nodata value and completed; no warning suppression was added.
+- Interpretation: 2025 finite-pixel point support remains higher for this frozen 346-point window under every tested offset. The 10.2 m value is a published 99th-percentile HiRISE-to-CTX alignment statistic, not a hard bound or fitted MOLA registration. This does not establish elevation accuracy, independent horizontal registration, area coverage, route safety or analogue similarity.
+- Next: obtain an independent horizontal-control residual or authoritative registration validation. Do not widen the translation grid without a new source-backed uncertainty model.
