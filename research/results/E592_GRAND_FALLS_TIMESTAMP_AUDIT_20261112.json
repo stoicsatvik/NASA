@@ -1,0 +1,72 @@
+{
+  "catalog_metadata_sha256": "ce33f7a8a18d0076d0b883f634447c0466fa8354e9c3577ff43b48171225e389",
+  "complete_lines_bytes": 4999997,
+  "complete_lines_match_e590_receipt": true,
+  "complete_lines_sha256": "29f68a77ac948949d869a64790b7e7e7b795681fb81f2c6a4962657e980737f7",
+  "credentials_used": false,
+  "decision": "TIMESTAMP_AUDIT_COMPLETE",
+  "expected_file_size_bytes": 67050032,
+  "experiment": "E592",
+  "full_file_downloaded": false,
+  "matching_file_record_count": 1,
+  "metadata_http_status": 200,
+  "prefix_matches_e590_receipt": true,
+  "published_logging_note": "The E590 source report records the Data.gov description as 1 Hz sampling averaged/logged at one-minute intervals. This audit measures only the Date and Time row intervals in the bounded prefix; it does not verify raw 1 Hz acquisition or sensor averaging.",
+  "raw_coordinates_stored": false,
+  "raw_rows_stored": false,
+  "raw_timestamps_stored": false,
+  "raw_urls_stored": false,
+  "raw_values_stored": false,
+  "sample_http_status": 200,
+  "sample_response": {
+    "bytes_read": 5000000,
+    "content_length": "67050032",
+    "content_type": "text/csv",
+    "final_host": "www.sciencebase.gov",
+    "html_response": false,
+    "mode": "bounded_stream_prefix",
+    "prefix_sha256": "f9f150f9eee2f3a8e477614b1ad4cd2d4fd4de5de20d3d74e3350dc4f41e86a6"
+  },
+  "source_file_name": "SensorData_07-07-23_to_11-03-23.csv",
+  "source_item_id": "67bf94acd34e8876fcbfc91b",
+  "timestamp_audit": {
+    "adjacent_interval_count": 85144,
+    "cadence": "MIXED_OR_NON_60_SECOND_INTERVALS",
+    "chronological_max_naive": "2023-07-17T05:56:00",
+    "chronological_min_naive": "2023-07-07T09:25:00",
+    "common_interval_seconds": [
+      {
+        "count": 70953,
+        "seconds": 0
+      },
+      {
+        "count": 14191,
+        "seconds": 60
+      }
+    ],
+    "duplicate_timestamp_row_count": 70953,
+    "duplicate_timestamp_value_count": 14192,
+    "first_timestamp_in_file_order_naive": "2023-07-07T09:25:00",
+    "invalid_timestamp_count": 0,
+    "last_timestamp_in_file_order_naive": "2023-07-17T05:56:00",
+    "negative_interval_count": 0,
+    "one_minute_interval_count": 14191,
+    "one_minute_interval_fraction": 0.1666705816029315,
+    "ordering": "NONDECREASING_WITH_DUPLICATES",
+    "parse_success_fraction": 1.0,
+    "positive_gaps_over_300_seconds": 0,
+    "positive_gaps_over_60_seconds": 0,
+    "positive_interval_count": 14191,
+    "positive_interval_max_seconds": 60,
+    "positive_interval_median_seconds": 60,
+    "positive_interval_min_seconds": 60,
+    "positive_interval_p95_seconds": 60,
+    "raw_timestamps_stored": false,
+    "row_count": 85145,
+    "timestamp_column": "Date and Time",
+    "timestamp_format": "%m/%d/%Y %H:%M",
+    "timezone_status": "NOT_ENCODED_IN_COLUMN; parsed as naive wall-clock values; no UTC conversion",
+    "valid_timestamp_count": 85145,
+    "zero_interval_count": 70953
+  }
+}
