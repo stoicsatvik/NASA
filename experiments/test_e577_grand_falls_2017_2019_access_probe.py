@@ -11,6 +11,7 @@ from experiments.e577_grand_falls_2017_2019_access_probe import (
     safe_url_summary,
     summarize_text,
     summarize_zip,
+    summarize_receipt,
 )
 
 
@@ -70,6 +71,43 @@ class E577Tests(unittest.TestCase):
         result = inspect_payload("sample.csv", payload)
         self.assertEqual(result["data_summary"]["row_count"], 1)
         self.assertNotIn("raw_rows", result["data_summary"])
+
+
+    def test_receipt_summary_handles_null_data_sample(self):
+        summary = summarize_receipt({
+            "experiment": "E577",
+            "decision": "ACQUISITION_ERROR",
+            "metadata_http_status": None,
+            "file_count": None,
+            "selected_file": None,
+            "data_sample": None,
+        })
+        self.assertEqual(summary["decision"], "ACQUISITION_ERROR")
+        self.assertIsNone(summary["data_rows"])
+        self.assertIsNone(summary["selected_file"])
+        self.assertFalse(summary["credentials_used"])
+        self.assertFalse(summary["raw_values_stored"])
+
+    def test_receipt_summary_reads_delimited_row_count(self):
+        summary = summarize_receipt({
+            "experiment": "E577",
+            "decision": "SMALL_PUBLIC_DATA_FILE_ACQUIRED_AND_PROFILED",
+            "data_sample": {"data_summary": {"row_count": 17}},
+        })
+        self.assertEqual(summary["data_rows"], 17)
+
+    def test_receipt_summary_reads_zip_member_row_count(self):
+        summary = summarize_receipt({
+            "experiment": "E577",
+            "decision": "SMALL_PUBLIC_DATA_FILE_ACQUIRED_AND_PROFILED",
+            "data_sample": {
+                "data_summary": {
+                    "format": "zip_with_delimited_member",
+                    "member_summary": {"row_count": 9},
+                }
+            },
+        })
+        self.assertEqual(summary["data_rows"], 9)
 
 
 if __name__ == "__main__":
