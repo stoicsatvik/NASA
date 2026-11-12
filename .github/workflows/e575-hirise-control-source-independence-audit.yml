@@ -44,7 +44,14 @@ jobs:
       - name: Validate and compare receipt
         run: |
           python -m json.tool .artifacts/e575/receipt.json > /dev/null
-          cmp .artifacts/e575/receipt.json research/results/E575_HIRISE_CONTROL_SOURCE_INDEPENDENCE_AUDIT_20261112.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          generated = json.loads(Path(".artifacts/e575/receipt.json").read_text(encoding="utf-8"))
+          committed = json.loads(Path("research/results/E575_HIRISE_CONTROL_SOURCE_INDEPENDENCE_AUDIT_20261112.json").read_text(encoding="utf-8"))
+          assert generated == committed, "generated and committed E575 receipts differ"
+          PY
       - name: Upload aggregate receipt only
         if: always()
         uses: actions/upload-artifact@v4
