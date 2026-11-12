@@ -7,8 +7,6 @@ on:
     paths:
       - experiments/e586_ctx_footprint_geometry_audit.py
       - tests/test_e586_ctx_footprint_geometry_audit.py
-      - research/E586_CTX_FOOTPRINT_GEOMETRY_AUDIT_20261112.md
-      - FOUNDRY_STATE.md
       - .github/workflows/e586-ctx-footprint-geometry-audit.yml
 
 permissions:
@@ -35,6 +33,7 @@ jobs:
         run: >-
           python experiments/e586_ctx_footprint_geometry_audit.py
           --receipt research/results/E583_CTX_QA_COHORT_SCREEN_20261112.json
+          --bbox-audit research/results/E585_CTX_BBOX_OVERLAP_AUDIT_20261112.json
           --out .artifacts/e586/ctx-footprint-geometry.json
       - name: Upload aggregate E586 receipt
         if: always()
