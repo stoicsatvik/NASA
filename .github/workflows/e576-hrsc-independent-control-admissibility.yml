@@ -1,0 +1,62 @@
+name: E576 HRSC independent-control admissibility audit
+
+on:
+  push:
+    branches:
+      - research/e576-hrsc-independent-control-admissibility-20261112
+    paths:
+      - experiments/e576_hrsc_independent_control_admissibility.py
+      - tests/test_e576_hrsc_independent_control_admissibility.py
+      - research/results/E576_HRSC_INDEPENDENT_CONTROL_ADMISSIBILITY_20261112.json
+      - research/E576_HRSC_INDEPENDENT_CONTROL_ADMISSIBILITY_20261112.md
+      - .github/workflows/e576-hrsc-independent-control-admissibility.yml
+  pull_request:
+    branches:
+      - research/e575-hirise-control-source-independence-audit-20261112
+    paths:
+      - experiments/e576_hrsc_independent_control_admissibility.py
+      - tests/test_e576_hrsc_independent_control_admissibility.py
+      - research/results/E576_HRSC_INDEPENDENT_CONTROL_ADMISSIBILITY_20261112.json
+      - research/E576_HRSC_INDEPENDENT_CONTROL_ADMISSIBILITY_20261112.md
+      - .github/workflows/e576-hrsc-independent-control-admissibility.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e576-hrsc-independent-control-admissibility
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run deterministic source-audit tests
+        run: python -m unittest discover -s tests -p "test_e576_hrsc_independent_control_admissibility.py" -v
+      - name: Generate aggregate receipt
+        run: python -m experiments.e576_hrsc_independent_control_admissibility --out .artifacts/e576/receipt.json
+      - name: Validate and compare receipt
+        run: |
+          python -m json.tool .artifacts/e576/receipt.json > /dev/null
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          generated = json.loads(Path(".artifacts/e576/receipt.json").read_text(encoding="utf-8"))
+          committed = json.loads(Path("research/results/E576_HRSC_INDEPENDENT_CONTROL_ADMISSIBILITY_20261112.json").read_text(encoding="utf-8"))
+          assert generated == committed, "generated and committed E576 receipts differ"
+          PY
+      - name: Upload aggregate receipt only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e576-hrsc-independent-control-admissibility
+          path: .artifacts/e576/receipt.json
+          if-no-files-found: ignore
+          retention-days: 14
