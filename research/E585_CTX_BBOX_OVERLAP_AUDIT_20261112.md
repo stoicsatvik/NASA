@@ -65,9 +65,9 @@ This makes independence especially implausible as a default assumption. Bounding
 
 ## Validation
 
-- Seven deterministic offline tests cover bbox validation, spherical area/intersection, the six/three containment split, subset summaries, pairwise overlap, duplicate IDs, invalid geometry bounds, failed QA assets, incomplete receipts, and credential boundaries.
-- The committed E585 result is recomputed from the E583 receipt and compared structurally in CI.
-- No live source request or Actions workflow requiring external data is used.
+- Exact-head Actions run [#43222673590](https://github.com/stoicsatvik/NASA/actions/runs/43222673590) passed all 7 deterministic offline tests and recomputed the committed E585 result with a structural match to the E583 receipt.
+- The initial recomputation mismatch exposed a P05 item-ID transcription error in the expected receipt; the ID was corrected against the source E583 receipt. Earlier failed runs remain preserved.
+- No live source request or external-data workflow is used.
 
 ## Next decisive gate
 
