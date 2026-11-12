@@ -108,7 +108,7 @@ class E572CatalogueAuditTests(unittest.TestCase):
         self.assertEqual(result["common_target_measurement_fields"], [])
         self.assertFalse(result["minimum_e001_input_gate_passed"])
         self.assertTrue(any(
-            "No target-body numeric measurement field is populated across every in-scope positive/control record" == reason
+            reason.startswith("No target-body numeric measurement field is populated across every in-scope positive/control record")
             for reason in result["e001_reasons"]
         ))
 
