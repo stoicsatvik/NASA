@@ -704,7 +704,12 @@ def _walk_json_strings(value: object, path: tuple[str, ...] = ()):
             yield from _walk_json_strings(child, path + (str(key),))
     elif isinstance(value, list):
         if value and all(isinstance(child, str) for child in value):
-            yield " ".join(value), path
+            if any(re.search(r"\b(geodiff|pc_align)\b", child) for child in value):
+                for child in value:
+                    yield child, path
+            else:
+                yield " ".join(value), path
+            return
         for index, child in enumerate(value):
             yield from _walk_json_strings(child, path + (str(index),))
     elif isinstance(value, str):
