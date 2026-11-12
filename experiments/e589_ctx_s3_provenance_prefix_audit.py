@@ -103,6 +103,39 @@ def parse_s3_listing(payload: bytes) -> dict[str, Any]:
 
 
 
+def parse_qa_metrics(payload: bytes) -> dict[str, Any]:
+    try:
+        text = payload.decode("utf-8-sig")
+    except UnicodeDecodeError:
+        return {"decision": "QA_TEXT_NOT_UTF8", "line_count": 0, "metrics": [], "raw_text_stored": False}
+    metrics = []
+    pattern = re.compile(
+        r"(?i)\\b(mean|median|std(?:dev|_dev)?|standard\\s+deviation|maximum|minimum|max|min)\\b[^0-9+\\-]*([-+]?\\d+(?:\\.\\d+)?(?:[eE][-+]?\\d+)?)"
+    )
+    for line in text.splitlines():
+        match = pattern.search(line)
+        if match:
+            unit = "m" if re.search(r"(?i)\\b(m|meter|meters)\\b", line) else None
+            metrics.append({
+                "metric": re.sub(r"\\s+", "_", match.group(1).lower()),
+                "value": float(match.group(2)),
+                "unit": unit,
+            })
+    lower = text.lower()
+    sign_terms = [
+        term for term in ("ctx-mola", "mola-ctx", "dem1-dem2", "dem2-dem1", "--reverse", "geodiff", "pc_align")
+        if term in lower
+    ]
+    return {
+        "decision": "QA_METRICS_PARSED" if metrics else "QA_TEXT_WITHOUT_RECOGNIZED_METRICS",
+        "line_count": len(text.splitlines()),
+        "metrics": metrics[:30],
+        "sign_terms": sign_terms,
+        "text_sha256": hashlib.sha256(payload).hexdigest(),
+        "raw_text_stored": False,
+    }
+
+
 def _tool_record_summary(tool: str, node: Any, path: str) -> dict[str, Any]:
     """Summarize a structured tool record without retaining its argument strings."""
     values: list[str] = []
