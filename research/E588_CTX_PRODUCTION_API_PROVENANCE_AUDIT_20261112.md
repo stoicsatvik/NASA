@@ -58,3 +58,24 @@ No E001 known-site recovery or cross-body similarity test was run. All planetary
 - Official production collection metadata: https://g6goyz4w56.execute-api.us-west-2.amazonaws.com/prod/collections/mro_ctx_controlled_usgs_dtms
 - ASP pc_align: https://stereopipeline.readthedocs.io/en/latest/tools/pc_align.html
 - ASP geodiff: https://stereopipeline.readthedocs.io/en/latest/tools/geodiff.html
+
+
+## Independent USGS product-level control cross-check — 12 November 2026
+
+A separate source review of the USGS CTX Analysis Ready Data page and the NASA/USGS public open-data release description adds the following product-level context:
+
+- USGS describes CTX stereo DTMs as local-scale topographic models with nominal 20 m post spacing and states that they are aligned to MOLA. Associated orthoimages are generated with Ames Stereo Pipeline `point2dem` and align to their associated DTM.
+- USGS cautions that offsets can remain between different CTX DTMs because each is individually controlled to lower-resolution MOLA data; this is not a guarantee of seamless inter-DTM absolute alignment.
+- The public release description documents global CTX bundle adjustment with ISIS `jigsaw` and iterative `pc_align` alignment to MOLA across 26 groupings. This is a dataset-level process description, not an item-specific command receipt.
+- USGS describes CTX image values as top-of-atmosphere I/F reflectance affected by dust, illumination geometry and topography; they are not direct surface albedo.
+
+**Reconciliation:** product-level CTX-to-MOLA control is **SUPPORTED**. Exact E583 item-specific `geodiff` operand order, `pc_align` reference/source order, grouping assignment and applied transform file remain **NOT YET ESTABLISHED**. The E587 exact nine-item S3-prefix inventory already listed all nine product directories without truncation and found zero provenance-named objects, so a second P18-only prefix query is redundant. The MOLA CSVs remain control inputs, not held-out validation.
+
+The nominal 20 m CTX post spacing is not the spatial support of MOLA measurements. Do not infer robust 20 m slope, roughness or traversability from grid spacing alone. No independent accuracy, route-safety, E001, cross-body, novel-analogue, local-validation or challenge-selection claim changes.
+
+Sources accessed 12 November 2026:
+- USGS CTX Analysis Ready Data: https://stac.astrogeology.usgs.gov/docs/data/mars/ctx/
+- NASA/USGS CTX DTM open-data registry: https://registry.opendata.aws/nasa-usgs-controlled-mro-ctx-dtms/
+- USGS CTX mission/data documentation: https://astrogeology.usgs.gov/docs/concepts/missions/mro/ctx-data/
+
+Documentation-only cross-check. No raster, QA asset, MOLA CSV, raw STAC item, or control point was downloaded. No code tests or benchmark were run.
