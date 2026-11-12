@@ -134,5 +134,35 @@
     "benchmark_run": false,
     "e001_run": false,
     "field_measurement": false
+  },
+  "support_scale_sensitivity": {
+    "experiment": "E600A",
+    "script": "research/e600a_sample_to_pixel_support_sensitivity.py",
+    "validation": "6/6 deterministic local assertions passed; no CI run",
+    "nominal_sample_area_m2": 0.005,
+    "assumption": "approximately 500 mL uniformly represented across exactly 0.10 m depth; idealized slab only",
+    "oli_pixel_area_m2": 900,
+    "tirs_pixel_area_m2": 10000,
+    "oli_pixel_to_nominal_sample_area_ratio": 180000,
+    "tirs_pixel_to_nominal_sample_area_ratio": 2000000,
+    "earth_dry_tiu_range": [
+      285,
+      694
+    ],
+    "mars_sandy_rocky_literature_range": [
+      150,
+      350
+    ],
+    "range_intersection_tiu": [
+      285,
+      350
+    ],
+    "fraction_of_earth_dry_range_width": 0.158924205,
+    "warnings": [
+      "sample geometry is not precisely reported; nominal area is not an observed footprint",
+      "range overlap is not distributional overlap, a site match, or an analogue score",
+      "no coordinates or sample rows were added; E001 was not run"
+    ],
+    "claim_state": "direct point-sample ATI/TIU calibration REJECTED; cross-body similarity NOT_YET_PROVEN"
   }
 }
