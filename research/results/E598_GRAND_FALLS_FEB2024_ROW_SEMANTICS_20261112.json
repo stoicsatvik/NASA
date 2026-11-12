@@ -1,0 +1,36 @@
+{
+  "claim_state": {
+    "cross_body_similarity": "NOT_YET_PROVEN",
+    "exact_catalogue_file_identity": "SUPPORTED_AS_PINNED",
+    "known_site_recovery": "NOT_YET_MEASURED",
+    "metadata_supplied_download_payload": "NOT_ESTABLISHED",
+    "row_semantics": "NOT_YET_MEASURED"
+  },
+  "experiment": "E598",
+  "parse_status": "REJECTED_CATALOGUE_SIZE_MISMATCH",
+  "provenance": {
+    "catalog_metadata_http_status": 200,
+    "catalog_metadata_sha256": "ce33f7a8a18d0076d0b883f634447c0466fa8354e9c3577ff43b48171225e389",
+    "credentials_used": false,
+    "csv_final_host": "sciencebase.usgs.gov",
+    "csv_http_status": 200,
+    "raw_payload_retained": false,
+    "raw_urls_retained": false,
+    "read_limit_bytes": 5000000,
+    "workflow_run_id": 43271607662,
+    "workflow_artifact_id": 13966839833,
+    "workflow_artifact_sha256": "sha256:3eb25046d061ac6974175a7127f2430b3f2eadfa22fbea238211f96ddd9faf50"
+  },
+  "response": {
+    "bytes_read": 4255,
+    "catalogue_size_match": false,
+    "content_length_header": 0,
+    "content_type": "text/html",
+    "csv_header_admissible": false,
+    "http_status": 200,
+    "payload_sha256": "01d324b90d086dd7389e13cfabbc185a7b7afe7917620e05254248773d01e1a2"
+  },
+  "source_file_name": "SensorData_02-14-24_to_02-16-24.csv",
+  "source_file_size_bytes": 1091813,
+  "source_item_id": "67bf94acd34e8876fcbfc91b"
+}
