@@ -1,0 +1,63 @@
+name: E577 Grand Falls 2017-2019 public data access probe
+
+on:
+  push:
+    branches:
+      - research/e577-grand-falls-2017-2019-access-20261112
+    paths:
+      - experiments/e577_grand_falls_2017_2019_access_probe.py
+      - experiments/test_e577_grand_falls_2017_2019_access_probe.py
+      - .github/workflows/e577-grand-falls-2017-2019-access.yml
+      - research/E577_GRAND_FALLS_2017_2019_ACCESS_20261112.md
+  pull_request:
+    branches:
+      - research/e576-hrsc-independent-control-admissibility-20261112
+      - main
+    paths:
+      - experiments/e577_grand_falls_2017_2019_access_probe.py
+      - experiments/test_e577_grand_falls_2017_2019_access_probe.py
+      - .github/workflows/e577-grand-falls-2017-2019-access.yml
+      - research/E577_GRAND_FALLS_2017_2019_ACCESS_20261112.md
+  workflow_dispatch:
+    inputs:
+      run_live_probe:
+        description: "Run one bounded anonymous ScienceBase probe"
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run deterministic E577 tests
+        run: python -m unittest experiments.test_e577_grand_falls_2017_2019_access_probe -v
+
+  live_probe:
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.run_live_probe == 'true'
+    needs: tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Probe one bounded public data file
+        run: python -m experiments.e577_grand_falls_2017_2019_access_probe --out .artifacts/e577/grand-falls-2017-2019.json
+      - name: Preserve sanitized receipt only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e577-grand-falls-2017-2019-receipt
+          path: .artifacts/e577/grand-falls-2017-2019.json
+          if-no-files-found: ignore
+          retention-days: 7

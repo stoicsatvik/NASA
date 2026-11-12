@@ -3,7 +3,7 @@
 Updated: 2026-11-12
 Class: Tier A
 Time horizon: NASA Space Apps Challenge, 14–15 Nov 2026
-Working branch: `research/e575-hirise-control-source-independence-audit-20261112`
+Working branch: `research/e577-grand-falls-2017-2019-access-20261112`
 Main objective: maximize uncertainty eliminated per run and converge on a scientifically defensible Space Apps entry.
 
 ## Current thesis
@@ -884,3 +884,41 @@ Next: acquire analysis-grade, source-pinned Earth measurements and explicit nega
 - The previously pending E576 Actions run [#43176210399](https://github.com/stoicsatvik/NASA/actions/runs/43176210399) completed successfully: **8/8 tests passed**.
 - The E572 independent-analogue catalogue workflow also passed on the same E576 branch head.
 - The E576 result remains negative for HRSC as 10 m-scale independent horizontal control. No scientific claim state or challenge score changed.
+
+## E577 exact-head live result — 12 November 2026
+
+- Branch head: 316468d3674c71d3903836def1f4992d388fbba7; draft PR #137.
+- The exact-head E577 workflow run [#43181807071](https://github.com/stoicsatvik/NASA/actions/runs/43181807071) completed successfully at the workflow level: **7/7 deterministic tests passed**, the compact receipt was generated, and artifact [13927155285](https://github.com/stoicsatvik/NASA/actions/runs/43181807071/artifacts/13927155285) was uploaded.
+- The live data decision inside that successful run was **ACQUISITION_ERROR**: metadata_http_status=null, selected_file=null, file_count=null and data_rows=null. No credentials were used and no raw values were stored.
+- The first 5 MB metadata response overflow was addressed with the documented ScienceBase fields projection. The projected request still failed before an HTTP status was captured. The logs do not identify the transport exception; do not invent a cause.
+- This is **not** evidence that the USGS release contains no data, and it is not a measured scientific null. It is a failed live acquisition attempt. No file was selected or downloaded.
+
+### Consequence for E001 and challenge selection
+
+- E577 does not supply an Earth-side positive-site sample. E001 known-site recovery remains **NOT YET MEASURED**.
+- E576 independently rejected HRSC as a 10 m-scale absolute horizontal-control source; retain it only for coarse cross-sensor comparison.
+- E572 still leaves the independent analogue catalogue as a candidate-site index, not quantitative labels or negative controls.
+- The all-14 challenge screen still ranks Martian Map (4.10) and MODIS/VIIRS (4.00) above planetary analog (2.93). The E531 sensitivity screen is heuristic, but its reported winner frequencies favour Martian Map under the tested perturbations. Planetary analog remains the scientific research thesis under test, **not** the readiness leader and **not** a proven best challenge. No challenge is locked.
+
+### Next move
+
+Do not repeat the same ScienceBase endpoint with more guessed URL variants. Pivot to a different legitimate public Earth-side dataset or a separately controlled published analogue source. Preserve provenance and reject any candidate whose coordinates, physical descriptors, measurement support or non-analogue controls cannot be independently defended. E001 runs only after a positive-site set, matched Mars-side feature family and defensible negative controls exist.
+
+Claim states remain unchanged: repo operating system SUPPORTED; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN; challenge-selection superiority NOT YET PROVEN.
+
+## E577 null-safe receipt correction — 12 November 2026
+
+- Run [#43185820740](https://github.com/stoicsatvik/NASA/actions/runs/43185820740): 7/7 deterministic tests passed; the live receipt had data_sample=null and the CLI summary formatter raised AttributeError on nested .get access. The sanitized artifact still uploaded. This is a software robustness failure, not a scientific result.
+- Run [#43185828498](https://github.com/stoicsatvik/NASA/actions/runs/43185828498): workflow and 7/7 deterministic tests passed; receipt decision remained ACQUISITION_ERROR, with metadata_http_status=null, no file_count, no selected file and no data rows. Artifact 13928595688 uploaded. No credentials or raw values.
+- Added a null-safe receipt summarizer and regression tests for null, delimited and ZIP data summaries. The E577 workflow now runs tests on push/PR; the live ScienceBase probe is manual-only to avoid repeating the same external request on documentation/test changes.
+- No new data were acquired. This is not evidence that the USGS release contains no data and not a scientific null. E001 remains NOT YET MEASURED.
+- Next: pivot to a different independent Earth-side dataset/source. Do not repeat the same ScienceBase endpoint with guessed URL variants.
+
+
+
+## E577 current-head deterministic revalidation — 12 November 2026
+
+- Current branch head `f28fad133b9e55a8b84429af7c3fa08756f07d3c`: push workflow [#43186974168](https://github.com/stoicsatvik/NASA/actions/runs/43186974168) passed **7/7 deterministic tests**; inherited E572 audit [#43186974229](https://github.com/stoicsatvik/NASA/actions/runs/43186974229) passed.
+- The live-probe job was skipped; no repeat network request was made.
+- Last live attempt remains [#43185828498](https://github.com/stoicsatvik/NASA/actions/runs/43185828498): null-safe receipt generation succeeded but data access remained `ACQUISITION_ERROR` with no captured HTTP status, selected file or rows.
+- No source absence or scientific null is inferred. Keep E001 NOT YET MEASURED and pivot to a different independent Earth-side source; do not retry the same endpoint using guessed URL variants.
