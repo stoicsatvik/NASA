@@ -1165,3 +1165,18 @@ No channel is missing in the prefix. Particle-count maxima are 48, 28 and 15, wi
 - E001 remains NOT YET MEASURED; cross-body similarity NOT YET PROVEN; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN.
 
 Highest-value next action: stop the same-site CSV route work unless official metadata exposes a distinct direct file URI. Return compute to cross-body physically comparable feature evidence and the E001 known-analogue gate. Do not spend time on geospatial UI polish before evidence.
+
+
+## E599 — CTX–MOLA QA sign and control-lineage documentation audit (13 November 2026)
+
+- Draft source audit on `research/e599-ctx-mola-sign-control-audit-20261113`, stacked on E598. Main untouched.
+- Official USGS product documentation says CTX DTMs are aligned to individual MOLA shot tracks using ASP, and that `qa_metrics.txt` contains final **CTX–MOLA differences after ground control**. It also lists the item-level provenance processing commands and MOLA control-point CSV as available assets.
+- Official ASP `geodiff` documentation says the default is first input minus second input; `--reverse` flips the sign. This makes CTX-minus-MOLA the expected interpretation if the USGS QA asset follows its product label and default argument order.
+- Official ASP `pc_align` documentation defines input 1 as the fixed/reference cloud and input 2 as the movable/source cloud. The USGS product page says CTX is aligned to MOLA, but the reviewed public docs do not expose this item's exact command, `--reverse` flag, MOLA shot IDs/grouping, or tool version.
+- **Claim update:** product-level CTX–MOLA QA semantics SUPPORTED; product-family MOLA-shot control SUPPORTED; item-specific `geodiff` order/reverse flag and exact `pc_align` control lineage NOT YET VERIFIED. Keep the +27 m residual sign as reported; do not interpret it as CTX physically higher/lower until item-specific provenance is retrieved.
+- Existing E582 MOLA CSV has 8,750 rows with latitude/longitude/radius; radius is planet-centre radius and must not be silently treated as areoid elevation. These are control inputs, not held-out validation.
+- No raw raster, new measurement, or credentialed access. Documentation-only; no CI/benchmark claimed.
+- Durable report: `research/E599_CTX_MOLA_GEODIFF_SIGN_CONTROL_AUDIT_20261113.md`; structured receipt: `research/results/E599_CTX_MOLA_GEODIFF_SIGN_CONTROL_AUDIT_20261113.json`.
+- All required NASA claim states remain: cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN; challenge-selection superiority NOT YET PROVEN.
+- Next action: acquire only the pinned item's public provenance asset via a bounded no-auth STAC request, if available, and parse the exact command/shot lineage. If unavailable, preserve ambiguity and seek an independent control set. Do not spend on UI polish.
+
