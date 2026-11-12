@@ -38,6 +38,15 @@ LINE_PROJECTION_OFFSET = 1439.5 <pix>
 SAMPLE_PROJECTION_OFFSET = 2879.5 <pix>
 CENTER_LATITUDE = 0 <deg>
 CENTER_LONGITUDE = 180 <deg>
+MAP_PROJECTION_ROTATION = 0.0
+LINE_FIRST_PIXEL = 1
+LINE_LAST_PIXEL = 2880
+SAMPLE_FIRST_PIXEL = 1
+SAMPLE_LAST_PIXEL = 5760
+MAXIMUM_LATITUDE = 90 <deg>
+MINIMUM_LATITUDE = -90 <deg>
+WESTERNMOST_LONGITUDE = 0 <deg>
+EASTERNMOST_LONGITUDE = 360 <deg>
 POSITIVE_LONGITUDE_DIRECTION = "EAST"
 COORDINATE_SYSTEM_NAME = "MEAN EARTH/POLAR AXIS OF DE421"
 MINIMUM = -9.075
@@ -185,3 +194,13 @@ def test_range_reader_accepts_exact_streamed_payload():
     )
     assert read_bounded_range_response(response, 100, 115, 1000) == b"0123456789abcdef"
     assert response.iterated is True
+
+
+def test_projection_rotation_and_extent_are_pinned():
+    label = LABEL.replace(
+        "MAP_PROJECTION_ROTATION = 0.0",
+        "MAP_PROJECTION_ROTATION = 1.0",
+    )
+    fields = parse_label(label)
+    with pytest.raises(ValueError, match="map_projection_rotation_deg"):
+        validate_label(fields)
