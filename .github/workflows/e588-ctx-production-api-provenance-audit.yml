@@ -1,6 +1,13 @@
 name: E588 production CTX STAC provenance audit
 
 on:
+  push:
+    branches:
+      - research/e588-ctx-production-api-provenance-audit-20261112
+    paths:
+      - experiments/e588_ctx_production_api_provenance_audit.py
+      - tests/test_e588_ctx_production_api_provenance_audit.py
+      - .github/workflows/e588-ctx-production-api-provenance-audit.yml
   pull_request:
     branches:
       - research/e587-ctx-processing-provenance-audit-20261112
@@ -9,8 +16,6 @@ on:
       - experiments/e588_ctx_production_api_provenance_audit.py
       - tests/test_e588_ctx_production_api_provenance_audit.py
       - .github/workflows/e588-ctx-production-api-provenance-audit.yml
-      - FOUNDRY_STATE.md
-      - research/E588_CTX_PRODUCTION_API_PROVENANCE_AUDIT_20261112.md
 
 permissions:
   contents: read
