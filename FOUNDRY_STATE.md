@@ -1131,3 +1131,16 @@ Next gate: resolve item-specific `geodiff` order/control provenance; then inspec
 - 14,192 distinct timestamp values are all repeated, approximately six rows per timestamp on average. The file is nondecreasing with duplicates; it is not one row per minute. The E590 lexicographic extrema are superseded for chronological interpretation, while the original E590 receipt remains unchanged.
 - Supported: timestamp parsing and minute-spaced transitions between distinct timestamp groups in this prefix. Not established: row semantics, raw 1 Hz acquisition, averaging algorithm, timezone, calibration, wBSNE mass conversion, sediment flux or E001 admissibility.
 - Next experiment: aggregate Record Number progression and per-timestamp group sizes/channel patterns from the same bounded prefix; reconcile against the source data dictionary before any temporal covariation analysis.
+
+## E597 — bounded Grand Falls row-group and sensor-channel semantics (12 November 2026)
+
+Follow-up to E592's exact 5 MB CSV prefix and E595's parsed source dictionary. E595 establishes that `Record_Number` is a sequential row identifier, not a sensor identifier; the CSV has three wind-speed, three particle-count, three uncalibrated kinetic-energy and three wBSNE voltage columns. E597 re-reads only the exact E590/E592 5,000,000-byte prefix, verifies both pinned prefix hashes, and measures row-ID progression, timestamp-group sizes, per-row channel completeness and within-group channel-vector uniqueness.
+
+The audit stores no CSV rows, timestamps, record IDs, coordinates or channel values. It retains only aggregate counts, distributions and the two prefix hashes. The test must distinguish:
+- one row per minute with repeated timestamps caused by an upstream export error;
+- multiple sequential row records per minute;
+- six duplicated complete channel vectors per timestamp;
+- six distinct complete or partially populated channel vectors per timestamp.
+
+Even if six rows per timestamp are confirmed, that does not establish six sensors, synchronized acquisition, replicate independence, calibration or sediment mass flux. The wBSNE #3 height remains undefined as “XX cm”; kinetic-energy units remain uncalibrated. E001 remains NOT YET MEASURED because this is one Earth site without an independently labelled control cohort or matched planetary feature matrix.
+
