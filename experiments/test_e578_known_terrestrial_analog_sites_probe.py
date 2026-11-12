@@ -10,6 +10,7 @@ from experiments.e578_known_terrestrial_analog_sites_probe import (
     ITEM_ID,
     ITEM_URL,
     choose_candidate,
+    classify_shapefile_layer,
     parse_dbf_header,
     parse_shapefile_header,
     summarize_receipt,
@@ -39,12 +40,12 @@ def dbf_fixture():
     return bytes(payload)
 
 
-def shp_fixture():
+def shp_fixture(shape_type=1):
     payload = bytearray(100)
     struct.pack_into(">i", payload, 0, 9994)
     struct.pack_into(">i", payload, 24, 50)
     struct.pack_into("<i", payload, 28, 1000)
-    struct.pack_into("<i", payload, 32, 1)
+    struct.pack_into("<i", payload, 32, shape_type)
     struct.pack_into("<4d", payload, 36, -120.0, 25.0, 15.0, 70.0)
     return bytes(payload)
 
@@ -112,6 +113,41 @@ class E578Tests(unittest.TestCase):
         self.assertFalse(summary["raw_rows_stored"])
         self.assertNotIn("coordinates", summary)
 
+
+    def test_point_shapefile_requires_identity_type_and_crs(self):
+        buffer = io.BytesIO()
+        with zipfile.ZipFile(buffer, "w") as archive:
+            archive.writestr("analog_sites.shp", shp_fixture())
+            archive.writestr("analog_sites.dbf", dbf_fixture())
+            archive.writestr("analog_sites.prj", 'GEOGCS["WGS 84",AUTHORITY["EPSG","4326"]]')
+        summary = summarize_zip(buffer.getvalue())
+        self.assertEqual(
+            classify_shapefile_layer(summary),
+            "PUBLIC_ANALOG_POINT_LAYER_ACQUIRED_SCHEMA_VERIFIED",
+        )
+
+    def test_polygon_shapefile_is_not_admitted_as_point_layer(self):
+        buffer = io.BytesIO()
+        with zipfile.ZipFile(buffer, "w") as archive:
+            archive.writestr("analog_sites.shp", shp_fixture(shape_type=5))
+            archive.writestr("analog_sites.dbf", dbf_fixture())
+            archive.writestr("analog_sites.prj", 'GEOGCS["WGS 84",AUTHORITY["EPSG","4326"]]')
+        summary = summarize_zip(buffer.getvalue())
+        self.assertEqual(
+            classify_shapefile_layer(summary),
+            "PUBLIC_VECTOR_LAYER_ACQUIRED_NON_POINT_GEOMETRY",
+        )
+
+    def test_point_shapefile_without_identity_type_or_crs_is_incomplete(self):
+        summary = {
+            "dbf": {"record_count": 7, "fields": [{"name": "SITE_NAME"}]},
+            "shapefile": {"shape_type": 1},
+            "projection": None,
+        }
+        self.assertEqual(
+            classify_shapefile_layer(summary),
+            "PUBLIC_ANALOG_POINT_LAYER_ACQUIRED_SCHEMA_INCOMPLETE",
+        )
 
 if __name__ == "__main__":
     unittest.main()

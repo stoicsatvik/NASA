@@ -34,6 +34,7 @@ ITEM_URL = (
     + urllib.parse.urlencode({"format": "json", "fields": ITEM_FIELDS})
 )
 SUPPORTED_EXTENSIONS = {".zip", ".geojson", ".json", ".csv", ".tsv", ".txt"}
+POINT_SHAPE_TYPES = frozenset({1, 8, 11, 18, 21, 28})
 
 
 def file_name(record: dict) -> str:
@@ -210,6 +211,43 @@ def safe_file_record(record: dict) -> dict:
     }
 
 
+def classify_shapefile_layer(vector_summary: dict) -> str:
+    """Fail closed unless a non-empty DBF is paired with point geometry,
+    site identity/type fields, and a recognized EPSG authority.
+    """
+    dbf = vector_summary.get("dbf")
+    shp = vector_summary.get("shapefile")
+    projection = vector_summary.get("projection")
+    if not isinstance(dbf, dict) or not isinstance(shp, dict) or dbf.get("record_count", 0) <= 0:
+        return "PUBLIC_FILE_ACQUIRED_SCHEMA_INCOMPLETE"
+    if shp.get("shape_type") not in POINT_SHAPE_TYPES:
+        return "PUBLIC_VECTOR_LAYER_ACQUIRED_NON_POINT_GEOMETRY"
+
+    fields = {
+        re.sub(r"[^a-z0-9]", "", str(field.get("name", "")).lower())
+        for field in dbf.get("fields", [])
+        if isinstance(field, dict)
+    }
+    identity_fields = {
+        "name", "site", "sitename", "siteid", "sitecode", "location",
+        "analogname", "analoguename", "analogsite", "analoguesite",
+    }
+    type_fields = {
+        "type", "sitetype", "analogtype", "analoguetype", "featuretype",
+        "process", "landform", "category", "feature", "analog", "analogue",
+    }
+    has_identity = bool(fields & identity_fields)
+    has_type = bool(fields & type_fields)
+    epsg_candidates = (
+        projection.get("epsg_authority_candidates", [])
+        if isinstance(projection, dict)
+        else []
+    )
+    if has_identity and has_type and epsg_candidates:
+        return "PUBLIC_ANALOG_POINT_LAYER_ACQUIRED_SCHEMA_VERIFIED"
+    return "PUBLIC_ANALOG_POINT_LAYER_ACQUIRED_SCHEMA_INCOMPLETE"
+
+
 def audit() -> dict:
     metadata = fetch_bounded(ITEM_URL, limit=MAX_METADATA_BYTES)
     result = {
@@ -286,10 +324,12 @@ def audit() -> dict:
         return result
     result["data_sample"] = inspect_payload(name, full["payload"])
     vector = result["data_sample"].get("vector_summary", {})
-    dbf = vector.get("dbf") if isinstance(vector, dict) else None
-    shp = vector.get("shapefile") if isinstance(vector, dict) else None
-    if dbf and shp and dbf.get("record_count", 0) > 0:
-        result["decision"] = "PUBLIC_ANALOG_POINT_LAYER_ACQUIRED_SCHEMA_VERIFIED"
+    if (
+        isinstance(vector, dict)
+        and vector.get("dbf") is not None
+        and vector.get("shapefile") is not None
+    ):
+        result["decision"] = classify_shapefile_layer(vector)
     elif result["data_sample"].get("feature_count", 0) > 0:
         result["decision"] = "PUBLIC_ANALOG_FEATURE_COLLECTION_ACQUIRED"
     else:
