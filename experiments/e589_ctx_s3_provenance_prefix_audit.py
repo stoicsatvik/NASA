@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import shlex
 import sys
 import urllib.parse
@@ -110,14 +111,14 @@ def parse_qa_metrics(payload: bytes) -> dict[str, Any]:
         return {"decision": "QA_TEXT_NOT_UTF8", "line_count": 0, "metrics": [], "raw_text_stored": False}
     metrics = []
     pattern = re.compile(
-        r"(?i)\\b(mean|median|std(?:dev|_dev)?|standard\\s+deviation|maximum|minimum|max|min)\\b[^0-9+\\-]*([-+]?\\d+(?:\\.\\d+)?(?:[eE][-+]?\\d+)?)"
+        r"(?i)\b(mean|median|std(?:dev|_dev)?|standard\s+deviation|maximum|minimum|max|min)\b[^0-9+\-]*([-+]?\d+(?:\.\d+)?(?:[eE][-+]?\d+)?)"
     )
     for line in text.splitlines():
         match = pattern.search(line)
         if match:
-            unit = "m" if re.search(r"(?i)\\b(m|meter|meters)\\b", line) else None
+            unit = "m" if re.search(r"(?i)\b(m|meter|meters)\b", line) else None
             metrics.append({
-                "metric": re.sub(r"\\s+", "_", match.group(1).lower()),
+                "metric": re.sub(r"\s+", "_", match.group(1).lower()),
                 "value": float(match.group(2)),
                 "unit": unit,
             })
@@ -546,6 +547,7 @@ def summarize_receipt(receipt: dict[str, Any]) -> dict[str, Any]:
         "raw_s3_xml_stored": False,
         "full_object_keys_stored": False,
         "raw_provenance_stored": False,
+        "raw_qa_text_stored": False,
         "local_paths_stored": False,
         "signed_query_values_stored": False,
     }
