@@ -75,13 +75,16 @@ def correlation_matrix(wind: np.ndarray, particle: np.ndarray, method: str = "sp
         raise ValueError("method must be spearman or pearson")
     wind = wind - wind.mean(axis=1, keepdims=True)
     particle = particle - particle.mean(axis=1, keepdims=True)
-    wind_norm = np.linalg.norm(wind, axis=1, keepdims=True)
-    particle_norm = np.linalg.norm(particle, axis=1, keepdims=True)
-    if np.any(wind_norm == 0) or np.any(particle_norm == 0):
-        raise ValueError("constant channel cannot be correlated")
-    wind = wind / wind_norm
-    particle = particle / particle_norm
-    return wind @ particle.T
+    wind_norm = np.linalg.norm(wind, axis=1)
+    particle_norm = np.linalg.norm(particle, axis=1)
+    valid_wind = wind_norm > 0
+    valid_particle = particle_norm > 0
+    result = np.full((wind.shape[0], particle.shape[0]), np.nan, dtype=float)
+    if np.any(valid_wind) and np.any(valid_particle):
+        normalized_wind = wind[valid_wind] / wind_norm[valid_wind, None]
+        normalized_particle = particle[valid_particle] / particle_norm[valid_particle, None]
+        result[np.ix_(valid_wind, valid_particle)] = normalized_wind @ normalized_particle.T
+    return result
 
 
 def circular_shift_max_null(
@@ -219,16 +222,26 @@ def _matrix_summary(matrix: np.ndarray, label: str) -> dict:
         column: int(np.count_nonzero(matrix[:, ALL_CHANNELS.index(column)]))
         for column in WIND_CHANNELS + PARTICLE_CHANNELS
     }
+    finite_values = np.abs(log_spearman[np.isfinite(log_spearman)])
+    to_json = lambda values: [
+        [float(value) if np.isfinite(value) else None for value in row]
+        for row in values
+    ]
+    constant_channels = [
+        column for column in WIND_CHANNELS + PARTICLE_CHANNELS
+        if float(np.std(matrix[:, ALL_CHANNELS.index(column)])) == 0.0
+    ]
     return {
         "observation_unit": label,
         "observation_count": int(matrix.shape[0]),
-        "spearman_raw_particle_count": raw_spearman.tolist(),
-        "spearman_log1p_particle_count": log_spearman.tolist(),
-        "spearman_binary_particle_detection": binary_spearman.tolist(),
-        "pearson_raw_particle_count": raw_pearson.tolist(),
+        "spearman_raw_particle_count": to_json(raw_spearman),
+        "spearman_log1p_particle_count": to_json(log_spearman),
+        "spearman_binary_particle_detection": to_json(binary_spearman),
+        "pearson_raw_particle_count": to_json(raw_pearson),
         "zero_fraction": zero_fraction,
         "nonzero_count": nonzero_count,
-        "max_abs_spearman_log1p": float(np.max(np.abs(log_spearman))),
+        "constant_channels": constant_channels,
+        "max_abs_spearman_log1p": float(finite_values.max()) if finite_values.size else None,
     }
 
 
