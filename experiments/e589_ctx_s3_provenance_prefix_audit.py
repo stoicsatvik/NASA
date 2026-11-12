@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import shlex
 import sys
 import urllib.parse
 import xml.etree.ElementTree as ET
