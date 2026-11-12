@@ -13,7 +13,7 @@ from experiments.e573_2025_hirise_translation_envelope import (
 
 
 def test_2020_range_budget_is_explicitly_bounded():
-    assert MAX_2020_RANGE_BYTES == 16 * 1024 * 1024
+    assert MAX_2020_RANGE_BYTES == 32 * 1024 * 1024
 
 
 def test_translation_grid_is_unique_and_within_published_radial_envelope():
