@@ -11,7 +11,7 @@ on:
   pull_request:
     branches:
       - research/e582-ctx-qa-mola-control-audit-20261112
-    types: [opened, synchronize]
+    types: [opened, synchronize, reopened]
     paths:
       - experiments/e583_ctx_qa_cohort_screen.py
       - tests/test_e583_ctx_qa_cohort_screen.py
