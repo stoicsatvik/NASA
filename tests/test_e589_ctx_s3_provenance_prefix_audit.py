@@ -100,6 +100,33 @@ class E589Tests(unittest.TestCase):
         self.assertEqual(result["command_count"], 0)
         self.assertIn("$.processes", [entry["path"] for entry in result["command_like_key_paths"]])
 
+
+    def test_json_tool_objects_with_reference_and_source_fields_are_summarized(self):
+        payload = {
+            "properties": {
+                "processing": {
+                    "pc_align": {
+                        "reference": "/data/CTX_reference.tif",
+                        "source": "/data/MOLA_source.csv",
+                    },
+                    "geodiff": {
+                        "dem": "/data/CTX_reference.tif",
+                        "csv": "/data/MOLA_source.csv",
+                        "reverse": True,
+                    },
+                }
+            }
+        }
+        result = parse_provenance_payload("provenance.json", json.dumps(payload).encode("utf-8"))
+        pc = next(r for r in result["tool_records"] if r["tool"] == "pc_align")
+        gd = next(r for r in result["tool_records"] if r["tool"] == "geodiff")
+        self.assertEqual(pc["reference_role"], "CTX_DTM")
+        self.assertEqual(pc["source_role"], "MOLA_CONTROL")
+        self.assertEqual(gd["effective_sign_semantics"], "MOLA_MINUS_CTX")
+        serialized = json.dumps(result)
+        self.assertNotIn("/data", serialized)
+        self.assertIn("$.properties.processing.pc_align", serialized)
+
     def test_receipt_summary_contains_no_raw_keys_or_credentials(self):
         summary = summarize_receipt({
             "experiment": "E589",

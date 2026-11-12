@@ -23,7 +23,7 @@ from experiments.e588_ctx_production_api_provenance_audit import (  # noqa: E402
     fetch_bounded,
     safe_url_summary,
 )
-from experiments.e587_ctx_processing_provenance_audit import _command_summary, parse_provenance_text  # noqa: E402
+from experiments.e587_ctx_processing_provenance_audit import _command_summary, classify_operand, parse_provenance_text  # noqa: E402
 
 BUCKET_URL = "https://astrogeo-ard.s3-us-west-2.amazonaws.com/"
 ITEM_PREFIX = f"mars/mro/ctx/controlled/usgs/{ITEM_ID}/"
@@ -96,6 +96,84 @@ def parse_s3_listing(payload: bytes) -> dict[str, Any]:
     }
 
 
+
+
+
+def _tool_record_summary(tool: str, node: Any, path: str) -> dict[str, Any]:
+    """Summarize a structured tool record without retaining its argument strings."""
+    values: list[str] = []
+    reverse = False
+    if isinstance(node, dict):
+        reverse = bool(node.get("reverse") or node.get("reverse_sign") or node.get("--reverse"))
+        for key in ("argv", "args", "arguments", "command", "cmd", "invocation"):
+            value = node.get(key)
+            if isinstance(value, list) and all(isinstance(v, (str, int, float)) for v in value):
+                tokens = [str(v) for v in value]
+                if not any(token.lower().split("/")[-1] in {"pc_align", "geodiff"} for token in tokens[:2]):
+                    tokens = [tool] + tokens
+                line = shlex.join(tokens)
+                if reverse and tool == "geodiff" and "--reverse" not in tokens:
+                    line = tool + " --reverse " + line[len(tool):].lstrip()
+                parsed = _command_summary(line)
+                if parsed:
+                    return {"path": path[:240], **parsed}
+            if isinstance(value, str):
+                line = value if tool in value else tool + " " + value
+                if reverse and tool == "geodiff" and "--reverse" not in line:
+                    line = tool + " --reverse " + line[len(tool):].lstrip()
+                parsed = _command_summary(line)
+                if parsed:
+                    return {"path": path[:240], **parsed}
+        for key in ("reference", "reference_cloud", "fixed", "target", "source", "source_cloud", "moving", "input", "input1", "input2", "dem", "dem1", "dem2", "csv"):
+            value = node.get(key)
+            if isinstance(value, str):
+                values.append(value)
+        if values:
+            line = shlex.join([tool] + values + (["--reverse"] if reverse and tool == "geodiff" else []))
+            parsed = _command_summary(line)
+            if parsed:
+                return {"path": path[:240], **parsed}
+    elif isinstance(node, (str, list)):
+        if isinstance(node, str):
+            line = node if tool in node else tool + " " + node
+        else:
+            tokens = [str(v) for v in node]
+            if not any(token.lower().split("/")[-1] in {"pc_align", "geodiff"} for token in tokens[:2]):
+                tokens = [tool] + tokens
+            line = shlex.join(tokens)
+        if reverse and tool == "geodiff" and "--reverse" not in line:
+            line = tool + " --reverse " + line[len(tool):].lstrip()
+        parsed = _command_summary(line)
+        if parsed:
+            return {"path": path[:240], **parsed}
+    return {
+        "path": path[:240],
+        "tool": tool,
+        "record_type": type(node).__name__,
+        "child_keys": sorted(str(k) for k in node)[:80] if isinstance(node, dict) else [],
+        "operand_count": 0,
+        "reference_role": "UNRESOLVED" if tool == "pc_align" else None,
+        "source_role": "UNRESOLVED" if tool == "pc_align" else None,
+        "reverse_flag": reverse if tool == "geodiff" else None,
+        "command_arguments_recovered": False,
+    }
+
+
+def _structure_summary(node: Any, depth: int = 0) -> dict[str, Any]:
+    if depth > 5:
+        return {"type": type(node).__name__}
+    if isinstance(node, dict):
+        keys = sorted(str(k) for k in node)
+        selected = {}
+        for key in keys:
+            if key.lower() in {"pc_align", "geodiff", "processing", "provenance", "commands", "command", "argv", "args", "arguments", "inputs", "outputs", "reference", "source", "parameters", "options"}:
+                selected[key] = _structure_summary(node[key], depth + 1)
+        return {"type": "object", "keys": keys[:100], "selected": selected}
+    if isinstance(node, list):
+        return {"type": "array", "length": len(node), "sample": _structure_summary(node[0], depth + 1) if node else None}
+    if isinstance(node, str):
+        return {"type": "string", "length": len(node)}
+    return {"type": type(node).__name__}
 
 
 def parse_provenance_payload(name: str, payload: bytes) -> dict[str, Any]:
@@ -190,14 +268,36 @@ def parse_provenance_payload(name: str, payload: bytes) -> dict[str, Any]:
                         seen.add(digest)
                         commands.append(parsed)
 
-    walk(document)
+    tool_records: list[dict[str, Any]] = []
+    def collect_tool_records(node: Any, path: str = "$", depth: int = 0) -> None:
+        if depth > 24:
+            return
+        if isinstance(node, dict):
+            for key, value in node.items():
+                key_text = str(key).lower()
+                child_path = (path + "." + str(key))[:240]
+                if key_text in {"pc_align", "geodiff"}:
+                    tool_records.append(_tool_record_summary(key_text, value, child_path))
+                collect_tool_records(value, child_path, depth + 1)
+        elif isinstance(node, list):
+            for index, value in enumerate(node[:5000]):
+                collect_tool_records(value, f"{path}[{index}]"[:240], depth + 1)
+
+    collect_tool_records(document)
+    property_keys = sorted(str(k) for k in document.get("properties", {})) if isinstance(document, dict) and isinstance(document.get("properties"), dict) else []
+    asset_keys = sorted(str(k) for k in document.get("assets", {})) if isinstance(document, dict) and isinstance(document.get("assets"), dict) else []
+    commands.extend(record for record in tool_records if record.get("tool") in {"pc_align", "geodiff"} and record.get("operand_count", 0) >= 2)
     return {
         "decision": "JSON_PROCESSING_COMMANDS_FOUND" if commands else "JSON_WITHOUT_RECOGNIZED_COMMANDS",
         "json_sha256": hashlib.sha256(payload).hexdigest(),
         "top_level_keys": sorted(str(k) for k in document)[:120] if isinstance(document, dict) else [],
+        "property_keys": property_keys[:160],
+        "asset_keys": asset_keys[:100],
+        "structure": _structure_summary(document),
         "node_counts": node_counts,
         "max_depth": max_depth,
         "command_like_key_paths": key_paths[:120],
+        "tool_records": tool_records[:40],
         "command_count": len(commands),
         "commands": commands[:40],
         "raw_json_stored": False,
