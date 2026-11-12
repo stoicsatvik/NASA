@@ -72,7 +72,7 @@ class E575HiRISEControlIndependenceTests(unittest.TestCase):
                 text=True,
             )
             payload = output.read_text(encoding="utf-8")
-            self.assertTrue(payload.endswith("\\n"))
+            self.assertTrue(payload.endswith("\n"))
             self.assertEqual(json.loads(payload), self.result)
 
     def test_challenge_ranking_remains_conditional(self):
