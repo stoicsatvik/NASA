@@ -1,0 +1,48 @@
+{
+  "experiment": "E596",
+  "source": {
+    "repository": "rachellelecussan/planetary-analogue-catalogue",
+    "commit": "62e6339bdf308de3bc987388d0faa7130cf57de9",
+    "geojson_git_blob_sha": "156edd871599cf9ac9c083658d14d034f660e35d",
+    "data_license": "CC-BY-4.0",
+    "code_license": "MIT",
+    "citation": "Le Cussan, R. (2026). Planetary Analogue Catalogue, v0.1.",
+    "url": "https://raw.githubusercontent.com/rachellelecussan/planetary-analogue-catalogue/62e6339bdf308de3bc987388d0faa7130cf57de9/data/sites.geojson"
+  },
+  "workflow_run_id": 43265462598,
+  "workflow_head_sha": "626c21a554e0c79cf21539c3de2fcfcb7c7fe3f8",
+  "feature_count": 16,
+  "review_status_counts": {"Draft": 16},
+  "draft_count": 16,
+  "verified_count": 0,
+  "coordinate_precision_counts": {
+    "Approximately 10 km": 10,
+    "Approximately 1 km": 2,
+    "Region only": 4
+  },
+  "primary_target_counts": {
+    "Mars": 10,
+    "Early Earth": 2,
+    "Moon": 2,
+    "Enceladus": 1,
+    "Europa": 1
+  },
+  "primary_analogue_type_counts": {
+    "Habitability / biological": 6,
+    "Mineralogical": 3,
+    "Volcanic": 2,
+    "Operational (instrument, rover or crew testing)": 2,
+    "Geochemical": 1,
+    "Impact": 1,
+    "Geological / geomorphological": 1
+  },
+  "reference_count": 96,
+  "photo_count": 42,
+  "sensitive_site_count": 7,
+  "e001_label_admission": "NONE; source review status is not an independently validated ground-truth label",
+  "e001_known_site_recovery": "NOT_YET_MEASURED",
+  "cross_body_similarity": "NOT_YET_PROVEN",
+  "novel_analogue_discovery": "NOT_YET_PROVEN",
+  "raw_coordinates_retained": false,
+  "raw_geometry_retained": false
+}
