@@ -62,3 +62,23 @@ If the row-group pattern recurs, retain the mechanism as unresolved and stop tre
 - The metadata-supplied endpoint returned a payload whose Content-Length did not equal the pinned 1,091,813-byte catalogue size. The implementation rejected it before parsing.
 - The corrected code now records the actual response media type, Content-Length, bytes read, payload hash, host and header-admissibility flag as a sanitized negative receipt. It does not reinterpret an HTML or truncated response as sensor data.
 - This is an endpoint/payload-integrity result, not evidence about the physical row-group pattern.
+
+
+## Final exact-head result — 12 November 2026
+
+- Workflow [#43271607662](https://github.com/stoicsatvik/NASA/actions/runs/43271607662) passed all 6 deterministic tests, completed the bounded source request and validated the aggregate receipt. Artifact #13966839833 SHA-256: 3eb25046d061ac6974175a7127f2430b3f2eadfa22fbea238211f96ddd9faf50.
+- The pinned catalogue metadata was HTTP 200 and matched SHA-256 ce33f7a8a18d0076d0b883f634447c0466fa8354e9c3577ff43b48171225e389.
+- The exact metadata-listed record is pinned as SensorData_02-14-24_to_02-16-24.csv, 1,091,813 bytes. Its supplied URL returned HTTP 200 from sciencebase.usgs.gov but the response was text/html, only 4,255 bytes, with no Content-Length header. Payload SHA-256: 01d324b90d086dd7389e13cfabbc185a7b7afe7917620e05254248773d01e1a2. The CSV header was inadmissible.
+- The 1,091,813-byte CSV was **not acquired or parsed**. No row count, timestamp grouping, channel-vector or record-number result is claimed. This is a source-route/payload-integrity negative, not a scientific null.
+- Independent public-catalogue cross-checks: Data.gov lists only the DOI landing page as the Digital Data access URL and the original metadata XML as a separate resource; the USGS release page describes the dataset but does not expose a direct CSV URL in its page content. Sources: [USGS release page](https://www.usgs.gov/data/imagery-sediment-collection-photogrammetry-and-meteorological-data-july-2023-november-2024), [Data.gov record](https://catalog.data.gov/dataset/sediment-transport-data-from-july-2023-to-november-2024-grand-falls-dune-field-arizona), [DOI 10.5066/P13HPPYM](https://doi.org/10.5066/P13HPPYM).
+- Stop retrying this same metadata-supplied HTML route. Resume only if a distinct direct file URL is exposed by official metadata or the publisher. The Navajo Nation fieldwork permit boundary remains in force; no field visit or contact was attempted.
+
+## Final claim boundary
+
+- Exact catalogue record identity: SUPPORTED AS PINNED.
+- Metadata-supplied payload as the requested CSV: NOT ESTABLISHED.
+- February 2024 row semantics: NOT YET MEASURED.
+- Cross-release row-pattern recurrence: NOT YET MEASURED.
+- Cross-body similarity: NOT YET PROVEN.
+- Known-site recovery / E001: NOT YET MEASURED.
+- Novel analogue discovery and local validation advantage: NOT YET PROVEN.
