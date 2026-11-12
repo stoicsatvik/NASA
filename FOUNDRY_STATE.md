@@ -1061,3 +1061,17 @@ Next gate: resolve item-specific `geodiff` order/control provenance; then inspec
 - Parses only geodiff and pc_align command semantics. ASP docs define geodiff as first DEM minus second by default (or reversed with --reverse), and pc_align as first fixed reference / second movable source. Exact item-linked commands are required before assigning CTX/MOLA roles.
 - E587 is a provenance audit, not an independent accuracy test. MOLA control points remain control inputs, not held-out validation. A pc_align command alone does not prove which transformed output generated the released DTM.
 - Exact-head Actions #43236020927 passed 10/10 deterministic tests and completed the bounded live STAC inventory; artifact #13951878650. Exact E583 item-set match 9/9. All nine items expose a text/plain MOLA CSV titled 'MOLA Spot Observations Used for initial pc-align'; zero provenance-named assets, zero candidate downloads, zero provenance bytes and zero item-specific geodiff/pc_align commands. The MOLA CSV is a control input, not held-out validation. Generic ASP docs define geodiff/pc_align semantics but do not establish this item's command order. Next: search official release documentation/source packages for separately published processing-command records; do not guess object paths.
+
+
+## E588 — USGS CTX product-level control provenance boundary (12 November 2026)
+
+- Isolated on `research/e588-usgs-ctx-product-control-boundary-20261112`, stacked on E587 / PR #150. Main untouched.
+- Independent USGS CTX Analysis Ready Data documentation confirms CTX stereo DTMs have nominal 20 m post spacing and are aligned to MOLA; associated orthoimages are generated with Ames Stereo Pipeline `point2dem`.
+- The public NASA/USGS open-data release description states global CTX bundle adjustment with ISIS `jigsaw` and iterative `pc_align` alignment to MOLA across 26 groupings.
+- USGS explicitly warns that different CTX DTMs can retain offsets because each is individually aligned to lower-resolution MOLA. CTX I/F is top-of-atmosphere reflectance affected by dust, illumination and topography, not direct surface albedo.
+- This independently supports product-level MOLA control, but does not identify the exact E583 per-item `geodiff` operands, `pc_align` reference/source order, grouping assignment or applied transform file. E587's nine MOLA CSVs remain control inputs, not held-out validation.
+- Decision: product-level CTX-to-MOLA control SUPPORTED; exact item-specific processing lineage NOT YET ESTABLISHED; independent accuracy and route safety NOT YET MEASURED/PROVEN. No E001, cross-body, novel-analogue, local-validation or challenge-selection claim changes.
+- Nominal 20 m post spacing is not MOLA support. Do not infer robust 20 m slope/roughness/traversability from grid spacing alone.
+- Source report: `research/E588_USGS_CTX_PRODUCT_CONTROL_BOUNDARY_20261112.md`. Sources: https://stac.astrogeology.usgs.gov/docs/data/mars/ctx/ ; https://registry.opendata.aws/nasa-usgs-controlled-mro-ctx-dtms/ ; https://astrogeology.usgs.gov/docs/concepts/missions/mro/ctx-data/ .
+- Documentation-only audit; no code/tests/benchmark or raster/control-point acquisition. E587 exact-head workflow remains 10/10 deterministic tests plus bounded STAC inventory; metadata-only S3 prefix inventory was pending.
+- Next: complete E587's bounded S3 sidecar inventory. If no item-linked sidecar exists, stop searching the same catalogue surface and pivot to independent validation or explicitly retain item-level lineage uncertainty.
