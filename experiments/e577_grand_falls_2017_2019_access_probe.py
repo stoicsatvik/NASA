@@ -21,7 +21,8 @@ from pathlib import Path, PurePosixPath
 
 ITEM_ID = "5f6e51f182ce38aaa24a73a7"
 DOI = "10.5066/P9IYGDGQ"
-ITEM_URL = f"https://www.sciencebase.gov/catalog/item/{ITEM_ID}?format=json"
+ITEM_FIELDS = "title,files.name,files.size,files.downloadUri,files.url"
+ITEM_URL = f"https://www.sciencebase.gov/catalog/item/{ITEM_ID}?" + urllib.parse.urlencode({"format": "json", "fields": ITEM_FIELDS})
 ALLOWED_HOSTS = {
     "www.sciencebase.gov",
     "sciencebase.gov",
@@ -243,6 +244,7 @@ def audit() -> dict:
         "experiment": "E577",
         "doi": DOI,
         "item_id": ITEM_ID,
+        "metadata_fields_requested": ITEM_FIELDS.split(","),
         "metadata_http_status": metadata["status"],
         "metadata_bytes": len(metadata["payload"]),
         "metadata_sha256": hashlib.sha256(metadata["payload"]).hexdigest(),
