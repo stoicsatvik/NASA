@@ -144,7 +144,11 @@ def parse_provenance_payload(name: str, payload: bytes) -> dict[str, Any]:
             argv = node.get("argv")
             args = node.get("args") or node.get("arguments")
             if isinstance(argv, list) and all(isinstance(v, (str, int, float)) for v in argv):
-                add_line(shlex.join([str(v) for v in argv]))
+                argv_values = [str(v) for v in argv]
+                has_tool = any(str(v).lower().split("/")[-1] in {"pc_align", "geodiff"} for v in argv_values[:2])
+                if isinstance(program, str) and not has_tool:
+                    argv_values = [program] + argv_values
+                add_line(shlex.join(argv_values))
             elif isinstance(program, str) and program.lower().split("/")[-1] in {"pc_align", "geodiff"}:
                 if isinstance(args, list) and all(isinstance(v, (str, int, float)) for v in args):
                     add_line(shlex.join([program] + [str(v) for v in args]))
@@ -163,6 +167,8 @@ def parse_provenance_payload(name: str, payload: bytes) -> dict[str, Any]:
                     key_paths.append({"path": child_path, "type": type(value).__name__, "length": length})
                 if isinstance(value, str):
                     node_counts["strings"] += 1
+                    if key_text.lower() in {"program", "tool", "executable"}:
+                        continue
                     if "pc_align" in value.lower() or "geodiff" in value.lower():
                         for parsed in parse_provenance_text(value.encode("utf-8")).get("commands", []):
                             digest = parsed["command_line_sha256"]
