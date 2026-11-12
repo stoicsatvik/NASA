@@ -4,7 +4,7 @@ import unittest
 from experiments.e585_ctx_bbox_overlap_audit import (
     analyze,
     intersection_bbox,
-    spherical_rectangle_area_m2,
+    spherical_rectangle_solid_angle_sr,
     validate_bbox,
 )
 
@@ -62,11 +62,24 @@ def fixture():
 
 
 class E585Tests(unittest.TestCase):
-    def test_bbox_validation_and_spherical_area(self):
+    def test_bbox_validation_and_solid_angle(self):
         bbox = validate_bbox([0, 0, 1, 1])
-        self.assertGreater(spherical_rectangle_area_m2(bbox), 0)
+        self.assertGreater(spherical_rectangle_solid_angle_sr(bbox), 0)
+        result = analyze(fixture())
+        self.assertIn("unit-sphere", result["spatial_measure_method"].lower())
+        self.assertNotIn("earth radius", result["spatial_measure_method"].lower())
         self.assertEqual(intersection_bbox(bbox, (1, 0, 2, 1)), None)
         self.assertEqual(intersection_bbox(bbox, (0.5, 0.5, 2, 2)), (0.5, 0.5, 1.0, 1.0))
+
+    def test_solid_angle_fraction_is_scale_free(self):
+        item = validate_bbox([0, 0, 2, 2])
+        clipped = intersection_bbox(item, validate_bbox([0, 0, 1, 2]))
+        self.assertIsNotNone(clipped)
+        fraction = (
+            spherical_rectangle_solid_angle_sr(clipped)
+            / spherical_rectangle_solid_angle_sr(item)
+        )
+        self.assertAlmostEqual(fraction, 0.5, places=12)
 
     def test_six_items_are_bbox_contained_and_three_are_partial(self):
         result = analyze(fixture())
