@@ -3,7 +3,7 @@
 Updated: 2026-11-12
 Class: Tier A
 Time horizon: NASA Space Apps Challenge, 14–15 Nov 2026
-Working branch: `research/e572-independent-analogue-catalogue-audit-20261112`
+Working branch: `research/e575-hirise-control-source-independence-audit-20261112`
 Main objective: maximize uncertainty eliminated per run and converge on a scientifically defensible Space Apps entry.
 
 ## Current thesis
@@ -848,3 +848,18 @@ Next: acquire analysis-grade, source-pinned Earth measurements and explicit nega
 - Added fail-closed source provenance checks and arithmetic invariants for the 239-point shared partition, both product valid totals, baseline +22/+73/+95 decomposition, and all offset min/max components.
 - Local exact-content validation: **13/13 unittest cases passed**; aggregate runner returned +22 shared / +73 footprint / +95 total and 76.8421% / 23.1579%. GitHub Actions validation on the clean-base branch is pending.
 - Independent horizontal registration, terrain accuracy, route safety, cross-body similarity, known-site recovery and novel analogue discovery remain unmeasured/not proven.
+
+
+## E575 — HiRISE control-source independence audit (12 November 2026)
+
+- The USGS MSR product reports 0.9 m 99th-percentile internal alignment between individual DEMs, 2.3 m vertical offsets between individual DEMs, and 10.2 m 99th-percentile alignment to the CTX reference. The 10.2 m value is CTX-relative, not absolute horizontal accuracy.
+- The LPSC 2025 paper states the stereo-pair images were horizontally aligned, DEMs vertically aligned to MOLA shot data, and the preliminary/final mosaic rigidly/affinely aligned to the existing Mars 2020 CTX DEM. The 1 m-at-30th-percentile / 3 m-at-80th-percentile inter-mosaic check uses ASP normalized cross-correlation between orthoimages; it is not an independent ground-control network or a DTM-to-ground-truth residual.
+- The USGS HiRISE DTM ARD guidance gives general best-case horizontal accuracy relative to MOLA PEDR of approximately 100 m because a MOLA shot spot is approximately 100 m across, and vertical accuracy approximately ±1.3 m. This is general product-family guidance, not a 2025 product-specific residual.
+- Result: no independent horizontal-control residual for the pinned 2025 MSR DTM was found in the public sources reviewed. E573/E574's 10.2 m translation grid remains a sensitivity diagnostic for a CTX-relative statistic, not an absolute-error bound or independent MOLA registration.
+- Localized offsets are reported near dune fields, smooth texture and dark regions; unresolved jitter or camera-model intrinsics are candidate causes. No cause or correction is established.
+- Challenge ranking remains provisional: Martian Map #11 4.10, MODIS/VIIRS #9 4.00, planetary analog #10 2.93. E575 changes no frozen score factor, so no numeric score change is made. No challenge is locked; planetary analog is not the current readiness-ranked leader.
+- Claim states: repo operating system SUPPORTED; internal HiRISE alignment SUPPORTED AS REPORTED; CTX-relative alignment SUPPORTED AS REPORTED; independent horizontal registration NOT YET MEASURED; absolute horizontal accuracy NOT ESTABLISHED; route safety NOT CLAIMED; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; planetary-analog challenge superiority NOT YET PROVEN.
+- Deterministic source-audit runner, report, receipt and eight standard-library tests: experiments/e575_hirise_control_source_independence_audit.py, research/E575_HIRISE_CONTROL_SOURCE_INDEPENDENCE_AUDIT_20261112.md, research/results/E575_HIRISE_CONTROL_SOURCE_INDEPENDENCE_AUDIT_20261112.json, tests/test_e575_hirise_control_source_independence_audit.py. The CLI receipt is checked for valid JSON and a real trailing newline. No raster acquisition, new elevation sample, route-safety claim, UI work or competition submission.
+- Exact-head E575 Actions [#43167818230](https://github.com/stoicsatvik/NASA/actions/runs/43167818230) passed 8/8 tests, CLI JSON generation, semantic receipt equality and aggregate artifact #13920647500. Initial newline and byte-order comparison failures remain preserved in runs #43167610009 and #43167695733. The inherited E572 source audit also passed [#43167818221](https://github.com/stoicsatvik/NASA/actions/runs/43167818221).
+- MOLA PEDR is an independent sensor family, but its approximately 100 m shot footprint is too coarse to validate a 10.2 m horizontal residual; held-out tracks are suitable only for gross-error screening.
+- Next: acquire a separate control network or independently controlled product with documented horizontal uncertainty materially below 10.2 m; measure held-out multi-patch residuals without fitting corrections to evaluation points.
