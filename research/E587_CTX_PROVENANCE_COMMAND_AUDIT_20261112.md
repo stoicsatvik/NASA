@@ -6,32 +6,26 @@ Base: E586 / PR #148. Draft research only; main untouched.
 
 ## Question
 
-Can item-linked USGS provenance assets identify the actual command operand order used to generate CTX–MOLA QA metrics and the initial MOLA control alignment?
+Can item-linked USGS provenance assets or separately stored files identify the actual command operand order used to generate CTX–MOLA QA metrics and the initial MOLA control alignment?
 
-## Exact source inventory result
+## STAC result
 
-One bounded anonymous STAC search returned the exact nine E583 item IDs. All nine items expose the same seven asset keys:
+One bounded anonymous STAC search returned the exact nine E583 item IDs. All nine expose the same seven asset keys: dtm, image, intersection_error, mola_csv, orthoimage, qa_metrics, thumbnail.
 
-- dtm
-- image
-- intersection_error
-- mola_csv
-- orthoimage
-- qa_metrics
-- thumbnail
-
-All nine expose a text/plain MOLA CSV asset titled **MOLA Spot Observations Used for initial pc-align**. This confirms the identity and stated purpose of the MOLA control-point asset for each selected product.
-
-No asset key/title identifies provenance, processing commands or pipeline history:
+All nine expose a text/plain MOLA CSV asset titled **MOLA Spot Observations Used for initial pc-align**. No asset key/title identifies provenance, processing commands or pipeline history:
 
 - Provenance candidate assets: 0/9.
 - Provenance downloads: 0.
 - Provenance bytes read: 0.
-- Relevant item-specific geodiff/pc_align commands: 0.
+- Item-specific geodiff/pc_align commands: 0.
 
-The bounded metadata receipt is artifact #13951878650 from Actions #43236020927. The raw STAC response and any raw item JSON were not retained. The aggregate artifact contains safe asset metadata summaries only; signed query values are not stored.
+The E587 first exact-head run #43236020927 passed 10/10 tests and uploaded aggregate artifact #13951878650.
 
-The E582 audit of the pinned P18 item separately acquired its MOLA CSV and counted 8,750 rows with latitude/longitude/radius columns. That is an item-specific control input inventory, not independent validation. This E587 run did not download any of the nine MOLA CSVs.
+## S3-prefix follow-on
+
+The second phase derives each exact product-folder prefix from that item's advertised DTM asset URL; it does not guess object paths. It issues a metadata-only S3 ListObjectsV2 request with max-keys=100, 500 KB per prefix, 5 MB total, and stops after access denial. It stores only object basenames, sizes, ETags and last-modified timestamps; full object keys and query values are not stored. It downloads no sidecar contents, MOLA CSV, QA text or raster.
+
+The result of the exact-head S3 prefix listing is pending.
 
 ## Tool semantics pinned from primary documentation
 
@@ -44,18 +38,11 @@ Sources:
 - https://stereopipeline.readthedocs.io/en/latest/tools/pc_align.html
 - https://stac.astrogeology.usgs.gov/docs/data/mars/ctxdtms/
 
+## Interpretation limits
+
+The MOLA CSV is a control input, not held-out validation. Generic ASP documentation defines command semantics but cannot establish item-specific command order. Even a discovered sidecar filename is not proof of its contents; no sidecar will be downloaded unless its identity and text type are explicitly established and the bounded follow-on is reviewed.
+
 ## Validation
 
-- Exact-head workflow #43236020927 passed **10/10 deterministic tests** and completed the bounded STAC asset inventory.
-- Aggregate artifact #13951878650 (2,582 bytes; seven-day retention).
-- Exact E583 item-set match: 9/9.
-- No provenance asset was downloaded because no provenance-named asset was exposed.
-- Parser tests cover geodiff first-minus-second, --reverse, --absolute, pc_align reference/source order, unknown input roles, path redaction, signed-query redaction, exact-item-set fail-closed behavior and narrow provenance selection.
-
-## Interpretation and next gate
-
-The MOLA CSV asset is explicitly described as the initial pc-align control input. It is not a held-out validation set. The exact pc_align operand order and exact geodiff operand order remain unresolved because the item-linked STAC asset inventory exposes no provenance file.
-
-Generic tool documentation defines command semantics but cannot substitute for the item-specific command. The QA values remain post-control product summaries; do not convert them into independent accuracy estimates or held-out residuals.
-
-Next: search the official dataset release documentation/source package for a separately published processing-command record. Do not guess S3 object paths or treat the MOLA control CSV as independent validation.
+- First exact-head run #43236020927: 10/10 deterministic tests passed; exact E583 item set 9/9; zero provenance assets exposed.
+- Second exact-head run: includes URL-derived S3-prefix inventory and fail-closed access-denial/truncation tests; result pending.
