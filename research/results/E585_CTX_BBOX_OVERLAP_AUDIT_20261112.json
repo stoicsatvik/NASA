@@ -87,7 +87,7 @@
     {
       "bbox_intersection_fraction_of_aoi": 0.179029,
       "bbox_intersection_fraction_of_item": 0.12279,
-      "id": "P05_002809_1975_XI_17N283W__P13_006000_1974_XI_18N283W",
+      "id": "P05_002809_1975_XI_17N283W__P13_006000_1974_XI_17N283W",
       "intersection_bbox_wgs84_lon_lat": [76.69, 17.41, 77.04805886, 19.41],
       "mean_difference_m": 28.4886,
       "median_difference_m": 27.9154,
