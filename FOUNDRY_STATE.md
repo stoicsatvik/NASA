@@ -1073,3 +1073,12 @@ Next gate: resolve item-specific `geodiff` order/control provenance; then inspec
 - No credentials, raw STAC JSON, raw provenance text, local filesystem paths, coordinates or signed query values are retained. Safe URL summaries preserve public S3 object paths so the next bounded prefix-listing experiment can target the verified object directory.
 - Exact-head workflow #43238810519 passed 7/7 deterministic tests and the production API GET. HTTP 200, 10,067 bytes. The official production item exposes the same seven assets and four link relations as E587, with no provenance property/link/asset/command metadata. The MOLA CSV asset title explicitly says it was used for initial pc-align. This reinforces that MOLA points are control inputs, not independent validation. The result is bounded to both STAC item representations; it does not prove the separate data-browser provenance record is absent.
 - The MOLA asset is titled 'MOLA Spot Observations Used for initial pc-align'; the collection description says the products are absolutely controlled to MOLA using pc_align. Exact pc_align input order, inverse-transform application and geodiff --reverse state remain NOT YET ESTABLISHED until recovered from processing commands.
+
+
+## E589 — verified public S3 item-prefix provenance audit (12 November 2026)
+
+- Isolated branch research/e589-ctx-s3-provenance-prefix-audit-20261112, stacked on E588 / PR #151. Main remains untouched.
+- E588's production STAC item exposed the public DTM, MOLA CSV and QA object paths but no provenance asset. E589 tests the exact verified item prefix in the public Astrogeology S3 bucket, where a processing-command sidecar may exist outside the STAC asset list.
+- One anonymous ListObjectsV2 request, max-keys=100, 1 MB cap, 20 s timeout; at most one provenance-like text object can be fetched, capped at 2 MB. No raster downloads, credentials, raw S3 XML, full object keys, raw provenance text, local paths or signed query values.
+- E589 result: PENDING exact-head workflow.
+- Item-specific pc_align order, inverse-transform application and geodiff --reverse remain NOT YET ESTABLISHED until actual commands are recovered.
