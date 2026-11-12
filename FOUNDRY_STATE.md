@@ -1085,3 +1085,12 @@ Next gate: resolve item-specific `geodiff` order/control provenance; then inspec
 - Claim states unchanged: product-level MOLA control SUPPORTED; item-specific lineage NOT YET ESTABLISHED; independent accuracy/route safety NOT YET MEASURED/PROVEN; E001 NOT YET MEASURED; cross-body similarity, novel discovery, local validation advantage and challenge-selection superiority NOT YET PROVEN.
 - Source report section appended to `research/E588_CTX_PRODUCTION_API_PROVENANCE_AUDIT_20261112.md`. Sources: https://stac.astrogeology.usgs.gov/docs/data/mars/ctx/ ; https://registry.opendata.aws/nasa-usgs-controlled-mro-ctx-dtms/ ; https://astrogeology.usgs.gov/docs/concepts/missions/mro/ctx-data/ .
 - Documentation-only review; no data download, code test or benchmark. E587's exact-head 14/14 run and complete 9-prefix inventory remain the relevant validation.
+
+### E589 bounded QA-metadata extraction (12 November 2026; PR #152 closed)
+
+- A later bounded run against the already inventoried P18 product prefix fetched only the 13,095-byte JSON metadata mirror and the 398-byte qa_metrics.txt; no raster or MOLA CSV was downloaded. The S3 listing itself is redundant with E587's exact nine-product inventory; PR #152 remains closed.
+- The JSON is an ordinary STAC item mirror (same seven assets and 18 ordinary properties), not processing provenance. It contains one textual pc_align mention with zero operands, no structured command record and zero executable commands.
+- The QA file mentions geodiff but gives no DEM operand order, CTX-MOLA/MOLA-CTX label or --reverse flag. Post-control CTX-MOLA diagnostic values: max 117.316 m; min -79.9007 m; mean 27.3687 m; standard deviation 10.934 m; median 26.7783 m.
+- These values are not independent accuracy or held-out validation. The MOLA points remain control inputs. Item-specific pc_align order, inverse-transform application and geodiff sign remain NOT YET ESTABLISHED.
+- Workflow #43242642721 passed 12/12 tests; artifact #13956436025, ZIP SHA-256 a7b3a9331886816f34697e30db7733dfb597165ac006ba6ee3a5631e5e335040. Metadata JSON SHA-256 05146f1b8636737d653bc6e2cfecfe7a5d43ff602c2e08e5d97b35da0321622d; QA text SHA-256 c577c0a83ccc58375b4a7790b6edd9eeee0d84de41f602c56ba00c424a8bcd5e.
+- This addendum integrates the bounded metadata result into the active E588 draft PR #151; it does not reopen or merge the closed E589 PR #152.
