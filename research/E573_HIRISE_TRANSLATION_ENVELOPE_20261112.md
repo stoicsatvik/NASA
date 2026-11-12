@@ -3,7 +3,7 @@
 Date: 12 November 2026  
 Branch: \`research/e573-hirise-translation-envelope-20261112\`  
 Parent: E572 / PR #131  
-Status: awaiting exact-head deterministic and bounded live validation
+Status: bounded live validation retry after range-plan preflight correction
 
 ## Question
 
@@ -32,9 +32,11 @@ Sources:
 - LPSC 2025 paper: https://www.hou.usra.edu/meetings/lpsc2025/pdf/1627.pdf
 - 2020 HiRISE product: https://astrogeology.usgs.gov/search/map/Mars/Mars2020/JEZ_hirise_soc_006_DTM_MOLAtopography_DeltaGeoid_1m_Eqc_latTs0_lon0_blend40
 
-## Exact-head result
+## Exact-head result and preserved failure
 
-Pending workflow execution. No support-sensitivity result is claimed until the live receipt reproduces the frozen zero-shift aggregates.
+Initial exact-head workflow [#43152358641](https://github.com/stoicsatvik/NASA/actions/runs/43152358641) passed all 4 deterministic tests, then failed before any 2020 point samples or 2025 DTM member were read. The receipt artifact [#13913928464](https://github.com/stoicsatvik/NASA/actions/runs/43152358641/artifacts/13913928464) records `RuntimeError: 2020 HiRISE point-window plan exceeds the 4 MiB range cap`; inspection of the exact branch showed E573 had raised the inherited reader cap to 16 MiB, so the failure was that the 13-offset union plan exceeded 16 MiB. The stale 4 MiB text in the exception was misleading and has been replaced with the actual planned byte count and configured cap. The TIFF `GDAL_NODATA` parser warning was non-fatal and was not the failure cause.
+
+The safe correction raises only the explicit 2020 point-window cap from 16 MiB to 32 MiB. This remains a hard bounded-range budget; it does not permit whole-file TIFF download. The deterministic test now asserts the 32 MiB cap. Exact-head bounded acquisition is pending. No support-sensitivity result is claimed until the live receipt reproduces the frozen zero-shift aggregates.
 
 ## Interpretation boundary
 
