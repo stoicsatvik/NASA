@@ -1,0 +1,107 @@
+{
+  "experiment": "E597",
+  "source_item_id": "67bf94acd34e8876fcbfc91b",
+  "source_file_name": "SensorData_07-07-23_to_11-03-23.csv",
+  "source_file_size_bytes": 67050032,
+  "workflow_run_id": 43267508332,
+  "workflow_head_sha": "8458bff33968531528402e00426d79b2af6e9135",
+  "sample": {
+    "mode": "bounded_stream_prefix",
+    "prefix_bytes": 5000000,
+    "complete_lines_bytes": 4999997,
+    "prefix_sha256": "f9f150f9eee2f3a8e477614b1ad4cd2d4fd4de5de20d3d74e3350dc4f41e86a6",
+    "complete_lines_sha256": "29f68a77ac948949d869a64790b7e7e7b795681fb81f2c6a4962657e980737f7",
+    "row_count": 85145,
+    "column_count": 14,
+    "incomplete_rows_dropped": 0,
+    "raw_rows_retained": false,
+    "raw_timestamps_retained": false,
+    "raw_record_numbers_retained": false,
+    "raw_channel_values_retained": false
+  },
+  "record_number": {
+    "source_definition": "Sequential number assigned to row by computer",
+    "numeric_record_count": 85145,
+    "unique_record_ids": 85145,
+    "min_record_id": 662976,
+    "max_record_id": 748120,
+    "strictly_increasing": true,
+    "unit_step_count": 85144,
+    "gap_count": 0,
+    "reset_or_duplicate_count": 0,
+    "timestamp_groups_with_distinct_record_ids": 14192,
+    "timestamp_groups_with_sequential_record_ids": 14192
+  },
+  "timestamps": {
+    "format": "%m/%d/%Y %H:%M",
+    "timezone": "NOT_ENCODED; naive wall-clock parse only",
+    "valid_timestamp_rows": 85145,
+    "invalid_timestamp_rows": 0,
+    "distinct_timestamp_groups": 14192,
+    "group_size_distribution": {"2": 1, "3": 1, "6": 14190},
+    "group_size_min": 2,
+    "group_size_max": 6,
+    "mean_group_size": 5.999507,
+    "median_group_size": 6,
+    "all_groups_repeated": true,
+    "adjacent_interval_seconds": {"0": 70953, "60": 14191},
+    "nondecreasing_in_file_order": true
+  },
+  "within_timestamp_group": {
+    "unique_channel_vector_count_distribution": {"1": 10480, "2": 2902, "3": 614, "4": 176, "5": 18, "6": 2},
+    "groups_with_all_rows_channel_vectors_distinct": 2,
+    "groups_with_all_rows_channel_vectors_identical": 10480,
+    "groups_with_partial_channel_vector_duplicates": 3710,
+    "groups_with_all_rows_all_12_channels_present": 14192,
+    "groups_with_any_row_channel_missing": 0,
+    "row_nonnull_channel_count_distribution": {"12": 85145},
+    "family_rows_with_all_three_channels_present": {
+      "kinetic_energy_uncalibrated": 85145,
+      "particle_count": 85145,
+      "wbsne_voltage_mvv": 85145,
+      "wind_speed_mph": 85145
+    },
+    "family_rows_with_any_channel_present": {
+      "kinetic_energy_uncalibrated": 85145,
+      "particle_count": 85145,
+      "wbsne_voltage_mvv": 85145,
+      "wind_speed_mph": 85145
+    }
+  },
+  "channel_summary": {
+    "Wind Speed - Low (mph)": {"numeric_count":85145,"missing_or_non_numeric_count":0,"min":0.0,"max":10.12,"mean":0.000461,"sample_sd":0.0687,"saturation_at_7999_count":0},
+    "Wind Speed - Mid (mph)": {"numeric_count":85145,"missing_or_non_numeric_count":0,"min":0.0,"max":10.12,"mean":0.000854,"sample_sd":0.1055,"saturation_at_7999_count":0},
+    "Wind Speed - High (mph)": {"numeric_count":85145,"missing_or_non_numeric_count":0,"min":0.0,"max":9.56,"mean":0.004081,"sample_sd":0.2039,"saturation_at_7999_count":0},
+    "Particle Count_Tot(1)": {"numeric_count":85145,"missing_or_non_numeric_count":0,"min":0.0,"max":48.0,"mean":0.001352,"sample_sd":0.2344,"saturation_at_7999_count":0},
+    "Particle Count_Tot(2)": {"numeric_count":85145,"missing_or_non_numeric_count":0,"min":0.0,"max":28.0,"mean":0.000529,"sample_sd":0.1198,"saturation_at_7999_count":0},
+    "Particle Count_Tot(3)": {"numeric_count":85145,"missing_or_non_numeric_count":0,"min":0.0,"max":15.0,"mean":0.000364,"sample_sd":0.0861,"saturation_at_7999_count":0},
+    "Kinetic Energy_Tot(1)": {"numeric_count":85145,"missing_or_non_numeric_count":0,"min":0.0,"max":6.0,"mean":0.000188,"sample_sd":0.0278,"saturation_at_7999_count":0},
+    "Kinetic Energy_Tot(2)": {"numeric_count":85145,"missing_or_non_numeric_count":0,"min":0.0,"max":7.0,"mean":0.000188,"sample_sd":0.0281,"saturation_at_7999_count":0},
+    "Kinetic Energy_Tot(3)": {"numeric_count":85145,"missing_or_non_numeric_count":0,"min":0.0,"max":7.0,"mean":0.000352,"sample_sd":0.0412,"saturation_at_7999_count":0},
+    "wBSNE #1 average (mV/V)": {"numeric_count":85145,"missing_or_non_numeric_count":0,"min":0.0,"max":0.075,"mean":0.069,"sample_sd":0.00248,"saturation_at_7999_count":0},
+    "wBSNE #2 average (mV/V)": {"numeric_count":85145,"missing_or_non_numeric_count":0,"min":0.0993,"max":0.0994,"mean":0.0993,"sample_sd":0.00002,"saturation_at_7999_count":0},
+    "wBSNE #3 average (mV/V)": {"numeric_count":85145,"missing_or_non_numeric_count":0,"min":0.0127,"max":0.013,"mean":0.01288,"sample_sd":0.000034,"saturation_at_7999_count":0}
+  },
+  "claim_state": {
+    "source_dictionary_row_id_semantics": "SUPPORTED_AS_REPORTED",
+    "observed_row_id_progression": "MEASURED",
+    "observed_timestamp_group_structure": "MEASURED",
+    "repeated_row_mechanism": "NOT_YET_PROVEN",
+    "sensor_synchronization": "NOT_YET_PROVEN",
+    "sensor_calibration": "NOT_YET_PROVEN",
+    "sediment_mass_conversion": "NOT_YET_PROVEN",
+    "cross_body_similarity": "NOT_YET_PROVEN",
+    "known_site_recovery": "NOT_YET_MEASURED"
+  },
+  "provenance": {
+    "catalog_metadata_sha256": "ce33f7a9f0b7d1940f80b47f7d8c4d8b6a84a8f4",
+    "catalog_metadata_http_status": 200,
+    "csv_http_status": 200,
+    "csv_content_type": "text/csv",
+    "csv_content_length": 67050032,
+    "csv_final_host": "www.sciencebase.gov",
+    "credentials_used": false,
+    "full_file_downloaded": false,
+    "raw_urls_retained": false
+  }
+}
