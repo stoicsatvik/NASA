@@ -5,7 +5,9 @@ import argparse
 import hashlib
 import json
 import re
+import urllib.error
 import urllib.parse
+import urllib.request
 import xml.etree.ElementTree as ET
 from collections import Counter
 from pathlib import Path
@@ -19,9 +21,12 @@ from experiments.e590_grand_falls_2023_2024_probe import (
     _extract_file_records,
     _file_name,
     _file_size,
-    fetch_prefix_bounded,
 )
-from experiments.e577_grand_falls_2017_2019_access_probe import validate_public_url
+from experiments.e577_grand_falls_2017_2019_access_probe import (
+    ALLOWED_HOSTS,
+    TIMEOUT_SECONDS,
+    USER_AGENT,
+)
 
 EXPERIMENT = "E594"
 EXPECTED_CATALOG_METADATA_SHA256 = "ce33f7a8a18d0076d0b883f634447c0466fa8354e9c3577ff43b48171225e389"
@@ -39,6 +44,65 @@ COORD_PAIR_RE = re.compile(
 
 class ProbeError(RuntimeError):
     pass
+
+
+def validate_public_url(url: str) -> None:
+    parsed = urlsplit(url)
+    try:
+        port = parsed.port
+    except ValueError as exc:
+        raise ProbeError("invalid URL port") from exc
+    decoded_segments = [urllib.parse.unquote(part) for part in parsed.path.split("/")]
+    if (
+        parsed.scheme != "https"
+        or parsed.hostname not in ALLOWED_HOSTS
+        or parsed.username is not None
+        or parsed.password is not None
+        or parsed.fragment
+        or port not in (None, 443)
+        or any(part == ".." for part in decoded_segments)
+    ):
+        raise ProbeError("URL outside strict public ScienceBase/S3 boundary")
+
+
+class StrictRedirectHandler(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        validate_public_url(newurl)
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+
+def fetch_strict_bounded(url: str, *, limit: int) -> dict:
+    validate_public_url(url)
+    request = urllib.request.Request(
+        url,
+        headers={
+            "User-Agent": USER_AGENT,
+            "Accept": "application/json,application/xml,text/xml,*/*",
+        },
+    )
+    opener = urllib.request.build_opener(StrictRedirectHandler())
+    try:
+        with opener.open(request, timeout=TIMEOUT_SECONDS) as response:
+            payload = response.read(limit)
+            final_url = response.geturl()
+            validate_public_url(final_url)
+            return {
+                "status": response.status,
+                "headers": response.headers,
+                "payload": payload,
+                "final_url": final_url,
+            }
+    except urllib.error.HTTPError as error:
+        final_url = error.geturl()
+        validate_public_url(final_url)
+        result = {
+            "status": error.code,
+            "headers": error.headers,
+            "payload": b"",
+            "final_url": final_url,
+        }
+        error.close()
+        return result
 
 
 def _local_name(tag: str) -> str:
@@ -88,11 +152,6 @@ def summarize_dictionary(payload: bytes) -> dict:
     root = ET.fromstring(payload)
     entity_labels: list[str] = []
     attributes: list[dict] = []
-    tag_counts: Counter[str] = Counter()
-
-    for element in root.iter():
-        tag_counts[_local_name(element.tag)] += 1
-
     for element in root.iter():
         if _local_name(element.tag) == "enttypl":
             value = _safe_text(element.text or "", 160)
@@ -139,7 +198,6 @@ def summarize_dictionary(payload: bytes) -> dict:
         "record_number_definition_found": any(item["definition"] for item in record_fields),
         "timestamp_definition_found": any(item["definition"] for item in timestamp_fields),
         "sensor_channel_definition_count": sum(category_counts.get(name, 0) for name in channel_categories),
-        "tag_counts": dict(sorted(tag_counts.items())),
         "raw_xml_stored": False,
         "raw_coordinates_stored": False,
         "raw_urls_stored": False,
@@ -148,8 +206,8 @@ def summarize_dictionary(payload: bytes) -> dict:
 
 
 def audit(metadata_fetcher=None, xml_fetcher=None, expected_catalog_sha256: str = EXPECTED_CATALOG_METADATA_SHA256) -> dict:
-    metadata_fetcher = metadata_fetcher or fetch_prefix_bounded
-    xml_fetcher = xml_fetcher or fetch_prefix_bounded
+    metadata_fetcher = metadata_fetcher or fetch_strict_bounded
+    xml_fetcher = xml_fetcher or fetch_strict_bounded
     result = {
         "experiment": EXPERIMENT,
         "source_item_id": CATALOG_RECORD_ID,

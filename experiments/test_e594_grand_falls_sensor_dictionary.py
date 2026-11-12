@@ -1,12 +1,14 @@
 import hashlib
 import json
 import unittest
+import urllib.request
 
 from experiments.e594_grand_falls_sensor_dictionary import (
     EXPECTED_XML_NAME,
     EXPECTED_XML_SIZE,
     MAX_XML_BYTES,
     ProbeError,
+    StrictRedirectHandler,
     audit,
     summarize_dictionary,
     validate_public_url,
@@ -105,10 +107,23 @@ class E594DictionaryTests(unittest.TestCase):
             "https://user@www.sciencebase.gov/file.xml",
             "https://www.sciencebase.gov/file.xml#fragment",
             "https://www.sciencebase.gov/a/../file.xml",
+            "https://www.sciencebase.gov/a/%2e%2e/file.xml",
+            "https://www.sciencebase.gov:bad/file.xml",
         ):
             with self.subTest(url=url):
                 with self.assertRaises(ProbeError):
                     validate_public_url(url)
+
+        handler = StrictRedirectHandler()
+        with self.assertRaises(ProbeError):
+            handler.redirect_request(
+                urllib.request.Request(SAFE_URL),
+                None,
+                302,
+                "Found",
+                {},
+                "https://example.org/redirect.xml",
+            )
 
     def test_url_policy_accepts_allowlisted_sciencebase_target(self):
         validate_public_url(SAFE_URL)

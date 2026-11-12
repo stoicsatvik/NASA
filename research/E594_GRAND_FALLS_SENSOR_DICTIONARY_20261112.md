@@ -44,3 +44,15 @@ A field definition can explain the source's intended row semantics, but it canno
 ## Next gate
 
 If the dictionary defines \`Record Number\` as a per-instrument record, design a separate bounded aggregate audit of record-number progression and per-timestamp channel patterns using the same 5 MB prefix. If the dictionary does not define the field or does not resolve row grouping, stop at the current descriptive timestamp result. Do not infer six synchronized sensors merely from the mean group size.
+
+
+## Preserved initial validation failure and correction
+
+The first E594 workflow [#43261847579](https://github.com/stoicsatvik/NASA/actions/runs/43261847579) executed all 15 deterministic tests: **8 passed, 3 failed and 4 errored**. The live request was correctly skipped because the test job failed.
+
+The failures exposed two issues in the new audit implementation:
+
+1. E594 initially reused E577's older URL validator. It checked the pinned host/scheme but did not enforce the stricter no-userinfo, absent/443-port, no-fragment and decoded-path-traversal contract required here; its exception type also differed from E594's test contract. The correction adds an E594-owned strict validator and redirect handler, and uses them for both metadata and XML requests.
+2. The receipt's XML tag-count diagnostic retained range-bound tag names such as \`rdommin\`/\`rdommax\`, despite not retaining their numeric values. That diagnostic was unnecessary for the question and conflicted with the intended minimal domain summary, so it was removed; only the broad domain kind remains.
+
+This was a real validation gap in the first E594 implementation. No live XML request or sensor-data access occurred on the failed run. The original failure remains in Actions history; the corrected exact head must pass all 15 tests before the single bounded XML request can run.
