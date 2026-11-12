@@ -1,0 +1,55 @@
+name: E575 HiRISE control-source independence audit
+
+on:
+  push:
+    branches:
+      - research/e575-hirise-control-source-independence-audit-20261112
+    paths:
+      - experiments/e575_hirise_control_source_independence_audit.py
+      - tests/test_e575_hirise_control_source_independence_audit.py
+      - research/results/E575_HIRISE_CONTROL_SOURCE_INDEPENDENCE_AUDIT_20261112.json
+      - research/E575_HIRISE_CONTROL_SOURCE_INDEPENDENCE_AUDIT_20261112.md
+      - .github/workflows/e575-hirise-control-source-independence-audit.yml
+  pull_request:
+    branches:
+      - research/e574-hirise-support-gain-decomposition-20261112-r1
+    paths:
+      - experiments/e575_hirise_control_source_independence_audit.py
+      - tests/test_e575_hirise_control_source_independence_audit.py
+      - research/results/E575_HIRISE_CONTROL_SOURCE_INDEPENDENCE_AUDIT_20261112.json
+      - research/E575_HIRISE_CONTROL_SOURCE_INDEPENDENCE_AUDIT_20261112.md
+      - .github/workflows/e575-hirise-control-source-independence-audit.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e575-hirise-control-source-independence-audit
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run deterministic source-audit tests
+        run: python -m unittest discover -s tests -p "test_e575_hirise_control_source_independence_audit.py" -v
+      - name: Generate aggregate source-audit receipt
+        run: python -m experiments.e575_hirise_control_source_independence_audit --out .artifacts/e575/receipt.json
+      - name: Validate and compare receipt
+        run: |
+          python -m json.tool .artifacts/e575/receipt.json > /dev/null
+          cmp .artifacts/e575/receipt.json research/results/E575_HIRISE_CONTROL_SOURCE_INDEPENDENCE_AUDIT_20261112.json
+      - name: Upload aggregate receipt only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e575-hirise-control-source-independence-audit
+          path: .artifacts/e575/receipt.json
+          if-no-files-found: ignore
+          retention-days: 14
