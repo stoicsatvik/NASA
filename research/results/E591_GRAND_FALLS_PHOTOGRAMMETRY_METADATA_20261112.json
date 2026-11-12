@@ -1,0 +1,57 @@
+{
+  "experiment": "E591",
+  "source_item_id": "67b78df2d34e1a2e835b13b7",
+  "title": "Ripple Photogrammetry at Grand Falls Dune Field, Arizona, from February 2024 to July 2024",
+  "http_status": 200,
+  "metadata_bytes": 7491,
+  "metadata_sha256": "f466468ba4b700ecb2a613727483100a9f62f14e8d26dfc8ba840b0122049424",
+  "file_count": 8,
+  "archive_candidate_count": 7,
+  "archive_total_bytes": 1561281654,
+  "archive_inventory": [
+    {
+      "name": "Photogrammetry_GFDF_ripples_02-20-2024.zip",
+      "size_bytes": 382999941
+    },
+    {
+      "name": "Photogrammetry_GFDF_ripples_03-12-2024.zip",
+      "size_bytes": 143460859
+    },
+    {
+      "name": "Photogrammetry_GFDF_ripples_04-16-2024.zip",
+      "size_bytes": 122973592
+    },
+    {
+      "name": "Photogrammetry_GFDF_ripples_04-30-2024.zip",
+      "size_bytes": 201499903
+    },
+    {
+      "name": "Photogrammetry_GFDF_ripples_05-16-2024.zip",
+      "size_bytes": 297584215
+    },
+    {
+      "name": "Photogrammetry_GFDF_ripples_06-20-2024.zip",
+      "size_bytes": 235362501
+    },
+    {
+      "name": "Photogrammetry_GFDF_ripples_07-25-2024.zip",
+      "size_bytes": 177400643
+    }
+  ],
+  "metadata_file": {
+    "name": "Photogrammetry_GFDF_ripples_2024.xml",
+    "size_bytes": 12658
+  },
+  "raster_candidate_count": 0,
+  "spatial_extent_present": true,
+  "credentials_used": false,
+  "file_bytes_downloaded": false,
+  "raw_coordinates_stored": false,
+  "raw_urls_stored": false,
+  "claim_state": {
+    "metadata_access": "SUPPORTED",
+    "archive_inventory": "MEASURED",
+    "archive_contents": "NOT_YET_INSPECTED",
+    "crs_vertical_datum_grid_spacing_nodata": "NOT_YET_ESTABLISHED"
+  }
+}
