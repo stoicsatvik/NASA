@@ -50,3 +50,18 @@ Deterministic tests and the bounded live probe run on the isolated branch. Exact
 - The workflow's green status means the bounded runner handled and preserved the failure correctly. It does **not** mean the USGS data were acquired or that the source contains no records.
 - This is an access/transport failure, not a scientific null. E001 known-site recovery remains **NOT YET MEASURED**; cross-body similarity, novel analogue discovery, local validation advantage and challenge-selection superiority remain **NOT YET PROVEN**.
 - One-shot guard: the live probe is now pinned to the tested head so later documentation/test updates do not repeat the same external request.
+
+
+
+## Geometry/schema gate hardening — 12 November 2026
+
+Code review found that the first E578 classifier treated any non-empty DBF+SHP package as a schema-verified point layer, without checking the SHP geometry type or whether the DBF/PRJ exposed the minimum site identity, analogue type and CRS evidence. That could false-admit a polygon or line layer as a point-site index.
+
+- Added an explicit ESRI point-family allowlist (Point, MultiPoint, PointZ, MultiPointZ, PointM, MultiPointM).
+- A non-empty DBF/SHP package with another shape type is now classified as `PUBLIC_VECTOR_LAYER_ACQUIRED_NON_POINT_GEOMETRY`.
+- A point geometry is only `PUBLIC_ANALOG_POINT_LAYER_ACQUIRED_SCHEMA_VERIFIED` when the DBF contains a recognized site-identity field and analogue-type field and the PRJ exposes an EPSG authority candidate. Missing evidence remains `PUBLIC_ANALOG_POINT_LAYER_ACQUIRED_SCHEMA_INCOMPLETE`.
+- Added three regression tests: admissible point schema, polygon rejection, and incomplete point schema.
+- Commit: `e2427ce046f3f864cfaf8f914e40f33aef8870b8`.
+- Exact code/test workflow [#43194344911](https://github.com/stoicsatvik/NASA/actions/runs/43194344911) passed **9/9 tests**. The live-probe job was skipped by the one-shot SHA guard; the original bounded attempt remains a timeout, with no source records acquired.
+
+This is an admissibility-classifier correction only. It does not change the USGS source result: E578 remains an access failure, not a source-absence finding or scientific null. E001 known-site recovery remains NOT YET MEASURED.
