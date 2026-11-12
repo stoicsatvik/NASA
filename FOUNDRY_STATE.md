@@ -824,3 +824,31 @@ Next: acquire analysis-grade, source-pinned Earth measurements and explicit nega
 
 
 - E572 gate hardening: target-body numeric measurements are counted by record and must be common to every in-scope positive/control record. A one-record-only measurement fails the E001 gate. The pinned catalogue has only `compare` map context (lat/lon/view_km), so target-measurement coverage remains zero and the negative admissibility result is unchanged.
+
+## E573 — 2025 HiRISE support sensitivity to a 10.2 m translation envelope (12 November 2026)
+
+- Draft PR #132, branch `research/e573-hirise-translation-envelope-20261112`, exact head `2a986bcfe81026a31061178021b015c753edab02`, stacked on E572 / PR #131.
+- Exact-head Actions [#43153845215](https://github.com/stoicsatvik/NASA/actions/runs/43153845215) succeeded: all deterministic translation/summary tests passed and bounded live acquisition completed. Aggregate artifact #13915515652.
+- Baseline reconciled exactly: 346 observed MOLA point centers; 2020 valid=164; 2025 valid=259.
+- Thirteen deterministic translations (0, ±5.1 m cardinal, ±10.2 m cardinal, and ±10.2 m radial diagonals) were applied in common-mode and 2025-only differential modes.
+- Common-mode total support advantage remained +94 to +95; 2025-only differential advantage remained +95 at every offset.
+- 2025/2020 support difference is MEASURED for this frozen window; support advantage under the tested offsets is SUPPORTED. The 10.2 m value is a published 99th-percentile HiRISE-to-CTX alignment statistic, not a hard bound or independent MOLA tie.
+- The 2025 mosaic is aligned to CTX, not an independent horizontal control network. No registration residual, terrain accuracy, route safety, cross-body similarity or E001 recovery is claimed.
+
+## E574 — decompose the E573 support gain (12 November 2026)
+
+- Draft PR branch `research/e574-hirise-support-gain-decomposition-20261112`, stacked on E573.
+- Reconciled E573's zero-offset +95 net valid-point difference into +22 from differing valid/nodata masks within the 239-point shared footprint and +73 from footprint-only valid points (90 valid 2025 points outside the 2020 footprint minus 17 valid 2020 points outside the 2025 footprint).
+- Thus 76.84% of the net support-count advantage is attributable to footprint extent; 23.16% is the within-shared-footprint validity difference.
+- Across 13 common-mode offsets: total +94 to +95, shared-footprint +21 to +22, footprint +73. Across 13 2025-only differential offsets: total +95, shared-footprint +22, footprint +73.
+- This narrows the interpretation: the 2025 product has more valid point support in this window, but most of the headline count advantage is broader footprint, not improved data quality. Point-support availability is not accuracy or registration.
+- Exact aggregate source: E573 run #43153845215, artifact #13915515652, receipt SHA-256 `939e3c3b81917f50065f4a1296e909bcfd95144e20257fc8939035ae0f5450a0`. No raw elevation values or coordinates were retained.
+- Claim states: bounded point-support difference MEASURED; support-gain decomposition SUPPORTED FOR THIS WINDOW/GRID; independent horizontal registration NOT MEASURED; terrain accuracy NOT MEASURED; route safety NOT CLAIMED; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN.
+
+## Current challenge-selection state
+
+E541 already rescored all 14 official 2026 challenge candidates under five single-factor ablations. Martian Map #11 (4.10) and MODIS/VIIRS #9 (4.00) remain a provisional top tier; removing portfolio reuse reverses the leader to #9 by only 0.125, below the 0.25 meaningful-difference threshold. Planetary analog #10 remains outside the top five under all five ablations. Its data-readiness plus validation scores would need to rise from 3.5 to at least 7.8 to match #9 under the frozen rubric. No challenge is locked.
+
+## Next highest-information work
+
+Do not repeat E573 translations or another catalogue-only audit. Seek an independent horizontal control/registration source for the pinned Mars area, and separately obtain analysis-grade Earth positive sites plus explicit non-analogue controls for E001. E001 remains NOT YET MEASURED because the E572 catalogue has zero Verified positives, zero controls and zero common physical numeric descriptors. Reassess Martian Map vs MODIS/VIIRS only when a measured data/validation gate changes the scorecard. No UI polish before the evidence gate.
