@@ -57,20 +57,61 @@
     "public_host_items_get": "INACCESSIBLE",
     "public_host_search_get": "INACCESSIBLE",
     "s3_cog_web_get": "INACCESSIBLE",
-    "container_curl": "DNS_RESOLUTION_FAILURE",
+    "container_curl": "DNS_RESOLUTION_FAILURE_AT_API_GATEWAY_AND_PUBLIC_S3_HOSTS",
     "actual_item_json_downloaded": false,
     "actual_dtm_raster_downloaded": false,
     "current_live_item_count_measured": false
   },
-  "decision": "SOURCE_READINESS_SUPPORTED; ITEM_RASTER_INGESTION_BLOCKED_IN_CURRENT_AUTOMATION_RUNTIME",
-  "interpretation": "transport/runtime failure, not evidence of zero items or scientific null",
-  "next_test": "Use pystac-client from a network-enabled authorized environment for one pinned Jezero item; preserve item JSON, exact assets, CRS, GSD, nodata, QA and hashes; sample DTM and compare to same-area MOLA.",
+  "decision": "PRIOR_E580_E586_ITEM_RASTER_QA_ACQUISITION_SUPPORTED; CURRENT_RUNTIME_REACQUISITION_BLOCKED",
+  "interpretation": "E601 records a current-runtime transport failure only; it does not invalidate prior successful GitHub Actions acquisitions and is not a scientific null.",
+  "next_test": "Do not repeat P18. Resume CTX only for a genuinely distinct item-specific provenance route or independent control source; otherwise prioritize E600 Supporting Table S2 and matched independent Mars reference data.",
   "claims": {
     "repo_operating_system": "SUPPORTED",
     "cross_body_similarity": "NOT_YET_PROVEN",
     "known_site_recovery": "NOT_YET_MEASURED",
     "novel_analogue_discovery": "NOT_YET_PROVEN",
     "local_validation_advantage": "NOT_YET_PROVEN",
-    "challenge_selection_superiority": "NOT_YET_PROVEN"
+    "challenge_selection_superiority": "NOT_YET_PROVEN",
+    "public_ctx_item_and_cog_acquisition": "SUPPORTED_BY_E580_E581",
+    "pinned_ctx_pixel_windows": "SUPPORTED_BY_E581",
+    "pinned_ctx_qa_and_mola_control_assets": "SUPPORTED_BY_E582_NOT_INDEPENDENT_VALIDATION",
+    "current_runtime_reacquisition": "BLOCKED_BY_DNS_API_ACCESS"
+  },
+  "prior_successful_acquisitions": {
+    "e580": {
+      "workflow_run": 43212727544,
+      "item_id": "P18_007925_1987_XN_18N282W__P19_008650_1987_XI_18N282W",
+      "dtm_range_http_status": 206,
+      "range_bytes": 4096
+    },
+    "e581": {
+      "workflow_run": 43213482433,
+      "dtm_bytes": 18114156,
+      "window_count": 5,
+      "window_shape": [
+        64,
+        64
+      ],
+      "valid_pixels": 20480,
+      "vertical_unit_in_file_metadata": "NOT_REPORTED"
+    },
+    "e582": {
+      "workflow_run": 43215530283,
+      "qa_asset_bytes": 398,
+      "mola_control_csv_bytes": 344365,
+      "mola_control_rows": 8750,
+      "qa_mean_difference_m": 27.3687,
+      "qa_median_difference_m": 26.7783,
+      "qa_stddev_difference_m": 10.934,
+      "mola_points_are_held_out_validation": false
+    },
+    "e583_e584_e586": {
+      "qa_items": 9,
+      "qa_assets_successful": 9,
+      "footprints_at_least_99_percent_inside_aoi": 6,
+      "contained_subset_intersecting_pairs": 14,
+      "contained_subset_pairs": 15,
+      "qa_spatial_support": "NOT_ESTABLISHED"
+    }
   }
 }
