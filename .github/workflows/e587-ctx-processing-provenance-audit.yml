@@ -1,0 +1,42 @@
+name: E587 CTX processing-provenance audit
+
+on:
+  pull_request:
+    branches:
+      - research/e586-ctx-footprint-geometry-audit-20261112
+    types: [opened, synchronize]
+    paths:
+      - experiments/e587_ctx_processing_provenance_audit.py
+      - tests/test_e587_ctx_processing_provenance_audit.py
+      - .github/workflows/e587-ctx-processing-provenance-audit.yml
+      - FOUNDRY_STATE.md
+      - research/E587_CTX_PROCESSING_PROVENANCE_AUDIT_20261112.md
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e587-ctx-processing-provenance-audit
+  cancel-in-progress: true
+
+jobs:
+  e587:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run deterministic provenance-parser tests
+        run: python -m unittest discover -s tests -p "test_e587_ctx_processing_provenance_audit.py" -v
+      - name: Inspect pinned public STAC item and bounded provenance assets
+        run: python experiments/e587_ctx_processing_provenance_audit.py --out .artifacts/e587/ctx-provenance-audit.json
+      - name: Upload aggregate receipt only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e587-ctx-processing-provenance-audit
+          path: .artifacts/e587/ctx-provenance-audit.json
+          if-no-files-found: ignore
+          retention-days: 7
