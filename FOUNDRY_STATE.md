@@ -914,3 +914,11 @@ Claim states remain unchanged: repo operating system SUPPORTED; cross-body simil
 - No new data were acquired. This is not evidence that the USGS release contains no data and not a scientific null. E001 remains NOT YET MEASURED.
 - Next: pivot to a different independent Earth-side dataset/source. Do not repeat the same ScienceBase endpoint with guessed URL variants.
 
+
+
+## E577 current-head deterministic revalidation — 12 November 2026
+
+- Current branch head `f28fad133b9e55a8b84429af7c3fa08756f07d3c`: push workflow [#43186974168](https://github.com/stoicsatvik/NASA/actions/runs/43186974168) passed **7/7 deterministic tests**; inherited E572 audit [#43186974229](https://github.com/stoicsatvik/NASA/actions/runs/43186974229) passed.
+- The live-probe job was skipped; no repeat network request was made.
+- Last live attempt remains [#43185828498](https://github.com/stoicsatvik/NASA/actions/runs/43185828498): null-safe receipt generation succeeded but data access remained `ACQUISITION_ERROR` with no captured HTTP status, selected file or rows.
+- No source absence or scientific null is inferred. Keep E001 NOT YET MEASURED and pivot to a different independent Earth-side source; do not retry the same endpoint using guessed URL variants.
