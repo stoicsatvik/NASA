@@ -252,7 +252,12 @@ def parse_mola_csv(payload: bytes, *, max_rows: int = MAX_CSV_ROWS) -> dict:
             "raw_rows_stored": False,
         }
 
-    columns = [str(name).strip()[:80] for name in fieldnames if name is not None]
+    field_map = [
+        (str(name).strip()[:80], name)
+        for name in fieldnames[:64]
+        if name is not None
+    ]
+    columns = [clean for clean, _original in field_map]
     accumulators: dict[str, dict] = {}
     row_count = 0
     truncated = False
@@ -261,8 +266,8 @@ def parse_mola_csv(payload: bytes, *, max_rows: int = MAX_CSV_ROWS) -> dict:
             truncated = True
             break
         row_count += 1
-        for name in columns:
-            raw = row.get(name)
+        for clean_name, original_name in field_map:
+            raw = row.get(original_name)
             if raw is None or not str(raw).strip():
                 continue
             try:
@@ -271,9 +276,8 @@ def parse_mola_csv(payload: bytes, *, max_rows: int = MAX_CSV_ROWS) -> dict:
                 continue
             if not math.isfinite(value):
                 continue
-            stats = accumulators.setdefault(name, {
+            stats = accumulators.setdefault(clean_name, {
                 "count": 0,
-                "missing_or_non_numeric": 0,
                 "min": value,
                 "max": value,
                 "sum": 0.0,
@@ -316,7 +320,15 @@ def audit_asset(name: str, asset: dict, max_bytes: int, parser) -> dict:
             "url": safe_url_summary(href),
         }
 
-    response = fetch_bounded(href, max_bytes=max_bytes)
+    try:
+        response = fetch_bounded(href, max_bytes=max_bytes)
+    except Exception as error:
+        return {
+            "decision": "ASSET_FETCH_ERROR",
+            "asset": name,
+            "error_type": type(error).__name__,
+            "raw_asset_stored": False,
+        }
     result = {
         "asset": name,
         "http_status": response["status"],
@@ -335,7 +347,12 @@ def audit_asset(name: str, asset: dict, max_bytes: int, parser) -> dict:
         return result
 
     result["sha256"] = hashlib.sha256(response["payload"]).hexdigest()
-    result["summary"] = parser(response["payload"])
+    try:
+        result["summary"] = parser(response["payload"])
+    except Exception as error:
+        result["decision"] = "ASSET_PARSE_ERROR"
+        result["error_type"] = type(error).__name__
+        return result
     result["decision"] = result["summary"].get("decision", "PARSED")
     return result
 
@@ -442,7 +459,6 @@ def main() -> None:
             "pinned_item_id": ITEM_ID,
             "decision": "ACQUISITION_OR_PARSING_ERROR",
             "error_type": type(error).__name__,
-            "error_message": str(error)[:300],
             "credentials_used": False,
             "raw_item_json_stored": False,
             "raw_qa_text_stored": False,
