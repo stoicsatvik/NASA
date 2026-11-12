@@ -1,0 +1,53 @@
+name: E593 Grand Falls photogrammetry XML metadata audit
+
+on:
+  pull_request:
+    branches:
+      - research/e591-grand-falls-photogrammetry-metadata-20261112
+    paths:
+      - experiments/e593_grand_falls_xml_metadata_audit.py
+      - experiments/test_e593_grand_falls_xml_metadata_audit.py
+      - research/E593_GRAND_FALLS_XML_METADATA_AUDIT_20261112.md
+      - research/results/E593_GRAND_FALLS_XML_METADATA_AUDIT_20261112.json
+      - .github/workflows/e593-grand-falls-xml-metadata-audit.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e593-grand-falls-xml-metadata-audit
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run deterministic E593 tests
+        run: python -m unittest experiments.test_e593_grand_falls_xml_metadata_audit -v
+
+  live_probe:
+    if: github.event_name == 'pull_request'
+    needs: tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Fetch only the exact 12,658-byte XML metadata file
+        if: hashFiles('research/results/E593_GRAND_FALLS_XML_METADATA_AUDIT_20261112.json') == ''
+        run: python -m experiments.e593_grand_falls_xml_metadata_audit --out .artifacts/e593/grand-falls-xml-metadata-audit.json
+      - name: Preserve sanitized aggregate receipt only
+        if: always() && hashFiles('research/results/E593_GRAND_FALLS_XML_METADATA_AUDIT_20261112.json') == ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: e593-grand-falls-xml-metadata-audit
+          path: .artifacts/e593/grand-falls-xml-metadata-audit.json
+          if-no-files-found: ignore
+          retention-days: 7
