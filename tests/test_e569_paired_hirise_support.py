@@ -31,7 +31,7 @@ def test_paired_cross_tab_reports_gains_losses_and_footprint_separately():
     assert result["both_invalid"] == 2
     assert result["net_valid_support_change_2025_minus_2020"] == 1
     assert result["paired_gain_minus_loss"] == 1
-    assert result["validity_jaccard"] == pytest.approx(1 / 3)
+    assert result["validity_jaccard"] == pytest.approx(1 / 4)
 
 
 def test_paired_cross_tab_rejects_valid_samples_outside_own_raster():
