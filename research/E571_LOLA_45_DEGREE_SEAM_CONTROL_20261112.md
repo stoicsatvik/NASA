@@ -49,7 +49,7 @@ No geoid correction, geological classification, cross-body similarity, known-sit
 ## Claim boundary
 
 - Bounded LOLA metadata and sample ingestion: SUPPORTED by E570.
-- Same-location seam/control comparison: NOT YET MEASURED.
+- Same-location seam/control comparison: SUPPORTED FOR THIS SINGLE LOCATION (one seam window and two adjacent controls; overlapping windows; no causal attribution).
 - Seam artifact attribution: NOT YET PROVEN.
 - Cross-body similarity: NOT YET PROVEN.
 - Known-site recovery: NOT YET MEASURED.
