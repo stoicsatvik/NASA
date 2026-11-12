@@ -836,3 +836,15 @@ Next: acquire analysis-grade, source-pinned Earth measurements and explicit nega
 - A non-fatal tifffile GDAL_NODATA parse warning remains recorded. The experiment's resolver read the pinned nodata value and completed; no warning suppression was added.
 - Interpretation: 2025 finite-pixel point support remains higher for this frozen 346-point window under every tested offset. The 10.2 m value is a published 99th-percentile HiRISE-to-CTX alignment statistic, not a hard bound or fitted MOLA registration. This does not establish elevation accuracy, independent horizontal registration, area coverage, route safety or analogue similarity.
 - Next: obtain an independent horizontal-control residual or authoritative registration validation. Do not widen the translation grid without a new source-backed uncertainty model.
+
+
+## E574 — support-gain decomposition (12 November 2026)
+
+- Draft PR #134, branch `research/e574-hirise-support-gain-decomposition-20261112-r1`, stacked on the current E573 exact-head branch.
+- Source is pinned to E573 run #43155697664 / artifact #13916101713, receipt JSON SHA-256 `939e3c3b81917f50065f4a1296e909bcfd95144e20257fc8939035ae0f5450a0`, source commit `7f6541e10a823402c2c50bcf6647e425d037ca3a`.
+- Zero-offset +95 valid-point difference decomposes into +22 from valid/nodata differences inside the 239-point shared footprint and +73 from footprint-only valid points. Thus 76.84% of the net difference is footprint extent and 23.16% is within-shared-footprint validity.
+- Across 13 common-mode offsets, components are +21–22 shared and +73 footprint; across 13 2025-only offsets, +22 shared and +73 footprint. This is point support, not accuracy or registration.
+- The initial E574 workflow failure [#43156436125](https://github.com/stoicsatvik/NASA/actions/runs/43156436125) was caused by invoking pytest without installing it; no tests or analysis ran. The workflow now uses standard-library unittest.
+- Added fail-closed source provenance checks and arithmetic invariants for the 239-point shared partition, both product valid totals, baseline +22/+73/+95 decomposition, and all offset min/max components.
+- Local exact-content validation: **13/13 unittest cases passed**; aggregate runner returned +22 shared / +73 footprint / +95 total and 76.8421% / 23.1579%. GitHub Actions validation on the clean-base branch is pending.
+- Independent horizontal registration, terrain accuracy, route safety, cross-body similarity, known-site recovery and novel analogue discovery remain unmeasured/not proven.
