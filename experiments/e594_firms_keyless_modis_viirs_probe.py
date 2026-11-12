@@ -22,20 +22,16 @@ SOURCES = {
         "nominal_product_resolution": "about 1 km",
         "url": "https://firms.modaps.eosdis.nasa.gov/data/active_fire/modis-c6.1/csv/MODIS_C6_1_Global_7d.csv",
     },
-    "VIIRS_NOAA20": {
-        "platform": "NOAA-20",
+    "VIIRS_SNPP": {
+        "platform": "Suomi-NPP",
         "nominal_product_resolution": "375 m",
-        "url": "https://firms.modaps.eosdis.nasa.gov/data/active_fire/viirs-noaa20-1/csv/VIIRS_NOAA20_NRT_Global_7d.csv",
-    },
-    "VIIRS_NOAA21": {
-        "platform": "NOAA-21",
-        "nominal_product_resolution": "375 m",
-        "url": "https://firms.modaps.eosdis.nasa.gov/data/active_fire/viirs-noaa21-1/csv/VIIRS_NOAA21_NRT_Global_7d.csv",
+        "product_coverage_end": "2026-11-02",
+        "url": "https://firms.modaps.eosdis.nasa.gov/data/active_fire/viirs-npp-1/csv/VIIRS_SNPP_NRT_Global_7d.csv",
     },
 }
 COMMON_FIELDS = {
     "latitude", "longitude", "acq_date", "acq_time", "satellite",
-    "instrument", "confidence", "version", "frp", "daynight",
+    "confidence", "version", "frp", "daynight",
 }
 
 
@@ -184,12 +180,17 @@ def probe_source(name: str, config: dict) -> dict:
                 "content_type": headers.get_content_type(),
                 "content_length_header": headers.get("Content-Length"),
                 "content_range_header": headers.get("Content-Range"),
+                "last_modified_header": headers.get("Last-Modified"),
                 "etag_present": bool(headers.get("ETag")),
                 "last_modified_present": bool(headers.get("Last-Modified")),
                 "final_host": urlsplit(final_url).hostname,
                 "prefix_bytes": min(len(payload), MAX_BYTES),
                 "prefix_sha256": hashlib.sha256(payload[:MAX_BYTES]).hexdigest(),
                 "prefix_truncated_by_probe": len(payload) > MAX_BYTES or (
+                    headers.get("Content-Range") is not None
+                    and headers.get("Content-Range").rsplit("/", 1)[-1].isdigit()
+                    and int(headers.get("Content-Range").rsplit("/", 1)[-1]) > min(len(payload), MAX_BYTES)
+                ) or (
                     headers.get("Content-Length") is not None
                     and int(headers.get("Content-Length")) > MAX_BYTES
                 ),
@@ -239,7 +240,7 @@ def run_probe() -> dict:
         "experiment": "E594",
         "date": "2026-11-12",
         "source_page": "https://firms.modaps.eosdis.nasa.gov/content/active_fire/",
-        "source_page_claim": "official FIRMS page advertises 24 h, 48 h and 7 day products; its two-month daily HTTPS text folder requires Earthdata Login",
+        "source_page_claim": "official FIRMS page advertises 24 h, 48 h and 7 day products; the two-month daily HTTPS text folder requires Earthdata Login; S-NPP product coverage ends 2026-11-02",
         "request_policy": {
             "max_prefix_bytes_per_product": MAX_BYTES,
             "range_request": True,
@@ -251,11 +252,13 @@ def run_probe() -> dict:
         },
         "products": results,
         "recent_modis_access_supported": modis_ok,
-        "recent_viirs_access_supported": viirs_ok,
-        "both_sensor_families_accessible": modis_ok and viirs_ok,
+        "viirs_keyless_7d_file_access_supported": viirs_ok,
+        "viirs_current_coverage_available": False,
+        "both_sensor_families_keyless_7d_file_access": modis_ok and viirs_ok,
         "common_fields_across_successful_products": sorted(common),
         "interpretation": (
-            "Recent keyless sample access is supported for the exact successful product endpoints only. "
+            "Keyless 7-day file access is supported for the exact successful product endpoints only. "
+            "The tested VIIRS S-NPP product has official coverage ending 2026-11-02, so it is not a current 12-Nov stream. "
             "This does not establish archive access, complete seven-day coverage, detection equivalence, "
             "cross-sensor bias correction or a validated harmonization model."
             if modis_ok and viirs_ok else
@@ -264,7 +267,8 @@ def run_probe() -> dict:
         ),
         "claim_state": {
             "recent_modis_keyless_access": "SUPPORTED" if modis_ok else "NOT_YET_ESTABLISHED",
-            "recent_viirs_keyless_access": "SUPPORTED" if viirs_ok else "NOT_YET_ESTABLISHED",
+            "viirs_snpp_keyless_7d_file_access": "SUPPORTED" if viirs_ok else "NOT_YET_ESTABLISHED",
+            "current_viirs_product_coverage": "ENDED_2026-11-02" if viirs_ok else "NOT_YET_ESTABLISHED",
             "cross_sensor_harmonization": "NOT_YET_PROVEN",
             "historical_archive_keyless_access": "NOT_YET_PROVEN",
             "challenge_selection_superiority": "NOT_YET_PROVEN",
