@@ -922,3 +922,13 @@ Claim states remain unchanged: repo operating system SUPPORTED; cross-body simil
 - The live-probe job was skipped; no repeat network request was made.
 - Last live attempt remains [#43185828498](https://github.com/stoicsatvik/NASA/actions/runs/43185828498): null-safe receipt generation succeeded but data access remained `ACQUISITION_ERROR` with no captured HTTP status, selected file or rows.
 - No source absence or scientific null is inferred. Keep E001 NOT YET MEASURED and pivot to a different independent Earth-side source; do not retry the same endpoint using guessed URL variants.
+
+
+## E578 — independent USGS known-terrestrial-analogue source gate (12 November 2026)
+
+- Isolated branch: \`research/e578-usgs-known-terrestrial-analog-sites-20261112\`, stacked on E577 PR #137; main remains untouched.
+- Source: USGS data release DOI 10.5066/P9J72921, ScienceBase item 5f88940b82cebb8c13d912ee. This is distinct from the failed E577 Grand Falls item.
+- The frozen probe requests only projected metadata, requires an explicit metadata-linked download URI, caps metadata and any eligible vector package at 5 MB, validates a 4 KiB HTTP Range/Content-Range before a full read, and stores only hashes, file/schema/count/CRS summaries. No raw site rows or coordinates are committed.
+- Exact-head deterministic and bounded live results will be recorded after Actions completes.
+- Potential positive outcome: an independently sourced known-analogue point index with site/type fields and CRS. Even a successful point layer is not quantitative ground truth and supplies no non-analogue controls by itself.
+- Claim states remain: repo operating system SUPPORTED; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN; planetary-analog challenge superiority NOT YET PROVEN.
