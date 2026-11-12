@@ -863,3 +863,17 @@ Next: acquire analysis-grade, source-pinned Earth measurements and explicit nega
 - Exact-head E575 Actions [#43167818230](https://github.com/stoicsatvik/NASA/actions/runs/43167818230) passed 8/8 tests, CLI JSON generation, semantic receipt equality and aggregate artifact #13920647500. Initial newline and byte-order comparison failures remain preserved in runs #43167610009 and #43167695733. The inherited E572 source audit also passed [#43167818221](https://github.com/stoicsatvik/NASA/actions/runs/43167818221).
 - MOLA PEDR is an independent sensor family, but its approximately 100 m shot footprint is too coarse to validate a 10.2 m horizontal residual; held-out tracks are suitable only for gross-error screening.
 - Next: acquire a separate control network or independently controlled product with documented horizontal uncertainty materially below 10.2 m; measure held-out multi-patch residuals without fitting corrections to evaluation points.
+
+
+## E576 — HRSC independent-control admissibility audit (12 November 2026)
+
+- Draft PR #136; branch `research/e576-hrsc-independent-control-admissibility-20261112`, stacked on E575.
+- Source-pinned test of Mars Express HRSC as a possible independent horizontal-control product for the pinned 2025 HiRISE mosaic.
+- Li & Jiang (2023), DOI 10.1029/2023EA002971, uses MOLA PEDR GCPs (476 calibration GCPs; 125,749 overlapping points across 126 tracks). Reported horizontal positional accuracy: 144.61–145.31 m for calibration and 178.716–301.776 m across validation images. MOLA planimetric accuracy is on the order of 100 m.
+- Kirk et al. (2020), DOI 10.5194/isprs-archives-XLIII-B3-2020-1129-2020, uses a mosaicked HiRISE DTM as the reference for HRSC/CTX comparison. Its 10–20 pixel horizontal-resolution estimate is not an independent absolute registration residual.
+- **Negative result:** HRSC is a separate sensor family but the retrieved absolute-control evidence is MOLA-GCP controlled and remains hundreds of metres. It does not clear the current 10 m-scale horizontal-control gate. Retain HRSC only for coarse cross-sensor comparison/gross-error screening.
+- The 10.2 m E575 value is a CTX-relative P99 alignment statistic, not an absolute-accuracy bound. Ratios in E576 are scale screens only, not formal uncertainty comparisons.
+- Exact-head E576 Actions are pending at report time. Eight deterministic standard-library tests and CLI receipt equality are included.
+- Claim states unchanged: repo operating system SUPPORTED; independent horizontal registration NOT YET MEASURED; absolute horizontal accuracy NOT ESTABLISHED; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; route safety NOT CLAIMED; planetary-analog challenge superiority NOT YET PROVEN.
+- No new raster/coordinate sample, field measurement, route-safety result, UI work, or challenge lock.
+- Next: identify a separate ground-control network or independently controlled product with documented horizontal uncertainty materially below 10.2 m and no shared CTX/HiRISE/MOLA control dependency.
