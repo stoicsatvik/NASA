@@ -54,6 +54,9 @@ FGDC_XML = b"""<?xml version="1.0" encoding="UTF-8"?>
   </procstep></lineage></dataqual>
   <eainfo><detailed><enttyp><enttypl>Raster elevation surface</enttypl></enttyp>
     <attr><attrlabl>NoData</attrlabl></attr>
+    <geoform>Raster digital data</geoform>
+    <attracc>Attribute accuracy was not assessed.</attracc>
+    <attraccr>No independent accuracy assessment was performed.</attraccr>
   </detailed></eainfo>
 </metadata>
 """
