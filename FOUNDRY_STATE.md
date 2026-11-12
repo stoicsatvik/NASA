@@ -957,3 +957,15 @@ Claim states remain unchanged: repo operating system SUPPORTED; cross-body simil
 - Full report: research/E579_MARTIAN_MAP_STAC_READINESS_20261112.md.
 - Exact claim states unchanged: repo operating system SUPPORTED; cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN; challenge-selection superiority NOT YET PROVEN.
 - No tests were run because this is a documentation/source-metadata audit and the Actions quota is exhausted. No UI, raster processing, field data, public deployment or competition submission.
+
+
+## E580 — real CTX item and public DTM byte-range acquisition (12 November 2026)
+
+- Current research branch: `research/e580-stac-search-post-20261112`; draft PR #140, stacked on E579 / PR #139. Main remains untouched.
+- The official USGS STAC `POST /search` route returned one item for collection `mro_ctx_controlled_usgs_dtms`, Jezero bbox [76.69, 17.41, 78.69, 19.41], limit 1.
+- Item: `P18_007925_1987_XN_18N282W__P19_008650_1987_XI_18N282W`; acquisition datetime 2023-04-18T12:00:00Z; polygon bbox [77.2128114, 17.7577892, 77.9059771, 19.3423089].
+- Item metadata: shape [4622, 2013], affine transform [4577133.445008798, 20.162955124498982, 0, 1146178.5021103406, 0, -20.162955124498982], WKT2 present, EPSG field absent. Assets include DTM, orthoimage, intersection error, QA metrics and MOLA control CSV.
+- A single anonymous HTTP Range request returned 206 for bytes 0–4095 of the 18,114,156-byte DTM. The 4 KiB response hash is recorded in `research/E580_STAC_SEARCH_ITEM_ACCESS_20261112.md`; no raw bytes, raster or pixel values were stored.
+- Exact-head workflow #43212727544 passed 9/9 tests and uploaded receipt artifact #13942396569. The first run's one failure was a test assertion defect about the intentional redaction flag; the live probe was skipped, the assertion was corrected, and the exact-head run passed.
+- Claim states: collection metadata access SUPPORTED; pinned item metadata acquisition SUPPORTED; public DTM byte-range access SUPPORTED; actual raster/pixel sampling NOT YET MEASURED; cross-body similarity NOT YET PROVEN; E001 known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN; challenge-selection superiority NOT YET PROVEN.
+- Next: use the pinned item to inspect actual COG band units, nodata, CRS/WKT, transform, data type and QA; extract small deterministic valid pixel windows with provenance and uncertainty. Do not infer elevation units from GSD or treat a successful byte-range request as a terrain measurement.
