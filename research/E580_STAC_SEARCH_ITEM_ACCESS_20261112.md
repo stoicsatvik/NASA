@@ -76,3 +76,21 @@ Do not claim route safety, cross-body similarity, E001 recovery, or challenge su
 - Challenge-selection superiority: NOT YET PROVEN.
 
 No field data, terrain measurements, route-safety claim, challenge lock or competition submission is asserted.
+
+
+## Exact-head result — 12 November 2026
+
+- Initial run [#43212633786](https://github.com/stoicsatvik/NASA/actions/runs/43212633786) exposed one test-contract defect: the range-summary test expected the redaction flag to be absent, while the receipt intentionally stores `query_values_stored: false`. The live probe was skipped by the failed test gate. The assertion was corrected without changing acquisition code.
+- Corrected exact-head run [#43212727544](https://github.com/stoicsatvik/NASA/actions/runs/43212727544) passed **9/9 repository tests**, completed the live probe, and uploaded receipt artifact [#13942396569](https://github.com/stoicsatvik/NASA/actions/runs/43212727544/artifacts/13942396569). Artifact SHA-256: `d642cd36ed8ad8f09a098b0b5ca1a7499cac5c9e67102d1fcf0ce6a9815f91c2`.
+- Search returned one item: `P18_007925_1987_XN_18N282W__P19_008650_1987_XI_18N282W`, acquisition datetime `2023-04-18T12:00:00Z`, polygon footprint, bbox [77.2128114, 17.7577892, 77.9059771, 19.3423089].
+- Item metadata: shape [4622, 2013], transform [4577133.445008798, 20.162955124498982, 0, 1146178.5021103406, 0, -20.162955124498982], WKT2 present, EPSG field absent. Assets: dtm, image, intersection_error, mola_csv, orthoimage, qa_metrics, thumbnail.
+- The public DTM asset returned HTTP **206** for bytes 0–4095 of 18,114,156 bytes. First-range SHA-256: `24c6e28a0934ffeac284d16e197cc431c210247bfe1f2fde47d38942c33bb6f4`.
+- This is real item metadata and verified byte-range access. It is **not** a pixel/elevation sample. No raster was downloaded, no pixel values were read, and no slope was calculated.
+
+Claim updates:
+- Item-level STAC acquisition for this pinned Jezero query: **SUPPORTED**.
+- Public DTM COG byte-range access: **SUPPORTED**.
+- Actual raster/pixel sample and units/nodata inspection: **NOT YET MEASURED**.
+- E001 known-site recovery, cross-body similarity, novel analogue discovery and challenge-selection superiority remain unchanged.
+
+Next decisive gate: inspect the pinned COG's band units, nodata, CRS, affine transform, data type, QA and a small deterministic set of valid pixel windows. Do not infer vertical units from horizontal posting distance or collection-level metadata.
