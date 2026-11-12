@@ -90,3 +90,10 @@ If the row-group pattern recurs, retain the mechanism as unresolved and stop tre
 - Added regression checks for an HTML payload and for a schema-valid CSV header whose byte count still fails the pinned-size gate. Schema validity must never override the exact catalogue-size contract.
 - Exact-head runs #43273561878 and #43273625070 initially failed 9/10 tests because the new CSV fixture encoded a literal backslash-n instead of a newline. The live source-acquisition step was skipped on both runs; these are test-fixture failures, not source or parser results.
 - Corrected the fixture to contain a real CSV header line terminator. The next exact-head push run is deterministic-only: the prior source-route negative receipt is already committed, and no repeat live request is authorized by this commit.
+
+
+## Exact-head deterministic validation after fixture correction
+
+- Commit `284b2b7cd439e5adeb7c154cacc27e05b6f8e971` corrects the test fixture to use a real newline in the schema-valid CSV header.
+- Workflow [#43274117119](https://github.com/stoicsatvik/NASA/actions/runs/43274117119) passed **10/10 deterministic tests**. The acquisition step was skipped because the exact source-route negative receipt is already committed; this documentation/test correction did not repeat the live request.
+- The earlier 9/10 failures (#43273561878 and #43273625070) remain preserved as fixture failures. The source-route result remains the separate negative receipt from workflow #43271607662.
