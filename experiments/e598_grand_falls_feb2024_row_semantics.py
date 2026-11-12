@@ -22,7 +22,7 @@ from experiments.e595_grand_falls_sensor_dictionary import (
     fetch_strict_bounded,
     validate_public_url,
 )
-from experiments.e597_grand_falls_row_group_semantics import summarize_rows
+from experiments.e597_grand_falls_row_group_semantics import CHANNELS, summarize_rows
 
 EXPERIMENT = "E598"
 EXPECTED_FILE_NAME = "SensorData_02-14-24_to_02-16-24.csv"
@@ -39,6 +39,21 @@ def select_exact_file(records: list[dict]) -> dict:
     if len(matches) != 1:
         raise ValueError(f"expected exactly one pinned February 2024 CSV record; found {len(matches)}")
     return matches[0]
+
+
+def classify_csv_response(content_type: str, payload: bytes) -> str | None:
+    if content_type == "text/csv":
+        return "STRICT_TEXT_CSV"
+    try:
+        header = next(csv.reader(io.StringIO(payload.decode("utf-8-sig"))))
+    except (UnicodeDecodeError, csv.Error, StopIteration):
+        return None
+    required = {"Date and Time", "Record Number"}
+    for columns in CHANNELS.values():
+        required.update(columns)
+    if len(header) != len(set(header)) or not required.issubset(set(header)):
+        return None
+    return "NONSTANDARD_CONTENT_TYPE_BUT_EXACT_CSV_SCHEMA_VALID"
 
 
 def summarize_payload(payload: bytes) -> dict:
@@ -184,20 +199,56 @@ def acquire_and_audit() -> dict:
     if response["status"] != 200:
         raise ValueError(f"CSV HTTP status {response['status']}")
     headers = response["headers"]
-    if headers.get_content_type() != "text/csv":
-        raise ValueError("CSV content type mismatch")
+    content_type = headers.get_content_type()
     content_length = int(headers.get("Content-Length") or 0)
+    payload = response["payload"]
     if content_length != EXPECTED_FILE_SIZE:
         raise ValueError("CSV Content-Length differs from the exact catalogue size")
-    if len(response["payload"]) != EXPECTED_FILE_SIZE:
+    if len(payload) != EXPECTED_FILE_SIZE:
         raise ValueError("bounded response did not contain the complete exact-size CSV")
 
-    result = summarize_payload(response["payload"])
+    content_type_policy = classify_csv_response(content_type, payload)
+    if content_type_policy is None:
+        return {
+            "experiment": EXPERIMENT,
+            "parse_status": "REJECTED_CONTENT_TYPE_OR_HEADER",
+            "source_item_id": CATALOG_RECORD_ID,
+            "source_file_name": EXPECTED_FILE_NAME,
+            "source_file_size_bytes": EXPECTED_FILE_SIZE,
+            "response": {
+                "http_status": response["status"],
+                "content_type": content_type,
+                "content_length": content_length,
+                "bytes_read": len(payload),
+                "payload_sha256": hashlib.sha256(payload).hexdigest(),
+                "csv_header_admissible": False,
+            },
+            "claim_state": {
+                "exact_catalogue_file_identity": "SUPPORTED_AS_PINNED",
+                "file_payload_as_expected_csv": "NOT_ESTABLISHED",
+                "row_semantics": "NOT_YET_MEASURED",
+                "cross_body_similarity": "NOT_YET_PROVEN",
+                "known_site_recovery": "NOT_YET_MEASURED",
+            },
+            "provenance": {
+                "catalog_metadata_sha256": metadata_sha,
+                "catalog_metadata_http_status": metadata["status"],
+                "csv_http_status": response["status"],
+                "csv_final_host": response["final_url"].split("/")[2],
+                "credentials_used": False,
+                "read_limit_bytes": MAX_FILE_BYTES,
+                "raw_payload_retained": False,
+                "raw_urls_retained": False,
+            },
+        }
+
+    result = summarize_payload(payload)
     result["provenance"] = {
         "catalog_metadata_sha256": metadata_sha,
         "catalog_metadata_http_status": metadata["status"],
         "csv_http_status": response["status"],
-        "csv_content_type": headers.get_content_type(),
+        "csv_content_type": content_type,
+        "content_type_policy": content_type_policy,
         "csv_content_length": content_length,
         "csv_final_host": response["final_url"].split("/")[2],
         "credentials_used": False,
