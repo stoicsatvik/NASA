@@ -3,12 +3,13 @@
   "date": "2026-11-12",
   "source": {
     "experiment": "E573_HIRISE_10_2M_TRANSLATION_ENVELOPE",
-    "workflow_run_id": 43153845215,
-    "workflow_url": "https://github.com/stoicsatvik/NASA/actions/runs/43153845215",
-    "artifact_id": 13915515652,
-    "artifact_receipt_sha256": "939e3c3b81917f50065f4a1296e909bcfd95144e20257fc8939035ae0f5450a0",
+    "workflow_run_id": 43155697664,
+    "workflow_url": "https://github.com/stoicsatvik/NASA/actions/runs/43155697664",
+    "artifact_id": 13916101713,
+    "artifact_receipt_sha256": "939e3c3b81917f50065f4a1296e909bcfd95144e20257fc8939035ae0f5450a",
     "source_branch": "research/e573-hirise-translation-envelope-20261112",
-    "source_commit": "2a986bcfe81026a31061178021b015c753edab02"
+    "source_commit": "7f6541e10a823402c2c50bcf6647e425d037ca3a",
+    "artifact_zip_sha256": "da4e03d6f923cdb789f8349157ecd704ea40ae3ce9d2513ffb7d13cde44ac172"
   },
   "baseline": {
     "observed_mola_points": 346,
@@ -21,7 +22,10 @@
     "shared_footprint_validity_delta": 22,
     "hirise_2025_valid_where_2020_outside": 90,
     "hirise_2020_valid_where_2025_outside": 17,
-    "footprint_only_validity_delta": 73
+    "footprint_only_validity_delta": 73,
+    "both_valid_within_shared_footprint": 86,
+    "both_nodata_within_shared_footprint": 9,
+    "shared_footprint_partition_reconciles": true
   },
   "common_mode_translation": {
     "offsets": 13,
