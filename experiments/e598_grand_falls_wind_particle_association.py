@@ -303,7 +303,7 @@ def analyze_prefix(prefix: bytes) -> dict:
     }
 
 
-def acquire_prefix() -> bytes:
+def acquire_prefix() -> tuple[bytes, dict]:
     metadata = fetch_strict_bounded(CATALOG_RECORD_URL, limit=MAX_METADATA_BYTES)
     if metadata["status"] != 200:
         raise ValueError(f"metadata HTTP status {metadata['status']}")
@@ -333,14 +333,27 @@ def acquire_prefix() -> bytes:
         raise ValueError("CSV Content-Length mismatch")
     if len(response["payload"]) != MAX_PREFIX_BYTES:
         raise ValueError("bounded prefix length mismatch")
-    return response["payload"]
+    provenance = {
+        "catalog_metadata_sha256": hashlib.sha256(metadata["payload"]).hexdigest(),
+        "catalog_metadata_http_status": metadata["status"],
+        "csv_http_status": response["status"],
+        "csv_content_type": response["headers"].get_content_type(),
+        "csv_content_length": int(response["headers"].get("Content-Length")),
+        "csv_final_host": response["final_url"].split("/")[2],
+        "credentials_used": False,
+        "full_file_downloaded": False,
+        "raw_urls_retained": False,
+    }
+    return response["payload"], provenance
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args()
-    result = analyze_prefix(acquire_prefix())
+    prefix, provenance = acquire_prefix()
+    result = analyze_prefix(prefix)
+    result["provenance"] = provenance
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(result, indent=2, sort_keys=True, allow_nan=False) + "\n", encoding="utf-8")
 
