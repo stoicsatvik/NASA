@@ -38,7 +38,7 @@ class E594FirmsProbeTests(unittest.TestCase):
         self.assertEqual(set(result["brightness_fields"]), {"bright_ti4", "bright_ti5"})
         self.assertEqual(result["confidence_value_counts"], {"nominal": 1})
 
-    def test_invalid_coordinates_and_incomplete_rows_are_not_counted(self):
+    def test_invalid_coordinates_are_separate_and_incomplete_rows_are_dropped(self):
         fixture = (
             "latitude,longitude,brightness,scan,track,acq_date,acq_time,satellite,instrument,"
             "confidence,version,bright_t31,frp,daynight\n"
@@ -46,9 +46,9 @@ class E594FirmsProbeTests(unittest.TestCase):
             "34.1,-117.2,330,1,1,2026-11-11,123,Terra,MODIS,80,6.1NRT,290,4\n"
         ).encode()
         result = summarize_csv_prefix(fixture)
-        self.assertEqual(result["row_count_in_prefix"], 2)
+        self.assertEqual(result["row_count_in_prefix"], 1)
         self.assertEqual(result["incomplete_rows_dropped"], 1)
-        self.assertEqual(result["valid_coordinate_rows"], 1)
+        self.assertEqual(result["valid_coordinate_rows"], 0)
 
     def test_probe_boundary_rejects_credentials_queries_and_other_hosts(self):
         for url in (
