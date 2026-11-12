@@ -82,12 +82,16 @@ class E593XmlMetadataTests(unittest.TestCase):
         self.assertTrue(result["metadata_categories_present"]["acquisition_dates"])
         self.assertTrue(result["metadata_categories_present"]["processing_lineage"])
         self.assertTrue(result["metadata_categories_present"]["raster_representation"])
+        self.assertTrue(result["metadata_categories_present"]["accuracy_quality"])
         self.assertTrue(result["metadata_categories_present"]["nodata_label"])
         self.assertFalse(result["metadata_categories_present"]["nodata"])
         horizontal = json.dumps(result["horizontal_reference_fields"])
         self.assertIn("WGS 84", horizontal)
         self.assertIn("Universal Transverse Mercator", horizontal)
         self.assertEqual(len(result["grid_resolution_fields"]), 2)
+        raster = json.dumps(result["raster_representation_fields"])
+        self.assertIn("Raster digital data", raster)
+        self.assertEqual(len(result["accuracy_quality_fields"]), 2)
 
     def test_coordinate_urls_emails_and_paths_are_not_retained(self):
         result = summarize_xml(FGDC_XML)
@@ -107,6 +111,19 @@ class E593XmlMetadataTests(unittest.TestCase):
         result = summarize_xml(xml)
         self.assertEqual(result["xml_root_tag"], "metadata")
         self.assertEqual(result["product_description_fields"][0]["value"], "Projected DEM metadata")
+
+
+    def test_processing_lineage_is_bounded_at_three_thousand_characters(self):
+        description = "Processing step " + ("x" * 3500)
+        xml = (
+            "<metadata><dataqual><lineage><procstep><procdesc>"
+            + description
+            + "</procdesc></procstep></lineage></dataqual></metadata>"
+        ).encode("utf-8")
+        result = summarize_xml(xml)
+        value = result["processing_lineage_fields"][0]["value"]
+        self.assertEqual(len(value), 3000)
+        self.assertTrue(value.startswith("Processing step"))
 
     def test_dtd_and_entity_declarations_are_rejected(self):
         xml = b'<!DOCTYPE metadata [<!ENTITY x SYSTEM "file:///etc/passwd">]><metadata>&x;</metadata>'
