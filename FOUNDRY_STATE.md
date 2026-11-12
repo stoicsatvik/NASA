@@ -3,7 +3,7 @@
 Updated: 2026-11-12
 Class: Tier A
 Time horizon: NASA Space Apps Challenge, 14–15 Nov 2026
-Working branch: `research/e587-ctx-processing-provenance-audit-20261112`
+Working branch: `research/e590-grand-falls-2023-2024-access-20261112`
 Main objective: maximize uncertainty eliminated per run and converge on a scientifically defensible Space Apps entry.
 
 ## Current thesis
@@ -1094,3 +1094,29 @@ Next gate: resolve item-specific `geodiff` order/control provenance; then inspec
 - These values are not independent accuracy or held-out validation. The MOLA points remain control inputs. Item-specific pc_align order, inverse-transform application and geodiff sign remain NOT YET ESTABLISHED.
 - Workflow #43242642721 passed 12/12 tests; artifact #13956436025, ZIP SHA-256 a7b3a9331886816f34697e30db7733dfb597165ac006ba6ee3a5631e5e335040. Metadata JSON SHA-256 05146f1b8636737d653bc6e2cfecfe7a5d43ff602c2e08e5d97b35da0321622d; QA text SHA-256 c577c0a83ccc58375b4a7790b6edd9eeee0d84de41f602c56ba00c424a8bcd5e.
 - This addendum integrates the bounded metadata result into the active E588 draft PR #151; it does not reopen or merge the closed E589 PR #152.
+
+
+## E590 — bounded Grand Falls 2023–2024 sensor-data sample (2026-11-12)
+
+- Draft PR #154, branch `research/e590-grand-falls-2023-2024-access-20261112`, code head `852a75ab461265022f8001f070696d3aecc8e2ec`; exact-head workflow #43252297062 passed **11/11 deterministic tests** and the bounded live probe. Artifact #13958724949; ZIP SHA-256 f57b6ff9ac32fcf1a6beaabd9f4da833b3de375df5925d2cf4dbbe5c5cec91cb.
+- The official ScienceBase hierarchy returned five child items and five file records. A 5,000,000-byte prefix of the 67,050,032-byte `SensorData_07-07-23_to_11-03-23.csv` was read from the explicit file endpoint; HTTP 200, text/csv, matching Content-Length. No full file or raw values were committed.
+- Prefix summary: 85,145 complete rows; 14 columns; six numeric channels had zero missing/non-numeric entries in the prefix. Wind maxima 10.12/10.12/9.56 mph (low/mid/high); wBSNE channels are mV/V and have no validated mass conversion.
+- The receipt's timestamp min/max are lexicographic strings, not chronological bounds. Cadence, timezone, monotonicity, duplicate timestamps, calibration and sediment-mass conversion remain NOT YET ESTABLISHED. Data.gov describes 1 Hz sampling averaged/logged at one-minute intervals; this sample has not independently verified that contract.
+- One site and one release do not provide independent-site replication or non-analogue controls. No E001 feature matrix is admissible yet.
+
+### E590 claim states
+
+- Repo operating system: SUPPORTED.
+- Public bounded CSV-prefix access and aggregate schema/value profiling: SUPPORTED.
+- Timestamp integrity / cadence / calibration / mass conversion: NOT YET ESTABLISHED.
+- Cross-body similarity: NOT YET PROVEN.
+- Known-site recovery: NOT YET MEASURED.
+- Novel analogue discovery: NOT YET PROVEN.
+- Local validation advantage: NOT YET PROVEN.
+- Planetary-analog challenge superiority: NOT YET PROVEN.
+
+### Next decisive actions
+
+1. One bounded metadata-only audit of the distinct photogrammetry child item `67b78df2d34e1a2e835b13b7`; establish whether a DEM/orthomosaic is listed, without downloading raster bytes.
+2. Fix the timestamp audit by parsing source strings and measuring ordering, duplicate timestamps, interval distribution and gaps; compare against the published one-minute logging description.
+3. Continue independent Earth positive/control acquisition and matched Mars-side feature admissibility. E001 remains gated.

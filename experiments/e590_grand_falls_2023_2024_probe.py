@@ -1,0 +1,367 @@
+"""E590: bounded access audit for the 2023–2024 Grand Falls USGS release."""
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import urllib.parse
+import urllib.error
+import urllib.request
+from pathlib import Path, PurePosixPath
+from urllib.parse import urlsplit
+
+from experiments.e577_grand_falls_2017_2019_access_probe import (
+    ALLOWED_HOSTS,
+    MAX_METADATA_BYTES,
+    TIMEOUT_SECONDS,
+    USER_AGENT,
+    SafeRedirectHandler,
+    fetch_bounded,
+    inspect_payload,
+    parse_content_range,
+    validate_public_url,
+)
+
+PARENT_ITEM_ID = "677ee6bed34e760b392c4aa3"
+CATALOG_RECORD_ID = "67bf94acd34e8876fcbfc91b"
+DOI = "10.5066/P13HPPYM"
+ITEM_FIELDS = "title,files,facets"
+MAX_SAMPLE_BYTES = 5_000_000
+MAX_REMOTE_FILE_BYTES = 100_000_000
+PARENT_ITEM_URL = (
+    f"https://www.sciencebase.gov/catalog/item/{PARENT_ITEM_ID}?"
+    + urllib.parse.urlencode({"format": "json", "fields": ITEM_FIELDS})
+)
+CATALOG_RECORD_URL = (
+    f"https://www.sciencebase.gov/catalog/item/{CATALOG_RECORD_ID}?"
+    + urllib.parse.urlencode({"format": "json", "fields": ITEM_FIELDS})
+)
+CHILDREN_URL = (
+    "https://www.sciencebase.gov/catalog/items?"
+    + urllib.parse.urlencode({
+        "q": "",
+        "filter": f"parentId={PARENT_ITEM_ID}",
+        "format": "json",
+        "max": "100",
+    })
+)
+DATA_EXTENSIONS = {".csv", ".txt", ".tsv", ".dat"}
+
+
+def _file_name(record: dict) -> str:
+    return str(record.get("name") or record.get("fileName") or record.get("filename") or "")
+
+
+def _file_size(record: dict) -> int | None:
+    value = record.get("size") or record.get("sizeBytes") or record.get("fileSize")
+    try:
+        size = int(value)
+    except (TypeError, ValueError):
+        return None
+    return size if size > 0 else None
+
+
+def _download_uri(record: dict) -> str | None:
+    value = record.get("downloadUri") or record.get("downloadUrl")
+    from_url_field = False
+    if not isinstance(value, str) or not value.strip():
+        value = record.get("url")
+        from_url_field = True
+    if not isinstance(value, str) or not value.strip():
+        return None
+    parsed = urlsplit(value.strip())
+    if parsed.scheme != "https" or parsed.hostname not in ALLOWED_HOSTS:
+        return None
+    if from_url_field and not (
+        parsed.hostname == "prod-is-usgs-sb-prod-content.s3.amazonaws.com"
+        or "/catalog/file/get/" in parsed.path
+        or "/manager/download/" in parsed.path
+    ):
+        return None
+    return value.strip()
+
+
+def _safe_file_record(record: dict) -> dict:
+    uri = _download_uri(record)
+    if uri:
+        parsed = urlsplit(uri)
+        url_summary = {
+            "scheme": parsed.scheme,
+            "host": parsed.hostname,
+            "query_key_names": sorted(
+                {key.lower() for key, _ in urllib.parse.parse_qsl(parsed.query, keep_blank_values=True)}
+            ),
+            "query_values_stored": False,
+        }
+    else:
+        url_summary = None
+    name = _file_name(record)
+    return {
+        "source_item_id": record.get("_source_item_id"),
+        "name": PurePosixPath(name).name,
+        "extension": PurePosixPath(name).suffix.lower(),
+        "size_bytes": _file_size(record),
+        "download_uri": url_summary,
+    }
+
+
+def _extract_file_records(item: dict, source_item_id: str) -> list[dict]:
+    records: list[dict] = []
+    top_level = item.get("files", [])
+    if isinstance(top_level, list):
+        records.extend(record for record in top_level if isinstance(record, dict))
+    facets = item.get("facets", [])
+    if isinstance(facets, list):
+        for facet in facets:
+            if isinstance(facet, dict) and isinstance(facet.get("files"), list):
+                records.extend(record for record in facet["files"] if isinstance(record, dict))
+    elif isinstance(facets, dict) and isinstance(facets.get("files"), list):
+        records.extend(record for record in facets["files"] if isinstance(record, dict))
+
+    unique: dict[tuple[str, int | None, str | None], dict] = {}
+    for record in records:
+        copy = dict(record)
+        copy["_source_item_id"] = source_item_id
+        key = (_file_name(copy), _file_size(copy), _download_uri(copy))
+        unique[key] = copy
+    return list(unique.values())
+
+
+def _choose_candidate(records: list[dict]) -> dict | None:
+    candidates = []
+    for record in records:
+        extension = PurePosixPath(_file_name(record)).suffix.lower()
+        size = _file_size(record)
+        uri = _download_uri(record)
+        if extension not in DATA_EXTENSIONS or size is None or size > MAX_REMOTE_FILE_BYTES or not uri:
+            continue
+        parsed = urlsplit(uri)
+        query_keys = {key.lower() for key, _ in urllib.parse.parse_qsl(parsed.query, keep_blank_values=True)}
+        # Prefer the explicit ScienceBase ?f= file endpoint after the smaller
+        # sciencebase.usgs.gov URL returned an HTML page instead of CSV bytes.
+        direct_file_score = 0 if parsed.hostname == "www.sciencebase.gov" and "f" in query_keys else 1
+        candidates.append((direct_file_score, size, _file_name(record).lower(), record))
+    return min(candidates, key=lambda item: (item[0], item[1], item[2]))[3] if candidates else None
+
+
+def _children_summary(document: dict) -> list[dict]:
+    items = document.get("items", []) if isinstance(document, dict) else []
+    if not isinstance(items, list):
+        return []
+    result = []
+    for item in items[:100]:
+        if not isinstance(item, dict):
+            continue
+        item_id = item.get("id") or item.get("itemId")
+        title = item.get("title")
+        if item_id:
+            result.append({"id": str(item_id), "title": str(title or "")})
+    return result
+
+
+def fetch_prefix_bounded(url: str, *, limit: int) -> dict:
+    """Read no more than limit bytes; never follow redirects outside the allowlist."""
+    validate_public_url(url)
+    request = urllib.request.Request(
+        url,
+        headers={"User-Agent": USER_AGENT, "Accept": "text/csv,text/plain,*/*"},
+    )
+    opener = urllib.request.build_opener(SafeRedirectHandler())
+    try:
+        with opener.open(request, timeout=TIMEOUT_SECONDS) as response:
+            payload = response.read(limit)
+            final_url = response.geturl()
+            validate_public_url(final_url)
+            return {"status": response.status, "headers": response.headers, "payload": payload, "final_url": final_url}
+    except urllib.error.HTTPError as error:
+        final_url = error.geturl()
+        validate_public_url(final_url)
+        return {"status": error.code, "headers": error.headers, "payload": b"", "final_url": final_url}
+
+
+def classify_sample_response(status: int, headers: dict, payload: bytes, expected_size: int, limit: int) -> str | None:
+    content_type = str(headers.get("Content-Type") or "").lower()
+    if "text/html" in content_type or len(payload) != min(limit, expected_size):
+        return None
+    if status == 206:
+        content_range = parse_content_range(headers.get("Content-Range"))
+        expected_end = min(limit - 1, expected_size - 1)
+        if content_range and content_range[0] == 0 and content_range[1] == expected_end and content_range[2] == expected_size:
+            return "http_range"
+        return None
+    if status == 200:
+        try:
+            content_length = int(headers.get("Content-Length"))
+        except (TypeError, ValueError):
+            return None
+        if content_length == expected_size:
+            return "bounded_stream_prefix"
+    return None
+
+
+def _complete_csv_prefix(payload: bytes) -> bytes:
+    end = payload.rfind(b"\n")
+    return payload[:end + 1] if end >= 0 else b""
+
+
+def audit() -> dict:
+    result = {
+        "experiment": "E590",
+        "doi": DOI,
+        "doi_parent_item_id": PARENT_ITEM_ID,
+        "data_gov_catalog_record_id": CATALOG_RECORD_ID,
+        "source": "USGS Grand Falls Dune Field, July 2023–November 2024",
+        "metadata_fields_requested": ITEM_FIELDS.split(","),
+        "parent_metadata_http_status": None,
+        "parent_metadata_sha256": None,
+        "parent_file_count": None,
+        "children_search_http_status": None,
+        "child_count": None,
+        "catalog_record_metadata_http_status": None,
+        "catalog_record_metadata_sha256": None,
+        "catalog_record_file_count": None,
+        "catalog_record_id_in_parent_children": None,
+        "child_items": [],
+        "file_count": 0,
+        "file_inventory": [],
+        "selected_file": None,
+        "sample_response": None,
+        "data_sample": None,
+        "credentials_used": False,
+        "raw_values_stored": False,
+        "raw_files_committed": False,
+        "signed_query_values_stored": False,
+        "decision": "ACQUISITION_ERROR",
+    }
+    try:
+        parent_files: list[dict] = []
+        parent = fetch_bounded(PARENT_ITEM_URL, limit=MAX_METADATA_BYTES)
+        result["parent_metadata_http_status"] = parent["status"]
+        if parent["status"] == 200:
+            result["parent_metadata_sha256"] = hashlib.sha256(parent["payload"]).hexdigest()
+            parent_doc = json.loads(parent["payload"].decode("utf-8"))
+            result["parent_title_present"] = bool(parent_doc.get("title"))
+            parent_files = _extract_file_records(parent_doc, PARENT_ITEM_ID)
+            result["parent_file_count"] = len(parent_files)
+
+        children_response = fetch_bounded(CHILDREN_URL, limit=MAX_METADATA_BYTES)
+        result["children_search_http_status"] = children_response["status"]
+        children: list[dict] = []
+        if children_response["status"] == 200:
+            result["children_search_sha256"] = hashlib.sha256(children_response["payload"]).hexdigest()
+            children = _children_summary(json.loads(children_response["payload"].decode("utf-8")))
+            result["child_count"] = len(children)
+            result["child_items"] = children
+            result["catalog_record_id_in_parent_children"] = any(
+                item["id"] == CATALOG_RECORD_ID for item in children
+            )
+
+        catalog_files: list[dict] = []
+        catalog_record = fetch_bounded(CATALOG_RECORD_URL, limit=MAX_METADATA_BYTES)
+        result["catalog_record_metadata_http_status"] = catalog_record["status"]
+        if catalog_record["status"] == 200:
+            result["catalog_record_metadata_sha256"] = hashlib.sha256(catalog_record["payload"]).hexdigest()
+            catalog_doc = json.loads(catalog_record["payload"].decode("utf-8"))
+            result["catalog_record_title_present"] = bool(catalog_doc.get("title"))
+            catalog_files = _extract_file_records(catalog_doc, CATALOG_RECORD_ID)
+            result["catalog_record_file_count"] = len(catalog_files)
+
+        all_files = parent_files + catalog_files
+        unique_files: dict[tuple[str | None, str, int | None], dict] = {}
+        for record in all_files:
+            key = (record.get("_source_item_id"), _file_name(record), _file_size(record))
+            unique_files[key] = record
+        all_files = list(unique_files.values())
+        result["file_count"] = len(all_files)
+        result["file_inventory"] = [_safe_file_record(record) for record in all_files]
+
+        if not all_files:
+            if parent["status"] != 200 and catalog_record["status"] != 200:
+                result["decision"] = "METADATA_UNAVAILABLE"
+            else:
+                result["decision"] = "NO_FILE_RECORDS_IN_TOP_LEVEL_OR_FACETS"
+            return result
+
+        candidate = _choose_candidate(all_files)
+        if candidate is None:
+            result["decision"] = "NO_SUPPORTED_METADATA_LINKED_CSV"
+            return result
+
+        name = _file_name(candidate)
+        size = _file_size(candidate)
+        uri = _download_uri(candidate)
+        result["selected_file"] = _safe_file_record(candidate)
+        if size is None or uri is None:
+            result["decision"] = "SELECTED_FILE_METADATA_INCOMPLETE"
+            return result
+
+        sample = fetch_prefix_bounded(uri, limit=MAX_SAMPLE_BYTES)
+        mode = classify_sample_response(sample["status"], sample["headers"], sample["payload"], size, MAX_SAMPLE_BYTES)
+        content_type = str(sample["headers"].get("Content-Type") or "").lower()
+        content_range = parse_content_range(sample["headers"].get("Content-Range"))
+        result["sample_response"] = {
+            "http_status": sample["status"],
+            "mode": mode,
+            "content_type": content_type,
+            "content_length": sample["headers"].get("Content-Length"),
+            "content_range_total_bytes": content_range[2] if content_range else None,
+            "bytes_read": len(sample["payload"]),
+            "sha256": hashlib.sha256(sample["payload"]).hexdigest(),
+            "host": urlsplit(sample["final_url"]).hostname,
+            "html_response": "text/html" in content_type,
+        }
+        if mode is None:
+            result["decision"] = "BOUNDED_SAMPLE_NOT_CONFIRMED"
+            return result
+
+        complete_payload = _complete_csv_prefix(sample["payload"])
+        if not complete_payload:
+            result["decision"] = "SAMPLE_HAS_NO_COMPLETE_CSV_RECORD"
+            return result
+        sample_summary = inspect_payload(name, complete_payload)
+        sample_summary.pop("prefix_hex", None)
+        result["data_sample"] = {
+            "sampling_mode": mode,
+            "sample_range_start": 0,
+            "sample_bytes": len(sample["payload"]),
+            "complete_lines_bytes": len(complete_payload),
+            "total_file_bytes": size,
+            "partial_prefix_sample": size > len(sample["payload"]),
+            "sha256": hashlib.sha256(complete_payload).hexdigest(),
+            "summary": sample_summary,
+        }
+        result["decision"] = "PUBLIC_CSV_PREFIX_SAMPLE_ACQUIRED_AND_PROFILED"
+        return result
+    except Exception as exc:
+        result["error_type"] = type(exc).__name__
+        return result
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--out", type=Path, required=True)
+    args = parser.parse_args()
+    receipt = audit()
+    args.out.parent.mkdir(parents=True, exist_ok=True)
+    args.out.write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    print(json.dumps({
+        "experiment": receipt["experiment"],
+        "decision": receipt["decision"],
+        "parent_metadata_http_status": receipt["parent_metadata_http_status"],
+        "parent_file_count": receipt["parent_file_count"],
+        "children_search_http_status": receipt["children_search_http_status"],
+        "child_count": receipt["child_count"],
+        "catalog_record_metadata_http_status": receipt["catalog_record_metadata_http_status"],
+        "catalog_record_file_count": receipt["catalog_record_file_count"],
+        "catalog_record_id_in_parent_children": receipt["catalog_record_id_in_parent_children"],
+        "file_count": receipt["file_count"],
+        "selected_file": receipt["selected_file"],
+        "sample_response": receipt["sample_response"],
+        "data_sample": receipt["data_sample"],
+        "credentials_used": receipt["credentials_used"],
+        "raw_values_stored": receipt["raw_values_stored"],
+    }, indent=2, sort_keys=True))
+
+
+if __name__ == "__main__":
+    main()
