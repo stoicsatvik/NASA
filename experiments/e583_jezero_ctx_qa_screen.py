@@ -9,7 +9,10 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
-from unittest.mock import patch
+import sys
+
+# The script is also executed directly from the experiments/ directory by CI.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from experiments.e582_ctx_qa_mola_audit import (
     API_URL,
