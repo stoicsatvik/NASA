@@ -34,7 +34,7 @@
       "bbox_intersection_fraction_of_aoi": 0.110679,
       "bbox_intersection_fraction_of_item": 1.0,
       "id": "N03_063453_1982_XN_18N282W__N03_063519_1982_XN_18N282W",
-      "intersection_bbox_wgs84_lon_lat": [76.89545517, 17.70502299, 77.47625912, 18.4658123],
+      "intersection_bbox_wgs84_lon_lat": [76.89545517, 17.70502248, 77.47625912, 18.4658123],
       "mean_difference_m": 21.2787,
       "median_difference_m": 22.0458,
       "stddev_difference_m": 13.4709
