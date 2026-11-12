@@ -133,15 +133,18 @@ def parse_command_line(line: str) -> dict | None:
     except ValueError:
         return None
 
-    command_index = None
-    tool = None
-    for index, token in enumerate(tokens):
-        candidate = Path(token.strip(";,")).name.lower()
-        if candidate in {"geodiff", "pc_align"}:
-            command_index = index
-            tool = candidate
-            break
-    if command_index is None or tool is None:
+    command_index = 0
+    wrappers = {"sudo", "env", "time", "nice", "command"}
+    while command_index < len(tokens):
+        token = tokens[command_index]
+        if token in wrappers or ("=" in token and not token.startswith("-")):
+            command_index += 1
+            continue
+        break
+    if command_index >= len(tokens):
+        return None
+    tool = Path(tokens[command_index].strip(";,")).name.lower()
+    if tool not in {"geodiff", "pc_align"}:
         return None
 
     flags = []
@@ -716,7 +719,7 @@ def _walk_json_strings(value: object, path: tuple[str, ...] = ()):
         yield value, path
 
 
-def summarize_sidecar_json(payload: bytes) -> dict:
+def summarize_sidecar_json(payload: bytes, stac_feature: dict | None = None) -> dict:
     document = json.loads(payload.decode("utf-8-sig"))
     if not isinstance(document, (dict, list)):
         raise ValueError("sidecar JSON root must be an object or array")
@@ -732,17 +735,34 @@ def summarize_sidecar_json(payload: bytes) -> dict:
         for command in parse_commands(text_value):
             commands[command["command_sha256"]] = command
     top_level_keys = sorted(document.keys()) if isinstance(document, dict) else []
-    return {
+    result = {
         "top_level_keys": [str(key) for key in top_level_keys],
         "relevant_key_paths": sorted(relevant_paths),
         "relevant_value_sha256": sorted(set(relevant_value_hashes)),
         "commands": [commands[key] for key in sorted(commands)],
         "command_count": len(commands),
         "decision": "COMMANDS_FOUND" if commands else "JSON_SIDECAR_NO_RELEVANT_COMMANDS",
+        "sidecar_canonical_sha256": hashlib.sha256(
+            json.dumps(document, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+        ).hexdigest(),
         "raw_json_stored": False,
         "raw_string_values_stored": False,
         "full_paths_stored": False,
     }
+    if isinstance(stac_feature, dict) and isinstance(document, dict):
+        stac_canonical = json.dumps(
+            stac_feature, sort_keys=True, separators=(",", ":"), ensure_ascii=False
+        ).encode("utf-8")
+        sidecar_canonical = json.dumps(
+            document, sort_keys=True, separators=(",", ":"), ensure_ascii=False
+        ).encode("utf-8")
+        sidecar_assets = document.get("assets") if isinstance(document.get("assets"), dict) else {}
+        stac_assets = stac_feature.get("assets") if isinstance(stac_feature.get("assets"), dict) else {}
+        result["matches_stac_feature_exactly"] = sidecar_canonical == stac_canonical
+        result["sidecar_id_matches_stac"] = document.get("id") == stac_feature.get("id")
+        result["asset_key_set_matches_stac"] = set(sidecar_assets) == set(stac_assets)
+        result["stac_feature_canonical_sha256"] = hashlib.sha256(stac_canonical).hexdigest()
+    return result
 
 
 def audit_sidecar_json(
@@ -820,7 +840,7 @@ def audit_sidecar_json(
         payload = response.get("payload", b"")
         result["sha256"] = hashlib.sha256(payload).hexdigest()
         try:
-            summary = summarize_sidecar_json(payload)
+            summary = summarize_sidecar_json(payload, stac_feature=feature)
         except Exception as error:
             result["decision"] = "SIDECAR_JSON_PARSE_ERROR"
             result["error_type"] = type(error).__name__
