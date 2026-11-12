@@ -21,7 +21,7 @@ XML = b"""<?xml version="1.0"?>
   <eainfo><detailed>
     <enttyp><enttypl>Grand Falls sediment transport observations</enttypl></enttyp>
     <attr><attrlabl>Record Number</attrlabl><attrdef>Sequential identifier assigned to each instrument record.</attrdef></attr>
-    <attr><attrlabl>Date and Time</attrlabl><attrdef>Timestamp associated with the record.</attrdef></attr>
+    <attr><attrlabl>Date_Time</attrlabl><attrdef>Timestamp associated with the record.</attrdef></attr>
     <attr><attrlabl>Wind Speed - Low (mph)</attrlabl><attrdef>Low-range wind speed.</attrdef><attrunit>miles per hour</attrunit></attr>
     <attr><attrlabl>Particle Count_Tot(1)</attrlabl><attrdef>Particle counter channel one total.</attrdef></attr>
     <attr><attrlabl>Kinetic Energy_Tot(1)</attrlabl><attrdef>Kinetic energy channel one total.</attrdef></attr>
@@ -44,6 +44,7 @@ class E595DictionaryTests(unittest.TestCase):
     def test_extracts_record_timestamp_and_sensor_field_definitions(self):
         result = summarize_dictionary(XML)
         self.assertEqual(result["attribute_count"], 6)
+        self.assertEqual(result["attribute_occurrence_count"], 6)
         self.assertTrue(result["record_number_definition_found"])
         self.assertTrue(result["timestamp_definition_found"])
         self.assertEqual(result["sensor_channel_definition_count"], 4)
@@ -60,13 +61,22 @@ class E595DictionaryTests(unittest.TestCase):
         self.assertTrue(result["record_number_definition_found"])
 
     def test_units_and_domain_kinds_are_summarized_without_domain_values(self):
-        xml = b"""<metadata><eainfo><detailed>
+        xml = b"""<metadata><eainfo>
+        <detailed><enttyp><enttypl>File A.csv</enttypl></enttyp>
+        <attr><attrlabl>Wind Speed</attrlabl><attrdef>Wind speed measurement.</attrdef>
+        <attrunit>mph</attrunit><attrdomv><rdom><rdommin>0</rdommin><rdommax>20</rdommax></rdom></attrdomv></attr>
+        </detailed>
+        <detailed><enttyp><enttypl>File B.csv</enttypl></enttyp>
         <attr><attrlabl>Wind Speed</attrlabl><attrdef>Wind speed measurement.</attrdef>
         <attrunit>mph</attrunit><attrdomv><rdom><rdommin>0</rdommin><rdommax>20</rdommax></rdom></attrdomv></attr>
         </detailed></eainfo></metadata>"""
         result = summarize_dictionary(xml)
+        self.assertEqual(result["attribute_count"], 1)
+        self.assertEqual(result["attribute_occurrence_count"], 2)
+        self.assertEqual(result["entity_type_count"], 2)
         self.assertEqual(result["attributes"][0]["unit"], "mph")
         self.assertEqual(result["attributes"][0]["domain_kind"], "range")
+        self.assertEqual(result["attributes"][0]["entity_type_labels"], ["File A.csv", "File B.csv"])
         self.assertNotIn("rdommin", json.dumps(result))
         self.assertNotIn("rdommax", json.dumps(result))
 
@@ -74,10 +84,16 @@ class E595DictionaryTests(unittest.TestCase):
         xml = b"""<metadata><eainfo><detailed>
         <attr><attrlabl>Record Number</attrlabl>
         <attrdef>Control at 35.123, -111.456; https://example.org/x; /tmp/private; owner@example.org</attrdef></attr>
+        <attr><attrlabl>Date_Time</attrlabl><attrdef>Format mm/dd/yyyy hh:mm; ISO 8601.</attrdef></attr>
+        <attr><attrlabl>wBSNE_1_average</attrlabl><attrdef>Voltage reported in mV/V; /tmp/private; owner@example.org</attrdef></attr>
         </detailed></eainfo></metadata>"""
-        encoded = json.dumps(summarize_dictionary(xml))
+        result = summarize_dictionary(xml)
+        encoded = json.dumps(result)
         for forbidden in ("35.123", "-111.456", "https://example.org", "/tmp/private", "owner@example.org"):
             self.assertNotIn(forbidden, encoded)
+        self.assertIn("mm/dd/yyyy", encoded)
+        self.assertIn("mV/V", encoded)
+        self.assertTrue(result["timestamp_definition_found"])
 
     def test_dtd_and_entity_declarations_are_rejected(self):
         for payload in (

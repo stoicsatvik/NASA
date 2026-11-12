@@ -36,7 +36,7 @@ MAX_XML_BYTES = 65_536
 
 URL_RE = re.compile(r"https?://\S+", re.IGNORECASE)
 EMAIL_RE = re.compile(r"\b[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}\b")
-PATH_RE = re.compile(r"(?:[A-Za-z]:\\|/)[^\s,;]+")
+PATH_RE = re.compile(r"(?<![A-Za-z0-9])(?:[A-Za-z]:\\|/)[^\s,;]+")
 COORD_PAIR_RE = re.compile(
     r"(?<![A-Za-z0-9])[-+]?\d{1,3}(?:\.\d+)?\s*,\s*[-+]?\d{1,3}(?:\.\d+)?(?![A-Za-z0-9])"
 )
@@ -129,7 +129,7 @@ def _field_category(label: str) -> str:
     normalized = re.sub(r"[^a-z0-9]+", "", label.lower())
     if normalized in {"recordnumber", "recordno", "recordid"}:
         return "record_identifier"
-    if "dateandtime" in normalized or "timestamp" in normalized:
+    if normalized in {"datetime", "dateandtime"} or "timestamp" in normalized:
         return "timestamp"
     if "windspeed" in normalized:
         return "wind_speed"
@@ -151,40 +151,63 @@ def summarize_dictionary(payload: bytes) -> dict:
 
     root = ET.fromstring(payload)
     entity_labels: list[str] = []
-    attributes: list[dict] = []
-    for element in root.iter():
-        if _local_name(element.tag) == "enttypl":
-            value = _safe_text(element.text or "", 160)
-            if value and value not in entity_labels:
-                entity_labels.append(value)
+    unique_attributes: dict[tuple, dict] = {}
+    occurrence_count = 0
 
-    for attr in (node for node in root.iter() if _local_name(node.tag) == "attr"):
-        label = _direct_text(attr, {"attrlabl"})
-        if not label:
-            continue
-        definition = _direct_text(attr, {"attrdef"})
-        unit = _direct_text(attr, {"attrunit", "unitofmeasure"})
-        domain_kind = None
-        for child in attr.iter():
-            name = _local_name(child.tag)
-            if name == "rdom":
-                domain_kind = "range"
-                break
-            if name == "codesetd":
-                domain_kind = "codeset"
-                break
-            if name == "edom":
-                domain_kind = "enumerated"
-                break
+    detailed_blocks = [node for node in root.iter() if _local_name(node.tag) == "detailed"]
+    if not detailed_blocks:
+        detailed_blocks = [root]
 
-        attributes.append({
-            "label": _safe_text(label, 160),
-            "category": _field_category(label),
-            "definition": _safe_text(definition, 600) if definition else None,
-            "unit": _safe_text(unit, 80) if unit else None,
-            "domain_kind": domain_kind,
-        })
+    for detailed in detailed_blocks:
+        entity_label = ""
+        for node in detailed.iter():
+            if _local_name(node.tag) == "enttypl":
+                entity_label = _safe_text(node.text or "", 180)
+                if entity_label:
+                    break
+        if entity_label and entity_label not in entity_labels:
+            entity_labels.append(entity_label)
 
+        for attr in (node for node in detailed.iter() if _local_name(node.tag) == "attr"):
+            label = _direct_text(attr, {"attrlabl"})
+            if not label:
+                continue
+            definition = _direct_text(attr, {"attrdef"})
+            unit = _direct_text(attr, {"attrunit", "unitofmeasure"})
+            domain_kind = None
+            for child in attr.iter():
+                name = _local_name(child.tag)
+                if name == "rdom":
+                    domain_kind = "range"
+                    break
+                if name == "codesetd":
+                    domain_kind = "codeset"
+                    break
+                if name == "edom":
+                    domain_kind = "enumerated"
+                    break
+
+            safe_label = _safe_text(label, 160)
+            safe_definition = _safe_text(definition, 600) if definition else None
+            safe_unit = _safe_text(unit, 80) if unit else None
+            key = (safe_label, safe_definition, safe_unit, domain_kind)
+            if key not in unique_attributes:
+                unique_attributes[key] = {
+                    "label": safe_label,
+                    "category": _field_category(label),
+                    "definition": safe_definition,
+                    "unit": safe_unit,
+                    "domain_kind": domain_kind,
+                    "entity_type_labels": [],
+                    "occurrences": 0,
+                }
+            item = unique_attributes[key]
+            item["occurrences"] += 1
+            occurrence_count += 1
+            if entity_label and entity_label not in item["entity_type_labels"]:
+                item["entity_type_labels"].append(entity_label)
+
+    attributes = sorted(unique_attributes.values(), key=lambda item: item["label"])
     category_counts = Counter(item["category"] for item in attributes)
     record_fields = [item for item in attributes if item["category"] == "record_identifier"]
     timestamp_fields = [item for item in attributes if item["category"] == "timestamp"]
@@ -192,6 +215,8 @@ def summarize_dictionary(payload: bytes) -> dict:
 
     return {
         "entity_type_labels": entity_labels[:20],
+        "entity_type_count": len(entity_labels),
+        "attribute_occurrence_count": occurrence_count,
         "attribute_count": len(attributes),
         "attributes": attributes[:100],
         "category_counts": dict(sorted(category_counts.items())),
@@ -203,7 +228,6 @@ def summarize_dictionary(payload: bytes) -> dict:
         "raw_urls_stored": False,
         "raw_contact_data_stored": False,
     }
-
 
 def audit(metadata_fetcher=None, xml_fetcher=None, expected_catalog_sha256: str = EXPECTED_CATALOG_METADATA_SHA256) -> dict:
     metadata_fetcher = metadata_fetcher or fetch_strict_bounded

@@ -58,3 +58,27 @@ The failures exposed two issues in the new audit implementation:
 2. The receipt's XML tag-count diagnostic retained range-bound tag names such as \`rdommin\`/\`rdommax\`, despite not retaining their numeric values. That diagnostic was unnecessary for the question and conflicted with the intended minimal domain summary, so it was removed; only the broad domain kind remains.
 
 This was a real validation gap in the first E594 implementation. No live XML request or sensor-data access occurred on the failed run. The original failure remains in Actions history; the corrected exact head must pass all 15 tests before the single bounded XML request can run.
+
+
+## First live dictionary acquisition — corrected interpretation
+
+The initial E595 run [#43262464604](https://github.com/stoicsatvik/NASA/actions/runs/43262464604) passed all 15 tests and fetched exactly 41,313 bytes from the unique catalogue file record (HTTP 200, \`application/fgdc+xml\`). XML SHA-256: \`ece31278b299c144dddc48ed7554737a1b51bbcbd33dd6092bf50fba66e1259a\`. The catalog metadata was 4,880 bytes and matched the pinned SHA-256.
+
+The first receipt exposed parser defects that are now corrected before the result is admitted:
+- Four FGDC \`detailed\` sections describe four CSV entities. The first parser counted the same 14 field definitions four times (56 occurrences). The corrected parser deduplicates field definitions while preserving entity coverage and occurrence counts.
+- \`Date_Time\` was not recognized as a timestamp label.
+- A path-redaction expression treated slashes inside \`mm/dd/yyyy\` and \`mV/V\` as absolute paths. The corrected expression only redacts paths beginning at a token boundary; a regression test preserves both format and unit strings while still redacting actual paths, URLs, emails and coordinate pairs.
+
+The source definitions already visible in the sanitized first receipt establish:
+- \`Record_Number\`: “Sequential number assigned to row by computer” — a row identifier, not a sensor identifier.
+- \`Date_Time\`: format \`mm/dd/yyyy hh:mm\`; the metadata describes time as ISO 8601.
+- Three wind-speed channels at approximately 20 cm, 60 cm and 1 m AGL; sampled each second, one value reported per minute, in mph.
+- Three Sensit particle-count channels at approximately 12 cm AGL; one-minute totals; each saturates at 7,999, so high-wind movement can be underestimated.
+- Three kinetic-energy channels; one-minute totals in uncalibrated instrument units.
+- Three wBSNE voltage channels; one-second measurements averaged over one minute and reported in mV/V. The third sensor's height is recorded as “XX cm” and remains unknown.
+
+These definitions explain intended columns but do not prove the CSV's repeated timestamp groups, record-number progression, clock timezone or sensor synchronization. No CSV rows or raw XML were downloaded or retained.
+
+## Next experiment after corrected receipt
+
+E596 should re-fetch only the same bounded 5 MB CSV prefix and retain aggregate checks only: Record_Number monotonicity/gaps/resets; timestamp-group size distribution; per-row non-null counts by wind, particle-count, kinetic-energy and wBSNE channel families; and whether each repeated timestamp group contains distinct sequential row IDs. No row values, coordinates or raw CSV are to be retained. The result may distinguish repeated rows from minute-level channel columns, but still cannot prove physical synchronization or calibration.
