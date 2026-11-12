@@ -1051,3 +1051,12 @@ Next gate: resolve item-specific `geodiff` order/control provenance; then inspec
 - Exact-head workflow [#43225029602](https://github.com/stoicsatvik/NASA/actions/runs/43225029602) passed 10/10 deterministic tests and completed the bounded live acquisition. Aggregate artifact [#13947177574](https://github.com/stoicsatvik/NASA/actions/runs/43225029602/artifacts/13947177574); durable aggregate receipt: `research/results/E586_CTX_FOOTPRINT_GEOMETRY_AUDIT_20261112.json`.
 - This improves footprint and sampling-dependence understanding only. It does not establish QA spatial support, independent accuracy, route safety, E001 recovery, cross-body similarity, novel analogue discovery, local validation advantage or challenge-selection superiority. All scientific claim states remain unchanged.
 - Next decisive gate: resolve the CTX–MOLA `geodiff` input order and initial pc-align control lineage from public processing documentation/metadata, or identify a genuinely independent control set. Do not treat the nine QA products as AOI-clipped or independent validation.
+
+## E587 — item-specific CTX processing-provenance audit (12 November 2026)
+
+- Isolated branch `research/e587-ctx-processing-provenance-audit-20261112`, stacked on E586 / PR #148. Main remains untouched.
+- The new bounded runner checks the exact pinned STAC item for provenance/processing properties, links and assets, and fetches at most two allowlisted text provenance assets (2 MB cap each). It stores only metadata summaries, command roles/flags and hashes; no raw paths, command lines, coordinates, signed query values, credentials or source text.
+- Official ASP documentation now constrains interpretation: `pc_align` uses first input as fixed reference and second as movable source, with the denser reference first; `geodiff` defaults to DEM1−DEM2, while a DEM+CSV comparison uses the DEM grid regardless of input order and `--reverse` flips sign. The USGS CTX page says CTX products are aligned to MOLA shot tracks and QA metrics are post-ground-control CTX–MOLA differences.
+- These public docs do not identify the pinned item's exact commands. The exact-head workflow will determine whether the STAC item exposes item-specific provenance; no input order or sign is inferred from absence.
+- Independent validation remains unavailable from the MOLA control points because they are used in alignment. All required scientific claim states remain unchanged.
+- Exact-head validation: PENDING.
