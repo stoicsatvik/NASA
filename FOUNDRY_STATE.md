@@ -1146,3 +1146,10 @@ No channel is missing in the prefix. Particle-count maxima are 48, 28 and 15, wi
 
 **Claim states:** observed row-ID progression and timestamp-group structure MEASURED; repeated-row mechanism NOT YET PROVEN; sensor synchronization, calibration and sediment mass conversion NOT YET PROVEN; E001 known-site recovery NOT YET MEASURED; cross-body similarity NOT YET PROVEN. E597 is one Earth-site data-integrity/semantics experiment, not an E001 recovery result.
 
+
+### E597 exact-head validation reconciliation
+
+- Corrected the durable E597 receipt to the exact E595 catalog metadata SHA-256 and exact aggregate values from artifact 13966637360. Earlier manually transcribed channel statistics were not source-of-truth and have been replaced with the workflow artifact values.
+- Preserved failed workflow runs #43267066778 (missing pure row-summary helper) and #43267342440 (one assertion referenced the wrong nested aggregate key); neither reached live source acquisition. Exact-head run #43267508332 passed 4/4 tests and completed the one bounded 5 MB audit.
+- The E597 workflow now skips the live source request whenever the exact aggregate receipt is already committed. Future documentation/PR events rerun deterministic tests without re-reading the same 5 MB source prefix.
+- Next: E598 compares the distinct 1,091,813-byte February 2024 CSV entity to determine whether the six-row/repeated-vector pattern recurs in another release. No deduplication or wind/particle correlation is authorized before that comparison.
