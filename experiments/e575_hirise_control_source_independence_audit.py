@@ -64,6 +64,7 @@ def run() -> dict[str, Any]:
             "1m_3m_inter_mosaic_values_are_independent_ground_control": False,
             "1m_3m_method_uses_orthoimage_correlation": True,
             "mola_pedr_is_an_independent_sensor_family": True,
+            "mola_pedr_horizontal_support_sufficient_for_10m_validation": False,
             "2025_product_specific_held_out_mola_horizontal_residual_found": False,
             "independent_horizontal_control_for_pinned_2025_dtm_found": False,
         },
@@ -100,7 +101,7 @@ def run() -> dict[str, Any]:
             "novel_analogue_discovery": "NOT YET PROVEN",
             "planetary_analog_challenge_superiority": "NOT YET PROVEN",
         },
-        "next_gate": "Acquire a genuinely independent reference with documented control lineage (for example, a held-out MOLA PEDR track set or an independently controlled HRSC product), then measure multi-patch residuals without fitting a corrective shift to the evaluation points.",
+        "next_gate": "A held-out MOLA PEDR track is an independent sensor-family cross-check but its approximately 100 m shot footprint is too coarse to validate a 10.2 m residual; use it only for gross-error screening. For a 10 m-scale horizontal residual, acquire a separate control network or independently controlled product with documented horizontal uncertainty materially below 10.2 m, then measure held-out multi-patch residuals without fitting a corrective shift to evaluation points.",
     }
 
 
@@ -110,7 +111,7 @@ def main() -> int:
     args = parser.parse_args()
     result = run()
     args.out.parent.mkdir(parents=True, exist_ok=True)
-    args.out.write_text(json.dumps(result, indent=2, sort_keys=True) + "\\n", encoding="utf-8")
+    args.out.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print(json.dumps({
         "experiment": result["experiment"],
         "10_2m_is_ctx_relative_p99_alignment": result["control_independence_audit"]["10_2m_is_ctx_relative_p99_alignment"],
