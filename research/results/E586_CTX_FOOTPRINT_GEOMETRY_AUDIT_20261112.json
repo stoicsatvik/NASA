@@ -1,0 +1,214 @@
+{
+  "experiment": "E586",
+  "date": "2026-11-12",
+  "decision": "GEOMETRY_AUDIT_COMPLETE",
+  "collection": "mro_ctx_controlled_usgs_dtms",
+  "source": {
+    "api": "https://stac.astrogeology.usgs.gov/api/search",
+    "dataset_doi": "10.5066/P9JKVWR3",
+    "query": {
+      "collections": [
+        "mro_ctx_controlled_usgs_dtms"
+      ],
+      "bbox": [
+        76.69,
+        17.41,
+        78.69,
+        19.41
+      ],
+      "limit": 9
+    },
+    "http_status": 200,
+    "response_bytes": 90433,
+    "response_sha256": "0298b4ef52fe96ad0595657c364da321d81a56e299d9e1a1fe8d22132aa475c5",
+    "exact_e583_item_set": true,
+    "credentials_used": false
+  },
+  "coordinate_interpretation": "Mars 2015 ocentric longitude/latitude supplied by the USGS STAC collection; not Earth WGS84.",
+  "area_method": "Spherical cylindrical equal-area projection using Mars 2015 semi-major radius 3396190 m. Area ratios and IoU are primary outputs; this is an approximation, not DEM or terrain measurement.",
+  "summary": {
+    "selected_items": 9,
+    "valid_polygon_or_multipolygon_geometries": 9,
+    "invalid_geometries": 0,
+    "bbox_geometry_max_delta_degrees": 0,
+    "geometry_contained_at_least_99_percent": 6,
+    "partial_geometry_count": 3,
+    "pairwise_footprint_intersecting_pairs": 22,
+    "all_pairs": 36,
+    "pairwise_footprint_iou_at_least_0_1": 10,
+    "maximum_footprint_iou": 0.747534,
+    "contained_subset_intersecting_pairs": 14,
+    "contained_subset_pairs": 15,
+    "contained_subset_iou_at_least_0_1": 7,
+    "contained_subset_maximum_iou": 0.747534,
+    "contained_subset_median_qa_mean_difference_m": 26.17935,
+    "contained_subset_median_qa_median_difference_m": 25.2618,
+    "bbox_vs_geometry_median_absolute_fraction_difference": 0,
+    "bbox_vs_geometry_maximum_absolute_fraction_difference": 0.12235575
+  },
+  "items": [
+    {
+      "id": "N02_063242_1988_XN_18N283W__N03_063532_1988_XN_18N283W",
+      "geometry_type": "Polygon",
+      "geometry_sha256": "3642e81de2b63aade51031beb7486dd7091056ee13c61c232c47247f6f5fcdbd",
+      "footprint_area_km2": 1210.553338,
+      "fraction_inside_aoi": 1,
+      "bbox_fraction": 1,
+      "geometry_to_bbox_ratio": 1,
+      "qa_mean_m": 21.4381,
+      "qa_median_m": 21.0239,
+      "qa_stddev_m": 13.973,
+      "qa_asset_title": "ASP Generated Quality Assurance Metrics",
+      "qa_asset_type": "text/plain"
+    },
+    {
+      "id": "N03_063453_1982_XN_18N282W__N03_063519_1982_XN_18N282W",
+      "geometry_type": "Polygon",
+      "geometry_sha256": "168ae81b455c1fa88d1ae6a9e1b0085e299686465a59517ad6dec6fc71e912d0",
+      "footprint_area_km2": 1171.531499,
+      "fraction_inside_aoi": 1,
+      "bbox_fraction": 1,
+      "geometry_to_bbox_ratio": 1,
+      "qa_mean_m": 21.2787,
+      "qa_median_m": 22.0458,
+      "qa_stddev_m": 13.4709,
+      "qa_asset_title": "ASP Generated Quality Assurance Metrics",
+      "qa_asset_type": "text/plain"
+    },
+    {
+      "id": "N04_063809_1982_XN_18N282W__N05_064231_1982_XN_18N282W",
+      "geometry_type": "Polygon",
+      "geometry_sha256": "8c6e408b0451778c0b9ac16cb3ee8f2152433cda0f784a00f5e348d5acb98a77",
+      "footprint_area_km2": 1104.879798,
+      "fraction_inside_aoi": 1,
+      "bbox_fraction": 1,
+      "geometry_to_bbox_ratio": 1,
+      "qa_mean_m": 37.0019,
+      "qa_median_m": 37.2683,
+      "qa_stddev_m": 12.9054,
+      "qa_asset_title": "ASP Generated Quality Assurance Metrics",
+      "qa_asset_type": "text/plain"
+    },
+    {
+      "id": "N04_064020_1983_XN_18N283W__N04_063954_1982_XN_18N283W",
+      "geometry_type": "Polygon",
+      "geometry_sha256": "fe515f6c5467246a5c5971838a250bffc667e1094b4dad9d945ba0b1283e6ef7",
+      "footprint_area_km2": 1207.750841,
+      "fraction_inside_aoi": 0.99985694,
+      "bbox_fraction": 0.993842,
+      "geometry_to_bbox_ratio": 1.00605221,
+      "qa_mean_m": 24.99,
+      "qa_median_m": 23.7453,
+      "qa_stddev_m": 12.1603,
+      "qa_asset_title": "ASP Generated Quality Assurance Metrics",
+      "qa_asset_type": "text/plain"
+    },
+    {
+      "id": "N09_065774_1988_XN_18N283W__N10_066196_1987_XN_18N283W",
+      "geometry_type": "Polygon",
+      "geometry_sha256": "ba0c251b410dc11809030bcacef7a4ec166c4cbdd9df33af6ef106c36fdfc819",
+      "footprint_area_km2": 1183.535137,
+      "fraction_inside_aoi": 0.00505837,
+      "bbox_fraction": 0.035634,
+      "geometry_to_bbox_ratio": 0.1419535,
+      "qa_mean_m": 27.3646,
+      "qa_median_m": 26.9863,
+      "qa_stddev_m": 15.649,
+      "qa_asset_title": "ASP Generated Quality Assurance Metrics",
+      "qa_asset_type": "text/plain"
+    },
+    {
+      "id": "N15_068162_1984_XN_18N283W__N12_067159_1988_XN_18N283W",
+      "geometry_type": "Polygon",
+      "geometry_sha256": "c613d25f96a9d9ca33d8f7974a1582a001322e82413ae7c7828e68ebfbfb69e9",
+      "footprint_area_km2": 1202.212653,
+      "fraction_inside_aoi": 0.47814014,
+      "bbox_fraction": 0.480276,
+      "geometry_to_bbox_ratio": 0.99555284,
+      "qa_mean_m": 40.5091,
+      "qa_median_m": 40.0418,
+      "qa_stddev_m": 12.8508,
+      "qa_asset_title": "ASP Generated Quality Assurance Metrics",
+      "qa_asset_type": "text/plain"
+    },
+    {
+      "id": "P02_001820_1984_XI_18N282W__P06_003442_1987_XI_18N282W",
+      "geometry_type": "Polygon",
+      "geometry_sha256": "cf5c4c8cfc0e4e0a5bfc9b288a1e726f0bad6db81bc077c1ac233cc67067031d",
+      "footprint_area_km2": 1182.6582,
+      "fraction_inside_aoi": 1,
+      "bbox_fraction": 1,
+      "geometry_to_bbox_ratio": 1,
+      "qa_mean_m": 38.1975,
+      "qa_median_m": 37.2336,
+      "qa_stddev_m": 15.061,
+      "qa_asset_title": "ASP Generated Quality Assurance Metrics",
+      "qa_asset_type": "text/plain"
+    },
+    {
+      "id": "P05_002809_1975_XI_17N283W__P13_006000_1974_XI_17N283W",
+      "geometry_type": "Polygon",
+      "geometry_sha256": "ba664b37d2b71f0ff393ec26ffecdfff76a664cd5d249b75d4d2c2655a9e149b",
+      "footprint_area_km2": 8331.417446,
+      "fraction_inside_aoi": 0.00043425,
+      "bbox_fraction": 0.12279,
+      "geometry_to_bbox_ratio": 0.00353653,
+      "qa_mean_m": 28.4886,
+      "qa_median_m": 27.9154,
+      "qa_stddev_m": 15.0384,
+      "qa_asset_title": "ASP Generated Quality Assurance Metrics",
+      "qa_asset_type": "text/plain"
+    },
+    {
+      "id": "P18_007925_1987_XN_18N282W__P19_008650_1987_XI_18N282W",
+      "geometry_type": "Polygon",
+      "geometry_sha256": "f7c3d44b54127829d928d9b243b13fe8b217904d85f9ec418d98761d6a17452b",
+      "footprint_area_km2": 2579.890093,
+      "fraction_inside_aoi": 1,
+      "bbox_fraction": 1,
+      "geometry_to_bbox_ratio": 1,
+      "qa_mean_m": 27.3687,
+      "qa_median_m": 26.7783,
+      "qa_stddev_m": 10.934,
+      "qa_asset_title": "ASP Generated Quality Assurance Metrics",
+      "qa_asset_type": "text/plain"
+    }
+  ],
+  "pairwise_footprint_overlap": {
+    "total_pairs": 36,
+    "intersecting_pairs": 22,
+    "iou_ge_0_1_pairs": 10,
+    "maximum_iou": 0.747534,
+    "contained_subset": {
+      "total_pairs": 15,
+      "intersecting_pairs": 14,
+      "iou_ge_0_1_pairs": 7,
+      "maximum_iou": 0.747534
+    }
+  },
+  "qa_spatial_support": "NOT ESTABLISHED BY ITEM GEOMETRY. The QA asset is attached to the product; no AOI-clipped support is inferred.",
+  "interpretation_boundary": [
+    "Actual overlap uses STAC GeoJSON footprint geometry, not bounding boxes.",
+    "Bounding boxes materially overstate AOI coverage for P05 and N09; they are not a substitute for actual footprint geometry.",
+    "The same six products meet the >=99% containment screen, but their actual footprints still overlap substantially.",
+    "Product footprint/AOI overlap does not establish the spatial support of the attached QA metrics.",
+    "QA residuals remain post-control CTX-MOLA product QA, not held-out accuracy, independent validation or route-safety evidence.",
+    "No E001 recovery, cross-body similarity, novel analogue discovery or challenge superiority is inferred."
+  ],
+  "validation": {
+    "workflow_run": 43225029602,
+    "workflow_url": "https://github.com/stoicsatvik/NASA/actions/runs/43225029602",
+    "workflow_conclusion": "success",
+    "deterministic_tests": 10,
+    "tests_passed": 10,
+    "artifact_id": 13947177574,
+    "artifact_sha256": "sha256:c0501a4975109d4b8e3be699cac9da87f231d1f32d65e3beb8df624df11b3ac5"
+  },
+  "storage": {
+    "raw_item_json_stored": false,
+    "raw_geometry_stored": false,
+    "raw_qa_text_stored": false,
+    "signed_query_values_stored": false,
+    "credentials_used": false
+  }
+}
