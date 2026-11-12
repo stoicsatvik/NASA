@@ -1,0 +1,35 @@
+name: E580 STAC item and DTM range probe
+
+on:
+  push:
+    branches:
+      - research/e580-stac-search-post-20261112
+    paths:
+      - experiments/e580_stac_search_probe.py
+      - tests/test_e580_stac_search_probe.py
+      - .github/workflows/e580-stac-search-probe.yml
+
+permissions:
+  contents: read
+
+jobs:
+  e580:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run deterministic tests
+        run: python -m unittest discover -s tests -p "test_e580_stac_search_probe.py" -v
+      - name: Run one bounded anonymous STAC search and DTM range probe
+        run: python experiments/e580_stac_search_probe.py --out .artifacts/e580/stac-summary.json
+      - name: Upload aggregate receipt only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e580-stac-receipt
+          path: .artifacts/e580/stac-summary.json
+          if-no-files-found: warn
+          retention-days: 7
