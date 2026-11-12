@@ -149,7 +149,7 @@ class E589Tests(unittest.TestCase):
         self.assertEqual(result["decision"], "JSON_WITHOUT_RECOGNIZED_COMMANDS")
 
     def test_qa_metrics_parser_extracts_numeric_fields_without_raw_text(self):
-        payload = b"Mean difference: -1.25 m\\nMedian difference: -1.10 m\\nStandard deviation: 3.5 m\\nCTX-MOLA"
+        payload = b"Mean difference: -1.25 m\nMedian difference: -1.10 m\nStandard deviation: 3.5 m\nCTX-MOLA"
         result = parse_qa_metrics(payload)
         self.assertEqual(result["decision"], "QA_METRICS_PARSED")
         self.assertEqual([m["metric"] for m in result["metrics"]], ["mean", "median", "standard_deviation"])
