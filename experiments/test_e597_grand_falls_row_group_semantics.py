@@ -41,19 +41,19 @@ class E597RowGroupTests(unittest.TestCase):
         from experiments.e597_grand_falls_row_group_semantics import summarize_rows
         result = summarize_rows(headers, rows)
         self.assertEqual(result["row_count"], 6)
-        self.assertEqual(result["distinct_timestamp_groups"], 2)
-        self.assertEqual(result["group_size_distribution"], {"3": 2})
-        self.assertEqual(result["groups_with_distinct_record_ids"], 2)
-        self.assertEqual(result["groups_with_sequential_record_ids"], 2)
-        self.assertEqual(result["groups_with_all_rows_channel_vectors_distinct"], 2)
+        self.assertEqual(result["timestamps"]["distinct_timestamp_groups"], 2)
+        self.assertEqual(result["timestamps"]["group_size_distribution"], {"3": 2})
+        self.assertEqual(result["record_number"]["timestamp_groups_with_distinct_record_ids"], 2)
+        self.assertEqual(result["record_number"]["timestamp_groups_with_sequential_record_ids"], 2)
+        self.assertEqual(result["within_timestamp_group"]["groups_with_all_rows_channel_vectors_distinct"], 2)
 
     def test_missing_channel_values_are_counted_not_imputed(self):
         headers, rows = make_fixture()
         rows[0][2] = ""
         from experiments.e597_grand_falls_row_group_semantics import summarize_rows
         result = summarize_rows(headers, rows)
-        self.assertEqual(result["family_rows_with_all_three_channels_present"]["wind_speed_mph"], 5)
-        self.assertEqual(result["row_nonnull_channel_count_distribution"]["11"], 1)
+        self.assertEqual(result["within_timestamp_group"]["family_rows_with_all_three_channels_present"]["wind_speed_mph"], 5)
+        self.assertEqual(result["within_timestamp_group"]["row_nonnull_channel_count_distribution"]["11"], 1)
         self.assertEqual(result["row_nonnull_channel_count_distribution"]["12"], 5)
 
     def test_duplicate_record_numbers_are_measured_not_rewritten(self):
@@ -61,8 +61,8 @@ class E597RowGroupTests(unittest.TestCase):
         rows[1][1] = rows[0][1]
         from experiments.e597_grand_falls_row_group_semantics import summarize_rows
         result = summarize_rows(headers, rows)
-        self.assertEqual(result["unique_record_ids"], 5)
-        self.assertEqual(result["reset_or_duplicate_count"], 1)
+        self.assertEqual(result["record_number"]["unique_record_ids"], 5)
+        self.assertEqual(result["record_number"]["reset_or_duplicate_count"], 1)
 
 
 if __name__ == "__main__":
