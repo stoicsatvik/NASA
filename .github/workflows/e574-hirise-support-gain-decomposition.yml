@@ -1,0 +1,49 @@
+name: E574 HiRISE support gain decomposition
+
+on:
+  push:
+    branches:
+      - research/e574-hirise-support-gain-decomposition-20261112
+    paths:
+      - research/receipts/e573_support_summary.json
+      - experiments/e574_support_gain_decomposition.py
+      - tests/test_e574_support_gain_decomposition.py
+      - .github/workflows/e574-hirise-support-gain-decomposition.yml
+  pull_request:
+    branches:
+      - research/e573-hirise-translation-envelope-20261112
+    paths:
+      - research/receipts/e573_support_summary.json
+      - experiments/e574_support_gain_decomposition.py
+      - tests/test_e574_support_gain_decomposition.py
+      - .github/workflows/e574-hirise-support-gain-decomposition.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e574-hirise-support-gain-decomposition
+  cancel-in-progress: true
+
+jobs:
+  decomposition:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run deterministic support decomposition tests
+        run: python -m pytest -q tests/test_e574_support_gain_decomposition.py
+      - name: Emit aggregate support decomposition
+        run: python -m experiments.e574_support_gain_decomposition --input research/receipts/e573_support_summary.json --out .artifacts/e574/receipt.json
+      - name: Upload aggregate receipt only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e574-hirise-support-gain-decomposition
+          path: .artifacts/e574/receipt.json
+          if-no-files-found: ignore
+          retention-days: 14
