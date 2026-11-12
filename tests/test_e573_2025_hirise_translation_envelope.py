@@ -63,6 +63,7 @@ class _SinglePixelDataset:
     count = 1
     width = 1
     height = 1
+    nodata = None
     crs = pyproj.CRS.from_proj4(
         f"+proj=longlat +a={MOLA_RADIUS_FALLBACK_M} +b={MOLA_RADIUS_FALLBACK_M} +no_defs +type=crs"
     )
