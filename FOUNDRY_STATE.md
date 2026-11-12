@@ -1,9 +1,9 @@
 # FOUNDRY_STATE — NASA
 
-Updated: 2026-11-12
+Updated: 2026-11-13
 Class: Tier A
 Time horizon: NASA Space Apps Challenge, 14–15 Nov 2026
-Working branch: `research/e590-grand-falls-2023-2024-access-20261112`
+Working branch: `research/e600-mcmurdo-thermal-inertia-comparability-audit-20261113`
 Main objective: maximize uncertainty eliminated per run and converge on a scientifically defensible Space Apps entry.
 
 ## Current thesis
@@ -99,14 +99,20 @@ Pivot away from the planetary-analog track if any of these becomes clear:
 - required domain expertise cannot be recruited and scientific validity remains weak;
 - the only differentiator becomes UI/LLM orchestration.
 
-## Next trigger
+## Current next trigger (13 November 2026)
 
-**E560 has now completed the bounded official USGS ScienceBase metadata audit (11 Nov 2026).** Exact-head Actions run #43068609889 passed 13/13 deterministic tests and acquired the pinned metadata anonymously. The item JSON returned HTTP 200 (19,203 bytes); the only file was the 9,406-byte FGDC XML. The live receipt reports a catalogue MD5 mismatch, zero vector links, and no feature payload. The XML itself says the 192 points are for discovery/reference rather than analysis and may be displaced by up to 10 km from feature centroids. Its 0.6096 m coordinate-resolution field is not positional accuracy. Do not pursue this item/WFS as an E001 analytical label source. Preserve the checksum discrepancy and do not claim 192 acquired features.
+E599 completed a bounded official-documentation audit of CTX–MOLA QA sign and control lineage. Product-level CTX–MOLA QA semantics and MOLA-shot control are SUPPORTED; item-specific `geodiff` operand order, reverse flag and exact `pc_align` lineage remain NOT YET VERIFIED.
 
-The planetary-analog challenge remains **NOT YET PROVEN** as the best challenge. The all-14 screen and E541 factor ablation still put Martian Map (#11, 4.10) and MODIS/VIIRS (#9, 4.00) in a provisional top tier; the 0.10 gap is below the predeclared 0.25 threshold, and MODIS/VIIRS wins when portfolio reuse is removed. Planetary analog (#10, 2.93) remains a conditional research challenger, not the current readiness leader. No challenge is locked.
+E600 completed a source-level audit of Levy (2026) on McMurdo Dry Valleys thermal inertia. The MDV is a published Mars analogue and the article reports physical soil thermal inertia in TIU, but its satellite apparent thermal inertia is not directly interchangeable with physical TIU. The article itself reports poor point-scale ATI/TIU correspondence. Supporting Table S2 and sample georeferencing have not been retrieved. This is a candidate positive-site source, not E001 recovery.
 
-Next highest-information work: test actual CRS registration and spatial coverage for the Martian Map layers on one pinned Mars area, and independently verify a no-credential public MODIS/VIIRS data path with a measurable validation target. Reassess the 14-challenge screen only when those results change a scored factor. Keep analog work focused on independent positive sites, defensible non-analogue controls and physically comparable features. No UI polish before the evidence gate.
+The all-14 challenge screen remains provisional: #11 Martian Map 4.10 and #9 MODIS/VIIRS 4.00 exceed #10 planetary analog 2.93 on the current rubric. The 0.10 gap is below the predeclared meaningful threshold and factor ablations reverse the ranking; no challenge is locked.
 
+Next highest-information actions:
+1. Retrieve and source-hash E600 Supporting Table S2; verify whether sample IDs/coordinates support a defensible geospatial join.
+2. If georeferencing is valid, acquire matched Mars THEMIS physical TIU data, define non-analogue controls before scoring, and run a frozen single-site/leave-one-site-out baseline. Do not equate ATI with TIU.
+3. Continue the existing Martian Map CRS/coverage test and no-credential MODIS/VIIRS data-path validation. Re-score the all-14 challenge matrix only when a measured result changes a factor.
+
+E001 remains NOT YET MEASURED; cross-body similarity, novel analogue discovery, local validation advantage and challenge-selection superiority remain NOT YET PROVEN. No UI polish before evidence.
 ## E514 real matched-footprint falsification (2026-11-03)
 
 - Draft research PR #68 on `research/e514-equal-physical-footprint-20261103`,
@@ -1180,3 +1186,19 @@ Highest-value next action: stop the same-site CSV route work unless official met
 - All required NASA claim states remain: cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN; challenge-selection superiority NOT YET PROVEN.
 - Next action: acquire only the pinned item's public provenance asset via a bounded no-auth STAC request, if available, and parse the exact command/shot lineage. If unavailable, preserve ambiguity and seek an independent control set. Do not spend on UI polish.
 
+
+
+## E600 — McMurdo Dry Valleys thermal-inertia comparability audit (13 November 2026)
+
+Draft report: research/E600_MCMURDO_THERMAL_INERTIA_COMPARABILITY_AUDIT_20261113.md; structured receipt: research/results/E600_MCMURDO_THERMAL_INERTIA_COMPARABILITY_AUDIT_20261113.json. Branch research/e600-mcmurdo-thermal-inertia-comparability-audit-20261113, stacked on E599 / PR #165; main untouched.
+
+- Levy (2026), DOI 10.1080/15230430.2026.2617687, documents the McMurdo Dry Valleys as a long-used Mars analogue and reports 17 soil samples from four valleys. Physical soil thermal inertia spans 285–694 TIU dry and reaches 2,041 TIU at saturation; triplicate moisture-state measurements and ±10% instrument accuracy for conductivity/diffusivity/heat capacity are reported.
+- The same paper uses Landsat 8 OLI 30 m and TIRS 100 m observations on 6 Aug, 20 Oct and 30 Dec 2024, with 1 m lidar terrain correction. Its apparent thermal inertia is a proxy, not physical TIU. The paper reports poor point-scale ATI/TIU correspondence and says one-to-one calibration is not possible without contemporaneous field moisture and representative thermal-pixel sampling.
+- Decision: reject naive ATI=TIU substitution. Physical TIU is a candidate feature, but Supporting Table S2, sample georeferencing, a matched Mars THEMIS TIU product and non-analogue controls are not yet available in the audited evidence. E001 was not run.
+- The 17 samples are within one known analogue region and must not be treated as 17 independent analogue sites. No site rows or rankings were added.
+- Claim states unchanged: cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN; challenge-selection superiority NOT YET PROVEN.
+
+
+### E600A support-scale result (13 November 2026)
+
+The nominal sample-to-pixel support experiment is recorded in `research/e600a_sample_to_pixel_support_sensitivity.py`. Using the paper's ~500 mL sample and upper-10-cm collection depth as an idealized slab gives 0.005 m² nominal sample area; a 100 m TIRS pixel is 2,000,000× that area and a 30 m OLI pixel is 180,000×. Six deterministic local arithmetic assertions passed in an independent local calculation; the committed script was not executed from a repository checkout and no CI run was triggered. This is a nominal support diagnostic, not an observed footprint or coordinate join. The [285,694] Earth dry-TIU range overlaps the cited [150,350] Mars sandy/rocky context range over 65 TIU (15.89% of Earth range width), but that range arithmetic is not a distribution or site score. No E001 rows/ranking were added. Direct point-sample ATI/TIU calibration remains REJECTED; cross-body similarity remains NOT YET PROVEN.
