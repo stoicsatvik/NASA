@@ -3,7 +3,7 @@
 Updated: 2026-11-13
 Class: Tier A
 Time horizon: NASA Space Apps Challenge, 14–15 Nov 2026
-Working branch: `research/e600-mcmurdo-thermal-inertia-comparability-audit-20261113`
+Working branch: `research/e601-ctx-stac-item-access-20261113`
 Main objective: maximize uncertainty eliminated per run and converge on a scientifically defensible Space Apps entry.
 
 ## Current thesis
@@ -1196,4 +1196,16 @@ Draft report: research/E600_MCMURDO_THERMAL_INERTIA_COMPARABILITY_AUDIT_20261113
 - The same paper uses Landsat 8 OLI 30 m and TIRS 100 m observations on 6 Aug, 20 Oct and 30 Dec 2024, with 1 m lidar terrain correction. Its apparent thermal inertia is a proxy, not physical TIU. The paper reports poor point-scale ATI/TIU correspondence and says one-to-one calibration is not possible without contemporaneous field moisture and representative thermal-pixel sampling.
 - Decision: reject naive ATI=TIU substitution. Physical TIU is a candidate feature, but Supporting Table S2, sample georeferencing, a matched Mars THEMIS TIU product and non-analogue controls are not yet available in the audited evidence. E001 was not run.
 - The 17 samples are within one known analogue region and must not be treated as 17 independent analogue sites. No site rows or rankings were added.
+- Claim states unchanged: cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN; challenge-selection superiority NOT YET PROVEN.
+
+
+## E601 — controlled CTX STAC item-access probe (13 November 2026)
+
+Draft report: research/E601_CTX_STAC_ITEM_ACCESS_20261113.md; structured receipt: research/results/E601_CTX_STAC_ITEM_ACCESS_20261113.json. Branch research/e601-ctx-stac-item-access-20261113, stacked on E600 / PR #166; main untouched.
+
+- Live official USGS collection metadata GET succeeded for mro_ctx_controlled_usgs_dtms. It reports Mars/CTX, CC0-1.0, NASA producer/USGS processor, Mars 2015 ocentric equirectangular WKT2, GSD 20.0002–35.9626 m, MOLA control via Ames Stereo Pipeline/pc_align, and explicit jitter/nodata warnings.
+- The official USGS Mosaic.json tutorial uses Jezero at 77.69 E, 18.41 N and reports 80 matching items for bbox [76.69, 17.41, 78.69, 19.41] in its historical example. It documents the DTM/QA/MOLA asset keys; this is not a live count from this run.
+- Item/search endpoints and the exact S3 COG URL were inaccessible through the current web retrieval path; container curl failed before HTTP with DNS resolution failure. No item JSON, DTM raster, current live item count, pixel sample or terrain measurement was acquired.
+- Decision: public source readiness SUPPORTED; actual item/raster ingestion BLOCKED IN THIS RUNTIME by DNS/API access. This is not a scientific null and does not block the NASA repository as a whole.
+- Next: run the official pystac-client query from a network-enabled authorized environment, retrieve one pinned item and its dtm/qa_metrics/intersection_error/mola_csv assets, hash metadata, validate CRS/GSD/nodata/QA, then compare a small DTM window with same-area MOLA.
 - Claim states unchanged: cross-body similarity NOT YET PROVEN; known-site recovery NOT YET MEASURED; novel analogue discovery NOT YET PROVEN; local validation advantage NOT YET PROVEN; challenge-selection superiority NOT YET PROVEN.
