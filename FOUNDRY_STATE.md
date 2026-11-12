@@ -3,7 +3,7 @@
 Updated: 2026-11-12
 Class: Tier A
 Time horizon: NASA Space Apps Challenge, 14–15 Nov 2026
-Working branch: `research/e594-firms-keyless-modis-viirs-20261112`
+Working branch: `research/e596-analogue-catalogue-provenance-audit-20261112`
 Main objective: maximize uncertainty eliminated per run and converge on a scientifically defensible Space Apps entry.
 
 ## Current thesis
@@ -1165,3 +1165,33 @@ Source: Rachelle Le Cussan, *Planetary Analogue Catalogue* v0.1, data repository
 
 Next: independently review the primary references for a narrow analogue family, resolve site extents/coordinates from primary geospatial sources, and pair only verified site records with matched-footprint NASADEM/MOLA descriptors. The USGS TADP/ScienceBase geospatial source remains a candidate; prior metadata access timed out, so use a distinct public endpoint or preserve the failure. No author contact, account creation, field visit or raw-coordinate retention.
 
+
+
+## E595 — Grand Falls sensor dictionary result (12 November 2026)
+
+- The exact-head workflow on PR #160, run [#43263915572](https://github.com/stoicsatvik/NASA/actions/runs/43263915572), passed 15/15 deterministic tests and completed the one bounded 41,313-byte XML request.
+- The dictionary defines `Record_Number` as a sequential row identifier, not a sensor identifier; `Date_Time` as a minute-formatted timestamp with no explicit timezone offset; three wind channels, three particle-count channels, three uncalibrated kinetic-energy channels, and three wBSNE voltage channels. The third wBSNE height is recorded as unknown.
+- Particle counters saturate at 7,999; wBSNE is mV/V, not calibrated sediment mass. These definitions do not explain the repeated timestamp groups or establish sensor synchronization/calibration.
+- The committed receipt currently records the earlier validated head `9bb36ea3063113eb468bbc1e4796016c28d893ab`; the later exact PR head `811bf1affdc90d13fc9d51a7e7fc987b48b4e82c` passed, but its artifact has not been reconciled into a committed receipt. Preserve this exact-head receipt mismatch.
+- E001 remains NOT YET MEASURED. This is a source-semantics result, not an analogue feature or a cross-body validation result.
+
+## E596 — independent public analogue catalogue audit (12 November 2026)
+
+- Source: Le Cussan, *Planetary Analogue Catalogue* v0.1, pinned commit `62e6339bdf308de3bc987388d0faa7130cf57de9`, GeoJSON Git blob `156edd871599cf9ac9c083658d14d034f660e35d`; data licence CC BY 4.0. The source README says new entries begin as Draft and become Verified only after an independent person checks science, references and ratings.
+- Exact-head workflow [#43265462598](https://github.com/stoicsatvik/NASA/actions/runs/43265462598) passed 4/4 deterministic tests, fetched the pinned snapshot, verified the exact Git blob SHA, generated the coordinate-free receipt and uploaded artifact [#13966496606](https://github.com/stoicsatvik/NASA/actions/runs/43265462598/artifacts/13966496606).
+- 16 site records; **16 Draft, 0 Verified**; 96 references; 42 photos; 7 sensitive-site flags. Coordinate precision: 10 approximately 10 km, 2 approximately 1 km, 4 region-only. Target counts: Mars 10, Early Earth 2, Moon 2, Enceladus 1, Europa 1.
+- Decision: candidate index only. **No record is admitted as an E001 ground-truth label.** No coordinates or geometry were copied into the receipt. The catalogue's own review policy prevents treating its current Draft records as independently verified labels.
+- E001 known-site recovery remains NOT YET MEASURED; cross-body similarity, novel analogue discovery, local validation advantage and challenge-selection superiority remain NOT YET PROVEN.
+
+## Current challenge-selection boundary
+
+The all-14 screen remains provisional: #11 Martian Map 4.10, #9 MODIS/VIIRS 4.00, #10 planetary analog 2.93. The 0.10 #11/#9 gap is below the predeclared 0.25 meaningful-difference threshold; E541 reverses the lead when portfolio reuse is removed, while E531 score perturbations leave a negative fifth-percentile gap. E562 found one anonymous VIIRS sample path but no credential-free paired MODIS/VIIRS cohort. No challenge is locked and no judging-success probability is inferred.
+
+## Next highest-information actions
+
+1. Keep E001 gated: independently review primary references for a narrow analogue family, resolve site extents and uncertainty, and obtain defensible non-analogue controls before constructing a labelled feature matrix.
+2. Continue the bounded Grand Falls record-group audit only as an aeolian-source semantics experiment; it cannot substitute for E001 labels or Mars/Earth feature comparability.
+3. Reassess Martian Map only after actual MOLA/CTX/HiRISE CRS, footprint, valid-pixel support and nodata compatibility are measured on one pinned area.
+4. Keep MODIS/VIIRS as a co-leader only if a legitimate paired-data access path is available; do not create credentials or use gated data autonomously.
+
+No field data, raw catalogue coordinates, credentials, team contact, deployment, competition submission or main-branch change was made.
