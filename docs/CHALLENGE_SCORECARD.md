@@ -176,3 +176,11 @@ All 14 official challenge summaries are now tracked against current repo evidenc
 Planetary analog still has the most assembled cross-body source pipeline, but its core comparison is not scientifically admissible yet: E524 found zero directly comparable descriptors in the current PAAD/2018-workbook pair and E001 recovery is NOT YET MEASURED. E525 identifies a separate official MGD3 spatial route but does not ingest it. Earth Trend has a real source-verified numerical path; Martian Map has MOLA ingestion but no route-safety validation. Field Shift lacks local domain evidence. The remaining challenges are not ranked inferior where their audits are absent.
 
 **Conclusion: challenge-selection superiority remains NOT YET PROVEN.** Do not lock planetary analog until the spatial join and E001 baseline are run, and do not discard Earth Trend or Martian Map without their own acceptance gates.
+
+## E572 independent analogue-catalogue admissibility (2026-11-12)
+
+A second public catalogue was pinned and quantitatively audited: Rachelle Le Cussan's Planetary Analogue Catalogue, v0.1 (CC BY 4.0), commit \`62e6339bdf308de3bc987388d0faa7130cf57de9\`.
+
+It contains 12 primary Mars/Moon records (10 Mars, 2 Moon), all Draft; 68 references (21 peer-reviewed, 20 peer-reviewed label/feature-supporting, 1 unverified); zero explicit negative controls; zero common physical numeric descriptors; and zero target-body measurement fields. The only numeric fields shared across all records are contributor access/hazard ratings. Eleven of twelve coordinates are region-only or approximately 10 km precision.
+
+**Decision:** the catalogue is useful as a candidate-site index, not as E001 labels/features. No numeric challenge score changes. The planetary-analog challenge remains NOT YET PROVEN and below the provisional readiness pair: Martian Map #11 (4.10) and MODIS/VIIRS #9 (4.00). E001 remains NOT YET MEASURED. See \`research/E572_ANALOGUE_CATALOGUE_ADMISSIBILITY_20261112.md\` and its pinned aggregate receipt.
