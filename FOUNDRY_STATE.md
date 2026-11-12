@@ -1037,3 +1037,11 @@ Next gate: resolve item-specific `geodiff` order/control provenance; then inspec
 - Exact-head Actions [#43222673590](https://github.com/stoicsatvik/NASA/actions/runs/43222673590) passed 7/7 deterministic tests and recomputed the committed E585 result with a structural match to the E583 receipt. The first recomputation exposed a P05 item-ID transcription mismatch; the expected receipt was corrected against E583 and earlier failures remain preserved. No new live source access is performed.
 - Next: retrieve the nine STAC geometries and compute polygon/AOI intersections; establish whether QA assets summarize full products or AOI-clipped support; keep initial pc-align controls separate from held-out validation.
 - Claim states unchanged: absolute accuracy NOT YET MEASURED; independent validation NOT YET MEASURED; route safety NOT YET PROVEN; E001 known-site recovery NOT YET MEASURED; cross-body similarity, novel analogue discovery, local validation advantage and challenge-selection superiority NOT YET PROVEN.
+
+
+## E585 unit-sphere measure correction (12 November 2026)
+
+- Review found that E585 multiplied spherical-rectangle solid angles by Earth's radius squared even though the study coordinates describe Mars and the analysis uses only dimensionless intersection fractions and bbox IoU.
+- The common radius-squared factor cancels from every ratio, so all previously reported fractions and IoU values remain unchanged. The Earth-radius label was nevertheless physically inappropriate and suggested an absolute-area result that was never used.
+- Replaced the radius-scaled area helper with unit-sphere solid angle in steradians. No body-specific radius or absolute surface area is reported. The 99% containment screen, cohort summaries and claim boundaries are unchanged.
+- Added a scale-free fraction regression test and an output-metadata assertion. Exact-head revalidation is recorded in PR #147 after the new workflow completes.
