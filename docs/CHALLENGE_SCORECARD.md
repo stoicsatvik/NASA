@@ -24,7 +24,7 @@ Subtract:
 
 ### 1. Identify Earth Locations that Analog the Permanent Moon Base Locations and Mars
 
-**Current status: provisional lead, not locked.**
+**Current status: research thesis under test; not the current readiness leader and not locked.**
 
 Why:
 - inherently geospatial/scientific;
@@ -147,7 +147,7 @@ Do not lock a challenge until the leading candidate clears all five:
 
 ## Next decision
 
-Current provisional lead: **planetary analog identification**. Challenge-selection superiority remains NOT YET PROVEN.
+Current research thesis: **planetary analog identification**. Current readiness leaders by the provisional rubric: **Martian Map (4.10)** and **MODIS/VIIRS (4.00)**; planetary analog remains at **2.93**. Challenge-selection superiority remains NOT YET PROVEN.
 
 The next research sprint should try to *disprove* that choice rather than defend it.
 
@@ -184,3 +184,17 @@ A second public catalogue was pinned and quantitatively audited: Rachelle Le Cus
 It contains 12 primary Mars/Moon records (10 Mars, 2 Moon), all Draft; 68 references (21 peer-reviewed, 20 peer-reviewed label/feature-supporting, 1 unverified); zero explicit negative controls; zero common physical numeric descriptors; and zero target-body measurement fields. The only numeric fields shared across all records are contributor access/hazard ratings. Eleven of twelve coordinates are region-only or approximately 10 km precision.
 
 **Decision:** the catalogue is useful as a candidate-site index, not as E001 labels/features. No numeric challenge score changes. The planetary-analog challenge remains NOT YET PROVEN and below the provisional readiness pair: Martian Map #11 (4.10) and MODIS/VIIRS #9 (4.00). E001 remains NOT YET MEASURED. See \`research/E572_ANALOGUE_CATALOGUE_ADMISSIBILITY_20261112.md\` and its pinned aggregate receipt.
+
+## 2026-11-12 evidence refresh — falsification, not defence
+
+The planetary-analog thesis remains scientifically interesting, but new evidence does not clear its central data/validation gates:
+
+- E576 tested HRSC as a separate sensor family for independent horizontal control. The retrieved absolute-control evidence is MOLA-GCP controlled and hundreds of metres, so it does not clear the current 10 m-scale registration gate. HRSC remains a coarse cross-sensor check, not independent 10 m control.
+- E577 tested a separate USGS Grand Falls 2017–2019 sediment-transport release. Exact-head Actions passed 7/7 deterministic tests, but the live projected ScienceBase metadata probe returned ACQUISITION_ERROR with no HTTP status, selected file, file count or data rows. No data were acquired. This is an access failure, not evidence that the release has no data.
+- E572's independent analogue catalogue contains 12 primary Mars/Moon records, all Draft, with zero explicit negative controls and no common numeric physical descriptors. It remains a candidate-site index, not E001 ground truth.
+- E001 known-site recovery remains NOT YET MEASURED; cross-body similarity and novel analogue discovery remain NOT YET PROVEN.
+
+The existing E531 14-challenge sensitivity screen is a heuristic robustness diagnostic, not a probability of judging success. Across the reported perturbations, Martian Map remains the most frequent winner (83.97%, 65.40%, 54.34% as score perturbation widens); MODIS/VIIRS is second (15.88%, 27.46%, 28.55%). Planetary analog does not emerge as a winner in those tested scenarios. No numeric score is changed from this evidence refresh, and no challenge is locked.
+
+**Decision:** keep planetary analog as a research thesis, not a defended winner. Martian Map and MODIS/VIIRS remain the strongest readiness alternatives. The next analog experiment must use a different legitimate Earth-side source with explicit site identity, measurement support and defensible negative controls; do not repeat the failed ScienceBase endpoint or promote catalogue drafts into labels.
+
