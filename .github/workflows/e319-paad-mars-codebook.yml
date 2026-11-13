@@ -1,0 +1,33 @@
+name: E319 PAAD vs Mars dune codebook falsification
+on:
+  push:
+    branches:
+      - foundry/e319-paad-mars-codebook-overlap-20261027
+  pull_request:
+    paths:
+      - 'research/e319_paad_mars_codebook_overlap.py'
+      - 'tests/test_e319_paad_mars_codebook_overlap.py'
+      - '.github/workflows/e319-paad-mars-codebook.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  e319-label-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install pytest
+      - name: Frozen synthetic controls and inherited PAAD source tests
+        run: python -m pytest -q tests/test_e319_paad_mars_codebook_overlap.py tests/test_e317_paad_independent_source.py
+      - name: Re-read real fingerprinted PAAD source and audit lexical overlap
+        run: python -m research.e319_paad_mars_codebook_overlap --output e319_label_gate_receipt.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e319-label-gate-receipt
+          path: e319_label_gate_receipt.json
+          if-no-files-found: ignore
